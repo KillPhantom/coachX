@@ -1,5 +1,7 @@
 ## Backend APIs (Cloud Functions)
 
+Google docs: https://docs.google.com/document/d/1yKQgZWjdeALkwrl2SHf6RjUnsCmeLxtoWFrv0Epr7SQ/edit?tab=t.9cl42i828p31
+
 - 用户
   - fetchUserInfo(userId?)
   - login(userInfo)
@@ -33,13 +35,6 @@
   - deleteMeasurementSession(sessionId)
   - fetchMeasurementSessions(studentID, startDate?, endDate?)
 
-- 课程排班与预约（单表设计）
-  - createCoachAvailableSlots(coachId, timeSlots[], coachName, type, coachNote?)
-  - fetchCoachAvailableSlots(coachId, startDate, endDate, type?, status?)
-  - updateTimeSlot(slotId, coachNote?, studentId?, status?, startTime?, endTime?, studentNote?, coachId?)
-  - deleteTimeSlot(slotId, coachId)
-  - createCourseBooking(studentId, coachId, startTimestamp, endTimestamp, studentNote?, studentName?, duration?)
-  - fetchCoachBookings(coachId, startDate, endDate)
 
 - 食物库
   - foodLibrary: action in [create | update | delete | get | list | search]
@@ -59,28 +54,21 @@
 ### users
 | columnName | data type |
 | --- | --- |
-| _id | string |
-| open_id | string |
+| id | string |
 | role | string |
-| active_role | string |
 | name | string |
-| display_name | string |
-| avatar_url | string |
+| avatarRrl | string |
 | gender | string |
-| coach_id | string |
-| is_admin | boolean |
-| is_verified | boolean |
-| need_reply | boolean |
-| born_date | string |
+| coachId | string |
+| isVerified | boolean |
+| bornDate | string |
 | height | number |
-| initial_weight | number |
-| expire_at | number |
-| last_active_time | number |
+| initialWeight | number |
 
-### exercise_plan
+### exercisePlan
 | columnName | data type |
 | --- | --- |
-| _id | string |
+| id | string |
 | name | string |
 | description | string |
 | cyclePattern | string |
@@ -118,10 +106,10 @@ TrainingSet
 | weight | string |
 | completed | boolean |
 
-### diet_plan
+### dietPlan
 | columnName | data type |
 | --- | --- |
-| _id | string |
+| id | string |
 | name | string |
 | description | string |
 | cyclePattern | string |
@@ -178,10 +166,10 @@ Macros
 | calories | number |
 | water | number |
 
-### supplement_plan
+### supplementPlan
 | columnName | data type |
 | --- | --- |
-| _id | string |
+| id | string |
 | name | string |
 | description | string |
 | cyclePattern | string |
@@ -209,10 +197,10 @@ Supplement
 | amount | string |
 | note | string |
 
-### daily_training
+### dailyTraining
 | columnName | data type |
 | --- | --- |
-| _id | string |
+| id | string |
 | studentID | string |
 | coachID | string |
 | date | string |
@@ -220,12 +208,8 @@ Supplement
 | exercises | StudentExercise[] |
 | diet | StudentDiet |
 | supplements | StudentSupplement[] |
-| bodyStats | BodyStatsRecord |
 | completionStatus | string |
-| coachFeedback | string |
-| studentFeedback | string |
 | isReviewed | boolean |
-| name | string |
 
 TrainingDaySelection
 | columnName | data type |
@@ -245,8 +229,6 @@ StudentExercise
 | type | "strength" | "cardio" |
 | sets | TrainingSet[] |
 | completed | boolean |
-| coachFeedback | string |
-| studentFeedback | string |
 | videos | string[] |
 | voiceFeedbacks | VoiceFeedback[] |
 
@@ -286,10 +268,10 @@ BodyStatsRecord
 | photo | string |
 | note | string |
 
-### exercise_f (exercise feedback)
+### exerciseFeedBack
 | columnName | data type |
 | --- | --- |
-| _id | string |
+| id | string |
 | exercisePlanId | string |
 | exerciseIndex | number |
 | exerciseName | string |
@@ -311,34 +293,12 @@ FeedbackMessage
 | status | "sending" | "sent" | "failed" |
 | senderId | string |
 
-### course_schedule（单表：时间段/时间区间/预约/备忘录）
-| columnName | data type |
-| --- | --- |
-| _id | string |
-| coachId | string |
-| studentId | string |
-| startTime | number |
-| endTime | number |
-| status | "available" | "booked" | "available_range" |
-| type | "time_slot" | "time_range" | "booking" | "memo" |
-| createdAt | number |
-| updatedAt | number |
-| coachName | string |
-| studentName | string |
-| studentNote | string |
-| coachNote | string |
-| isRecurring | boolean |
-| dayOfWeek | number |
-| description | string |
-| isTemporary | boolean |
-| timeRangeId | string |
-| duration | number |
 
-### invitation_c
+### invitationCode
 | columnName | data type |
 | --- | --- |
-| _id | string |
-| invitation_code | string |
+| id | string |
+| invitationCode | string |
 | type | number |
 | is_used | boolean |
 | used_by | string |
@@ -346,10 +306,10 @@ FeedbackMessage
 | created_at | string |
 | total_days | number |
 
-### food_library
+### foodLibrary
 | columnName | data type |
 | --- | --- |
-| _id | string |
+| id | string |
 | name | string |
 | protein | number |
 | carbs | number |
@@ -360,25 +320,16 @@ FeedbackMessage
 | createdAt | number |
 | updatedAt | number |
 
-### body_measure
+### bodyMeasure
 | columnName | data type |
 | --- | --- |
-| _id | string |
+| id | string |
 | studentID | string |
 | createdAt | number |
 | recordDate | string |
 | weight | number |
-| measurements | object<string, number> |
+| measurements | json |
 | photos | string[] |
-
-### plan（如仍在使用，用于模板列表）
-| columnName | data type |
-| --- | --- |
-| _id | string |
-| name | string |
-| student_ids | string[] |
-| cycle_pattern | string |
-| created_by | string |
 
 
 ## Pages and API Usage
