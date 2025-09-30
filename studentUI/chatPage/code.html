@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Chat with Coach</title>
+<link href="image-fcf99f9e8cb442dd9603d6f373bd3e" rel="icon" type="image/x-icon"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<style type="text/tailwindcss">
+    @layer base {
+      :root {
+        --custom-primary: #f0e9d8;
+        --custom-primary-text: #8c7a51;
+        --custom-primary-action: #e6d7b4;
+        --text-primary: #1F2937;
+        --text-secondary: #6B7280;
+        --background-light: #f7f7f7;
+      }
+    }
+  </style>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: "#ddd1d1",
+            "background-light": "#f7f7f7",
+            "text-primary": "#1F2937",
+            "text-secondary": "#6B7280",
+            "background-dark": "#1b1717",
+            "accent-blue": "#3B82F6",
+            "accent-green": "#10B981",
+            "accent-yellow": "#F59E0B",
+            "accent-red": "#EF4444",
+            "custom-primary-text": "#8c7a51",
+            "custom-primary-bg-light": "#fdfaf3",
+            "custom-primary-action": "#e6d7b4",
+            "custom-primary": "#f0e9d8",
+          },
+          fontFamily: {
+            display: "Lexend",
+          },
+          borderRadius: {
+            DEFAULT: "0.125rem",
+            lg: "0.25rem",
+            xl: "0.5rem",
+            full: "0.75rem",
+          },
+        },
+      },
+    };
+  </script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<style>
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      display: flex;
+      flex-direction: column;
+      font-family: "Lexend", sans-serif;
+      background-color: var(--background-light);
+    }
+    .main-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .content-container {
+      flex: 1;
+      overflow-y: auto;
+    }
+    .chat-container {
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .feedback-container {
+      padding: 1.5rem;
+      display: none;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }#chat-tab:checked~.main-container #chat-content,
+    #feedback-tab:checked~.main-container #feedback-content {
+      display: flex;
+    }
+    #chat-tab:checked~.main-container .chat-footer {
+      display: flex;
+    }
+    #feedback-tab:checked~.main-container .chat-footer {
+      display: none;
+    }
+    #chat-tab:checked~.main-container #chat-tab-label,
+    #feedback-tab:checked~.main-container #feedback-tab-label {
+      border-color: var(--custom-primary-text);
+      color: var(--custom-primary-text);
+      font-weight: 600;
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light">
+<input checked="" class="hidden" id="chat-tab" name="tabs" type="radio"/>
+<input class="hidden" id="feedback-tab" name="tabs" type="radio"/>
+<div class="main-container">
+<header class="bg-white shadow-sm sticky top-0 z-10">
+<div class="p-4 flex items-center justify-between">
+<button class="text-text-primary">
+<span class="material-symbols-outlined">arrow_back_ios_new</span>
+</button>
+<div class="text-center">
+<h1 class="text-lg font-semibold text-text-primary">Coach Alex</h1>
+<p class="text-xs text-green-500">Online</p>
+</div>
+<button class="text-text-primary">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+<div class="flex border-b border-gray-200">
+<label class="flex-1 text-center py-3 text-sm font-medium text-text-secondary border-b-2 border-transparent cursor-pointer" for="chat-tab" id="chat-tab-label">
+          Chat
+        </label>
+<label class="flex-1 text-center py-3 text-sm font-medium text-text-secondary border-b-2 border-transparent cursor-pointer" for="feedback-tab" id="feedback-tab-label">
+          Feedback
+        </label>
+</div>
+</header>
+<div class="content-container">
+<main class="chat-container" id="chat-content">
+<div class="flex justify-start">
+<div class="bg-gray-200 rounded-xl p-3 max-w-xs">
+<p class="text-sm text-text-primary">
+              Hey! Just checking in. How was your workout today?
+            </p>
+<p class="text-xs text-right text-gray-500 mt-1">10:30 AM</p>
+</div>
+</div>
+<div class="flex justify-end">
+<div class="bg-custom-primary-action rounded-xl p-3 max-w-xs">
+<p class="text-sm text-custom-primary-text">
+              It was great, thanks for asking! I think I finally nailed the form on the squats.
+            </p>
+<p class="text-xs text-right text-custom-primary-text/70 mt-1">
+              10:32 AM
+            </p>
+</div>
+</div>
+<div class="flex justify-start">
+<div class="bg-gray-200 rounded-xl p-3 max-w-xs">
+<p class="text-sm text-text-primary">
+              Awesome to hear! If you have a video, feel free to send it over. I can give you some feedback.
+            </p>
+<p class="text-xs text-right text-gray-500 mt-1">10:33 AM</p>
+</div>
+</div>
+<div class="flex justify-end">
+<div class="bg-custom-primary-action rounded-xl p-3 max-w-xs">
+<p class="text-sm text-custom-primary-text">
+              Sure, let me upload it now.
+            </p>
+<p class="text-xs text-right text-custom-primary-text/70 mt-1">
+              10:35 AM
+            </p>
+</div>
+</div>
+<div class="flex justify-end">
+<div class="bg-custom-primary-action rounded-xl p-2 max-w-xs">
+<img alt="Video of squat form" class="rounded-lg" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA897Fptribg-400vyqhHUMPo9Dpt7iYuRTVqtDAEmi8syXU61S5qsRd8snZ_D7CsZ9GlMmz4y7BrFjyQ_qq-p5Kdxonl6dVnQEjqxZavX8Jdz2_0jGufJAoFekyLED9eZTxLh42lWOrPMm-_GPR9HQU5oRVyCQd38YWahRqCV2UBXUVqCfNkBio91FTTZ4yJhx_wJV-rW20z7clCt28BmOzK8hfEuG9mEOO2q5S75HtlcORN0xuaOjLhdLz6RZJmptznowxMAC72w"/>
+<p class="text-xs text-right text-custom-primary-text/70 mt-1 px-1">
+              10:36 AM
+            </p>
+</div>
+</div>
+</main>
+<div class="feedback-container" id="feedback-content">
+<div class="space-y-4">
+<h2 class="text-sm font-semibold text-text-secondary">Today, October 26</h2>
+<div class="bg-white rounded-xl shadow-sm p-4 space-y-4">
+<div class="flex items-start space-x-3">
+<div class="w-16 h-16 bg-gray-200 rounded-lg flex-shrink-0">
+<img alt="Squat video thumbnail" class="w-full h-full object-cover rounded-lg" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA897Fptribg-400vyqhHUMPo9Dpt7iYuRTVqtDAEmi8syXU61S5qsRd8snZ_D7CsZ9GlMmz4y7BrFjyQ_qq-p5Kdxonl6dVnQEjqxZavX8Jdz2_0jGufJAoFekyLED9eZTxLh42lWOrPMm-_GPR9HQU5oRVyCQd38YWahRqCV2UBXUVqCfNkBio91FTTZ4yJhx_wJV-rW20z7clCt28BmOzK8hfEuG9mEOO2q5S75HtlcORN0xuaOjLhdLz6RZJmptznowxMAC72w"/>
+</div>
+<div class="flex-1">
+<p class="text-sm font-semibold text-text-primary">Squat Form</p>
+<p class="text-xs text-text-secondary">Logged at 10:36 AM</p>
+</div>
+</div>
+<div class="flex items-start space-x-3">
+<img alt="Coach Alex" class="w-8 h-8 rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAwu2P_jZnNAk0JzHk0yM_Sppr5zI8PrcEnz1M0ECynmd488tihRXiYNlIJqiwwhPP7K29CmWmpwKF4SEac19G4jm4s_yGztj5iVbdTlBrl1OcABfXQTUrPXGRlvyypZ2rV60YU92-mgZdaX9euNjw7eNYwnAD3zHBDbTiHlUhamnKJ49L_0LfMSp1zUr-aUKD4baMuuGPg5CgJ95kfi0xP6PDCtv73tBXL5ROk5ZR0G9hY2lp6KtzGdKcFMsuvrmhengFGGEgrCBM"/>
+<div class="flex-1 bg-custom-primary-bg-light rounded-lg p-3">
+<p class="text-sm text-text-primary">
+                  "Great depth on this squat, your form is looking much more stable. Keep your chest up a bit more on the ascent. Solid improvement!"
+                </p>
+<p class="text-xs text-right text-text-secondary mt-1">11:15 AM</p>
+</div>
+</div>
+</div>
+</div>
+<div class="space-y-4">
+<h2 class="text-sm font-semibold text-text-secondary">Yesterday, October 25</h2>
+<div class="bg-white rounded-xl shadow-sm p-4 space-y-4">
+<div class="flex items-start space-x-3">
+<div class="w-16 h-16 bg-gray-200 rounded-lg flex-shrink-0">
+<img alt="Meal photo" class="w-full h-full object-cover rounded-lg" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD2Z274O2oAFhn7STDaaPd5ANm81zuV3SAFx5LKIpNNn6qWc6Panxr_GhnhGbjUb7_1jlZ63LAGHGIbRrB53_UepH-gwQPFOcSWnNJzzjpIdefvVfB-5hQTWAhykVg_LUMNpYIopiygvGX3NEfWfdzG9clJZQIuuOaK24LUdAJS9mHMlamT4hxQkpIKRZyscxP6NJQldegJUEe_B7y9-fGm0msKdE5Q9PtHvzlBrZ5zxQygxQzvdTl8kLMmF8ZMR0uZIqtZpxwHX9o"/>
+</div>
+<div class="flex-1">
+<p class="text-sm font-semibold text-text-primary">Post-workout Meal</p>
+<p class="text-xs text-text-secondary">Logged at 8:12 PM</p>
+</div>
+</div>
+<div class="flex items-start space-x-3">
+<img alt="Coach Alex" class="w-8 h-8 rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA_bH7nmeoyxlQBlYfnHYNjxf14dc9tqCvdh4k69ByCZNFENL0mcidW7EKDfdez7LGj0jUn-pfDKAtPgEqtSN6xqhNpOko7srigPGsa1iSMpcEI3rXvK4mKTxPEzzQc97qk6tooiKeyD2LiMJQw3oqyw-p8r9oIz2KKgWHDPZZeKi1YROOcBuDyobxqqxnk3qR66K7rWXkDkTE0XgaUHBbiaK5xt1hrXD3I5SB0dPwooZaBXlz7fa6cMEKcXTqL0ZcXeM8gQdgXum8"/>
+<div class="flex-1 bg-custom-primary-bg-light rounded-lg p-3">
+<p class="text-sm text-text-primary">
+                  "This looks delicious and well-balanced. The protein and carb ratio is perfect for recovery. Keep it up!"
+                </p>
+<p class="text-xs text-right text-text-secondary mt-1">8:30 PM</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<footer class="bg-white p-4 sticky bottom-0 border-t border-gray-200 chat-footer">
+<div class="flex items-center gap-2">
+<button class="p-2 text-text-secondary hover:text-text-primary">
+<span class="material-symbols-outlined">add_photo_alternate</span>
+</button>
+<input class="flex-1 border-gray-300 rounded-full py-2 px-4 focus:ring-custom-primary-action focus:border-custom-primary-action text-sm" placeholder="Type a message..." type="text"/>
+<button class="p-3 bg-custom-primary-action text-white rounded-full hover:bg-custom-primary-text transition-colors">
+<span class="material-symbols-outlined">send</span>
+</button>
+</div>
+</footer>
+</div>
+<nav class="bg-white border-t border-gray-200 w-full flex justify-around py-2 sticky bottom-0">
+<a class="flex flex-col items-center text-text-secondary hover:text-custom-primary-text transition-colors" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="text-xs">Home</span>
+</a>
+<a class="flex flex-col items-center text-text-secondary hover:text-custom-primary-text transition-colors" href="#">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="text-xs">Plan</span>
+</a>
+<a class="flex flex-col items-center text-white -mt-6" href="#">
+<div class="bg-custom-primary-text p-4 rounded-full shadow-lg">
+<span class="material-symbols-outlined text-3xl">add</span>
+</div>
+</a>
+<a class="flex flex-col items-center text-custom-primary-text font-semibold" href="#">
+<span class="material-symbols-outlined">chat_bubble</span>
+<span class="text-xs">Chat</span>
+</a>
+<a class="flex flex-col items-center text-text-secondary hover:text-custom-primary-text transition-colors" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="text-xs">Profile</span>
+</a>
+</nav>
+
+</body></html>

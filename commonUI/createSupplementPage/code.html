@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Supplement Plan Creation</title>
+<link crossorigin="" href="https://fonts.gstatic.com/" rel="preconnect"/>
+<link as="style" href="https://fonts.googleapis.com/css2?display=swap&amp;family=Lexend%3Awght%40400%3B500%3B700%3B900&amp;family=Noto+Sans%3Awght%40400%3B500%3B700%3B900" onload="this.rel='stylesheet'" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#dcd0d0",
+            "background-light": "#f7f7f7",
+            "background-dark": "#1a1818",
+          },
+          fontFamily: {
+            "display": ["Lexend"]
+          },
+          borderRadius: {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+        },
+      },
+    }
+  </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display">
+<div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
+<div class="flex-grow">
+<header class="sticky top-0 z-10 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-sm">
+<div class="flex items-center p-4">
+<button class="text-black dark:text-white">
+<svg fill="currentColor" height="24" viewBox="0 0 256 256" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M224,128a8,8,0,0,1-8,8H59.31l58.35,58.34a8,8,0,0,1-11.32,11.32l-72-72a8,8,0,0,1,0-11.32l72-72a8,8,0,0,1,11.32,11.32L59.31,120H216A8,8,0,0,1,224,128Z"></path>
+</svg>
+</button>
+<h1 class="text-lg font-bold text-black dark:text-white flex-1 text-center pr-6">Create Supplement Plan</h1>
+</div>
+</header>
+<main class="p-4 space-y-4">
+<div>
+<label class="sr-only" for="plan-name">Plan Name</label>
+<input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-black dark:text-white focus:outline-0 focus:ring-2 focus:ring-primary/50 border-none bg-black/5 dark:bg-white/5 h-12 placeholder:text-black/50 dark:placeholder:text-white/50 p-3 text-base font-normal leading-normal" id="plan-name" placeholder="Plan Name" type="text" value="Cutting Phase"/>
+</div>
+<div class="flex overflow-x-auto space-x-2 py-2 no-scrollbar">
+<button class="px-4 py-2 text-sm font-medium whitespace-nowrap rounded-full bg-primary text-black dark:text-black">Day 1</button>
+<button class="px-4 py-2 text-sm font-medium whitespace-nowrap rounded-full bg-black/5 dark:bg-white/5 text-black/60 dark:text-white/60">Day 2</button>
+<button class="px-4 py-2 text-sm font-medium whitespace-nowrap rounded-full bg-black/5 dark:bg-white/5 text-black/60 dark:text-white/60">Day 3</button>
+<button class="flex items-center justify-center gap-1 text-primary dark:text-primary text-sm font-medium">
+<svg class="h-4 w-4" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+<line x1="12" x2="12" y1="5" y2="19"></line>
+<line x1="5" x2="19" y1="12" y2="12"></line>
+</svg>
+<span>Add Day</span>
+</button>
+</div>
+<div class="space-y-4">
+<div class="bg-black/5 dark:bg-white/5 p-4 rounded-lg">
+<div class="flex items-center justify-between mb-4">
+<h3 class="text-base font-bold text-black dark:text-white">Day 1 Supplements</h3>
+<button class="text-black/50 dark:text-white/50">
+<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+<path d="M227.31,73.37,182.63,28.68a16,16,0,0,0-22.63,0L36.69,152A15.86,15.86,0,0,0,32,163.31V208a16,16,0,0,0,16,16H92.69A15.86,15.86,0,0,0,104,219.31L227.31,96a16,16,0,0,0,0-22.63ZM92.69,208H48V163.31l88-88L180.69,120ZM192,108.68,147.31,64l24-24L216,84.68Z"></path>
+</svg>
+</button>
+</div>
+<div class="space-y-3">
+<div class="grid grid-cols-[1fr_0.5fr_0.5fr_auto] gap-2 items-center">
+<label class="sr-only" for="supplement-name-1">Supplement Name</label>
+<input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-black dark:text-white focus:outline-0 focus:ring-2 focus:ring-primary/50 border-none bg-black/5 dark:bg-white/10 h-10 placeholder:text-black/50 dark:placeholder:text-white/50 p-2 text-sm font-normal leading-normal" id="supplement-name-1" placeholder="Supplement Name" type="text" value="Creatine Monohydrate"/>
+<label class="sr-only" for="quantity-1">Quantity</label>
+<input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-black dark:text-white focus:outline-0 focus:ring-2 focus:ring-primary/50 border-none bg-black/5 dark:bg-white/10 h-10 placeholder:text-black/50 dark:placeholder:text-white/50 p-2 text-sm font-normal leading-normal" id="quantity-1" placeholder="Qty" type="text" value="5g"/>
+<label class="sr-only" for="time-1">Time</label>
+<input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-black dark:text-white focus:outline-0 focus:ring-2 focus:ring-primary/50 border-none bg-black/5 dark:bg-white/10 h-10 placeholder:text-black/50 dark:placeholder:text-white/50 p-2 text-sm font-normal leading-normal" id="time-1" placeholder="Time" type="text" value="8:00 AM"/>
+<button class="text-black/50 dark:text-white/50">
+<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+<path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"></path>
+</svg>
+</button>
+</div>
+<div class="grid grid-cols-[1fr_0.5fr_0.5fr_auto] gap-2 items-center">
+<label class="sr-only" for="supplement-name-2">Supplement Name</label>
+<input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-black dark:text-white focus:outline-0 focus:ring-2 focus:ring-primary/50 border-none bg-black/5 dark:bg-white/10 h-10 placeholder:text-black/50 dark:placeholder:text-white/50 p-2 text-sm font-normal leading-normal" id="supplement-name-2" placeholder="Supplement Name" type="text" value="Whey Protein"/>
+<label class="sr-only" for="quantity-2">Quantity</label>
+<input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-black dark:text-white focus:outline-0 focus:ring-2 focus:ring-primary/50 border-none bg-black/5 dark:bg-white/10 h-10 placeholder:text-black/50 dark:placeholder:text-white/50 p-2 text-sm font-normal leading-normal" id="quantity-2" placeholder="Qty" type="text" value="30g"/>
+<label class="sr-only" for="time-2">Time</label>
+<input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-black dark:text-white focus:outline-0 focus:ring-2 focus:ring-primary/50 border-none bg-black/5 dark:bg-white/10 h-10 placeholder:text-black/50 dark:placeholder:text-white/50 p-2 text-sm font-normal leading-normal" id="time-2" placeholder="Time" type="text" value="Post-Workout"/>
+<button class="text-black/50 dark:text-white/50">
+<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+<path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"></path>
+</svg>
+</button>
+</div>
+<div class="grid grid-cols-[1fr_0.5fr_0.5fr_auto] gap-2 items-center">
+<label class="sr-only" for="supplement-name-3">Supplement Name</label>
+<input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-black dark:text-white focus:outline-0 focus:ring-2 focus:ring-primary/50 border-none bg-black/5 dark:bg-white/10 h-10 placeholder:text-black/50 dark:placeholder:text-white/50 p-2 text-sm font-normal leading-normal" id="supplement-name-3" placeholder="Supplement Name" type="text"/>
+<label class="sr-only" for="quantity-3">Quantity</label>
+<input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-black dark:text-white focus:outline-0 focus:ring-2 focus:ring-primary/50 border-none bg-black/5 dark:bg-white/10 h-10 placeholder:text-black/50 dark:placeholder:text-white/50 p-2 text-sm font-normal leading-normal" id="quantity-3" placeholder="Qty" type="text"/>
+<label class="sr-only" for="time-3">Time</label>
+<input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-black dark:text-white focus:outline-0 focus:ring-2 focus:ring-primary/50 border-none bg-black/5 dark:bg-white/10 h-10 placeholder:text-black/50 dark:placeholder:text-white/50 p-2 text-sm font-normal leading-normal" id="time-3" placeholder="Time" type="text"/>
+<button class="text-black/50 dark:text-white/50 invisible">
+<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+<path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"></path>
+</svg>
+</button>
+</div>
+<button class="flex items-center justify-center w-full gap-1 text-primary dark:text-primary text-sm font-medium pt-2">
+<svg class="h-4 w-4" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+<line x1="12" x2="12" y1="5" y2="19"></line>
+<line x1="5" x2="19" y1="12" y2="12"></line>
+</svg>
+<span>Add Supplement</span>
+</button>
+</div>
+</div>
+</div>
+</main>
+</div>
+<footer class="sticky bottom-0 bg-background-light dark:bg-background-dark pb-5">
+<div class="p-4">
+<button class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-5 flex-1 w-full bg-primary text-black dark:text-black text-base font-bold leading-normal tracking-wide">
+<span class="truncate">Save Plan</span>
+</button>
+</div>
+</footer>
+</div>
+
+</body></html>

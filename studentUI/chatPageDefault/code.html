@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<title>Stitch Design</title>
+<link href="data:image/x-icon;base64," rel="icon" type="image/x-icon"/>
+<link crossorigin="" href="https://fonts.gstatic.com/" rel="preconnect"/>
+<link as="style" href="https://fonts.googleapis.com/css2?display=swap&amp;family=Lexend:wght@400;500;700;900&amp;family=Noto+Sans:wght@400;500;700;900" onload="this.rel='stylesheet'" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#dcd0d0",
+            "background-light": "#f7f7f7",
+            "background-dark": "#1a1818",
+          },
+          fontFamily: {
+            "display": ["Lexend"]
+          },
+          borderRadius: {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+        },
+      },
+    }
+  </script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display">
+<div class="relative flex h-auto min-h-screen w-full flex-col justify-between overflow-x-hidden">
+<div class="flex-grow">
+<header class="flex items-center p-4">
+<button class="text-slate-800 dark:text-white">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<h1 class="flex-1 text-center text-xl font-bold text-slate-900 dark:text-white pr-8">Coach</h1>
+</header>
+<main class="px-4 pb-4 flex flex-col items-center justify-center text-center h-[calc(100vh-200px)]">
+<div class="flex flex-col items-center space-y-6">
+<div class="p-6 bg-primary/20 rounded-full">
+<span class="material-symbols-outlined text-6xl text-primary">person_search</span>
+</div>
+<h2 class="text-2xl font-bold text-slate-900 dark:text-white">No Coach Assigned</h2>
+<p class="text-slate-500 dark:text-slate-400 max-w-xs">
+            It looks like you don't have a coach yet. Find the perfect coach to help you reach your goals.
+          </p>
+<a class="mt-4 inline-flex items-center justify-center rounded-full bg-primary px-8 py-3 text-base font-bold text-slate-900 transition-colors hover:bg-primary/80" href="#">
+            Find a Coach
+          </a>
+</div>
+</main>
+</div>
+<footer class="sticky bottom-0 border-t border-slate-200 dark:border-slate-800 bg-background-light dark:bg-background-dark/80 backdrop-blur-sm">
+<nav class="flex justify-around py-2">
+<a class="flex flex-col items-center gap-1 text-slate-500 dark:text-slate-400" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="text-xs">Home</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-500 dark:text-slate-400" href="#">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="text-xs">Plan</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-500 dark:text-slate-400" href="#">
+<span class="material-symbols-outlined text-3xl">add_circle</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-500 dark:text-slate-400" href="#">
+<span class="material-symbols-outlined">chat_bubble</span>
+<span class="text-xs">Chat</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="text-xs font-bold">Profile</span>
+</a>
+</nav>
+</footer>
+</div>
+
+</body></html>

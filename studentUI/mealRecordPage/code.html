@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Meal Record Page</title>
+<link href="image-fcf99f9e8cb442dd9603d6f373bd3e" rel="icon" type="image/x-icon"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<style type="text/tailwindcss">
+    @layer base {
+      :root {
+        --custom-primary: #f0e9d8;
+        --custom-primary-text: #8c7a51;
+        --custom-primary-action: #e6d7b4;
+        --text-primary: #1F2937;
+        --text-secondary: #6B7280;
+        --background-light: #f7f7f7;
+      }
+    }
+  </style>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: "#ddd1d1",
+            "background-light": "#f7f7f7",
+            "text-primary": "#1F2937",
+            "text-secondary": "#6B7280",
+            "background-dark": "#1b1717",
+            "accent-blue": "#3B82F6",
+            "accent-green": "#10B981",
+            "accent-yellow": "#F59E0B",
+            "accent-red": "#EF4444",
+            "custom-primary-text": "#8c7a51",
+            "custom-primary-bg-light": "#fdfaf3",
+            "custom-primary-action": "#e6d7b4",
+            "custom-primary": "#f0e9d8",
+          },
+          fontFamily: {
+            display: "Lexend"
+          },
+          borderRadius: {
+            DEFAULT: "0.125rem",
+            lg: "0.25rem",
+            xl: "0.5rem",
+            "2xl": "1rem",
+            "3xl": "1.5rem",
+            full: "9999px"
+          }
+        }
+      }
+    };
+  </script>
+<style>
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      font-family: 'Lexend', sans-serif;
+    }
+    .flex-grow-1 {
+      flex-grow: 1;
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light">
+<div class="flex flex-col h-full">
+<header class="bg-white p-4 pb-6 shadow-sm">
+<div class="flex items-center justify-between mb-6">
+<button class="p-2">
+<span class="material-symbols-outlined text-text-primary">arrow_back_ios_new</span>
+</button>
+<h1 class="text-xl font-bold text-text-primary">Meal Record</h1>
+<button class="p-2">
+<span class="material-symbols-outlined text-text-primary">more_horiz</span>
+</button>
+</div>
+<div class="grid grid-cols-3 gap-4 text-center mb-6">
+<div>
+<p class="text-sm text-text-secondary">Protein</p>
+<p class="text-2xl font-bold text-accent-red">120g</p>
+</div>
+<div>
+<p class="text-sm text-text-secondary">Carbs</p>
+<p class="text-2xl font-bold text-accent-yellow">150g</p>
+</div>
+<div>
+<p class="text-sm text-text-secondary">Fat</p>
+<p class="text-2xl font-bold text-accent-blue">60g</p>
+</div>
+</div>
+<div class="space-y-4">
+<h2 class="font-semibold text-text-primary mb-2">Coach Suggestion</h2>
+<div class="bg-custom-primary-bg-light rounded-xl p-4">
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-medium text-text-primary">Breakfast</h3>
+<div class="text-right">
+<p class="text-xs text-text-secondary">Total Macros</p>
+<p class="font-bold text-sm text-text-primary">40P/35C/10F</p>
+</div>
+</div>
+<div class="space-y-1 text-sm text-text-secondary mb-4">
+<p>Cereal: 30g</p>
+<p>Egg White: 250g</p>
+</div>
+<div class="flex justify-end">
+<button class="bg-custom-primary text-custom-primary-text text-sm font-semibold rounded-lg px-4 py-2 hover:bg-custom-primary-action transition-colors">
+                            Add Record
+                        </button>
+</div>
+</div>
+<div class="bg-custom-primary-bg-light rounded-xl p-4">
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-medium text-text-primary">Lunch</h3>
+<div class="text-right">
+<p class="text-xs text-text-secondary">Total Macros</p>
+<p class="font-bold text-sm text-text-primary">50P/60C/15F</p>
+</div>
+</div>
+<div class="space-y-1 text-sm text-text-secondary mb-4">
+<p>Rice: 200g</p>
+<p>Chicken: 200g</p>
+<p>Coconut Oil: 10g</p>
+</div>
+<div class="flex justify-end">
+<button class="bg-custom-primary text-custom-primary-text text-sm font-semibold rounded-lg px-4 py-2 hover:bg-custom-primary-action transition-colors">
+                            Add Record
+                        </button>
+</div>
+</div>
+<div class="bg-custom-primary-bg-light rounded-xl p-4">
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-medium text-text-primary">Dinner</h3>
+<div class="text-right">
+<p class="text-xs text-text-secondary">Total Macros</p>
+<p class="font-bold text-sm text-text-primary">30P/55C/35F</p>
+</div>
+</div>
+<div class="space-y-1 text-sm text-text-secondary mb-4">
+<p>Pasta: 150g</p>
+<p>Salmon: 150g</p>
+<p>Avocado: 50g</p>
+</div>
+<div class="flex justify-end">
+<button class="bg-custom-primary text-custom-primary-text text-sm font-semibold rounded-lg px-4 py-2 hover:bg-custom-primary-action transition-colors">
+                            Add Record
+                        </button>
+</div>
+</div>
+</div>
+</header>
+<main class="flex-grow-1 p-6 overflow-y-auto bg-background-light">
+<div class="space-y-4">
+<div class="bg-white rounded-xl p-4 flex items-center justify-between">
+<div class="flex items-center gap-4">
+<div class="p-3 bg-custom-primary-bg-light rounded-full">
+<span class="material-symbols-outlined text-custom-primary-text" style="font-size: 24px;">restaurant</span>
+</div>
+<div>
+<p class="font-semibold text-text-primary">Recorded First Meal</p>
+<p class="text-sm text-text-secondary">Breakfast - 8:30 AM</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-text-secondary">chevron_right</span>
+</div>
+<div class="bg-white rounded-xl p-4 flex items-center justify-between">
+<div class="flex items-center gap-4">
+<div class="p-3 bg-custom-primary-bg-light rounded-full">
+<span class="material-symbols-outlined text-custom-primary-text" style="font-size: 24px;">restaurant</span>
+</div>
+<div>
+<p class="font-semibold text-text-primary">Recorded Second Meal</p>
+<p class="text-sm text-text-secondary">Lunch - 1:00 PM</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-text-secondary">chevron_right</span>
+</div>
+<div class="bg-white rounded-xl p-4 flex items-center justify-between">
+<div class="flex items-center gap-4">
+<div class="p-3 bg-custom-primary-bg-light rounded-full">
+<span class="material-symbols-outlined text-custom-primary-text" style="font-size: 24px;">restaurant</span>
+</div>
+<div>
+<p class="font-semibold text-text-primary">Recorded Third Meal</p>
+<p class="text-sm text-text-secondary">Dinner - 7:15 PM</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-text-secondary">chevron_right</span>
+</div>
+</div>
+</main>
+<footer class="bg-white rounded-t-3xl p-6 space-y-4 shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
+<div class="flex items-center gap-3">
+<button class="flex-1 flex flex-col items-center justify-center p-3 bg-custom-primary-bg-light border border-custom-primary rounded-xl text-custom-primary-text hover:bg-custom-primary-action/50 transition-colors">
+<span class="material-symbols-outlined" style="font-size: 28px;">photo_camera</span>
+<span class="text-xs font-medium mt-1">Take Picture</span>
+</button>
+<button class="flex-1 flex flex-col items-center justify-center p-3 bg-custom-primary-bg-light border border-custom-primary rounded-xl text-custom-primary-text hover:bg-custom-primary-action/50 transition-colors">
+<span class="material-symbols-outlined" style="font-size: 28px;">photo_library</span>
+<span class="text-xs font-medium mt-1">Upload Image</span>
+</button>
+</div>
+<div>
+<label class="text-sm font-medium text-text-secondary" for="comments">Comments or Questions</label>
+<textarea class="w-full mt-2 p-3 border border-gray-200 rounded-xl focus:ring-custom-primary-action focus:border-custom-primary-action" id="comments" name="comments" placeholder="Type your message here..." rows="3"></textarea>
+</div>
+<button class="w-full py-3 bg-custom-primary text-custom-primary-text font-bold rounded-xl hover:bg-custom-primary-action transition-colors">
+                Save Meal Record
+            </button>
+</footer>
+</div>
+
+</body></html>

@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Plan Page</title>
+<link href="image-fcf99f9e8cb442dd9603d6f373bd3e" rel="icon" type="image/x-icon"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<style type="text/tailwindcss">
+    @layer base {
+      :root {
+        --custom-primary: #f0e9d8;
+      }
+    }
+  </style>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: "#ddd1d1",
+            "background-light": "#f7f7f7",
+            "text-primary": "#1F2937",
+            "text-secondary": "#6B7280",
+            "background-dark": "#1b1717",
+            "accent-blue": "#3B82F6",
+            "accent-green": "#10B981",
+            "accent-yellow": "#F59E0B",
+            "accent-red": "#EF4444",
+            "custom-primary-text": "#8c7a51",
+            "custom-primary-bg-light": "#fdfaf3",
+            "custom-primary-action": "#e6d7b4"
+          },
+          fontFamily: {
+            display: "Lexend"
+          },
+          borderRadius: {
+            DEFAULT: "0.125rem",
+            lg: "0.25rem",
+            xl: "0.5rem",
+            full: "0.75rem"
+          }
+        }
+      }
+    };
+  </script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<style>
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    .tab-active {
+      color: var(--text-primary);
+      border-bottom: 2px solid var(--custom-primary-text);
+      font-weight: 600;
+    }
+    .tab-inactive {
+      color: var(--text-secondary);
+      border-bottom: 2px solid transparent;
+      font-weight: 500;
+    }
+    .exercise-tab-active {
+      background-color: var(--custom-primary);
+      color: var(--custom-primary-text);
+      font-weight: 600;
+    }
+    .exercise-tab-inactive {
+      background-color: #f3f4f6;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light font-display text-text-primary">
+<div class="flex flex-col flex-1">
+<header class="sticky top-0 z-10 bg-background-light/90 backdrop-blur-sm border-b border-gray-200">
+<div class="flex items-center justify-between p-4">
+<button class="p-2 rounded-full hover:bg-gray-100 opacity-0">
+<span class="material-symbols-outlined text-text-secondary">arrow_back</span>
+</button>
+<h1 class="text-lg font-bold text-center flex-1">My Plan</h1>
+<button class="p-2 rounded-full hover:bg-gray-100">
+<span class="material-symbols-outlined text-text-secondary">notifications</span>
+</button>
+</div>
+</header>
+<main class="flex-grow p-4 space-y-6 pb-24">
+<div class="flex border-b border-gray-200">
+<button class="flex-1 py-3 text-center tab-active" id="training-tab">Training</button>
+<button class="flex-1 py-3 text-center tab-inactive" id="diet-tab">Diet</button>
+<button class="flex-1 py-3 text-center tab-inactive" id="supplements-tab">Supplements</button>
+</div>
+<div class="space-y-4" id="training-content">
+<div class="relative mb-4">
+<label class="sr-only" for="plan-selector">Select a training plan</label>
+<div class="flex items-center justify-between bg-white px-4 py-3 rounded-xl shadow-sm">
+<span class="font-semibold text-text-primary">Coach's Plan</span>
+<span class="material-symbols-outlined text-text-secondary">expand_more</span>
+</div>
+<select class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" id="plan-selector">
+<option selected="">Coach's Plan</option>
+<option>My Custom Plan</option>
+<option>Archived Plan</option>
+</select>
+</div>
+<div class="bg-white p-4 rounded-xl shadow-sm">
+<div class="mb-4 p-3 bg-custom-primary-bg-light rounded-lg">
+<div class="flex items-center gap-2 mb-2">
+<span class="material-symbols-outlined text-custom-primary-text">campaign</span>
+<h3 class="font-semibold text-custom-primary-text">Coach Note</h3>
+</div>
+<p class="text-sm text-text-secondary">练六休一: 胸-背-肩-腿-胸-背</p>
+</div>
+<div class="flex overflow-x-auto no-scrollbar space-x-2 pb-3 mb-4 border-b border-gray-200" id="exercise-tabs-container">
+<button class="exercise-tab-active px-4 py-2 rounded-lg text-sm whitespace-nowrap" data-target="leg-content">Leg</button>
+<button class="exercise-tab-inactive px-4 py-2 rounded-lg text-sm whitespace-nowrap" data-target="chest-content">Chest</button>
+<button class="exercise-tab-inactive px-4 py-2 rounded-lg text-sm whitespace-nowrap" data-target="shoulder-content">Shoulder</button>
+<button class="exercise-tab-inactive px-4 py-2 rounded-lg text-sm whitespace-nowrap" data-target="back-content">Back</button>
+<button class="exercise-tab-inactive px-4 py-2 rounded-lg text-sm whitespace-nowrap" data-target="arms-content">Arms</button>
+</div>
+<div id="exercise-details-container">
+<div class="space-y-4" id="leg-content">
+<div class="p-3 bg-custom-primary-bg-light rounded-lg">
+<div class="flex justify-between items-start mb-2">
+<div>
+<p class="font-semibold text-text-primary">Squats</p>
+<p class="text-sm font-medium text-custom-primary-text">x 12 reps</p>
+</div>
+<a class="flex items-center gap-1 text-sm text-accent-blue font-medium" href="#">
+<span class="material-symbols-outlined text-base">play_circle</span>
+<span>Video</span>
+</a>
+</div>
+<div>
+<p class="text-xs font-semibold text-text-secondary mb-1">Coach Notes:</p>
+<p class="text-sm text-text-secondary">Focus on keeping your back straight and going deep.</p>
+</div>
+</div>
+<div class="p-3 bg-gray-50 rounded-lg">
+<div class="flex justify-between items-start mb-2">
+<div>
+<p class="font-semibold text-text-primary">Lunges</p>
+<p class="text-sm font-medium text-custom-primary-text">x 10 reps per leg</p>
+</div>
+<a class="flex items-center gap-1 text-sm text-accent-blue font-medium" href="#">
+<span class="material-symbols-outlined text-base">play_circle</span>
+<span>Video</span>
+</a>
+</div>
+<div>
+<p class="text-xs font-semibold text-text-secondary mb-1">Coach Notes:</p>
+<p class="text-sm text-text-secondary">Ensure your front knee doesn't go past your toes.</p>
+</div>
+</div>
+<div class="p-3 bg-gray-50 rounded-lg">
+<div class="flex justify-between items-start mb-2">
+<div>
+<p class="font-semibold text-text-primary">Leg Press</p>
+<p class="text-sm font-medium text-custom-primary-text">x 15 reps</p>
+</div>
+<a class="flex items-center gap-1 text-sm text-accent-blue font-medium" href="#">
+<span class="material-symbols-outlined text-base">play_circle</span>
+<span>Video</span>
+</a>
+</div>
+<div>
+<p class="text-xs font-semibold text-text-secondary mb-1">Coach Notes:</p>
+<p class="text-sm text-text-secondary">Control the weight on the way down.</p>
+</div>
+</div>
+</div>
+<div class="hidden space-y-4" id="chest-content">
+<div class="p-3 bg-gray-50 rounded-lg">
+<div class="flex justify-between items-start mb-2">
+<div>
+<p class="font-semibold text-text-primary">Bench Press</p>
+<p class="text-sm font-medium text-custom-primary-text">x 10 reps</p>
+</div>
+<a class="flex items-center gap-1 text-sm text-accent-blue font-medium" href="#">
+<span class="material-symbols-outlined text-base">play_circle</span>
+<span>Video</span>
+</a>
+</div>
+<div>
+<p class="text-xs font-semibold text-text-secondary mb-1">Coach Notes:</p>
+<p class="text-sm text-text-secondary">Keep your shoulder blades retracted.</p>
+</div>
+</div>
+</div>
+<div class="hidden space-y-4" id="shoulder-content">
+<div class="p-3 bg-gray-50 rounded-lg">
+<div class="flex justify-between items-start mb-2">
+<div>
+<p class="font-semibold text-text-primary">Overhead Press</p>
+<p class="text-sm font-medium text-custom-primary-text">x 10 reps</p>
+</div>
+<a class="flex items-center gap-1 text-sm text-accent-blue font-medium" href="#">
+<span class="material-symbols-outlined text-base">play_circle</span>
+<span>Video</span>
+</a>
+</div>
+<div>
+<p class="text-xs font-semibold text-text-secondary mb-1">Coach Notes:</p>
+<p class="text-sm text-text-secondary">Don't arch your back too much.</p>
+</div>
+</div>
+</div>
+<div class="hidden space-y-4" id="back-content">
+</div>
+<div class="hidden space-y-4" id="arms-content">
+</div>
+</div>
+</div>
+</div>
+<div class="hidden space-y-4" id="diet-content">
+<div class="bg-white p-4 rounded-xl shadow-sm">
+<div class="flex justify-between items-center mb-3">
+<h3 class="font-bold text-lg">High-Protein Diet</h3>
+<span class="text-xs font-medium text-text-secondary bg-gray-100 px-2 py-1 rounded-full">2500 kcal</span>
+</div>
+<p class="text-sm text-text-secondary mb-4">A balanced diet to support muscle growth and recovery.</p>
+<div class="space-y-3">
+<div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+<div>
+<p class="font-semibold text-text-primary">Meal 1: Breakfast</p>
+<p class="text-sm text-text-secondary">Oatmeal, whey protein, berries</p>
+</div>
+<span class="material-symbols-outlined text-gray-400">chevron_right</span>
+</div>
+<div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+<div>
+<p class="font-semibold text-text-primary">Meal 2: Lunch</p>
+<p class="text-sm text-text-secondary">Grilled chicken, quinoa, broccoli</p>
+</div>
+<span class="material-symbols-outlined text-gray-400">chevron_right</span>
+</div>
+<div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+<div>
+<p class="font-semibold text-text-primary">Meal 3: Dinner</p>
+<p class="text-sm text-text-secondary">Salmon, sweet potato, asparagus</p>
+</div>
+<span class="material-symbols-outlined text-gray-400">chevron_right</span>
+</div>
+</div>
+</div>
+</div>
+<div class="hidden space-y-4" id="supplements-content">
+<div class="bg-white p-4 rounded-xl shadow-sm">
+<div class="flex justify-between items-center mb-3">
+<h3 class="font-bold text-lg">Supplement Stack</h3>
+<span class="text-xs font-medium text-text-secondary bg-gray-100 px-2 py-1 rounded-full">Daily</span>
+</div>
+<p class="text-sm text-text-secondary mb-4">Supplements to aid performance, recovery, and overall health.</p>
+<div class="space-y-3">
+<div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+<div>
+<p class="font-semibold text-text-primary">Creatine Monohydrate</p>
+<p class="text-sm text-text-secondary">5g post-workout</p>
+</div>
+<span class="material-symbols-outlined text-gray-400">chevron_right</span>
+</div>
+<div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+<div>
+<p class="font-semibold text-text-primary">Whey Protein</p>
+<p class="text-sm text-text-secondary">1 scoop post-workout</p>
+</div>
+<span class="material-symbols-outlined text-gray-400">chevron_right</span>
+</div>
+<div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+<div>
+<p class="font-semibold text-text-primary">Vitamin D3</p>
+<p class="text-sm text-text-secondary">2000 IU with breakfast</p>
+</div>
+<span class="material-symbols-outlined text-gray-400">chevron_right</span>
+</div>
+</div>
+</div>
+</div>
+</main>
+<footer class="fixed bottom-0 left-0 right-0 z-10 bg-white/90 backdrop-blur-sm border-t border-gray-200">
+<nav class="flex justify-around items-center p-2">
+<a class="flex flex-col items-center gap-1 p-2 rounded-lg text-text-secondary hover:text-custom-primary-text transition-colors" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="text-xs font-medium">Home</span>
+</a>
+<a class="flex flex-col items-center gap-1 p-2 rounded-lg text-custom-primary-text" href="#">
+<span class="material-symbols-outlined">calendar_month</span>
+<span class="text-xs font-medium">Plan</span>
+</a>
+<a class="bg-[var(--custom-primary)] text-custom-primary-text rounded-full p-4 shadow-lg -mt-8" href="#">
+<span class="material-symbols-outlined" style="font-size: 28px;">add</span>
+</a>
+<a class="flex flex-col items-center gap-1 p-2 rounded-lg text-text-secondary hover:text-custom-primary-text transition-colors" href="#">
+<span class="material-symbols-outlined">chat</span>
+<span class="text-xs font-medium">Chat</span>
+</a>
+<a class="flex flex-col items-center gap-1 p-2 rounded-lg text-text-secondary hover:text-custom-primary-text transition-colors" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="text-xs font-medium">Profile</span>
+</a>
+</nav>
+</footer>
+</div>
+<script>
+  const tabs = ['training', 'diet', 'supplements'];
+  tabs.forEach(tabName => {
+    const tabButton = document.getElementById(`${tabName}-tab`);
+    const tabContent = document.getElementById(`${tabName}-content`);
+    tabButton.addEventListener('click', () => {
+      tabs.forEach(t => {
+        document.getElementById(`${t}-content`).classList.add('hidden');
+        document.getElementById(`${t}-tab`).classList.remove('tab-active');
+        document.getElementById(`${t}-tab`).classList.add('tab-inactive');
+      });
+      tabContent.classList.remove('hidden');
+      tabButton.classList.add('tab-active');
+      tabButton.classList.remove('tab-inactive');
+    });
+  });
+  const exerciseTabsContainer = document.getElementById('exercise-tabs-container');
+  const exerciseDetailsContainer = document.getElementById('exercise-details-container');
+  const exerciseTabs = exerciseTabsContainer.querySelectorAll('button');
+  const exerciseContents = exerciseDetailsContainer.querySelectorAll('[id$="-content"]');
+  exerciseTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      // Deactivate all tabs
+      exerciseTabs.forEach(t => {
+        t.classList.remove('exercise-tab-active');
+        t.classList.add('exercise-tab-inactive');
+      });
+      // Hide all content
+      exerciseContents.forEach(c => {
+        c.classList.add('hidden');
+      });
+      // Activate clicked tab
+      tab.classList.remove('exercise-tab-inactive');
+      tab.classList.add('exercise-tab-active');
+      // Show target content
+      const targetId = tab.getAttribute('data-target');
+      document.getElementById(targetId).classList.remove('hidden');
+    });
+  });
+</script>
+
+</body></html>
