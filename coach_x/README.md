@@ -17,8 +17,12 @@ CoachX是一个基于Flutter开发的跨平台移动应用，旨在构建线上�
 - **支持平台**: iOS、Android
 
 ### 后端
-- **架构**: Firebase全家桶（Cloud Functions + Firestore）
-- **功能**: 用户鉴权、数据存储、API设计等
+- **架构**: Firebase全家桶
+  - **Cloud Functions**: Python (2nd gen)
+  - **Cloud Firestore**: NoSQL文档数据库
+  - **Firebase Storage**: 文件存储
+  - **Firebase Authentication**: 用户认证（邮箱/密码）
+- **功能**: 用户鉴权、数据存储、Serverless API等
 
 ## 设计规范
 
@@ -120,9 +124,44 @@ flutter run -d ios
 flutter run -d android
 ```
 
+## Firebase配置
+
+### 配置文件位置
+
+- **iOS**: `ios/Runner/GoogleService-Info.plist`
+- **Android**: `android/app/google-services.json`
+
+⚠️ **注意**: 配置文件包含敏感信息，已在`.gitignore`中排除，请勿提交到公开仓库。
+
+### Firebase服务
+
+| 服务 | 状态 | 说明 |
+|------|------|------|
+| Authentication | ✅ 已配置 | 邮箱/密码登录 |
+| Cloud Firestore | ✅ 已配置 | 测试模式（30天） |
+| Firebase Storage | ✅ 已配置 | 测试模式（30天） |
+| Cloud Functions | ✅ 已配置 | Python 2nd gen |
+
+### Cloud Functions语言选择
+
+本项目使用 **Python** 作为Cloud Functions的开发语言（Firebase Functions 2nd gen）。
+
+**选择原因**:
+- AI集成更便捷（丰富的Python AI库）
+- 数据处理能力强
+- 团队技术栈匹配
+
+**Functions目录结构**:
+```
+functions/
+├── main.py              # 函数入口
+├── requirements.txt     # Python依赖
+└── ...
+```
+
 ## 后端API
 
-后端API基于Firebase Cloud Functions实现，详细的API接口和数据库Schema请参考：
+后端API基于Firebase Cloud Functions (Python)实现，详细的API接口和数据库Schema请参考：
 - [后端API与数据库Schema文档](../docs/backend_apis_and_document_db_schemas.md)
 
 ## 参考资料
@@ -132,15 +171,29 @@ flutter run -d android
 
 ## 项目状态
 
-当前项目处于初始化阶段：
+### 阶段一：基础框架搭建 ✅ 已完成
 - ✅ Flutter项目结构搭建完成
 - ✅ UI设计稿（HTML原型）已完成
 - ✅ 后端API设计文档已完成
-- 🚧 Flutter UI组件开发中
-- 🚧 后端Cloud Functions实现中
-- ⏳ Firebase集成待开始
-- ⏳ 状态管理方案待确定
-- ⏳ API集成待开始
+- ✅ 核心主题系统（颜色、字体、尺寸）
+- ✅ 路由系统（go_router）
+- ✅ 状态管理方案（Riverpod）
+- ✅ 通用工具类和扩展方法
+- ✅ 基础通用组件
+
+### 阶段二：Firebase集成 🚧 进行中
+- ✅ Firebase项目创建和配置
+  - 项目名称: coachx-dev
+  - Authentication: 邮箱/密码登录已启用
+  - Firestore: 已创建（测试模式，30天有效期）
+  - Storage: 已启用（测试模式，30天有效期）
+  - Cloud Functions: Python 2nd gen
+  - 配置文件: 已放置到项目中
+- ⏳ Flutter端Firebase SDK集成
+- ⏳ Authentication实现
+- ⏳ Firestore数据层实现
+- ⏳ Storage文件上传实现
+- ⏳ Cloud Functions开发和部署
 
 ## 版本信息
 
