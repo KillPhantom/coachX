@@ -87,6 +87,23 @@ class AppDimensions {
   /// Tab栏高度 - 50.0
   static const double tabBarHeight = 50.0;
 
+  // ==================== 内边距 ====================
+
+  /// 小内边距 - 8.0
+  static const double paddingS = 8.0;
+
+  /// 中内边距 - 12.0
+  static const double paddingM = 12.0;
+
+  /// 大内边距 - 16.0
+  static const double paddingL = 16.0;
+
+  /// 超大内边距 - 20.0
+  static const double paddingXL = 20.0;
+
+  /// 双倍超大内边距 - 24.0
+  static const double paddingXXL = 24.0;
+
   // ==================== 通用尺寸 ====================
 
   /// 列表项高度 - 60.0

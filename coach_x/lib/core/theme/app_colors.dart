@@ -57,15 +57,19 @@ class AppColors {
   // ==================== 功能色 ====================
   /// 成功/完成 - 绿色
   static const Color successGreen = Color(0xFF10B981);
+  static const Color success = successGreen; // 别名
 
   /// 警告 - 黄色
   static const Color warningYellow = Color(0xFFF59E0B);
+  static const Color warning = warningYellow; // 别名
 
   /// 错误 - 红色
   static const Color errorRed = Color(0xFFEF4444);
+  static const Color error = errorRed; // 别名
 
   /// 信息 - 蓝色
   static const Color infoBlue = Color(0xFF3B82F6);
+  static const Color info = infoBlue; // 别名
 
   // ==================== 分割线 ====================
   /// 浅色分割线

@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
 import 'route_names.dart';
 import '../features/auth/presentation/pages/login_page.dart';
+import '../features/auth/presentation/pages/register_page.dart';
 import '../features/student/home/presentation/pages/student_home_page.dart';
 import '../features/student/training/presentation/pages/training_page.dart';
 import '../features/student/chat/presentation/pages/student_chat_page.dart';
@@ -32,6 +33,13 @@ final GoRouter appRouter = GoRouter(
       path: RouteNames.login,
       pageBuilder: (context, state) =>
           CupertinoPage(key: state.pageKey, child: const LoginPage()),
+    ),
+
+    // 注册页
+    GoRoute(
+      path: '/register',
+      pageBuilder: (context, state) =>
+          CupertinoPage(key: state.pageKey, child: const RegisterPage()),
     ),
 
     // 学生端路由组
