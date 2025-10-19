@@ -51,11 +51,21 @@ dependencies:
   dio: ^5.4.0
   
   # 工具类
-  intl: ^0.19.0
+  intl: ^0.20.2
   logger: ^2.0.2
   
-  # Firebase（本阶段仅添加，不配置）
+  # Firebase核心和服务
   firebase_core: ^2.24.2
+  firebase_auth: ^4.15.3
+  cloud_firestore: ^4.13.6
+  firebase_storage: ^11.5.6
+  cloud_functions: ^4.5.12
+  
+  # Firebase UI（可选，提供预构建的认证UI）
+  firebase_ui_auth: ^1.10.0
+  
+  # 图片选择和处理
+  image_picker: ^1.0.5
 
 dev_dependencies:
   flutter_test:

@@ -1,5 +1,6 @@
-package com.example.coach_x
+package com.coachx.app
 
 import io.flutter.embedding.android.FlutterActivity
 
 class MainActivity : FlutterActivity()
+

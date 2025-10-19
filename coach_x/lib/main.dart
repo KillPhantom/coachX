@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'app/app.dart';
 import 'core/utils/logger.dart';
+import 'core/services/firebase_init_service.dart';
 
 void main() async {
   // 确保Flutter绑定初始化
@@ -11,6 +12,14 @@ void main() async {
 
   // 初始化日志
   AppLogger.info('CoachX应用启动');
+
+  // 初始化Firebase
+  try {
+    await FirebaseInitService.initialize();
+  } catch (e, stackTrace) {
+    AppLogger.error('Firebase初始化失败', e, stackTrace);
+    // 继续运行应用，以便看到错误信息
+  }
 
   // 初始化Hive
   try {
