@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:coach_x/core/utils/logger.dart';
 
 /// Firebase Authentication服务
@@ -42,9 +43,12 @@ class AuthService {
     } on FirebaseAuthException catch (e) {
       AppLogger.error('注册失败', e);
       throw _handleAuthException(e);
+    } on FirebaseException catch (e) {
+      AppLogger.error('注册失败', e);
+      throw Exception(e.message ?? '注册失败');
     } catch (e, stackTrace) {
       AppLogger.error('注册失败', e, stackTrace);
-      rethrow;
+      throw Exception('注册失败: ${e.toString()}');
     }
   }
 
@@ -67,9 +71,12 @@ class AuthService {
     } on FirebaseAuthException catch (e) {
       AppLogger.error('登录失败', e);
       throw _handleAuthException(e);
+    } on FirebaseException catch (e) {
+      AppLogger.error('登录失败', e);
+      throw Exception(e.message ?? '登录失败');
     } catch (e, stackTrace) {
       AppLogger.error('登录失败', e, stackTrace);
-      rethrow;
+      throw Exception('登录失败: ${e.toString()}');
     }
   }
 
@@ -117,9 +124,12 @@ class AuthService {
     } on FirebaseAuthException catch (e) {
       AppLogger.error('发送密码重置邮件失败', e);
       throw _handleAuthException(e);
+    } on FirebaseException catch (e) {
+      AppLogger.error('发送密码重置邮件失败', e);
+      throw Exception(e.message ?? '发送密码重置邮件失败');
     } catch (e, stackTrace) {
       AppLogger.error('发送密码重置邮件失败', e, stackTrace);
-      rethrow;
+      throw Exception('发送密码重置邮件失败: ${e.toString()}');
     }
   }
 
