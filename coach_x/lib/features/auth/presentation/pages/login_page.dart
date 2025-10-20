@@ -78,10 +78,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                 const SizedBox(height: 60),
                 
                 // Logo和标题
-                const Icon(
-                  CupertinoIcons.sportscourt_fill,
-                  size: 80,
-                  color: AppColors.primaryColor,
+                Image.asset(
+                  'assets/fonts/images/icon.png',
+                  width: 100,
+                  height: 100,
                 ),
                 const SizedBox(height: AppDimensions.spacingL),
                 Text(
