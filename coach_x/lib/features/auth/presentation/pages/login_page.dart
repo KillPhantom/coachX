@@ -182,8 +182,8 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                       child: Text(
                         '立即注册',
                         style: AppTextStyles.body.copyWith(
-                          color: AppColors.primaryColor,
-                          fontWeight: FontWeight.w600,
+                          color: AppColors.primaryText,
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
                     ),

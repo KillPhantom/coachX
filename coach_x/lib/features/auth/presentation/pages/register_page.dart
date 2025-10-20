@@ -223,8 +223,8 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                       child: Text(
                         '立即登录',
                         style: AppTextStyles.body.copyWith(
-                          color: AppColors.primaryColor,
-                          fontWeight: FontWeight.w600,
+                          color: AppColors.primaryText,
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
                     ),
