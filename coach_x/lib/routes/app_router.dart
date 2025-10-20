@@ -23,16 +23,12 @@ final GoRouter appRouter = GoRouter(
   // 路由表
   routes: [
     // 根路由 - 重定向到登录页或首页
-    GoRoute(
-      path: RouteNames.splash,
-      redirect: (context, state) => RouteNames.login,
-    ),
+    GoRoute(path: RouteNames.splash, redirect: (context, state) => RouteNames.login),
 
     // 登录页
     GoRoute(
       path: RouteNames.login,
-      pageBuilder: (context, state) =>
-          CupertinoPage(key: state.pageKey, child: const LoginPage()),
+      pageBuilder: (context, state) => CupertinoPage(key: state.pageKey, child: const LoginPage()),
     ),
 
     // 注册页
@@ -43,10 +39,7 @@ final GoRouter appRouter = GoRouter(
     ),
 
     // 学生端路由组
-    GoRoute(
-      path: '/student',
-      redirect: (context, state) => RouteNames.studentHome,
-    ),
+    GoRoute(path: '/student', redirect: (context, state) => RouteNames.studentHome),
 
     GoRoute(
       path: RouteNames.studentHome,
@@ -89,8 +82,7 @@ final GoRouter appRouter = GoRouter(
 
     GoRoute(
       path: RouteNames.coachPlans,
-      pageBuilder: (context, state) =>
-          CupertinoPage(key: state.pageKey, child: const PlansPage()),
+      pageBuilder: (context, state) => CupertinoPage(key: state.pageKey, child: const PlansPage()),
     ),
 
     GoRoute(
@@ -125,10 +117,7 @@ class ErrorPage extends StatelessWidget {
               color: CupertinoColors.systemRed,
             ),
             const SizedBox(height: 16),
-            const Text(
-              '页面不存在',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
+            const Text('页面不存在', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
             const Text(
               '抱歉，您访问的页面不存在',

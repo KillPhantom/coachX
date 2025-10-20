@@ -2,7 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:coach_x/core/utils/logger.dart';
 
 /// Firebase Authentication服务
-/// 
+///
 /// 封装Firebase Authentication的所有操作
 class AuthService {
   AuthService._();
@@ -21,7 +21,7 @@ class AuthService {
   }
 
   /// 邮箱密码注册
-  /// 
+  ///
   /// [email] 邮箱地址
   /// [password] 密码
   /// 返回 [UserCredential] 用户凭证
@@ -31,7 +31,7 @@ class AuthService {
   }) async {
     try {
       AppLogger.info('开始注册用户: $email');
-      
+
       final credential = await _auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
@@ -49,7 +49,7 @@ class AuthService {
   }
 
   /// 邮箱密码登录
-  /// 
+  ///
   /// [email] 邮箱地址
   /// [password] 密码
   /// 返回 [UserCredential] 用户凭证
@@ -59,11 +59,8 @@ class AuthService {
   }) async {
     try {
       AppLogger.info('开始登录: $email');
-      
-      final credential = await _auth.signInWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
+
+      final credential = await _auth.signInWithEmailAndPassword(email: email, password: password);
 
       AppLogger.info('登录成功: ${credential.user?.uid}');
       return credential;
@@ -110,7 +107,7 @@ class AuthService {
   }
 
   /// 发送密码重置邮件
-  /// 
+  ///
   /// [email] 邮箱地址
   static Future<void> sendPasswordResetEmail({required String email}) async {
     try {
@@ -127,13 +124,10 @@ class AuthService {
   }
 
   /// 更新用户资料
-  /// 
+  ///
   /// [displayName] 显示名称
   /// [photoURL] 头像URL
-  static Future<void> updateProfile({
-    String? displayName,
-    String? photoURL,
-  }) async {
+  static Future<void> updateProfile({String? displayName, String? photoURL}) async {
     try {
       final user = currentUser;
       if (user == null) {
@@ -145,7 +139,7 @@ class AuthService {
       if (photoURL != null) {
         await user.updatePhotoURL(photoURL);
       }
-      
+
       await user.reload();
       AppLogger.info('用户资料更新成功');
     } catch (e, stackTrace) {
@@ -189,7 +183,7 @@ class AuthService {
   /// 处理Firebase Auth异常
   static Exception _handleAuthException(FirebaseAuthException e) {
     String message;
-    
+
     switch (e.code) {
       case 'email-already-in-use':
         message = '该邮箱已被注册';
@@ -225,4 +219,3 @@ class AuthService {
     return Exception(message);
   }
 }
-

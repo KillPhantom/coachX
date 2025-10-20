@@ -49,15 +49,11 @@ class AppTheme {
 
   /// 导航栏边框
   static Border get navBarBorder {
-    return const Border(
-      bottom: BorderSide(color: AppColors.dividerLight, width: 0.5),
-    );
+    return const Border(bottom: BorderSide(color: AppColors.dividerLight, width: 0.5));
   }
 
   /// Tab栏边框
   static Border get tabBarBorder {
-    return const Border(
-      top: BorderSide(color: AppColors.dividerLight, width: 0.5),
-    );
+    return const Border(top: BorderSide(color: AppColors.dividerLight, width: 0.5));
   }
 }

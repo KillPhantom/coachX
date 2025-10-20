@@ -12,12 +12,7 @@ class ErrorView extends StatelessWidget {
   /// 图标
   final IconData? icon;
 
-  const ErrorView({
-    super.key,
-    required this.error,
-    required this.onRetry,
-    this.icon,
-  });
+  const ErrorView({super.key, required this.error, required this.onRetry, this.icon});
 
   @override
   Widget build(BuildContext context) {
@@ -34,14 +29,8 @@ class ErrorView extends StatelessWidget {
           Text('出错了', style: AppTextStyles.title2),
           const SizedBox(height: AppDimensions.spacingM),
           Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppDimensions.spacingXXXL,
-            ),
-            child: Text(
-              error,
-              style: AppTextStyles.subhead,
-              textAlign: TextAlign.center,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingXXXL),
+            child: Text(error, style: AppTextStyles.subhead, textAlign: TextAlign.center),
           ),
           const SizedBox(height: AppDimensions.spacingXL),
           CupertinoButton.filled(onPressed: onRetry, child: const Text('重试')),

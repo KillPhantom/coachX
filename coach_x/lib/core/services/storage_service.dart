@@ -5,7 +5,7 @@ import 'package:coach_x/core/utils/logger.dart';
 import 'package:coach_x/core/services/auth_service.dart';
 
 /// Firebase Storage服务
-/// 
+///
 /// 封装文件上传、下载和管理功能
 class StorageService {
   StorageService._();
@@ -14,19 +14,15 @@ class StorageService {
   static final ImagePicker _picker = ImagePicker();
 
   /// 上传文件到Storage
-  /// 
+  ///
   /// [file] 要上传的文件
   /// [path] Storage中的路径
   /// [onProgress] 上传进度回调
   /// 返回文件的下载URL
-  static Future<String> uploadFile(
-    File file,
-    String path, {
-    Function(double)? onProgress,
-  }) async {
+  static Future<String> uploadFile(File file, String path, {Function(double)? onProgress}) async {
     try {
       AppLogger.info('开始上传文件: $path');
-      
+
       final ref = _storage.ref().child(path);
       final uploadTask = ref.putFile(file);
 
@@ -51,7 +47,7 @@ class StorageService {
   }
 
   /// 上传图片（从相机或相册选择）
-  /// 
+  ///
   /// [source] 图片来源（相机或相册）
   /// [folder] 存储文件夹
   /// [onProgress] 上传进度回调
@@ -76,7 +72,7 @@ class StorageService {
       }
 
       final file = File(pickedFile.path);
-      
+
       // 生成文件路径
       final userId = AuthService.currentUserId;
       if (userId == null) {
@@ -96,7 +92,7 @@ class StorageService {
   }
 
   /// 上传头像
-  /// 
+  ///
   /// [source] 图片来源
   /// [onProgress] 上传进度回调
   /// 返回头像URL
@@ -104,15 +100,11 @@ class StorageService {
     required ImageSource source,
     Function(double)? onProgress,
   }) async {
-    return uploadImage(
-      source: source,
-      folder: 'avatars',
-      onProgress: onProgress,
-    );
+    return uploadImage(source: source, folder: 'avatars', onProgress: onProgress);
   }
 
   /// 上传训练图片
-  /// 
+  ///
   /// [source] 图片来源
   /// [onProgress] 上传进度回调
   /// 返回图片URL
@@ -120,15 +112,11 @@ class StorageService {
     required ImageSource source,
     Function(double)? onProgress,
   }) async {
-    return uploadImage(
-      source: source,
-      folder: 'training_images',
-      onProgress: onProgress,
-    );
+    return uploadImage(source: source, folder: 'training_images', onProgress: onProgress);
   }
 
   /// 上传饮食图片
-  /// 
+  ///
   /// [source] 图片来源
   /// [onProgress] 上传进度回调
   /// 返回图片URL
@@ -136,15 +124,11 @@ class StorageService {
     required ImageSource source,
     Function(double)? onProgress,
   }) async {
-    return uploadImage(
-      source: source,
-      folder: 'diet_images',
-      onProgress: onProgress,
-    );
+    return uploadImage(source: source, folder: 'diet_images', onProgress: onProgress);
   }
 
   /// 上传身体测量图片
-  /// 
+  ///
   /// [source] 图片来源
   /// [onProgress] 上传进度回调
   /// 返回图片URL
@@ -152,15 +136,11 @@ class StorageService {
     required ImageSource source,
     Function(double)? onProgress,
   }) async {
-    return uploadImage(
-      source: source,
-      folder: 'body_stats',
-      onProgress: onProgress,
-    );
+    return uploadImage(source: source, folder: 'body_stats', onProgress: onProgress);
   }
 
   /// 删除文件
-  /// 
+  ///
   /// [path] Storage中的文件路径
   static Future<void> deleteFile(String path) async {
     try {
@@ -174,7 +154,7 @@ class StorageService {
   }
 
   /// 从URL删除文件
-  /// 
+  ///
   /// [url] 文件的下载URL
   static Future<void> deleteFileByUrl(String url) async {
     try {
@@ -188,7 +168,7 @@ class StorageService {
   }
 
   /// 获取文件元数据
-  /// 
+  ///
   /// [path] Storage中的文件路径
   /// 返回文件元数据
   static Future<FullMetadata> getMetadata(String path) async {
@@ -201,7 +181,7 @@ class StorageService {
   }
 
   /// 获取下载URL
-  /// 
+  ///
   /// [path] Storage中的文件路径
   /// 返回下载URL
   static Future<String> getDownloadUrl(String path) async {
@@ -214,14 +194,11 @@ class StorageService {
   }
 
   /// 列出文件夹中的文件
-  /// 
+  ///
   /// [path] 文件夹路径
   /// [maxResults] 最大结果数
   /// 返回文件引用列表
-  static Future<ListResult> listFiles(
-    String path, {
-    int? maxResults,
-  }) async {
+  static Future<ListResult> listFiles(String path, {int? maxResults}) async {
     try {
       final ref = _storage.ref().child(path);
       return await ref.list(ListOptions(maxResults: maxResults));
@@ -231,4 +208,3 @@ class StorageService {
     }
   }
 }
-

@@ -10,11 +10,11 @@ final userRepositoryProvider = Provider<UserRepository>((ref) {
 });
 
 /// 当前用户信息Provider（从Firestore获取）
-/// 
+///
 /// 根据当前登录用户的ID从Firestore获取完整用户信息
 final currentUserDataProvider = StreamProvider<UserModel?>((ref) {
   final userId = ref.watch(currentUserIdProvider);
-  
+
   if (userId == null) {
     return Stream.value(null);
   }
@@ -24,7 +24,7 @@ final currentUserDataProvider = StreamProvider<UserModel?>((ref) {
 });
 
 /// 用户角色Provider
-/// 
+///
 /// 提供当前用户的角色信息
 final userRoleProvider = Provider<UserRole>((ref) {
   final userData = ref.watch(currentUserDataProvider);
@@ -45,4 +45,3 @@ final isStudentProvider = Provider<bool>((ref) {
 final isCoachProvider = Provider<bool>((ref) {
   return ref.watch(userRoleProvider) == UserRole.coach;
 });
-

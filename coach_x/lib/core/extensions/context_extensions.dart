@@ -53,8 +53,7 @@ extension ContextExtensions on BuildContext {
           margin: const EdgeInsets.symmetric(horizontal: 40),
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
           decoration: BoxDecoration(
-            color:
-                backgroundColor ?? AppColors.textPrimary.withValues(alpha: 0.9),
+            color: backgroundColor ?? AppColors.textPrimary.withValues(alpha: 0.9),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Text(
@@ -137,11 +136,7 @@ extension ContextExtensions on BuildContext {
   }
 
   /// 显示提示对话框
-  Future<void> showAlertDialog({
-    required String title,
-    String? message,
-    String buttonText = '确定',
-  }) {
+  Future<void> showAlertDialog({required String title, String? message, String buttonText = '确定'}) {
     return showCupertinoDialog(
       context: this,
       builder: (context) => CupertinoAlertDialog(
@@ -189,17 +184,14 @@ extension ContextExtensions on BuildContext {
 
   /// 页面跳转并替换当前页面
   Future<T?> pushReplacement<T>(Widget page) {
-    return Navigator.of(
-      this,
-    ).pushReplacement<T, void>(CupertinoPageRoute(builder: (_) => page));
+    return Navigator.of(this).pushReplacement<T, void>(CupertinoPageRoute(builder: (_) => page));
   }
 
   /// 页面跳转并移除之前所有页面
   Future<T?> pushAndRemoveUntil<T>(Widget page) {
-    return Navigator.of(this).pushAndRemoveUntil<T>(
-      CupertinoPageRoute(builder: (_) => page),
-      (route) => false,
-    );
+    return Navigator.of(
+      this,
+    ).pushAndRemoveUntil<T>(CupertinoPageRoute(builder: (_) => page), (route) => false);
   }
 
   /// 返回上一页

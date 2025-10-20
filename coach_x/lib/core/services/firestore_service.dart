@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:coach_x/core/utils/logger.dart';
 
 /// Firestore数据库服务
-/// 
+///
 /// 封装Cloud Firestore的基础CRUD操作
 class FirestoreService {
   FirestoreService._();
@@ -10,14 +10,11 @@ class FirestoreService {
   static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   /// 添加文档（自动生成ID）
-  /// 
+  ///
   /// [collection] 集合名称
   /// [data] 文档数据
   /// 返回新文档的ID
-  static Future<String> addDocument(
-    String collection,
-    Map<String, dynamic> data,
-  ) async {
+  static Future<String> addDocument(String collection, Map<String, dynamic> data) async {
     try {
       // 添加时间戳
       data['createdAt'] = FieldValue.serverTimestamp();
@@ -33,7 +30,7 @@ class FirestoreService {
   }
 
   /// 创建文档（指定ID）
-  /// 
+  ///
   /// [collection] 集合名称
   /// [docId] 文档ID
   /// [data] 文档数据
@@ -49,10 +46,7 @@ class FirestoreService {
         data['createdAt'] = FieldValue.serverTimestamp();
       }
 
-      await _firestore.collection(collection).doc(docId).set(
-            data,
-            SetOptions(merge: merge),
-          );
+      await _firestore.collection(collection).doc(docId).set(data, SetOptions(merge: merge));
       AppLogger.info('文档设置成功: $collection/$docId');
     } catch (e, stackTrace) {
       AppLogger.error('设置文档失败: $collection/$docId', e, stackTrace);
@@ -61,7 +55,7 @@ class FirestoreService {
   }
 
   /// 更新文档
-  /// 
+  ///
   /// [collection] 集合名称
   /// [docId] 文档ID
   /// [data] 要更新的字段
@@ -72,7 +66,7 @@ class FirestoreService {
   ) async {
     try {
       data['updatedAt'] = FieldValue.serverTimestamp();
-      
+
       await _firestore.collection(collection).doc(docId).update(data);
       AppLogger.info('文档更新成功: $collection/$docId');
     } catch (e, stackTrace) {
@@ -82,13 +76,10 @@ class FirestoreService {
   }
 
   /// 删除文档
-  /// 
+  ///
   /// [collection] 集合名称
   /// [docId] 文档ID
-  static Future<void> deleteDocument(
-    String collection,
-    String docId,
-  ) async {
+  static Future<void> deleteDocument(String collection, String docId) async {
     try {
       await _firestore.collection(collection).doc(docId).delete();
       AppLogger.info('文档删除成功: $collection/$docId');
@@ -99,14 +90,11 @@ class FirestoreService {
   }
 
   /// 获取单个文档
-  /// 
+  ///
   /// [collection] 集合名称
   /// [docId] 文档ID
   /// 返回文档快照
-  static Future<DocumentSnapshot> getDocument(
-    String collection,
-    String docId,
-  ) async {
+  static Future<DocumentSnapshot> getDocument(String collection, String docId) async {
     try {
       final doc = await _firestore.collection(collection).doc(docId).get();
       AppLogger.info('获取文档: $collection/$docId, 存在: ${doc.exists}');
@@ -118,7 +106,7 @@ class FirestoreService {
   }
 
   /// 查询文档列表
-  /// 
+  ///
   /// [collection] 集合名称
   /// [where] 查询条件列表 [字段名, 操作符, 值]
   /// [orderBy] 排序字段
@@ -172,19 +160,16 @@ class FirestoreService {
   }
 
   /// 监听单个文档变化
-  /// 
+  ///
   /// [collection] 集合名称
   /// [docId] 文档ID
   /// 返回文档快照流
-  static Stream<DocumentSnapshot> watchDocument(
-    String collection,
-    String docId,
-  ) {
+  static Stream<DocumentSnapshot> watchDocument(String collection, String docId) {
     return _firestore.collection(collection).doc(docId).snapshots();
   }
 
   /// 监听集合变化
-  /// 
+  ///
   /// [collection] 集合名称
   /// [where] 查询条件列表
   /// [orderBy] 排序字段
@@ -230,18 +215,16 @@ class FirestoreService {
   }
 
   /// 批量写入操作
-  /// 
+  ///
   /// [operations] 操作列表
-  static Future<void> batchWrite(
-    List<void Function(WriteBatch)> operations,
-  ) async {
+  static Future<void> batchWrite(List<void Function(WriteBatch)> operations) async {
     try {
       final batch = _firestore.batch();
-      
+
       for (final operation in operations) {
         operation(batch);
       }
-      
+
       await batch.commit();
       AppLogger.info('批量写入成功: ${operations.length}个操作');
     } catch (e, stackTrace) {
@@ -251,11 +234,9 @@ class FirestoreService {
   }
 
   /// 事务操作
-  /// 
+  ///
   /// [transactionHandler] 事务处理函数
-  static Future<T> runTransaction<T>(
-    Future<T> Function(Transaction) transactionHandler,
-  ) async {
+  static Future<T> runTransaction<T>(Future<T> Function(Transaction) transactionHandler) async {
     try {
       return await _firestore.runTransaction(transactionHandler);
     } catch (e, stackTrace) {
@@ -264,4 +245,3 @@ class FirestoreService {
     }
   }
 }
-

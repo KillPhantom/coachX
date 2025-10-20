@@ -33,9 +33,7 @@ class DateUtils {
   /// 判断是否为今天
   static bool isToday(DateTime date) {
     final now = DateTime.now();
-    return date.year == now.year &&
-        date.month == now.month &&
-        date.day == now.day;
+    return date.year == now.year && date.month == now.month && date.day == now.day;
   }
 
   /// 判断是否为昨天
@@ -49,9 +47,7 @@ class DateUtils {
   /// 判断是否为明天
   static bool isTomorrow(DateTime date) {
     final tomorrow = DateTime.now().add(const Duration(days: 1));
-    return date.year == tomorrow.year &&
-        date.month == tomorrow.month &&
-        date.day == tomorrow.day;
+    return date.year == tomorrow.year && date.month == tomorrow.month && date.day == tomorrow.day;
   }
 
   /// 获取星期几（中文）
@@ -105,9 +101,7 @@ class DateUtils {
 
   /// 判断是否为同一天
   static bool isSameDay(DateTime date1, DateTime date2) {
-    return date1.year == date2.year &&
-        date1.month == date2.month &&
-        date1.day == date2.day;
+    return date1.year == date2.year && date1.month == date2.month && date1.day == date2.day;
   }
 
   /// 获取当前日期字符串

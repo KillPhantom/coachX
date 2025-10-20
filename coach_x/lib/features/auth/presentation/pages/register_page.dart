@@ -35,7 +35,9 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
 
   void _handleRegister() {
     if (_formKey.currentState?.validate() ?? false) {
-      ref.read(registerControllerProvider.notifier).signUpWithEmail(
+      ref
+          .read(registerControllerProvider.notifier)
+          .signUpWithEmail(
             email: _emailController.text.trim(),
             password: _passwordController.text,
             displayName: _nameController.text.trim(),
@@ -90,13 +92,8 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
         border: null,
         leading: CupertinoButton(
           padding: EdgeInsets.zero,
-          onPressed: registerState.status == RegisterStatus.loading
-              ? null
-              : () => context.pop(),
-          child: const Icon(
-            CupertinoIcons.back,
-            color: AppColors.primaryColor,
-          ),
+          onPressed: registerState.status == RegisterStatus.loading ? null : () => context.pop(),
+          child: const Icon(CupertinoIcons.back, color: AppColors.primaryColor),
         ),
         middle: const Text('注册账号'),
       ),
@@ -109,35 +106,25 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 const SizedBox(height: 40),
-                
+
                 // 标题
-                Text(
-                  '创建您的账号',
-                  style: AppTextStyles.title1,
-                  textAlign: TextAlign.center,
-                ),
+                Text('创建您的账号', style: AppTextStyles.title1, textAlign: TextAlign.center),
                 const SizedBox(height: AppDimensions.spacingS),
                 Text(
                   '开始您的健身之旅',
-                  style: AppTextStyles.subhead.copyWith(
-                    color: AppColors.textSecondary,
-                  ),
+                  style: AppTextStyles.subhead.copyWith(color: AppColors.textSecondary),
                   textAlign: TextAlign.center,
                 ),
-                
+
                 const SizedBox(height: 40),
-                
+
                 // 姓名输入
                 CustomTextField(
                   controller: _nameController,
                   placeholder: '姓名',
                   prefix: const Padding(
                     padding: EdgeInsets.only(left: 12, right: 8),
-                    child: Icon(
-                      CupertinoIcons.person,
-                      color: AppColors.textTertiary,
-                      size: 20,
-                    ),
+                    child: Icon(CupertinoIcons.person, color: AppColors.textTertiary, size: 20),
                   ),
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
@@ -147,9 +134,9 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                   },
                   enabled: registerState.status != RegisterStatus.loading,
                 ),
-                
+
                 const SizedBox(height: AppDimensions.spacingL),
-                
+
                 // 邮箱输入
                 CustomTextField(
                   controller: _emailController,
@@ -157,18 +144,14 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                   keyboardType: TextInputType.emailAddress,
                   prefix: const Padding(
                     padding: EdgeInsets.only(left: 12, right: 8),
-                    child: Icon(
-                      CupertinoIcons.mail,
-                      color: AppColors.textTertiary,
-                      size: 20,
-                    ),
+                    child: Icon(CupertinoIcons.mail, color: AppColors.textTertiary, size: 20),
                   ),
                   validator: ValidationUtils.validateEmail,
                   enabled: registerState.status != RegisterStatus.loading,
                 ),
-                
+
                 const SizedBox(height: AppDimensions.spacingL),
-                
+
                 // 密码输入
                 CustomTextField(
                   controller: _passwordController,
@@ -176,18 +159,14 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                   isPassword: true,
                   prefix: const Padding(
                     padding: EdgeInsets.only(left: 12, right: 8),
-                    child: Icon(
-                      CupertinoIcons.lock,
-                      color: AppColors.textTertiary,
-                      size: 20,
-                    ),
+                    child: Icon(CupertinoIcons.lock, color: AppColors.textTertiary, size: 20),
                   ),
                   validator: ValidationUtils.validatePassword,
                   enabled: registerState.status != RegisterStatus.loading,
                 ),
-                
+
                 const SizedBox(height: AppDimensions.spacingL),
-                
+
                 // 确认密码输入
                 CustomTextField(
                   controller: _confirmPasswordController,
@@ -195,11 +174,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                   isPassword: true,
                   prefix: const Padding(
                     padding: EdgeInsets.only(left: 12, right: 8),
-                    child: Icon(
-                      CupertinoIcons.lock,
-                      color: AppColors.textTertiary,
-                      size: 20,
-                    ),
+                    child: Icon(CupertinoIcons.lock, color: AppColors.textTertiary, size: 20),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -213,20 +188,18 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                   enabled: registerState.status != RegisterStatus.loading,
                   onEditingComplete: _handleRegister,
                 ),
-                
+
                 const SizedBox(height: AppDimensions.spacingXL),
-                
+
                 // 用户协议提示
                 Text(
                   '注册即表示您同意我们的服务条款和隐私政策',
-                  style: AppTextStyles.caption1.copyWith(
-                    color: AppColors.textTertiary,
-                  ),
+                  style: AppTextStyles.caption1.copyWith(color: AppColors.textTertiary),
                   textAlign: TextAlign.center,
                 ),
-                
+
                 const SizedBox(height: AppDimensions.spacingL),
-                
+
                 // 注册按钮
                 CustomButton(
                   text: '注册',
@@ -234,17 +207,14 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                   isLoading: registerState.status == RegisterStatus.loading,
                   fullWidth: true,
                 ),
-                
+
                 const SizedBox(height: AppDimensions.spacingL),
-                
+
                 // 登录提示
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
-                      '已有账号？',
-                      style: AppTextStyles.body,
-                    ),
+                    Text('已有账号？', style: AppTextStyles.body),
                     CupertinoButton(
                       padding: const EdgeInsets.symmetric(horizontal: 8),
                       onPressed: registerState.status == RegisterStatus.loading
@@ -268,4 +238,3 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
     );
   }
 }
-

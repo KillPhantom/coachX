@@ -174,10 +174,7 @@ class ValidationUtils {
   }
 
   /// 验证正整数
-  static String? validatePositiveInteger(
-    String? value, {
-    String fieldName = '数值',
-  }) {
+  static String? validatePositiveInteger(String? value, {String fieldName = '数值'}) {
     final intValidation = validateInteger(value, fieldName: fieldName);
     if (intValidation != null) {
       return intValidation;
@@ -254,10 +251,7 @@ class ValidationUtils {
 
   /// 通用验证组合器
   /// 可以组合多个验证器
-  static String? compose(
-    String? value,
-    List<String? Function(String?)> validators,
-  ) {
+  static String? compose(String? value, List<String? Function(String?)> validators) {
     for (final validator in validators) {
       final result = validator(value);
       if (result != null) {

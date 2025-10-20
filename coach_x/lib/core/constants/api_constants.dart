@@ -94,8 +94,7 @@ class ApiConstants {
   static const String getExerciseFeedback = '/getExerciseFeedback';
 
   /// 获取历史反馈
-  static const String getExerciseHistoryFeedback =
-      '/getExerciseHistoryFeedback';
+  static const String getExerciseHistoryFeedback = '/getExerciseHistoryFeedback';
 
   // ==================== 身体测量API ====================
 
@@ -125,8 +124,7 @@ class ApiConstants {
   static const String generateInvitationCodes = '/generateInvitationCodes';
 
   /// 生成学生邀请码
-  static const String generateStudentInvitationCode =
-      '/generateStudentInvitationCode';
+  static const String generateStudentInvitationCode = '/generateStudentInvitationCode';
 
   // ==================== AI生成API ====================
 

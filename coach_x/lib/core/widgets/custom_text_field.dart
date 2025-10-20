@@ -62,9 +62,7 @@ class CustomTextField extends StatelessWidget {
       children: [
         Container(
           decoration: BoxDecoration(
-            color: enabled
-                ? AppColors.backgroundWhite
-                : AppColors.backgroundLight,
+            color: enabled ? AppColors.backgroundWhite : AppColors.backgroundLight,
             borderRadius: BorderRadius.circular(AppDimensions.radiusM),
             border: Border.all(color: AppColors.dividerLight, width: 1.0),
           ),
@@ -84,24 +82,18 @@ class CustomTextField extends StatelessWidget {
             ),
             prefix: prefix != null
                 ? Padding(
-                    padding: const EdgeInsets.only(
-                      left: AppDimensions.spacingL,
-                    ),
+                    padding: const EdgeInsets.only(left: AppDimensions.spacingL),
                     child: prefix,
                   )
                 : null,
             suffix: suffix != null
                 ? Padding(
-                    padding: const EdgeInsets.only(
-                      right: AppDimensions.spacingL,
-                    ),
+                    padding: const EdgeInsets.only(right: AppDimensions.spacingL),
                     child: suffix,
                   )
                 : null,
             style: AppTextStyles.body,
-            placeholderStyle: AppTextStyles.body.copyWith(
-              color: AppColors.textTertiary,
-            ),
+            placeholderStyle: AppTextStyles.body.copyWith(color: AppColors.textTertiary),
             decoration: const BoxDecoration(),
           ),
         ),
@@ -117,9 +109,7 @@ class CustomTextField extends StatelessWidget {
                   ),
                   child: Text(
                     error,
-                    style: AppTextStyles.caption1.copyWith(
-                      color: AppColors.errorRed,
-                    ),
+                    style: AppTextStyles.caption1.copyWith(color: AppColors.errorRed),
                   ),
                 );
               }

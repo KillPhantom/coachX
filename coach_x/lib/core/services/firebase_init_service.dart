@@ -4,13 +4,13 @@ import 'package:coach_x/firebase_options.dart';
 import 'package:coach_x/core/utils/logger.dart';
 
 /// Firebase初始化服务
-/// 
+///
 /// 负责应用启动时初始化Firebase相关服务
 class FirebaseInitService {
   FirebaseInitService._();
 
   /// 初始化Firebase
-  /// 
+  ///
   /// 在应用启动时调用，初始化Firebase核心服务
   /// 并配置Firestore、Storage等服务
   static Future<void> initialize() async {
@@ -18,9 +18,7 @@ class FirebaseInitService {
       AppLogger.info('开始初始化Firebase...');
 
       // 初始化Firebase Core
-      await Firebase.initializeApp(
-        options: DefaultFirebaseOptions.currentPlatform,
-      );
+      await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
       AppLogger.info('Firebase Core 初始化成功');
 
@@ -61,4 +59,3 @@ class FirebaseInitService {
     }
   }
 }
-

@@ -45,14 +45,10 @@ class CustomButton extends StatelessWidget {
 
     Widget button = Container(
       height: height,
-      constraints: fullWidth
-          ? const BoxConstraints(minWidth: double.infinity)
-          : null,
+      constraints: fullWidth ? const BoxConstraints(minWidth: double.infinity) : null,
       child: CupertinoButton(
         padding: EdgeInsets.symmetric(
-          horizontal: size == ButtonSize.small
-              ? AppDimensions.spacingL
-              : AppDimensions.spacingXL,
+          horizontal: size == ButtonSize.small ? AppDimensions.spacingL : AppDimensions.spacingXL,
         ),
         color: type == ButtonType.primary ? backgroundColor : null,
         disabledColor: AppColors.secondaryGrey.withValues(alpha: 0.5),

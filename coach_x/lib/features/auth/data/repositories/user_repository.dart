@@ -20,4 +20,3 @@ abstract class UserRepository {
   /// 检查用户是否存在
   Future<bool> userExists(String userId);
 }
-

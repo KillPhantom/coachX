@@ -47,7 +47,7 @@ class UserModel {
   /// 从Firestore文档创建
   factory UserModel.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>?;
-    
+
     if (data == null) {
       throw Exception('用户文档数据为空');
     }
@@ -104,4 +104,3 @@ class UserModel {
     return 'UserModel(id: $id, email: $email, name: $name, role: $role)';
   }
 }
-
