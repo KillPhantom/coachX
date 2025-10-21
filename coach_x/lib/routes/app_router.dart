@@ -130,36 +130,52 @@ class _StudentDetailPlaceholderPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
-      navigationBar: CupertinoNavigationBar(
-        leading: CupertinoButton(
-          padding: EdgeInsets.zero,
-          onPressed: () => context.pop(),
-          child: const Icon(CupertinoIcons.back),
-        ),
-        middle: const Text('Student Detail'),
-      ),
-      child: Center(
+      child: SafeArea(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(CupertinoIcons.person_circle, size: 80),
-            const SizedBox(height: 20),
-            const Text(
-              'Student Detail Page',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Student ID: $studentId',
-              style: const TextStyle(
-                fontSize: 16,
-                color: CupertinoColors.systemGrey,
+            // 返回按钮
+            Align(
+              alignment: Alignment.centerLeft,
+              child: CupertinoButton(
+                padding: const EdgeInsets.all(16),
+                onPressed: () => context.pop(),
+                child: const Icon(CupertinoIcons.back, size: 28),
               ),
             ),
-            const SizedBox(height: 8),
-            const Text(
-              'TODO: 实现学生详情页面',
-              style: TextStyle(fontSize: 16, color: CupertinoColors.systemGrey),
+            // 内容区域
+            Expanded(
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(CupertinoIcons.person_circle, size: 80),
+                    const SizedBox(height: 20),
+                    const Text(
+                      'Student Detail Page',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Student ID: $studentId',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        color: CupertinoColors.systemGrey,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    const Text(
+                      'TODO: 实现学生详情页面',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: CupertinoColors.systemGrey,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ],
         ),
@@ -175,7 +191,6 @@ class ErrorPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
-      navigationBar: const CupertinoNavigationBar(middle: Text('错误')),
       child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

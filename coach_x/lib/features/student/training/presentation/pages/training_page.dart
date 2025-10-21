@@ -7,7 +7,6 @@ class TrainingPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
-      navigationBar: const CupertinoNavigationBar(middle: Text('训练')),
       child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

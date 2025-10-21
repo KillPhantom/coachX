@@ -122,11 +122,6 @@ class _ProfileSetupPageState extends ConsumerState<ProfileSetupPage> {
 
     return CupertinoPageScaffold(
       backgroundColor: AppColors.backgroundLight,
-      navigationBar: const CupertinoNavigationBar(
-        backgroundColor: AppColors.backgroundWhite,
-        border: null,
-        middle: Text('完善资料'),
-      ),
       child: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(AppDimensions.paddingXL),

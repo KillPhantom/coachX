@@ -18,30 +18,6 @@ class CoachHomePage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return CupertinoPageScaffold(
-      navigationBar: CupertinoNavigationBar(
-        middle: const Text('Home'),
-        trailing: CupertinoButton(
-          padding: EdgeInsets.zero,
-          onPressed: () {
-            // TODO: 打开设置页面
-            // 路由: /coach/settings
-            showCupertinoDialog(
-              context: context,
-              builder: (context) => CupertinoAlertDialog(
-                title: const Text('TODO: 设置'),
-                content: const Text('设置页面待实现'),
-                actions: [
-                  CupertinoDialogAction(
-                    child: const Text('知道了'),
-                    onPressed: () => Navigator.of(context).pop(),
-                  ),
-                ],
-              ),
-            );
-          },
-          child: const Icon(CupertinoIcons.settings),
-        ),
-      ),
       child: SafeArea(
         child: CustomScrollView(
           slivers: [

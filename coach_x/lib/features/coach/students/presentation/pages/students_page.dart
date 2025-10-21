@@ -7,7 +7,6 @@ class StudentsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
-      navigationBar: const CupertinoNavigationBar(middle: Text('学生列表')),
       child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

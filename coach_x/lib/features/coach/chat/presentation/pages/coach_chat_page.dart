@@ -7,7 +7,6 @@ class CoachChatPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
-      navigationBar: const CupertinoNavigationBar(middle: Text('对话列表')),
       child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

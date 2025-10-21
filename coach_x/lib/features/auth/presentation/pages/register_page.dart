@@ -74,18 +74,6 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
 
     return CupertinoPageScaffold(
       backgroundColor: AppColors.backgroundLight,
-      navigationBar: CupertinoNavigationBar(
-        backgroundColor: AppColors.backgroundWhite,
-        border: null,
-        leading: CupertinoButton(
-          padding: EdgeInsets.zero,
-          onPressed: registerState.status == RegisterStatus.loading
-              ? null
-              : () => context.pop(),
-          child: const Icon(CupertinoIcons.back, color: AppColors.primaryColor),
-        ),
-        middle: const Text('注册账号'),
-      ),
       child: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(AppDimensions.paddingXL),
@@ -94,7 +82,23 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const SizedBox(height: 40),
+                // 返回按钮
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: CupertinoButton(
+                    padding: EdgeInsets.zero,
+                    onPressed: registerState.status == RegisterStatus.loading
+                        ? null
+                        : () => context.pop(),
+                    child: const Icon(
+                      CupertinoIcons.back,
+                      color: AppColors.primaryColor,
+                      size: 28,
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 20),
 
                 // 标题
                 Text(

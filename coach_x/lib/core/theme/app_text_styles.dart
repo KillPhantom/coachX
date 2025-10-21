@@ -4,14 +4,11 @@ import 'app_colors.dart';
 /// CoachX 应用文字样式定义
 /// 定义了应用中使用的所有文字样式
 /// 当前使用iOS系统默认字体（SF Pro）
-/// TODO: 下载Lexend字体文件后，取消注释下方的_fontFamily配置
 class AppTextStyles {
   AppTextStyles._(); // 私有构造函数，防止实例化
 
   // 字体家族名称
-  // static const String _fontFamily = 'Lexend'; // 未下载字体时注释掉
-  static const String? _fontFamily =
-      null; // 使用系统默认字体（iOS: SF Pro, Android: Roboto）
+  static const String _fontFamily = 'Lexend';
 
   // ==================== 标题样式 ====================
 
