@@ -97,5 +97,5 @@ class AppConstants {
   static const int maxUsernameLength = 20;
 
   /// 邀请码长度
-  static const int invitationCodeLength = 6;
+  static const int invitationCodeLength = 8;
 }

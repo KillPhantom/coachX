@@ -18,7 +18,9 @@ class FirebaseInitService {
       AppLogger.info('开始初始化Firebase...');
 
       // 初始化Firebase Core
-      await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      );
 
       AppLogger.info('Firebase Core 初始化成功');
 

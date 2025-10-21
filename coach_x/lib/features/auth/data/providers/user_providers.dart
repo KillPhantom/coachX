@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:coach_x/features/auth/data/models/user_model.dart';
+import 'package:coach_x/core/enums/user_role.dart';
 import 'package:coach_x/features/auth/data/repositories/user_repository.dart';
 import 'package:coach_x/features/auth/data/repositories/user_repository_impl.dart';
 import 'package:coach_x/features/auth/data/providers/auth_providers.dart';
@@ -26,12 +27,12 @@ final currentUserDataProvider = StreamProvider<UserModel?>((ref) {
 /// 用户角色Provider
 ///
 /// 提供当前用户的角色信息
-final userRoleProvider = Provider<UserRole>((ref) {
+final userRoleProvider = Provider<UserRole?>((ref) {
   final userData = ref.watch(currentUserDataProvider);
   return userData.when(
-    data: (user) => user?.role ?? UserRole.unknown,
-    loading: () => UserRole.unknown,
-    error: (_, __) => UserRole.unknown,
+    data: (user) => user?.role,
+    loading: () => null,
+    error: (_, __) => null,
   );
 });
 

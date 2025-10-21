@@ -39,13 +39,22 @@ class EmptyState extends StatelessWidget {
           if (message != null) ...[
             const SizedBox(height: AppDimensions.spacingM),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingXXXL),
-              child: Text(message!, style: AppTextStyles.subhead, textAlign: TextAlign.center),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppDimensions.spacingXXXL,
+              ),
+              child: Text(
+                message!,
+                style: AppTextStyles.subhead,
+                textAlign: TextAlign.center,
+              ),
             ),
           ],
           if (actionText != null && onAction != null) ...[
             const SizedBox(height: AppDimensions.spacingXL),
-            CupertinoButton.filled(onPressed: onAction, child: Text(actionText!)),
+            CupertinoButton.filled(
+              onPressed: onAction,
+              child: Text(actionText!),
+            ),
           ],
         ],
       ),

@@ -52,21 +52,8 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
     // 监听注册状态
     ref.listen<RegisterState>(registerControllerProvider, (previous, next) {
       if (next.status == RegisterStatus.success) {
-        // 注册成功，导航到主页
-        context.go(RouteNames.studentHome);
-        showCupertinoDialog(
-          context: context,
-          builder: (context) => CupertinoAlertDialog(
-            title: const Text('注册成功'),
-            content: const Text('欢迎加入CoachX！'),
-            actions: [
-              CupertinoDialogAction(
-                child: const Text('确定'),
-                onPressed: () => Navigator.of(context).pop(),
-              ),
-            ],
-          ),
-        );
+        // 注册成功，导航到Profile Setup页面
+        context.go(RouteNames.profileSetup);
       } else if (next.status == RegisterStatus.error) {
         // 显示错误提示
         showCupertinoDialog(
@@ -92,7 +79,9 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
         border: null,
         leading: CupertinoButton(
           padding: EdgeInsets.zero,
-          onPressed: registerState.status == RegisterStatus.loading ? null : () => context.pop(),
+          onPressed: registerState.status == RegisterStatus.loading
+              ? null
+              : () => context.pop(),
           child: const Icon(CupertinoIcons.back, color: AppColors.primaryColor),
         ),
         middle: const Text('注册账号'),
@@ -108,11 +97,17 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                 const SizedBox(height: 40),
 
                 // 标题
-                Text('创建您的账号', style: AppTextStyles.title1, textAlign: TextAlign.center),
+                Text(
+                  '创建您的账号',
+                  style: AppTextStyles.title1,
+                  textAlign: TextAlign.center,
+                ),
                 const SizedBox(height: AppDimensions.spacingS),
                 Text(
                   '开始您的健身之旅',
-                  style: AppTextStyles.subhead.copyWith(color: AppColors.textSecondary),
+                  style: AppTextStyles.subhead.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
                   textAlign: TextAlign.center,
                 ),
 
@@ -124,7 +119,11 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                   placeholder: '姓名',
                   prefix: const Padding(
                     padding: EdgeInsets.only(left: 12, right: 8),
-                    child: Icon(CupertinoIcons.person, color: AppColors.textTertiary, size: 20),
+                    child: Icon(
+                      CupertinoIcons.person,
+                      color: AppColors.textTertiary,
+                      size: 20,
+                    ),
                   ),
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
@@ -144,7 +143,11 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                   keyboardType: TextInputType.emailAddress,
                   prefix: const Padding(
                     padding: EdgeInsets.only(left: 12, right: 8),
-                    child: Icon(CupertinoIcons.mail, color: AppColors.textTertiary, size: 20),
+                    child: Icon(
+                      CupertinoIcons.mail,
+                      color: AppColors.textTertiary,
+                      size: 20,
+                    ),
                   ),
                   validator: ValidationUtils.validateEmail,
                   enabled: registerState.status != RegisterStatus.loading,
@@ -159,7 +162,11 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                   isPassword: true,
                   prefix: const Padding(
                     padding: EdgeInsets.only(left: 12, right: 8),
-                    child: Icon(CupertinoIcons.lock, color: AppColors.textTertiary, size: 20),
+                    child: Icon(
+                      CupertinoIcons.lock,
+                      color: AppColors.textTertiary,
+                      size: 20,
+                    ),
                   ),
                   validator: ValidationUtils.validatePassword,
                   enabled: registerState.status != RegisterStatus.loading,
@@ -174,7 +181,11 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                   isPassword: true,
                   prefix: const Padding(
                     padding: EdgeInsets.only(left: 12, right: 8),
-                    child: Icon(CupertinoIcons.lock, color: AppColors.textTertiary, size: 20),
+                    child: Icon(
+                      CupertinoIcons.lock,
+                      color: AppColors.textTertiary,
+                      size: 20,
+                    ),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -194,7 +205,9 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                 // 用户协议提示
                 Text(
                   '注册即表示您同意我们的服务条款和隐私政策',
-                  style: AppTextStyles.caption1.copyWith(color: AppColors.textTertiary),
+                  style: AppTextStyles.caption1.copyWith(
+                    color: AppColors.textTertiary,
+                  ),
                   textAlign: TextAlign.center,
                 ),
 

@@ -14,7 +14,11 @@ final authStateProvider = StreamProvider<User?>((ref) {
 /// 提供当前登录的用户信息
 final currentUserProvider = Provider<User?>((ref) {
   final authState = ref.watch(authStateProvider);
-  return authState.when(data: (user) => user, loading: () => null, error: (_, __) => null);
+  return authState.when(
+    data: (user) => user,
+    loading: () => null,
+    error: (_, __) => null,
+  );
 });
 
 /// 当前用户ID Provider

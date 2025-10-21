@@ -33,7 +33,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     if (_formKey.currentState?.validate() ?? false) {
       ref
           .read(loginControllerProvider.notifier)
-          .signInWithEmail(email: _emailController.text.trim(), password: _passwordController.text);
+          .signInWithEmail(
+            email: _emailController.text.trim(),
+            password: _passwordController.text,
+          );
     }
   }
 
@@ -79,11 +82,17 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                 // Logo和标题
                 Image.asset('assets/images/icon.png', width: 100, height: 100),
                 const SizedBox(height: AppDimensions.spacingL),
-                Text('CoachX', style: AppTextStyles.largeTitle, textAlign: TextAlign.center),
+                Text(
+                  'CoachX',
+                  style: AppTextStyles.largeTitle,
+                  textAlign: TextAlign.center,
+                ),
                 const SizedBox(height: AppDimensions.spacingS),
                 Text(
                   'AI教练学生管理平台',
-                  style: AppTextStyles.subhead.copyWith(color: AppColors.textSecondary),
+                  style: AppTextStyles.subhead.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
                   textAlign: TextAlign.center,
                 ),
 
@@ -96,7 +105,11 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                   keyboardType: TextInputType.emailAddress,
                   prefix: const Padding(
                     padding: EdgeInsets.only(left: 12, right: 8),
-                    child: Icon(CupertinoIcons.mail, color: AppColors.textTertiary, size: 20),
+                    child: Icon(
+                      CupertinoIcons.mail,
+                      color: AppColors.textTertiary,
+                      size: 20,
+                    ),
                   ),
                   validator: ValidationUtils.validateEmail,
                   enabled: loginState.status != LoginStatus.loading,
@@ -111,7 +124,11 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                   isPassword: true,
                   prefix: const Padding(
                     padding: EdgeInsets.only(left: 12, right: 8),
-                    child: Icon(CupertinoIcons.lock, color: AppColors.textTertiary, size: 20),
+                    child: Icon(
+                      CupertinoIcons.lock,
+                      color: AppColors.textTertiary,
+                      size: 20,
+                    ),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -150,7 +167,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                           },
                     child: Text(
                       '忘记密码？',
-                      style: AppTextStyles.footnote.copyWith(color: AppColors.primaryColor),
+                      style: AppTextStyles.footnote.copyWith(
+                        color: AppColors.primaryColor,
+                      ),
                     ),
                   ),
                 ),

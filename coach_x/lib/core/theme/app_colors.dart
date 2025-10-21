@@ -54,6 +54,13 @@ class AppColors {
   /// 卡片背景
   static const Color backgroundCard = Color(0xFFFFFFFF);
 
+  /// 次级背景
+  static const Color backgroundSecondary = Color(0xFFF3F4F6);
+
+  // ==================== 边框颜色 ====================
+  /// 边框颜色
+  static const Color borderColor = Color(0xFFE5E7EB);
+
   // ==================== 功能色 ====================
   /// 成功/完成 - 绿色
   static const Color successGreen = Color(0xFF10B981);

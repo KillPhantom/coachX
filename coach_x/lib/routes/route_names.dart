@@ -11,6 +11,9 @@ class RouteNames {
   /// 登录页
   static const String login = '/login';
 
+  /// Profile Setup页
+  static const String profileSetup = '/profile-setup';
+
   // ==================== 学生端路由 ====================
 
   /// 学生首页

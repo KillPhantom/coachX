@@ -1,5 +1,4 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:coach_x/core/utils/logger.dart';
 
 /// Firebase Authentication服务
@@ -64,7 +63,10 @@ class AuthService {
     try {
       AppLogger.info('开始登录: $email');
 
-      final credential = await _auth.signInWithEmailAndPassword(email: email, password: password);
+      final credential = await _auth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
 
       AppLogger.info('登录成功: ${credential.user?.uid}');
       return credential;
@@ -137,7 +139,10 @@ class AuthService {
   ///
   /// [displayName] 显示名称
   /// [photoURL] 头像URL
-  static Future<void> updateProfile({String? displayName, String? photoURL}) async {
+  static Future<void> updateProfile({
+    String? displayName,
+    String? photoURL,
+  }) async {
     try {
       final user = currentUser;
       if (user == null) {

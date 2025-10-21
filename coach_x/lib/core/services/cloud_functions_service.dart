@@ -49,10 +49,31 @@ class CloudFunctionsService {
   ///
   /// [name] 用户名
   /// [avatarUrl] 头像URL
-  static Future<Map<String, dynamic>> updateUserInfo({String? name, String? avatarUrl}) async {
+  /// [role] 角色
+  /// [gender] 性别
+  /// [bornDate] 出生日期（格式: "yyyy-MM-dd"）
+  /// [height] 身高（cm）
+  /// [initialWeight] 体重（kg）
+  /// [coachId] 教练ID
+  static Future<Map<String, dynamic>> updateUserInfo({
+    String? name,
+    String? avatarUrl,
+    String? role,
+    String? gender,
+    String? bornDate,
+    double? height,
+    double? initialWeight,
+    String? coachId,
+  }) async {
     final params = <String, dynamic>{};
     if (name != null) params['name'] = name;
-    if (avatarUrl != null) params['avatar_url'] = avatarUrl;
+    if (avatarUrl != null) params['avatarUrl'] = avatarUrl;
+    if (role != null) params['role'] = role;
+    if (gender != null) params['gender'] = gender;
+    if (bornDate != null) params['bornDate'] = bornDate;
+    if (height != null) params['height'] = height;
+    if (initialWeight != null) params['initialWeight'] = initialWeight;
+    if (coachId != null) params['coachId'] = coachId;
 
     return await call('update_user_info', params);
   }
@@ -71,7 +92,9 @@ class CloudFunctionsService {
   ///
   /// [count] 生成数量
   /// 返回生成的邀请码列表
-  static Future<Map<String, dynamic>> generateInvitationCodes({int count = 1}) async {
+  static Future<Map<String, dynamic>> generateInvitationCodes({
+    int count = 1,
+  }) async {
     return await call('generate_invitation_codes', {'count': count});
   }
 

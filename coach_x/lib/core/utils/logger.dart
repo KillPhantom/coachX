@@ -17,7 +17,9 @@ class AppLogger {
     ),
   );
 
-  static final _simpleLogger = log.Logger(printer: log.SimplePrinter(colors: true));
+  static final _simpleLogger = log.Logger(
+    printer: log.SimplePrinter(colors: true),
+  );
 
   /// 调试日志
   /// 仅在Debug模式下输出
@@ -37,7 +39,11 @@ class AppLogger {
 
   /// 警告日志
   /// 所有模式下都输出
-  static void warning(dynamic message, [dynamic error, StackTrace? stackTrace]) {
+  static void warning(
+    dynamic message, [
+    dynamic error,
+    StackTrace? stackTrace,
+  ]) {
     _logger.w(message, error: error, stackTrace: stackTrace);
   }
 

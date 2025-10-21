@@ -57,7 +57,11 @@ class CupertinoCard extends StatelessWidget {
     );
 
     if (onTap != null) {
-      return GestureDetector(onTap: onTap, behavior: HitTestBehavior.opaque, child: card);
+      return GestureDetector(
+        onTap: onTap,
+        behavior: HitTestBehavior.opaque,
+        child: card,
+      );
     }
 
     return card;

@@ -24,7 +24,9 @@ class StringUtils {
 
   /// 验证邮箱格式
   static bool isEmail(String str) {
-    final emailRegex = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+    final emailRegex = RegExp(
+      r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+    );
     return emailRegex.hasMatch(str);
   }
 
@@ -84,7 +86,10 @@ class StringUtils {
   static String toSnakeCase(String str) {
     if (isEmpty(str)) return '';
     return str
-        .replaceAllMapped(RegExp(r'[A-Z]'), (match) => '_${match.group(0)!.toLowerCase()}')
+        .replaceAllMapped(
+          RegExp(r'[A-Z]'),
+          (match) => '_${match.group(0)!.toLowerCase()}',
+        )
         .replaceAll(RegExp(r'[_\s-]+'), '_')
         .replaceAll(RegExp(r'^_|_$'), '');
   }
@@ -151,7 +156,8 @@ class StringUtils {
 
     return List.generate(
       length,
-      (index) => pool[(DateTime.now().microsecondsSinceEpoch + index) % pool.length],
+      (index) =>
+          pool[(DateTime.now().microsecondsSinceEpoch + index) % pool.length],
     ).join();
   }
 
@@ -165,7 +171,10 @@ class StringUtils {
 
   /// 判断是否为URL
   static bool isUrl(String str) {
-    final urlRegex = RegExp(r'^(http|https):\/\/([\w.]+\/?)\S*$', caseSensitive: false);
+    final urlRegex = RegExp(
+      r'^(http|https):\/\/([\w.]+\/?)\S*$',
+      caseSensitive: false,
+    );
     return urlRegex.hasMatch(str);
   }
 

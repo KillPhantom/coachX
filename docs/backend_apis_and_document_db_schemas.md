@@ -5,7 +5,7 @@ Google docs: https://docs.google.com/document/d/1yKQgZWjdeALkwrl2SHf6RjUnsCmeLxt
 - 用户
   - fetchUserInfo(userId?)
   - login(userInfo)
-  - updateUserInfo(display_name?, born_date?, height?, expire_at?, gender?, need_reply?, initial_weight?, avatar_url?, active_role?)
+  - updateUserInfo(name?, avatarUrl?, role?, gender?, bornDate?, height?, initialWeight?, coachId?)
 
 - 学员与统计
   - fetchStudents(pageSize?, pageNumber?, otherParams?)
@@ -57,13 +57,16 @@ Google docs: https://docs.google.com/document/d/1yKQgZWjdeALkwrl2SHf6RjUnsCmeLxt
 | id | string |
 | role | string |
 | name | string |
-| avatarRrl | string |
+| email | string |
+| avatarUrl | string |
 | gender | string |
 | coachId | string |
 | isVerified | boolean |
 | bornDate | string |
 | height | number |
 | initialWeight | number |
+| createdAt | timestamp |
+| updatedAt | timestamp |
 
 ### exercisePlan
 | columnName | data type |
@@ -294,17 +297,16 @@ FeedbackMessage
 | senderId | string |
 
 
-### invitationCode
+### invitationCodes
 | columnName | data type |
 | --- | --- |
 | id | string |
-| invitationCode | string |
-| type | number |
-| is_used | boolean |
-| used_by | string |
-| created_by | string |
-| created_at | string |
-| total_days | number |
+| code | string |
+| coachId | string |
+| used | boolean |
+| usedBy | string |
+| createdAt | timestamp |
+| expiresAt | timestamp |
 
 ### foodLibrary
 | columnName | data type |

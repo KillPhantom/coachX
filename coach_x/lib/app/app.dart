@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../core/theme/app_theme.dart';
 import '../routes/app_router.dart';
@@ -15,8 +16,11 @@ class CoachXApp extends ConsumerWidget {
       routerConfig: appRouter,
       locale: const Locale('zh', 'CN'),
       debugShowCheckedModeBanner: false,
-      // 使用Material Localizations支持Cupertino组件
-      localizationsDelegates: const [DefaultCupertinoLocalizations.delegate],
+      // 完整的本地化支持 (使用delegates复数形式自动包含Cupertino支持)
+      localizationsDelegates: [
+        ...GlobalMaterialLocalizations.delegates,
+        GlobalCupertinoLocalizations.delegate,
+      ],
       supportedLocales: const [Locale('zh', 'CN'), Locale('en', 'US')],
     );
   }

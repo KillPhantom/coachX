@@ -19,7 +19,11 @@ class StorageService {
   /// [path] Storage中的路径
   /// [onProgress] 上传进度回调
   /// 返回文件的下载URL
-  static Future<String> uploadFile(File file, String path, {Function(double)? onProgress}) async {
+  static Future<String> uploadFile(
+    File file,
+    String path, {
+    Function(double)? onProgress,
+  }) async {
     try {
       AppLogger.info('开始上传文件: $path');
 
@@ -100,7 +104,11 @@ class StorageService {
     required ImageSource source,
     Function(double)? onProgress,
   }) async {
-    return uploadImage(source: source, folder: 'avatars', onProgress: onProgress);
+    return uploadImage(
+      source: source,
+      folder: 'avatars',
+      onProgress: onProgress,
+    );
   }
 
   /// 上传训练图片
@@ -112,7 +120,11 @@ class StorageService {
     required ImageSource source,
     Function(double)? onProgress,
   }) async {
-    return uploadImage(source: source, folder: 'training_images', onProgress: onProgress);
+    return uploadImage(
+      source: source,
+      folder: 'training_images',
+      onProgress: onProgress,
+    );
   }
 
   /// 上传饮食图片
@@ -124,7 +136,11 @@ class StorageService {
     required ImageSource source,
     Function(double)? onProgress,
   }) async {
-    return uploadImage(source: source, folder: 'diet_images', onProgress: onProgress);
+    return uploadImage(
+      source: source,
+      folder: 'diet_images',
+      onProgress: onProgress,
+    );
   }
 
   /// 上传身体测量图片
@@ -136,7 +152,11 @@ class StorageService {
     required ImageSource source,
     Function(double)? onProgress,
   }) async {
-    return uploadImage(source: source, folder: 'body_stats', onProgress: onProgress);
+    return uploadImage(
+      source: source,
+      folder: 'body_stats',
+      onProgress: onProgress,
+    );
   }
 
   /// 删除文件

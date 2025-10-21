@@ -10,7 +10,11 @@ class UserRepositoryImpl implements UserRepository {
   @override
   Future<void> createUser(UserModel user) async {
     try {
-      await FirestoreService.setDocument(_collection, user.id, user.toFirestore());
+      await FirestoreService.setDocument(
+        _collection,
+        user.id,
+        user.toFirestore(),
+      );
       AppLogger.info('用户创建成功: ${user.id}');
     } catch (e, stackTrace) {
       AppLogger.error('创建用户失败: ${user.id}', e, stackTrace);

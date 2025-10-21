@@ -14,7 +14,10 @@ class FirestoreService {
   /// [collection] 集合名称
   /// [data] 文档数据
   /// 返回新文档的ID
-  static Future<String> addDocument(String collection, Map<String, dynamic> data) async {
+  static Future<String> addDocument(
+    String collection,
+    Map<String, dynamic> data,
+  ) async {
     try {
       // 添加时间戳
       data['createdAt'] = FieldValue.serverTimestamp();
@@ -46,7 +49,10 @@ class FirestoreService {
         data['createdAt'] = FieldValue.serverTimestamp();
       }
 
-      await _firestore.collection(collection).doc(docId).set(data, SetOptions(merge: merge));
+      await _firestore
+          .collection(collection)
+          .doc(docId)
+          .set(data, SetOptions(merge: merge));
       AppLogger.info('文档设置成功: $collection/$docId');
     } catch (e, stackTrace) {
       AppLogger.error('设置文档失败: $collection/$docId', e, stackTrace);
@@ -94,7 +100,10 @@ class FirestoreService {
   /// [collection] 集合名称
   /// [docId] 文档ID
   /// 返回文档快照
-  static Future<DocumentSnapshot> getDocument(String collection, String docId) async {
+  static Future<DocumentSnapshot> getDocument(
+    String collection,
+    String docId,
+  ) async {
     try {
       final doc = await _firestore.collection(collection).doc(docId).get();
       AppLogger.info('获取文档: $collection/$docId, 存在: ${doc.exists}');
@@ -133,8 +142,12 @@ class FirestoreService {
               isLessThan: condition[1] == '<' ? condition[2] : null,
               isLessThanOrEqualTo: condition[1] == '<=' ? condition[2] : null,
               isGreaterThan: condition[1] == '>' ? condition[2] : null,
-              isGreaterThanOrEqualTo: condition[1] == '>=' ? condition[2] : null,
-              arrayContains: condition[1] == 'array-contains' ? condition[2] : null,
+              isGreaterThanOrEqualTo: condition[1] == '>='
+                  ? condition[2]
+                  : null,
+              arrayContains: condition[1] == 'array-contains'
+                  ? condition[2]
+                  : null,
             );
           }
         }
@@ -164,7 +177,10 @@ class FirestoreService {
   /// [collection] 集合名称
   /// [docId] 文档ID
   /// 返回文档快照流
-  static Stream<DocumentSnapshot> watchDocument(String collection, String docId) {
+  static Stream<DocumentSnapshot> watchDocument(
+    String collection,
+    String docId,
+  ) {
     return _firestore.collection(collection).doc(docId).snapshots();
   }
 
@@ -217,7 +233,9 @@ class FirestoreService {
   /// 批量写入操作
   ///
   /// [operations] 操作列表
-  static Future<void> batchWrite(List<void Function(WriteBatch)> operations) async {
+  static Future<void> batchWrite(
+    List<void Function(WriteBatch)> operations,
+  ) async {
     try {
       final batch = _firestore.batch();
 
@@ -236,7 +254,9 @@ class FirestoreService {
   /// 事务操作
   ///
   /// [transactionHandler] 事务处理函数
-  static Future<T> runTransaction<T>(Future<T> Function(Transaction) transactionHandler) async {
+  static Future<T> runTransaction<T>(
+    Future<T> Function(Transaction) transactionHandler,
+  ) async {
     try {
       return await _firestore.runTransaction(transactionHandler);
     } catch (e, stackTrace) {

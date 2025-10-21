@@ -13,7 +13,10 @@ class LoginState {
   const LoginState({this.status = LoginStatus.initial, this.errorMessage});
 
   LoginState copyWith({LoginStatus? status, String? errorMessage}) {
-    return LoginState(status: status ?? this.status, errorMessage: errorMessage);
+    return LoginState(
+      status: status ?? this.status,
+      errorMessage: errorMessage,
+    );
   }
 }
 
@@ -22,7 +25,10 @@ class LoginController extends StateNotifier<LoginState> {
   LoginController() : super(const LoginState());
 
   /// 邮箱密码登录
-  Future<void> signInWithEmail({required String email, required String password}) async {
+  Future<void> signInWithEmail({
+    required String email,
+    required String password,
+  }) async {
     try {
       state = state.copyWith(status: LoginStatus.loading);
 
@@ -31,7 +37,10 @@ class LoginController extends StateNotifier<LoginState> {
       state = state.copyWith(status: LoginStatus.success);
     } catch (e) {
       AppLogger.error('登录失败', e);
-      state = state.copyWith(status: LoginStatus.error, errorMessage: e.toString());
+      state = state.copyWith(
+        status: LoginStatus.error,
+        errorMessage: e.toString(),
+      );
     }
   }
 
@@ -42,6 +51,7 @@ class LoginController extends StateNotifier<LoginState> {
 }
 
 /// 登录控制器Provider
-final loginControllerProvider = StateNotifierProvider<LoginController, LoginState>((ref) {
-  return LoginController();
-});
+final loginControllerProvider =
+    StateNotifierProvider<LoginController, LoginState>((ref) {
+      return LoginController();
+    });

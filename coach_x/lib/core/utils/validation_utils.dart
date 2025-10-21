@@ -14,6 +14,23 @@ class ValidationUtils {
     return null;
   }
 
+  /// 验证姓名
+  static String? validateName(String? value) {
+    if (StringUtils.isEmpty(value)) {
+      return '姓名不能为空';
+    }
+
+    if (value!.length < 2) {
+      return '姓名至少需要2个字符';
+    }
+
+    if (value.length > 50) {
+      return '姓名不能超过50个字符';
+    }
+
+    return null;
+  }
+
   /// 验证邮箱
   static String? validateEmail(String? value, {bool required = true}) {
     if (!required && StringUtils.isEmpty(value)) {
@@ -174,7 +191,10 @@ class ValidationUtils {
   }
 
   /// 验证正整数
-  static String? validatePositiveInteger(String? value, {String fieldName = '数值'}) {
+  static String? validatePositiveInteger(
+    String? value, {
+    String fieldName = '数值',
+  }) {
     final intValidation = validateInteger(value, fieldName: fieldName);
     if (intValidation != null) {
       return intValidation;
@@ -249,9 +269,55 @@ class ValidationUtils {
     return validateNumberRange(value, min: 1, max: 150, fieldName: '年龄');
   }
 
+  /// 验证性别
+  static String? validateGender(String? value) {
+    if (StringUtils.isEmpty(value)) {
+      return '性别不能为空';
+    }
+
+    final validGenders = ['male', 'female', '男', '女'];
+    if (!validGenders.contains(value?.toLowerCase())) {
+      return '请选择有效的性别';
+    }
+
+    return null;
+  }
+
+  /// 验证出生日期
+  static String? validateBornDate(DateTime? value) {
+    if (value == null) {
+      return '出生日期不能为空';
+    }
+
+    final now = DateTime.now();
+
+    // 不能是未来日期
+    if (value.isAfter(now)) {
+      return '出生日期不能是未来日期';
+    }
+
+    // 年龄不能超过150岁
+    final age = now.year - value.year;
+    if (age > 150) {
+      return '出生日期不合理';
+    }
+
+    // 年龄不能小于1岁
+    if (age < 1 &&
+        (now.month < value.month ||
+            (now.month == value.month && now.day < value.day))) {
+      return '年龄至少为1岁';
+    }
+
+    return null;
+  }
+
   /// 通用验证组合器
   /// 可以组合多个验证器
-  static String? compose(String? value, List<String? Function(String?)> validators) {
+  static String? compose(
+    String? value,
+    List<String? Function(String?)> validators,
+  ) {
     for (final validator in validators) {
       final result = validator(value);
       if (result != null) {

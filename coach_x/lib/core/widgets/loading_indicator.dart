@@ -15,7 +15,13 @@ class LoadingIndicator extends StatelessWidget {
   /// 文字样式
   final TextStyle? textStyle;
 
-  const LoadingIndicator({super.key, this.color, this.radius = 14.0, this.text, this.textStyle});
+  const LoadingIndicator({
+    super.key,
+    this.color,
+    this.radius = 14.0,
+    this.text,
+    this.textStyle,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +29,10 @@ class LoadingIndicator extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          CupertinoActivityIndicator(color: color ?? AppColors.primaryColor, radius: radius),
+          CupertinoActivityIndicator(
+            color: color ?? AppColors.primaryColor,
+            radius: radius,
+          ),
           if (text != null) ...[
             const SizedBox(height: AppDimensions.spacingM),
             Text(text!, style: textStyle ?? AppTextStyles.subhead),
