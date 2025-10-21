@@ -21,8 +21,29 @@ https://fonts.google.com/specimen/Lexend
 4. 在 `static/` 目录中找到对应字重的ttf文件
 5. 将以上5个文件复制到当前目录
 
-## 临时方案
+## 临时方案：使用系统默认字体
 
-如果暂时无法下载字体文件，可以先使用系统默认字体继续开发。
-在 pubspec.yaml 中注释掉 fonts 配置即可。
+✅ **当前配置已启用系统默认字体**
+
+如果暂时无法下载字体文件，应用已配置为使用系统默认字体：
+- **iOS**: SF Pro (San Francisco)
+- **Android**: Roboto
+- **Web**: 系统默认无衬线字体
+
+### 已完成的配置
+
+1. ✅ `pubspec.yaml` - fonts 配置已注释（第118-130行）
+2. ✅ `lib/core/theme/app_text_styles.dart` - `_fontFamily` 设置为 `null`
+
+### 切换到 Lexend 字体
+
+当字体文件准备好后：
+
+1. 下载并放置字体文件到当前目录（参考上方"需要的字体文件和字重"）
+2. 在 `pubspec.yaml` 中取消注释 fonts 配置（第118-130行）
+3. 在 `lib/core/theme/app_text_styles.dart` 中：
+   - 注释掉：`static const String? _fontFamily = null;`
+   - 取消注释：`static const String _fontFamily = 'Lexend';`
+4. 运行 `flutter pub get`
+5. 重新启动应用
 
