@@ -9,6 +9,8 @@ import 'package:coach_x/core/widgets/custom_text_field.dart';
 import 'package:coach_x/core/utils/validation_utils.dart';
 import 'package:coach_x/features/auth/presentation/controllers/login_controller.dart';
 import 'package:coach_x/routes/route_names.dart';
+import 'package:coach_x/features/auth/data/providers/user_providers.dart';
+import 'package:coach_x/core/enums/user_role.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
@@ -40,6 +42,88 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     }
   }
 
+  /// 根据用户角色导航到对应的首页
+  Future<void> _navigateToHomePage() async {
+    // 等待用户数据加载完成（最多等待3秒）
+    int attempts = 0;
+    const maxAttempts = 30; // 30 * 100ms = 3秒
+
+    while (attempts < maxAttempts) {
+      final userData = ref.read(currentUserDataProvider);
+
+      // 检查数据是否已加载
+      if (userData is AsyncData) {
+        final user = userData.value;
+
+        if (user == null) {
+          // 用户数据不存在，跳转到Profile Setup
+          if (mounted) context.go(RouteNames.profileSetup);
+          return;
+        }
+
+        // 根据用户角色跳转到对应的首页
+        if (mounted) {
+          if (user.role == UserRole.coach) {
+            context.go(RouteNames.coachHome);
+          } else if (user.role == UserRole.student) {
+            context.go(RouteNames.studentHome);
+          } else {
+            // 未知角色，跳转到Profile Setup
+            context.go(RouteNames.profileSetup);
+          }
+        }
+        return;
+      }
+
+      // 如果是错误状态，显示错误并返回登录页
+      if (userData is AsyncError) {
+        if (mounted) {
+          showCupertinoDialog(
+            context: context,
+            builder: (context) => CupertinoAlertDialog(
+              title: const Text('错误'),
+              content: Text('获取用户信息失败: ${userData.error}'),
+              actions: [
+                CupertinoDialogAction(
+                  child: const Text('确定'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    context.go(RouteNames.login);
+                  },
+                ),
+              ],
+            ),
+          );
+        }
+        return;
+      }
+
+      // 等待100ms后重试
+      await Future.delayed(const Duration(milliseconds: 100));
+      attempts++;
+    }
+
+    // 超时，显示错误提示
+    if (mounted) {
+      showCupertinoDialog(
+        context: context,
+        builder: (context) => CupertinoAlertDialog(
+          title: const Text('超时'),
+          content: const Text('获取用户信息超时，请重试'),
+          actions: [
+            CupertinoDialogAction(
+              child: const Text('确定'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                context.go(RouteNames.login);
+              },
+            ),
+          ],
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final loginState = ref.watch(loginControllerProvider);
@@ -47,8 +131,8 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     // 监听登录状态
     ref.listen<LoginState>(loginControllerProvider, (previous, next) {
       if (next.status == LoginStatus.success) {
-        // 登录成功，导航到主页（临时跳转到学生首页）
-        context.go(RouteNames.studentHome);
+        // 登录成功，根据用户角色导航到对应的首页
+        _navigateToHomePage();
       } else if (next.status == LoginStatus.error) {
         // 显示错误提示
         showCupertinoDialog(
