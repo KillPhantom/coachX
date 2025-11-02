@@ -18,6 +18,15 @@ class UserModel {
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
+  // Profile 页面新增字段
+  final List<String>? tags; // 认证标签，如 ["IFFF Pro", "Certified"]
+  final DateTime? contractExpiresAt; // 学生与教练的合约有效期
+  final String? subscriptionPlan; // 订阅计划: 'free' | 'pro'
+  final DateTime? subscriptionRenewsAt; // 订阅续费日期
+  final bool notificationsEnabled; // 是否启用通知
+  final String? unitPreference; // 单位偏好: 'metric' | 'imperial'
+  final String? languageCode; // 语言偏好: 'en' | 'zh'
+
   const UserModel({
     required this.id,
     required this.email,
@@ -32,6 +41,13 @@ class UserModel {
     this.isVerified = false,
     this.createdAt,
     this.updatedAt,
+    this.tags,
+    this.contractExpiresAt,
+    this.subscriptionPlan,
+    this.subscriptionRenewsAt,
+    this.notificationsEnabled = true,
+    this.unitPreference,
+    this.languageCode,
   });
 
   /// 从Firestore文档创建
@@ -64,6 +80,12 @@ class UserModel {
       }
     }
 
+    // 解析 tags
+    List<String>? parsedTags;
+    if (data['tags'] != null && data['tags'] is List) {
+      parsedTags = (data['tags'] as List).map((e) => e.toString()).toList();
+    }
+
     return UserModel(
       id: doc.id,
       email: data['email'] as String? ?? '',
@@ -78,6 +100,13 @@ class UserModel {
       isVerified: data['isVerified'] as bool? ?? false,
       createdAt: (data['createdAt'] as Timestamp?)?.toDate(),
       updatedAt: (data['updatedAt'] as Timestamp?)?.toDate(),
+      tags: parsedTags,
+      contractExpiresAt: (data['contractExpiresAt'] as Timestamp?)?.toDate(),
+      subscriptionPlan: data['subscriptionPlan'] as String?,
+      subscriptionRenewsAt: (data['subscriptionRenewsAt'] as Timestamp?)?.toDate(),
+      notificationsEnabled: data['notificationsEnabled'] as bool? ?? true,
+      unitPreference: data['unitPreference'] as String?,
+      languageCode: data['languageCode'] as String?,
     );
   }
 
@@ -88,12 +117,19 @@ class UserModel {
       'name': name,
       'role': role.value,
       'isVerified': isVerified,
+      'notificationsEnabled': notificationsEnabled,
+      if (unitPreference != null) 'unitPreference': unitPreference,
+      if (languageCode != null) 'languageCode': languageCode,
       if (avatarUrl != null) 'avatarUrl': avatarUrl,
       if (gender != null) 'gender': gender!.value,
       if (coachId != null) 'coachId': coachId,
       if (bornDate != null) 'bornDate': _formatDate(bornDate!),
       if (height != null) 'height': height,
       if (initialWeight != null) 'initialWeight': initialWeight,
+      if (tags != null) 'tags': tags,
+      if (contractExpiresAt != null) 'contractExpiresAt': contractExpiresAt,
+      if (subscriptionPlan != null) 'subscriptionPlan': subscriptionPlan,
+      if (subscriptionRenewsAt != null) 'subscriptionRenewsAt': subscriptionRenewsAt,
       // createdAt和updatedAt由FirestoreService自动管理
     };
   }
@@ -118,6 +154,13 @@ class UserModel {
     bool? isVerified,
     DateTime? createdAt,
     DateTime? updatedAt,
+    List<String>? tags,
+    DateTime? contractExpiresAt,
+    String? subscriptionPlan,
+    DateTime? subscriptionRenewsAt,
+    bool? notificationsEnabled,
+    String? unitPreference,
+    String? languageCode,
   }) {
     return UserModel(
       id: id ?? this.id,
@@ -133,6 +176,13 @@ class UserModel {
       isVerified: isVerified ?? this.isVerified,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      tags: tags ?? this.tags,
+      contractExpiresAt: contractExpiresAt ?? this.contractExpiresAt,
+      subscriptionPlan: subscriptionPlan ?? this.subscriptionPlan,
+      subscriptionRenewsAt: subscriptionRenewsAt ?? this.subscriptionRenewsAt,
+      notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
+      unitPreference: unitPreference ?? this.unitPreference,
+      languageCode: languageCode ?? this.languageCode,
     );
   }
 

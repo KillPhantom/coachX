@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:coach_x/l10n/app_localizations.dart';
 import '../theme/app_theme.dart';
 
 /// 错误视图组件
@@ -21,6 +22,7 @@ class ErrorView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -31,7 +33,7 @@ class ErrorView extends StatelessWidget {
             color: AppColors.errorRed,
           ),
           const SizedBox(height: AppDimensions.spacingL),
-          Text('出错了', style: AppTextStyles.title2),
+          Text(l10n.errorTitle, style: AppTextStyles.title2),
           const SizedBox(height: AppDimensions.spacingM),
           Padding(
             padding: const EdgeInsets.symmetric(
@@ -44,7 +46,7 @@ class ErrorView extends StatelessWidget {
             ),
           ),
           const SizedBox(height: AppDimensions.spacingXL),
-          CupertinoButton.filled(onPressed: onRetry, child: const Text('重试')),
+          CupertinoButton.filled(onPressed: onRetry, child: Text(l10n.retry)),
         ],
       ),
     );

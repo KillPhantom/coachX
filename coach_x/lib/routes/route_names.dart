@@ -48,6 +48,9 @@ class RouteNames {
   /// 教练资料页
   static const String coachProfile = '/coach/profile';
 
+  /// 创建补剂计划页
+  static const String createSupplementPlan = 'create-supplement-plan';
+
   // ==================== 共享路由 ====================
 
   /// 计划详情页（带参数）
@@ -55,6 +58,9 @@ class RouteNames {
 
   /// 训练详情页（带参数）
   static const String trainingDetail = '/training/:id';
+
+  /// 对话详情页（带参数）
+  static const String chatDetail = '/chat/:conversationId';
 
   // ==================== 工具方法 ====================
 
@@ -66,5 +72,10 @@ class RouteNames {
   /// 获取训练详情路由（替换参数）
   static String getTrainingDetailRoute(String id) {
     return '/training/$id';
+  }
+
+  /// 获取对话详情路由（替换参数）
+  static String getChatDetailRoute(String conversationId) {
+    return '/chat/$conversationId';
   }
 }

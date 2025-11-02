@@ -10,20 +10,31 @@ class AppColors {
   static const Color primaryColor = Color(0xFFF2E8CF);
 
   /// 主色文字
-  static const Color primaryText = Color(0xFF8C7A51);
+  static const Color primaryText = Color(0xFF6B5E3F);
 
   /// 主色浅色背景
   static const Color primaryLight = Color(0xFFFDFAF3);
 
   /// 主色交互色
-  static const Color primaryAction = Color(0xFFE6D7B4);
+  static const Color primaryAction = Color.fromRGBO(235, 206, 137, 0.5);
+
+  // 别名（用于简化使用）
+  static const Color primary = Color(0xFFf0e9d8);// 主要交互色
+  static const Color primaryDark = Color(0xFF3D3424); // 主要交互色深色版
 
   // ==================== 辅助色系 ====================
   /// 辅助蓝色
-  static const Color secondaryBlue = Color(0xFFA8C0D0);
+  static const Color secondaryBlue = Color.fromRGBO(89, 165, 216, 1);
+
+  static const Color secondaryOrange = Color.fromARGB(255, 178, 138, 83);
+
+  static const Color secondaryRed = Color.fromARGB(255, 220, 108, 108);
+
+  static const Color secondaryPurple = Color.fromARGB(255, 207, 134, 222);
+
 
   /// 辅助灰色
-  static const Color secondaryGrey = Color(0xFFC0C0C0);
+  static const Color secondaryGrey = Color(0xFFA0A0A0);
 
   /// 深灰蓝
   static const Color secondaryDarkGrey = Color(0xFF7F8C8D);
@@ -36,10 +47,10 @@ class AppColors {
   static const Color textPrimary = Color(0xFF1F2937);
 
   /// 次要文字颜色
-  static const Color textSecondary = Color(0xFF6B7280);
+  static const Color textSecondary = Color(0xFF4B5563);
 
   /// 三级文字颜色
-  static const Color textTertiary = Color(0xFF9CA3AF);
+  static const Color textTertiary = Color(0xFF6B7280);
 
   /// 白色文字
   static const Color textWhite = Color(0xFFFFFFFF);
@@ -84,4 +95,20 @@ class AppColors {
 
   /// 中度分割线
   static const Color dividerMedium = Color(0xFFD1D5DB);
+
+  // ==================== 常用别名 ====================
+  /// 分割线（默认浅色）
+  static const Color divider = dividerLight;
+
+  /// 卡片背景（默认白色）
+  static const Color cardBackground = backgroundCard;
+
+  /// 背景色（默认浅色）
+  static const Color background = backgroundLight;
+
+  /// 阴影颜色
+  static const Color shadowColor = Color(0xFF000000);
+
+  /// 成功颜色（别名）
+  static const Color successColor = successGreen;
 }

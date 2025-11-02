@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:coach_x/l10n/app_localizations.dart';
 import 'package:coach_x/core/theme/app_colors.dart';
 import 'package:coach_x/core/theme/app_text_styles.dart';
 import 'package:coach_x/core/theme/app_dimensions.dart';
@@ -47,6 +48,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final registerState = ref.watch(registerControllerProvider);
 
     // 监听注册状态
@@ -59,11 +61,11 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
         showCupertinoDialog(
           context: context,
           builder: (context) => CupertinoAlertDialog(
-            title: const Text('注册失败'),
-            content: Text(next.errorMessage ?? '未知错误'),
+            title: Text(l10n.registerFailed),
+            content: Text(next.errorMessage ?? l10n.errorOccurred),
             actions: [
               CupertinoDialogAction(
-                child: const Text('确定'),
+                child: Text(l10n.confirm),
                 onPressed: () => Navigator.of(context).pop(),
               ),
             ],
@@ -102,13 +104,13 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
 
                 // 标题
                 Text(
-                  '创建您的账号',
+                  l10n.createAccount,
                   style: AppTextStyles.title1,
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: AppDimensions.spacingS),
                 Text(
-                  '开始您的健身之旅',
+                  l10n.startYourJourney,
                   style: AppTextStyles.subhead.copyWith(
                     color: AppColors.textSecondary,
                   ),
@@ -120,7 +122,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                 // 姓名输入
                 CustomTextField(
                   controller: _nameController,
-                  placeholder: '姓名',
+                  placeholder: l10n.namePlaceholder,
                   prefix: const Padding(
                     padding: EdgeInsets.only(left: 12, right: 8),
                     child: Icon(
@@ -131,7 +133,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                   ),
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
-                      return '请输入姓名';
+                      return l10n.nameRequired;
                     }
                     return null;
                   },
@@ -143,7 +145,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                 // 邮箱输入
                 CustomTextField(
                   controller: _emailController,
-                  placeholder: '邮箱地址',
+                  placeholder: l10n.emailPlaceholder,
                   keyboardType: TextInputType.emailAddress,
                   prefix: const Padding(
                     padding: EdgeInsets.only(left: 12, right: 8),
@@ -162,7 +164,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                 // 密码输入
                 CustomTextField(
                   controller: _passwordController,
-                  placeholder: '密码（至少6位）',
+                  placeholder: l10n.passwordMinLength,
                   isPassword: true,
                   prefix: const Padding(
                     padding: EdgeInsets.only(left: 12, right: 8),
@@ -181,7 +183,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                 // 确认密码输入
                 CustomTextField(
                   controller: _confirmPasswordController,
-                  placeholder: '确认密码',
+                  placeholder: l10n.confirmPasswordPlaceholder,
                   isPassword: true,
                   prefix: const Padding(
                     padding: EdgeInsets.only(left: 12, right: 8),
@@ -193,10 +195,10 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return '请确认密码';
+                      return l10n.confirmPasswordRequired;
                     }
                     if (value != _passwordController.text) {
-                      return '两次输入的密码不一致';
+                      return l10n.passwordMismatch;
                     }
                     return null;
                   },
@@ -208,7 +210,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
 
                 // 用户协议提示
                 Text(
-                  '注册即表示您同意我们的服务条款和隐私政策',
+                  l10n.termsAgreement,
                   style: AppTextStyles.caption1.copyWith(
                     color: AppColors.textTertiary,
                   ),
@@ -219,7 +221,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
 
                 // 注册按钮
                 CustomButton(
-                  text: '注册',
+                  text: l10n.register,
                   onPressed: _handleRegister,
                   isLoading: registerState.status == RegisterStatus.loading,
                   fullWidth: true,
@@ -231,14 +233,14 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text('已有账号？', style: AppTextStyles.body),
+                    Text(l10n.hasAccount, style: AppTextStyles.body),
                     CupertinoButton(
                       padding: const EdgeInsets.symmetric(horizontal: 8),
                       onPressed: registerState.status == RegisterStatus.loading
                           ? null
                           : () => context.pop(),
                       child: Text(
-                        '立即登录',
+                        l10n.loginNow,
                         style: AppTextStyles.body.copyWith(
                           color: AppColors.primaryText,
                           fontWeight: FontWeight.w700,

@@ -4,7 +4,9 @@
 from firebase_functions import https_fn
 from firebase_admin import firestore
 from utils import logger, validators, db_helper
-from .models import UserModel
+from utils.param_parser import parse_float_param
+from .models import UserModel, UserLLMProfile
+from ai.memory_manager import MemoryManager
 
 
 # ==================== Firestore触发器 ====================
@@ -186,16 +188,23 @@ def update_user_info(req: https_fn.CallableRequest):
         
         if 'bornDate' in req.data:
             update_data['bornDate'] = req.data['bornDate']
-        
+
         if 'height' in req.data:
-            update_data['height'] = req.data['height']
-        
+            update_data['height'] = parse_float_param(req.data['height'])
+
         if 'initialWeight' in req.data:
-            update_data['initialWeight'] = req.data['initialWeight']
+            update_data['initialWeight'] = parse_float_param(req.data['initialWeight'])
         
         if 'coachId' in req.data:
             update_data['coachId'] = req.data['coachId']
-        
+
+        if 'languageCode' in req.data:
+            language_code = req.data['languageCode']
+            # 验证语言代码格式（可选：en, zh, en_US, zh_CN等）
+            if language_code and not isinstance(language_code, str):
+                raise https_fn.HttpsError('invalid-argument', 'languageCode 必须是字符串')
+            update_data['languageCode'] = language_code
+
         if not update_data:
             raise https_fn.HttpsError('invalid-argument', '没有要更新的数据')
         
@@ -215,5 +224,131 @@ def update_user_info(req: https_fn.CallableRequest):
         raise https_fn.HttpsError('invalid-argument', str(e))
     except Exception as e:
         logger.error(f'更新用户信息失败', e)
+        raise https_fn.HttpsError('internal', f'服务器错误: {str(e)}')
+
+
+# ==================== LLM Memory 相关 ====================
+
+@https_fn.on_call()
+def get_user_llm_profile(req: https_fn.CallableRequest):
+    """
+    获取用户 LLM Profile
+    
+    请求参数:
+        无（使用当前登录用户）
+    
+    返回:
+        - status: 状态码
+        - data: LLM Profile 数据
+    """
+    try:
+        # 检查认证
+        if not req.auth:
+            raise https_fn.HttpsError('unauthenticated', '用户未登录')
+        
+        user_id = req.auth.uid
+        
+        # 获取 LLM Profile
+        profile = MemoryManager.get_user_memory(user_id)
+        
+        logger.info(f'获取用户 LLM Profile 成功: {user_id}')
+        
+        return {
+            'status': 'success',
+            'data': profile.to_dict()
+        }
+    
+    except https_fn.HttpsError:
+        raise
+    except Exception as e:
+        logger.error(f'获取用户 LLM Profile 失败', e)
+        raise https_fn.HttpsError('internal', f'服务器错误: {str(e)}')
+
+
+@https_fn.on_call()
+def update_user_preferences(req: https_fn.CallableRequest):
+    """
+    更新用户训练偏好
+    
+    请求参数:
+        - preferences: dict, 偏好字典
+            - preferred_exercises: list (可选)
+            - avoided_exercises: list (可选)
+            - intensity_preference: str (可选)
+            - equipment_preference: list (可选)
+            - training_style: list (可选)
+            - common_goals: list (可选)
+    
+    返回:
+        - status: 状态码
+        - message: 消息
+    """
+    try:
+        # 检查认证
+        if not req.auth:
+            raise https_fn.HttpsError('unauthenticated', '用户未登录')
+        
+        user_id = req.auth.uid
+        preferences = req.data.get('preferences', {})
+        
+        if not preferences:
+            raise https_fn.HttpsError('invalid-argument', 'preferences 不能为空')
+        
+        # 更新偏好
+        success = MemoryManager.update_preferences(user_id, preferences)
+        
+        if not success:
+            raise https_fn.HttpsError('internal', '更新偏好失败')
+        
+        logger.info(f'更新用户偏好成功: {user_id}')
+        
+        return {
+            'status': 'success',
+            'message': '偏好更新成功'
+        }
+    
+    except https_fn.HttpsError:
+        raise
+    except Exception as e:
+        logger.error(f'更新用户偏好失败', e)
+        raise https_fn.HttpsError('internal', f'服务器错误: {str(e)}')
+
+
+@https_fn.on_call()
+def clear_conversation_history(req: https_fn.CallableRequest):
+    """
+    清空对话历史
+    
+    请求参数:
+        无（使用当前登录用户）
+    
+    返回:
+        - status: 状态码
+        - message: 消息
+    """
+    try:
+        # 检查认证
+        if not req.auth:
+            raise https_fn.HttpsError('unauthenticated', '用户未登录')
+        
+        user_id = req.auth.uid
+        
+        # 清空对话历史
+        success = MemoryManager.clear_conversation_history(user_id)
+        
+        if not success:
+            raise https_fn.HttpsError('internal', '清空对话历史失败')
+        
+        logger.info(f'清空对话历史成功: {user_id}')
+        
+        return {
+            'status': 'success',
+            'message': '对话历史已清空'
+        }
+    
+    except https_fn.HttpsError:
+        raise
+    except Exception as e:
+        logger.error(f'清空对话历史失败', e)
         raise https_fn.HttpsError('internal', f'服务器错误: {str(e)}')
 

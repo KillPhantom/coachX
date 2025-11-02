@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:coach_x/l10n/app_localizations.dart';
 import 'package:coach_x/core/theme/app_theme.dart';
 import 'package:coach_x/core/widgets/cupertino_card.dart';
 import 'package:coach_x/core/widgets/loading_indicator.dart';
@@ -16,6 +17,7 @@ class RecentActivitySection extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final activitiesAsync = ref.watch(recentActivitiesProvider);
 
     return Column(
@@ -25,13 +27,13 @@ class RecentActivitySection extends ConsumerWidget {
           padding: const EdgeInsets.symmetric(
             horizontal: AppDimensions.spacingL,
           ),
-          child: Text('Recent Activity', style: AppTextStyles.title3),
+          child: Text(l10n.recentActivityTitle, style: AppTextStyles.title3),
         ),
         const SizedBox(height: AppDimensions.spacingL),
         activitiesAsync.when(
           data: (activities) {
             if (activities.isEmpty) {
-              return _buildEmptyState();
+              return _buildEmptyState(context);
             }
 
             return Column(
@@ -70,7 +72,7 @@ class RecentActivitySection extends ConsumerWidget {
   }
 
   /// 构建空状态
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(BuildContext context) {
     return CupertinoCard(
       child: Center(
         child: Padding(
@@ -84,7 +86,7 @@ class RecentActivitySection extends ConsumerWidget {
               ),
               const SizedBox(height: AppDimensions.spacingS),
               Text(
-                'No recent activity',
+                AppLocalizations.of(context)!.noRecentActivity,
                 style: AppTextStyles.subhead.copyWith(
                   color: AppColors.textTertiary,
                 ),

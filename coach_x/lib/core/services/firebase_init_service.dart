@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:coach_x/firebase_options.dart';
 import 'package:coach_x/core/utils/logger.dart';
 
@@ -23,6 +24,19 @@ class FirebaseInitService {
       );
 
       AppLogger.info('Firebase Core 初始化成功');
+
+      // 🔧 开发模式：连接到本地模拟器
+      const bool useLocalEmulator = true;
+      
+      if (useLocalEmulator) {
+        AppLogger.info('🔧 使用本地 Firebase Emulators');
+        
+        // Functions Emulator
+        FirebaseFunctions.instance.useFunctionsEmulator('127.0.0.1', 5001);
+        
+        // Firestore Emulator (如果需要)
+        // FirebaseFirestore.instance.useFirestoreEmulator('127.0.0.1', 8080);
+      }
 
       // 配置Firestore
       _configureFirestore();

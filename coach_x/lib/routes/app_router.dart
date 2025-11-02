@@ -1,11 +1,17 @@
 import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
+import 'package:coach_x/core/theme/app_text_styles.dart';
 import 'route_names.dart';
 import '../features/auth/presentation/pages/login_page.dart';
 import '../features/auth/presentation/pages/register_page.dart';
 import '../features/shared/profile_setup/presentation/pages/profile_setup_page.dart';
 import '../features/coach/presentation/widgets/coach_tab_scaffold.dart';
 import '../features/student/presentation/widgets/student_tab_scaffold.dart';
+import '../features/coach/plans/presentation/pages/create_training_plan_page.dart';
+import '../features/coach/plans/presentation/pages/create_diet_plan_page.dart';
+import '../features/coach/plans/presentation/pages/create_supplement_plan_page.dart';
+import '../features/chat/presentation/pages/chat_detail_page.dart';
+import '../features/shared/profile/presentation/pages/language_selection_page.dart';
 
 /// 应用路由配置
 final GoRouter appRouter = GoRouter(
@@ -84,6 +90,95 @@ final GoRouter appRouter = GoRouter(
         );
       },
     ),
+
+    // 计划详情页面
+    GoRoute(
+      path: '/plan-detail/:planType/:planId',
+      pageBuilder: (context, state) {
+        final planType = state.pathParameters['planType']!;
+        final planId = state.pathParameters['planId']!;
+        // TODO: 实现PlanDetailPage
+        // 当前显示占位页面
+        return CupertinoPage(
+          key: state.pageKey,
+          child: _PlanDetailPlaceholderPage(
+            planType: planType,
+            planId: planId,
+          ),
+        );
+      },
+    ),
+
+    // 创建/编辑训练计划页面（共享同一UI）
+    // 路径: /training-plan/new - 创建模式
+    // 路径: /training-plan/{planId} - 编辑模式
+    GoRoute(
+      path: '/training-plan/:planId',
+      pageBuilder: (context, state) {
+        final planId = state.pathParameters['planId'];
+        // 如果planId是'new'，则为创建模式
+        final actualPlanId = (planId == 'new') ? null : planId;
+        return CupertinoPage(
+          key: state.pageKey,
+          child: CreateTrainingPlanPage(planId: actualPlanId),
+        );
+      },
+    ),
+
+    // 创建/编辑饮食计划页面（共享同一UI）
+    // 路径: /diet-plan/new - 创建模式
+    // 路径: /diet-plan/{planId} - 编辑模式
+    GoRoute(
+      path: '/diet-plan/:planId',
+      pageBuilder: (context, state) {
+        final planId = state.pathParameters['planId'];
+        // 如果planId是'new'，则为创建模式
+        final actualPlanId = (planId == 'new') ? null : planId;
+        return CupertinoPage(
+          key: state.pageKey,
+          child: CreateDietPlanPage(planId: actualPlanId),
+        );
+      },
+    ),
+
+    // 创建/编辑补剂计划页面（共享同一UI）
+    // 路径: /supplement-plan/new - 创建模式
+    // 路径: /supplement-plan/{planId} - 编辑模式
+    GoRoute(
+      path: '/supplement-plan/:planId',
+      pageBuilder: (context, state) {
+        final planId = state.pathParameters['planId'];
+        // 如果planId是'new'，则为创建模式
+        final actualPlanId = (planId == 'new') ? null : planId;
+        return CupertinoPage(
+          key: state.pageKey,
+          child: CreateSupplementPlanPage(planId: actualPlanId),
+        );
+      },
+    ),
+
+    // 对话详情页面
+    GoRoute(
+      path: '/chat/:conversationId',
+      pageBuilder: (context, state) {
+        final conversationId = state.pathParameters['conversationId']!;
+        return CupertinoPage(
+          key: state.pageKey,
+          child: ChatDetailPage(conversationId: conversationId),
+        );
+      },
+    ),
+
+    // 语言选择页面
+    GoRoute(
+      path: '/language-selection',
+      pageBuilder: (context, state) {
+        return CupertinoPage(
+          key: state.pageKey,
+          child: const LanguageSelectionPage(),
+        );
+      },
+    ),
   ],
 );
 
@@ -152,29 +247,80 @@ class _StudentDetailPlaceholderPage extends StatelessWidget {
                     const SizedBox(height: 20),
                     const Text(
                       'Student Detail Page',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: AppTextStyles.title2,
                     ),
                     const SizedBox(height: 8),
                     Text(
                       'Student ID: $studentId',
-                      style: const TextStyle(
-                        fontSize: 16,
-                        color: CupertinoColors.systemGrey,
-                      ),
+                      style: AppTextStyles.callout,
                     ),
                     const SizedBox(height: 8),
-                    const Text(
+                    Text(
                       'TODO: 实现学生详情页面',
-                      style: TextStyle(
-                        fontSize: 16,
+                      style: AppTextStyles.callout.copyWith(
                         color: CupertinoColors.systemGrey,
                       ),
                     ),
                   ],
                 ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// 计划详情占位页面
+class _PlanDetailPlaceholderPage extends StatelessWidget {
+  final String planType;
+  final String planId;
+
+  const _PlanDetailPlaceholderPage({
+    required this.planType,
+    required this.planId,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return CupertinoPageScaffold(
+      navigationBar: CupertinoNavigationBar(
+        leading: CupertinoButton(
+          padding: EdgeInsets.zero,
+          onPressed: () => context.pop(),
+          child: const Icon(CupertinoIcons.back, size: 28),
+        ),
+        middle: const Text('Plan Detail'),
+      ),
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(CupertinoIcons.doc_text, size: 80),
+            const SizedBox(height: 20),
+            const Text(
+              'Plan Detail Page',
+              style: AppTextStyles.title2,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Type: $planType',
+              style: AppTextStyles.callout.copyWith(
+                color: CupertinoColors.systemGrey,
+              ),
+            ),
+            Text(
+              'ID: $planId',
+              style: AppTextStyles.callout.copyWith(
+                color: CupertinoColors.systemGrey,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'TODO: 实现计划详情页面',
+              style: AppTextStyles.callout.copyWith(
+                color: CupertinoColors.systemGrey,
               ),
             ),
           ],
@@ -203,12 +349,12 @@ class ErrorPage extends StatelessWidget {
             const SizedBox(height: 16),
             const Text(
               '页面不存在',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              style: AppTextStyles.title3,
             ),
             const SizedBox(height: 8),
             const Text(
               '抱歉，您访问的页面不存在',
-              style: TextStyle(fontSize: 14, color: CupertinoColors.systemGrey),
+              style: AppTextStyles.footnote,
             ),
             const SizedBox(height: 24),
             CupertinoButton.filled(

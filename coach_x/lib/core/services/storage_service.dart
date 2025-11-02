@@ -143,6 +143,74 @@ class StorageService {
     );
   }
 
+  /// 上传训练计划图片
+  ///
+  /// [source] 图片来源
+  /// [onProgress] 上传进度回调
+  /// 返回图片URL
+  static Future<String?> uploadTrainingPlanImage({
+    required ImageSource source,
+    Function(double)? onProgress,
+  }) async {
+    return uploadImage(
+      source: source,
+      folder: 'training_plan_images',
+      onProgress: onProgress,
+    );
+  }
+
+  /// 上传训练计划文件（通用）
+  ///
+  /// [file] 要上传的文件
+  /// [onProgress] 上传进度回调
+  /// 返回文件URL
+  static Future<String> uploadTrainingPlanFile({
+    required File file,
+    Function(double)? onProgress,
+  }) async {
+    try {
+      final userId = AuthService.currentUserId;
+      if (userId == null) {
+        throw Exception('用户未登录');
+      }
+
+      final timestamp = DateTime.now().millisecondsSinceEpoch;
+      final extension = file.path.split('.').last;
+      final path = 'training_plan_images/$userId/$timestamp.$extension';
+
+      return await uploadFile(file, path, onProgress: onProgress);
+    } catch (e, stackTrace) {
+      AppLogger.error('上传训练计划文件失败', e, stackTrace);
+      rethrow;
+    }
+  }
+
+  /// 上传补剂计划文件
+  ///
+  /// [file] 图片文件
+  /// [onProgress] 上传进度回调
+  /// 返回文件URL
+  static Future<String> uploadSupplementPlanFile({
+    required File file,
+    Function(double)? onProgress,
+  }) async {
+    try {
+      final userId = AuthService.currentUserId;
+      if (userId == null) {
+        throw Exception('用户未登录');
+      }
+
+      final timestamp = DateTime.now().millisecondsSinceEpoch;
+      final extension = file.path.split('.').last;
+      final path = 'supplement_plan_images/$userId/$timestamp.$extension';
+
+      return await uploadFile(file, path, onProgress: onProgress);
+    } catch (e, stackTrace) {
+      AppLogger.error('上传补剂计划文件失败', e, stackTrace);
+      rethrow;
+    }
+  }
+
   /// 上传身体测量图片
   ///
   /// [source] 图片来源
@@ -157,6 +225,93 @@ class StorageService {
       folder: 'body_stats',
       onProgress: onProgress,
     );
+  }
+
+  /// 上传聊天图片
+  ///
+  /// [file] 图片文件
+  /// [conversationId] 对话ID
+  /// [onProgress] 上传进度回调
+  /// 返回图片URL
+  static Future<String> uploadChatImage({
+    required File file,
+    required String conversationId,
+    Function(double)? onProgress,
+  }) async {
+    try {
+      final userId = AuthService.currentUserId;
+      if (userId == null) {
+        throw Exception('用户未登录');
+      }
+
+      final timestamp = DateTime.now().millisecondsSinceEpoch;
+      final extension = file.path.split('.').last;
+      final randomId = DateTime.now().microsecondsSinceEpoch.toString();
+      final path = 'chat_images/$userId/$conversationId/${timestamp}_$randomId.$extension';
+
+      return await uploadFile(file, path, onProgress: onProgress);
+    } catch (e, stackTrace) {
+      AppLogger.error('上传聊天图片失败', e, stackTrace);
+      rethrow;
+    }
+  }
+
+  /// 上传聊天视频
+  ///
+  /// [file] 视频文件
+  /// [conversationId] 对话ID
+  /// [onProgress] 上传进度回调
+  /// 返回视频URL
+  static Future<String> uploadChatVideo({
+    required File file,
+    required String conversationId,
+    Function(double)? onProgress,
+  }) async {
+    try {
+      final userId = AuthService.currentUserId;
+      if (userId == null) {
+        throw Exception('用户未登录');
+      }
+
+      final timestamp = DateTime.now().millisecondsSinceEpoch;
+      final extension = file.path.split('.').last;
+      final randomId = DateTime.now().microsecondsSinceEpoch.toString();
+      final path = 'chat_videos/$userId/$conversationId/${timestamp}_$randomId.$extension';
+
+      return await uploadFile(file, path, onProgress: onProgress);
+    } catch (e, stackTrace) {
+      AppLogger.error('上传聊天视频失败', e, stackTrace);
+      rethrow;
+    }
+  }
+
+  /// 上传聊天语音
+  ///
+  /// [file] 语音文件
+  /// [conversationId] 对话ID
+  /// [onProgress] 上传进度回调
+  /// 返回语音URL
+  static Future<String> uploadChatVoice({
+    required File file,
+    required String conversationId,
+    Function(double)? onProgress,
+  }) async {
+    try {
+      final userId = AuthService.currentUserId;
+      if (userId == null) {
+        throw Exception('用户未登录');
+      }
+
+      final timestamp = DateTime.now().millisecondsSinceEpoch;
+      final extension = file.path.split('.').last;
+      final randomId = DateTime.now().microsecondsSinceEpoch.toString();
+      final path = 'chat_voices/$userId/$conversationId/${timestamp}_$randomId.$extension';
+
+      return await uploadFile(file, path, onProgress: onProgress);
+    } catch (e, stackTrace) {
+      AppLogger.error('上传聊天语音失败', e, stackTrace);
+      rethrow;
+    }
   }
 
   /// 删除文件

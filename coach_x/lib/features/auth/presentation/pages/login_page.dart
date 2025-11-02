@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:coach_x/l10n/app_localizations.dart';
 import 'package:coach_x/core/theme/app_colors.dart';
 import 'package:coach_x/core/theme/app_text_styles.dart';
 import 'package:coach_x/core/theme/app_dimensions.dart';
@@ -78,14 +79,15 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       // 如果是错误状态，显示错误并返回登录页
       if (userData is AsyncError) {
         if (mounted) {
+          final l10n = AppLocalizations.of(context)!;
           showCupertinoDialog(
             context: context,
             builder: (context) => CupertinoAlertDialog(
-              title: const Text('错误'),
-              content: Text('获取用户信息失败: ${userData.error}'),
+              title: Text(l10n.error),
+              content: Text('${l10n.getUserInfoFailed}: ${userData.error}'),
               actions: [
                 CupertinoDialogAction(
-                  child: const Text('确定'),
+                  child: Text(l10n.confirm),
                   onPressed: () {
                     Navigator.of(context).pop();
                     context.go(RouteNames.login);
@@ -105,14 +107,15 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
     // 超时，显示错误提示
     if (mounted) {
+      final l10n = AppLocalizations.of(context)!;
       showCupertinoDialog(
         context: context,
         builder: (context) => CupertinoAlertDialog(
-          title: const Text('超时'),
-          content: const Text('获取用户信息超时，请重试'),
+          title: Text(l10n.error),
+          content: Text(l10n.getUserInfoTimeout),
           actions: [
             CupertinoDialogAction(
-              child: const Text('确定'),
+              child: Text(l10n.confirm),
               onPressed: () {
                 Navigator.of(context).pop();
                 context.go(RouteNames.login);
@@ -126,6 +129,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final loginState = ref.watch(loginControllerProvider);
 
     // 监听登录状态
@@ -138,11 +142,11 @@ class _LoginPageState extends ConsumerState<LoginPage> {
         showCupertinoDialog(
           context: context,
           builder: (context) => CupertinoAlertDialog(
-            title: const Text('登录失败'),
-            content: Text(next.errorMessage ?? '未知错误'),
+            title: Text(l10n.loginFailed),
+            content: Text(next.errorMessage ?? l10n.errorOccurred),
             actions: [
               CupertinoDialogAction(
-                child: const Text('确定'),
+                child: Text(l10n.confirm),
                 onPressed: () => Navigator.of(context).pop(),
               ),
             ],
@@ -167,13 +171,13 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                 Image.asset('assets/images/icon.png', width: 100, height: 100),
                 const SizedBox(height: AppDimensions.spacingL),
                 Text(
-                  'CoachX',
+                  l10n.appName,
                   style: AppTextStyles.largeTitle,
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: AppDimensions.spacingS),
                 Text(
-                  'AI教练学生管理平台',
+                  l10n.appTagline,
                   style: AppTextStyles.subhead.copyWith(
                     color: AppColors.textSecondary,
                   ),
@@ -185,7 +189,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                 // 邮箱输入
                 CustomTextField(
                   controller: _emailController,
-                  placeholder: '邮箱地址',
+                  placeholder: l10n.emailPlaceholder,
                   keyboardType: TextInputType.emailAddress,
                   prefix: const Padding(
                     padding: EdgeInsets.only(left: 12, right: 8),
@@ -204,7 +208,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                 // 密码输入
                 CustomTextField(
                   controller: _passwordController,
-                  placeholder: '密码',
+                  placeholder: l10n.passwordPlaceholder,
                   isPassword: true,
                   prefix: const Padding(
                     padding: EdgeInsets.only(left: 12, right: 8),
@@ -216,7 +220,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return '请输入密码';
+                      return l10n.passwordRequired;
                     }
                     return null;
                   },
@@ -238,11 +242,11 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                             showCupertinoDialog(
                               context: context,
                               builder: (ctx) => CupertinoAlertDialog(
-                                title: const Text('提示'),
-                                content: const Text('忘记密码功能开发中'),
+                                title: Text(l10n.alert),
+                                content: Text(l10n.forgotPasswordInDevelopment),
                                 actions: [
                                   CupertinoDialogAction(
-                                    child: const Text('确定'),
+                                    child: Text(l10n.confirm),
                                     onPressed: () => Navigator.of(ctx).pop(),
                                   ),
                                 ],
@@ -250,9 +254,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                             );
                           },
                     child: Text(
-                      '忘记密码？',
+                      l10n.forgotPassword,
                       style: AppTextStyles.footnote.copyWith(
-                        color: AppColors.primaryColor,
+                        color: AppColors.primaryText,
                       ),
                     ),
                   ),
@@ -262,7 +266,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
                 // 登录按钮
                 CustomButton(
-                  text: '登录',
+                  text: l10n.login,
                   onPressed: _handleLogin,
                   isLoading: loginState.status == LoginStatus.loading,
                   fullWidth: true,
@@ -274,7 +278,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text('还没有账号？', style: AppTextStyles.body),
+                    Text(l10n.noAccount, style: AppTextStyles.body),
                     CupertinoButton(
                       padding: const EdgeInsets.symmetric(horizontal: 8),
                       onPressed: loginState.status == LoginStatus.loading
@@ -283,10 +287,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                               context.push('/register');
                             },
                       child: Text(
-                        '立即注册',
+                        l10n.signUpNow,
                         style: AppTextStyles.body.copyWith(
                           color: AppColors.primaryText,
-                          fontWeight: FontWeight.w700,
                         ),
                       ),
                     ),

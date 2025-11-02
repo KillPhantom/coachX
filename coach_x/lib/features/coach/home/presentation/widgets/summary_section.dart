@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:coach_x/l10n/app_localizations.dart';
 import 'package:coach_x/core/theme/app_theme.dart';
 import 'package:coach_x/core/widgets/cupertino_card.dart';
 import 'package:coach_x/core/widgets/loading_indicator.dart';
@@ -18,21 +19,21 @@ class SummarySection extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final summaryAsync = ref.watch(coachSummaryProvider);
 
     return CupertinoCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Summary', style: AppTextStyles.title3),
+          Text(l10n.coachHomeSummaryTitle, style: AppTextStyles.title3),
           const SizedBox(height: AppDimensions.spacingL),
           summaryAsync.when(
             data: (summary) => Column(
               children: [
                 SummaryItem(
                   icon: CupertinoIcons.sportscourt,
-                  text:
-                      '${summary.completionRate} students completed training today',
+                  text: '${summary.completionRate} students completed training today',
                   onTap: () {
                     // TODO: 跳转到学生列表（筛选已完成）
                     // 路由: /coach/students?filter=completed_today
@@ -52,8 +53,7 @@ class SummarySection extends ConsumerWidget {
                 _buildDivider(),
                 SummaryItem(
                   icon: CupertinoIcons.star,
-                  text:
-                      '${summary.unreviewedTrainings} training records need to be reviewed',
+                  text: '${summary.unreviewedTrainings} training records need to be reviewed',
                   onTap: () {
                     // TODO: 跳转到待审核训练记录列表
                     // 路由: /coach/training-reviews
@@ -85,6 +85,7 @@ class SummarySection extends ConsumerWidget {
 
   /// 显示TODO提示
   void _showTodoAlert(BuildContext context, String title, String message) {
+    final l10n = AppLocalizations.of(context)!;
     showCupertinoDialog(
       context: context,
       builder: (context) => CupertinoAlertDialog(
@@ -92,7 +93,7 @@ class SummarySection extends ConsumerWidget {
         content: Text(message),
         actions: [
           CupertinoDialogAction(
-            child: const Text('知道了'),
+            child: Text(l10n.know),
             onPressed: () => Navigator.of(context).pop(),
           ),
         ],

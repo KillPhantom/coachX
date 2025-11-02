@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:coach_x/l10n/app_localizations.dart';
 import 'package:coach_x/core/theme/app_theme.dart';
 import '../../home/presentation/pages/student_home_page.dart';
 import '../../training/presentation/pages/training_page.dart';
@@ -17,6 +18,8 @@ class StudentTabScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return CupertinoTabScaffold(
       tabBar: CupertinoTabBar(
         backgroundColor: AppColors.backgroundWhite.withValues(alpha: 0.9),
@@ -28,17 +31,17 @@ class StudentTabScaffold extends StatelessWidget {
         iconSize: 24.0,
         items: [
           // Tab 0 - Home
-          const BottomNavigationBarItem(
+          BottomNavigationBarItem(
             icon: Icon(CupertinoIcons.house),
             activeIcon: Icon(CupertinoIcons.house_fill),
-            label: 'Home',
+            label: l10n.tabHome,
           ),
 
           // Tab 1 - Plan
-          const BottomNavigationBarItem(
+          BottomNavigationBarItem(
             icon: Icon(CupertinoIcons.calendar),
             activeIcon: Icon(CupertinoIcons.calendar_today),
-            label: 'Plan',
+            label: l10n.tabPlan,
           ),
 
           // Tab 2 - Add (特殊中间突出按钮)
@@ -70,17 +73,17 @@ class StudentTabScaffold extends StatelessWidget {
           // TODO: 添加未读消息Badge
           // 实现方式: 使用Badge widget包裹图标
           // Provider: unreadMessageCountProvider (StreamProvider<int>)
-          const BottomNavigationBarItem(
+          BottomNavigationBarItem(
             icon: Icon(CupertinoIcons.chat_bubble_2),
             activeIcon: Icon(CupertinoIcons.chat_bubble_2_fill),
-            label: 'Chat',
+            label: l10n.tabChat,
           ),
 
           // Tab 4 - Profile
-          const BottomNavigationBarItem(
+          BottomNavigationBarItem(
             icon: Icon(CupertinoIcons.person),
             activeIcon: Icon(CupertinoIcons.person_fill),
-            label: 'Profile',
+            label: l10n.tabProfile,
           ),
         ],
       ),
@@ -122,47 +125,49 @@ class StudentTabScaffold extends StatelessWidget {
 
   /// 显示添加选项ActionSheet
   void _showAddActionSheet(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     showCupertinoModalPopup(
       context: context,
       builder: (context) => CupertinoActionSheet(
-        title: const Text('Add Record'),
-        message: const Text('Choose a record type to add'),
+        title: Text(l10n.addRecordTitle),
+        message: Text(l10n.chooseRecordType),
         actions: [
           CupertinoActionSheetAction(
             onPressed: () {
               Navigator.pop(context);
               // TODO: 跳转到训练记录页面
               // 路由: /student/training/add
-              _showTodoAlert(context, '训练记录', '跳转到训练记录添加页面');
+              _showTodoAlert(context, l10n.trainingRecord, '跳转到训练记录添加页面');
             },
-            child: const Text('Training Record'),
+            child: Text(l10n.trainingRecord),
           ),
           CupertinoActionSheetAction(
             onPressed: () {
               Navigator.pop(context);
               // TODO: 跳转到饮食记录页面
               // 路由: /student/diet/add
-              _showTodoAlert(context, '饮食记录', '跳转到饮食记录添加页面');
+              _showTodoAlert(context, l10n.dietRecord, '跳转到饮食记录添加页面');
             },
-            child: const Text('Diet Record'),
+            child: Text(l10n.dietRecord),
           ),
           CupertinoActionSheetAction(
             onPressed: () {
               Navigator.pop(context);
               // TODO: 跳转到补剂记录页面
               // 路由: /student/supplement/add
-              _showTodoAlert(context, '补剂记录', '跳转到补剂记录添加页面');
+              _showTodoAlert(context, l10n.supplementRecord, '跳转到补剂记录添加页面');
             },
-            child: const Text('Supplement Record'),
+            child: Text(l10n.supplementRecord),
           ),
           CupertinoActionSheetAction(
             onPressed: () {
               Navigator.pop(context);
               // TODO: 跳转到身体测量页面
               // 路由: /student/body-stats/add
-              _showTodoAlert(context, '身体测量', '跳转到身体测量添加页面');
+              _showTodoAlert(context, l10n.bodyMeasurement, '跳转到身体测量添加页面');
             },
-            child: const Text('Body Measurement'),
+            child: Text(l10n.bodyMeasurement),
           ),
         ],
         cancelButton: CupertinoActionSheetAction(
@@ -170,7 +175,7 @@ class StudentTabScaffold extends StatelessWidget {
           onPressed: () {
             Navigator.pop(context);
           },
-          child: const Text('Cancel'),
+          child: Text(l10n.cancel),
         ),
       ),
     );
@@ -178,6 +183,8 @@ class StudentTabScaffold extends StatelessWidget {
 
   /// 显示TODO提示
   void _showTodoAlert(BuildContext context, String title, String message) {
+    final l10n = AppLocalizations.of(context)!;
+
     showCupertinoDialog(
       context: context,
       builder: (context) => CupertinoAlertDialog(
@@ -185,7 +192,7 @@ class StudentTabScaffold extends StatelessWidget {
         content: Text(message),
         actions: [
           CupertinoDialogAction(
-            child: const Text('知道了'),
+            child: Text(l10n.know),
             onPressed: () => Navigator.of(context).pop(),
           ),
         ],

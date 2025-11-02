@@ -47,6 +47,7 @@ Google docs: https://docs.google.com/document/d/1yKQgZWjdeALkwrl2SHf6RjUnsCmeLxt
 
 - AI 生成
   - generateAITrainingPlan(prompt, dayIndex?, activeTab?)
+  - getFoodMacros(food_name) - AI 获取食物营养信息
 
 
 ## Database Schemas (Document Database)
@@ -78,7 +79,6 @@ Google docs: https://docs.google.com/document/d/1yKQgZWjdeALkwrl2SHf6RjUnsCmeLxt
 | days | ExerciseTrainingDay[] |
 | ownerId | string |
 | studentIds | string[] |
-| isTemplate | boolean |
 | createdAt | number |
 | updatedAt | number |
 
@@ -119,7 +119,6 @@ TrainingSet
 | days | DietDay[] |
 | ownerId | string |
 | studentIds | string[] |
-| isTemplate | boolean |
 | createdAt | number |
 | updatedAt | number |
 
@@ -179,7 +178,6 @@ Macros
 | days | SupplementDay[] |
 | ownerId | string |
 | studentIds | string[] |
-| isTemplate | boolean |
 | createdAt | number |
 | updatedAt | number |
 

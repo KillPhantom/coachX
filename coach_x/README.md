@@ -50,6 +50,159 @@ CoachX是一个基于Flutter开发的跨平台移动应用，旨在构建线上�
 - Bold: 700
 - Black: 900
 
+### Typography 使用规范 ⚠️ 强制要求
+
+**核心原则**:
+- ✅ **必须使用** `AppTextStyles.*` 中定义的标准字体样式
+- ❌ **禁止使用** 自定义 `fontSize` 硬编码
+- 📏 **向下靠拢原则**: 当需要的字体大小在标准中不存在时，使用最接近的较小尺寸
+
+**标准 fontSize 映射表**:
+
+| 场景 | 推荐样式 | fontSize | fontWeight | 说明 |
+|------|---------|----------|------------|------|
+| 超大标题 | `AppTextStyles.largeTitle` | 34px | Bold (700) | 页面主标题 |
+| 大标题 | `AppTextStyles.title1` | 28px | Bold (700) | - |
+| 标题 | `AppTextStyles.title2` | 22px | Bold (700) | ⚠️ 24px向下靠拢 |
+| 中标题 | `AppTextStyles.title3` | 20px | SemiBold (600) | - |
+| 正文 | `AppTextStyles.body` | 17px | Regular (400) | 主要内容文字 |
+| 正文中等 | `AppTextStyles.bodyMedium` | 17px | Medium (500) | - |
+| 正文加粗 | `AppTextStyles.bodySemiBold` | 17px | SemiBold (600) | - |
+| 突出显示 | `AppTextStyles.callout` | 16px | Regular (400) | ⚠️ 18px向下靠拢 |
+| 副标题 | `AppTextStyles.subhead` | 15px | Regular (400) | - |
+| 脚注 | `AppTextStyles.footnote` | 13px | Regular (400) | ⚠️ 14px向下靠拢 |
+| 说明文字1 | `AppTextStyles.caption1` | 12px | Regular (400) | 次要信息 |
+| 说明文字2 | `AppTextStyles.caption2` | 11px | Regular (400) | - |
+| Tab标签 | `AppTextStyles.tabLabel` | 10px | Medium (500) | 底部Tab文字 |
+| 大按钮 | `AppTextStyles.buttonLarge` | 17px | SemiBold (600) | 主要操作按钮 |
+| 中按钮 | `AppTextStyles.buttonMedium` | 15px | SemiBold (600) | 次要操作按钮 |
+| 小按钮 | `AppTextStyles.buttonSmall` | 13px | Medium (500) | 辅助按钮 |
+| 导航栏标题 | `AppTextStyles.navTitle` | 17px | SemiBold (600) | - |
+| 导航栏大标题 | `AppTextStyles.navLargeTitle` | 34px | Bold (700) | - |
+
+**向下靠拢规则**:
+- `fontSize: 24` → 使用 `AppTextStyles.title2` (22px)
+- `fontSize: 18` → 使用 `AppTextStyles.callout` (16px)
+- `fontSize: 14` → 使用 `AppTextStyles.footnote` (13px)
+
+**代码示例**:
+
+✅ **正确做法**:
+```dart
+Text(
+  'Welcome',
+  style: AppTextStyles.title2,  // 使用标准样式
+)
+
+// 需要修改颜色时
+Text(
+  'Username',
+  style: AppTextStyles.body.copyWith(
+    color: AppColors.primary,
+  ),
+)
+```
+
+❌ **错误做法**:
+```dart
+// 禁止使用硬编码 fontSize
+Text(
+  'Welcome',
+  style: TextStyle(
+    fontSize: 24,  // ❌ 应使用 AppTextStyles.title2
+    fontWeight: FontWeight.bold,
+  ),
+)
+```
+
+**AI 开发注意事项**:
+> 在使用 AI 工具（如 Cursor、GitHub Copilot）生成代码时，必须严格遵守以上规范。AI 生成的代码如包含自定义 fontSize，必须替换为标准 AppTextStyles。
+
+### 国际化 (Internationalization) - MANDATORY ⚠️
+
+**核心原则**:
+- ✅ **必须使用** `AppLocalizations.of(context)!.*` 获取所有用户可见文字
+- ❌ **禁止使用** 硬编码字符串 (如 `Text('Login')`)
+- 📝 **新增文字** 必须先在 ARB 文件中定义，再使用
+
+#### 支持的语言
+- 中文 (zh_CN)
+- English (en_US)
+
+#### 使用方法
+
+**基本用法**:
+```dart
+// ✅ 正确 - 使用 AppLocalizations
+final l10n = AppLocalizations.of(context)!;
+Text(l10n.login)
+```
+
+**错误示例**:
+```dart
+// ❌ 错误 - 禁止硬编码
+Text('Login')  // 应使用 l10n.login
+Text('个人资料')  // 应使用 l10n.profile
+```
+
+#### 添加新翻译的流程
+
+1. **编辑 ARB 文件**
+   - 打开 `lib/l10n/app_en.arb`
+   - 添加新的 key-value 对和描述
+   - 打开 `lib/l10n/app_zh.arb`
+   - 添加对应的中文翻译
+
+2. **生成翻译代码**
+   ```bash
+   flutter gen-l10n
+   # 或运行
+   flutter pub get
+   ```
+
+3. **在代码中使用**
+   ```dart
+   final l10n = AppLocalizations.of(context)!;
+   Text(l10n.yourNewKey)
+   ```
+
+#### 命名规范
+
+**Key 命名规则**:
+- 使用 camelCase
+- 使用功能前缀 (如 `auth*`, `students*`, `plans*`)
+- 描述性且简洁 (2-4 words)
+
+**示例**:
+- 页面标题: `plansTitle`, `studentsTitle`
+- 按钮: `loginButton`, `cancel`, `confirm`
+- 错误消息: `loginFailed`, `loadFailed`
+- 占位符: `emailPlaceholder`, `searchPlaceholder`
+
+#### 参数化字符串
+
+当需要动态内容时:
+```dart
+// ARB 文件定义
+{
+  "studentCount": "{count} students",
+  "@studentCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  }
+}
+
+// 代码使用
+Text(l10n.studentCount(25))  // "25 students"
+```
+
+#### AI 开发注意事项
+> 使用 AI 工具生成代码时，必须检查并替换所有硬编码字符串为 `AppLocalizations` 调用。
+
+#### 详细实施指南
+完整的国际化实施步骤和文件修改清单请参考：[国际化实施指南](docs/i18n_implementation_guide.md)
+
 ### UI组件
 
 组件规范文档待建立。
@@ -62,37 +215,8 @@ coachX/
 │   ├── lib/             # Dart源代码
 │   ├── android/         # Android平台配置
 │   ├── ios/             # iOS平台配置
+│   ├── docs/             # 项目文档
 │   └── pubspec.yaml     # 依赖配置
-├── docs/                # 项目文档
-│   └── backend_apis_and_document_db_schemas.md  # 后端API与数据库Schema
-├── studentUI/           # 学生端UI设计稿（HTML）
-├── coachUI/             # 教练端UI设计稿（HTML）
-└── commonUI/            # 通用UI设计稿（HTML）
-```
-
-## 功能模块
-
-### 学生端功能
-- 首页概览（每日打卡、训练计划）
-- 训练记录上传
-- 饮食记录管理
-- 补剂记录跟踪
-- 身体数据测量
-- 与教练实时对话
-- 查看训练计划
-
-### 教练端功能
-- 学生管理（列表、详情）
-- 创建训练计划
-- 创建饮食计划
-- 创建补剂计划
-- 查看学生训练记录
-- 提供训练反馈
-- 与学生对话
-
-### AI功能
-- AI生成训练计划
-- 智能训练建议
 
 ## 开发环境设置
 
@@ -101,14 +225,6 @@ coachX/
 - Dart SDK ^3.9.2
 - iOS开发: Xcode 14+, CocoaPods
 - Android开发: Android Studio, Android SDK
-
-### 安装步骤
-
-1. 克隆项目
-```bash
-git clone <repository-url>
-cd coachX/coach_x
-```
 
 2. 安装依赖
 ```bash
@@ -170,151 +286,3 @@ flutter run -d android
 
 后端API基于Firebase Cloud Functions (Python)实现，详细的API接口和数据库Schema请参考：
 - [后端API与数据库Schema文档](../docs/backend_apis_and_document_db_schemas.md)
-
-## 参考资料
-
-- **后端API文档**: [Google Docs](https://docs.google.com/document/d/1yKQgZWjdeALkwrl2SHf6RjUnsCmeLxtoWFrv0Epr7SQ/edit?tab=t.9cl42i828p31)
-- **UI设计稿**: 位于 `studentUI/`、`coachUI/`、`commonUI/` 目录
-
-## 项目状态
-
-### 阶段一：基础框架搭建 ✅ 已完成
-- ✅ Flutter项目结构搭建完成
-- ✅ UI设计稿（HTML原型）已完成
-- ✅ 后端API设计文档已完成
-- ✅ 核心主题系统（颜色、字体、尺寸）
-- ✅ 路由系统（go_router）
-- ✅ 状态管理方案（Riverpod）
-- ✅ 通用工具类和扩展方法
-- ✅ 基础通用组件
-
-### 阶段二：Firebase集成 ✅ 已完成
-- ✅ Firebase项目创建和配置
-  - 项目名称: coachx-9d219
-  - Authentication: 邮箱/密码登录已启用
-  - Firestore: 已创建（测试模式，30天有效期）
-  - Storage: 已启用（测试模式，30天有效期）
-  - Cloud Functions: Python 2nd gen (模块化架构)
-  - 配置文件: 已放置到项目中
-- ✅ Flutter端Firebase SDK集成
-- ✅ Authentication实现
-  - AuthService：完整的认证服务
-  - Login/Register页面：Cupertino风格UI
-  - Profile Setup页面：用户资料完善
-  - 状态管理：Riverpod
-- ✅ Firestore数据层实现
-  - FirestoreService：基础CRUD服务
-  - UserModel：扩展用户数据模型（gender, bornDate, height, initialWeight等）
-  - UserRepository：仓库模式
-  - Gender枚举：性别类型定义
-- ✅ Storage文件上传实现
-  - StorageService：文件上传服务
-  - 图片选择和压缩
-  - 分类存储（头像、训练、饮食等）
-- ✅ Cloud Functions开发（模块化架构）
-  - users/: 用户管理模块
-  - invitations/: 邀请码系统模块
-  - utils/: 通用工具模块
-  - Firebase Auth触发器：自动创建Firestore用户文档
-  - Firestore触发器：用户创建后续处理
-- ✅ 完整用户注册流程
-  - 注册 → Profile Setup → 角色选择 → 信息完善 → 对应首页
-- ✅ 代码优化和格式化
-
-### 阶段三：核心功能开发 🔄 进行中
-- ✅ 教练首页完整实现
-  - Summary统计信息展示
-  - Event Reminder事件提醒
-  - Recent Activity最近活跃学生
-- ✅ 教练端底部导航（CupertinoTabScaffold）
-  - 5个Tab: Home, Students, Plans, Chat, Profile
-  - Tab状态保持
-- ✅ 学生端底部导航（CupertinoTabScaffold）
-  - 5个Tab: Home, Plan, Add(突出), Chat, Profile
-  - Add按钮ActionSheet
-- ✅ 路由架构调整（支持Tab导航）
-- ✅ 数据模型设计
-  - EventReminderModel
-  - CoachSummaryModel
-  - RecentActivityModel
-- ✅ Mock数据Provider实现
-- ⏳ 学生端训练记录功能
-- ⏳ 教练端计划管理功能
-- ⏳ 实时对话功能
-- ⏳ 数据API对接
-
-## 快速开始
-
-### 前置要求
-- Flutter SDK (3.19.0+)
-- Dart SDK (3.9.2+)
-- Firebase CLI (可选，用于Functions部署)
-- iOS开发: Xcode 14+, CocoaPods
-- Android开发: Android Studio, Android SDK (minSdk 21)
-
-### 运行应用
-
-1. **安装依赖**
-```bash
-flutter pub get
-```
-
-2. **运行应用**
-```bash
-# iOS模拟器
-flutter run -d ios
-
-# Android模拟器/设备
-flutter run -d android
-```
-
-### 部署Cloud Functions
-
-```bash
-cd functions
-pip install -r requirements.txt
-firebase deploy --only functions
-```
-
-## 核心技术栈
-
-### 前端
-- **UI框架**: Flutter + Cupertino Design
-- **状态管理**: Riverpod
-- **路由**: go_router  
-- **本地存储**: Hive + SharedPreferences
-- **网络**: Dio
-
-### 后端
-- **云函数**: Firebase Cloud Functions (Python)
-- **数据库**: Cloud Firestore
-- **存储**: Firebase Storage
-- **认证**: Firebase Authentication
-
-## 项目统计
-
-- **代码文件**: 70+ Dart files, 6 Python files
-- **代码行数**: ~6500+ lines
-- **Services**: 6个核心服务
-- **Models**: 4个数据模型
-- **Pages**: 11个页面（1个完整实现+10个占位）
-- **Features**: 教练首页和Tab导航完整实现
-- **Git提交**: 15+ commits
-
-## 版本信息
-
-- **当前版本**: 1.0.0+1
-- **最后更新**: 2025-10-21
-
-## TODO文档
-
-所有待实现功能已汇总至 [docs/todos.md](../docs/todos.md)，包括：
-- 数据层API对接
-- UI层跳转实现
-- Chat功能实现
-- 计划管理功能
-- 训练记录功能
-- 性能和体验优化
-
-详细请查阅TODO文档。
-

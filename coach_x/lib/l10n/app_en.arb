@@ -1,0 +1,1093 @@
+{
+  "@@locale": "en",
+
+  "profile": "Profile",
+  "@profile": {
+    "description": "Profile page title"
+  },
+
+  "settings": "Settings",
+  "@settings": {
+    "description": "Settings section title"
+  },
+
+  "notifications": "Notifications",
+  "@notifications": {
+    "description": "Notifications toggle label"
+  },
+
+  "unitPreference": "Unit Preference",
+  "@unitPreference": {
+    "description": "Unit preference setting"
+  },
+
+  "metric": "Metric",
+  "@metric": {
+    "description": "Metric unit system"
+  },
+
+  "imperial": "Imperial",
+  "@imperial": {
+    "description": "Imperial unit system"
+  },
+
+  "language": "Language",
+  "@language": {
+    "description": "Language setting"
+  },
+
+  "languageChinese": "中文",
+  "@languageChinese": {
+    "description": "Chinese language name"
+  },
+
+  "languageEnglish": "English",
+  "@languageEnglish": {
+    "description": "English language name"
+  },
+
+  "selectLanguage": "Select Language",
+  "@selectLanguage": {
+    "description": "Language selection page title"
+  },
+
+  "accountSettings": "Account Settings",
+  "@accountSettings": {
+    "description": "Account settings option"
+  },
+
+  "helpCenter": "Help Center",
+  "@helpCenter": {
+    "description": "Help center option"
+  },
+
+  "logOut": "Log Out",
+  "@logOut": {
+    "description": "Log out option"
+  },
+
+  "subscription": "Subscription",
+  "@subscription": {
+    "description": "Subscription section title"
+  },
+
+  "personalInformation": "Personal Information",
+  "@personalInformation": {
+    "description": "Personal information section"
+  },
+
+  "age": "Age",
+  "@age": {
+    "description": "Age label"
+  },
+
+  "height": "Height",
+  "@height": {
+    "description": "Height label"
+  },
+
+  "weight": "Weight",
+  "@weight": {
+    "description": "Weight label"
+  },
+
+  "coachInfo": "Coach Info",
+  "@coachInfo": {
+    "description": "Coach information section"
+  },
+
+  "student": "Student",
+  "@student": {
+    "description": "Student role"
+  },
+
+  "errorOccurred": "An error occurred",
+  "@errorOccurred": {
+    "description": "Generic error message title"
+  },
+
+  "retry": "Retry",
+  "@retry": {
+    "description": "Retry button text"
+  },
+
+  "cancel": "Cancel",
+  "@cancel": {
+    "description": "Cancel button text"
+  },
+
+  "confirm": "Confirm",
+  "@confirm": {
+    "description": "Confirm button text"
+  },
+
+  "loading": "Loading...",
+  "@loading": {
+    "description": "Loading indicator text"
+  },
+
+  "alert": "Alert",
+  "@alert": {
+    "description": "Alert dialog title"
+  },
+
+  "featureInDevelopment": "This feature is under development",
+  "@featureInDevelopment": {
+    "description": "Feature under development message"
+  },
+
+  "avatarEditInDevelopment": "Avatar editing is under development",
+  "@avatarEditInDevelopment": {
+    "description": "Avatar edit feature message"
+  },
+
+  "accountSettingsInDevelopment": "Account Settings is under development",
+  "@accountSettingsInDevelopment": {
+    "description": "Account settings feature message"
+  },
+
+  "helpCenterInDevelopment": "Help Center is under development",
+  "@helpCenterInDevelopment": {
+    "description": "Help center feature message"
+  },
+
+  "selectUnitPreference": "Select Unit Preference",
+  "@selectUnitPreference": {
+    "description": "Unit preference selection title"
+  },
+
+  "success": "Success",
+  "@success": {
+    "description": "Success message"
+  },
+
+  "error": "Error",
+  "@error": {
+    "description": "Error message"
+  },
+
+  "delete": "Delete",
+  "@delete": {
+    "description": "Delete action"
+  },
+
+  "copy": "Copy",
+  "@copy": {
+    "description": "Copy action"
+  },
+
+  "close": "Close",
+  "@close": {
+    "description": "Close action"
+  },
+
+  "all": "All",
+  "@all": {
+    "description": "All items filter"
+  },
+
+  "search": "Search",
+  "@search": {
+    "description": "Search action"
+  },
+
+  "know": "Got it",
+  "@know": {
+    "description": "Acknowledgment button"
+  },
+
+  "tabHome": "Home",
+  "@tabHome": {
+    "description": "Home tab label"
+  },
+
+  "tabStudents": "Students",
+  "@tabStudents": {
+    "description": "Students tab label"
+  },
+
+  "tabPlans": "Plans",
+  "@tabPlans": {
+    "description": "Plans tab label"
+  },
+
+  "tabChat": "Chat",
+  "@tabChat": {
+    "description": "Chat tab label"
+  },
+
+  "tabProfile": "Profile",
+  "@tabProfile": {
+    "description": "Profile tab label"
+  },
+
+  "tabPlan": "Plan",
+  "@tabPlan": {
+    "description": "Plan tab label (student)"
+  },
+
+  "appName": "CoachX",
+  "@appName": {
+    "description": "Application name"
+  },
+
+  "appTagline": "AI Coaching Platform",
+  "@appTagline": {
+    "description": "Application tagline"
+  },
+
+  "emailPlaceholder": "Email address",
+  "@emailPlaceholder": {
+    "description": "Email input placeholder"
+  },
+
+  "passwordPlaceholder": "Password",
+  "@passwordPlaceholder": {
+    "description": "Password input placeholder"
+  },
+
+  "passwordRequired": "Please enter password",
+  "@passwordRequired": {
+    "description": "Password required error"
+  },
+
+  "forgotPassword": "Forgot password?",
+  "@forgotPassword": {
+    "description": "Forgot password link"
+  },
+
+  "login": "Login",
+  "@login": {
+    "description": "Login button"
+  },
+
+  "noAccount": "Don't have an account?",
+  "@noAccount": {
+    "description": "No account prompt"
+  },
+
+  "signUpNow": "Sign up",
+  "@signUpNow": {
+    "description": "Sign up link"
+  },
+
+  "getUserInfoFailed": "Failed to get user info",
+  "@getUserInfoFailed": {
+    "description": "Get user info failed error"
+  },
+
+  "getUserInfoTimeout": "Get user info timeout, please try again",
+  "@getUserInfoTimeout": {
+    "description": "Get user info timeout error"
+  },
+
+  "loginFailed": "Login failed",
+  "@loginFailed": {
+    "description": "Login failed error"
+  },
+
+  "createAccount": "Create your account",
+  "@createAccount": {
+    "description": "Create account title"
+  },
+
+  "startYourJourney": "Start your fitness journey",
+  "@startYourJourney": {
+    "description": "Registration subtitle"
+  },
+
+  "namePlaceholder": "Name",
+  "@namePlaceholder": {
+    "description": "Name input placeholder"
+  },
+
+  "nameRequired": "Please enter your name",
+  "@nameRequired": {
+    "description": "Name required error"
+  },
+
+  "passwordMinLength": "Password (at least 6 characters)",
+  "@passwordMinLength": {
+    "description": "Password minimum length label"
+  },
+
+  "confirmPasswordPlaceholder": "Confirm password",
+  "@confirmPasswordPlaceholder": {
+    "description": "Confirm password placeholder"
+  },
+
+  "confirmPasswordRequired": "Please confirm password",
+  "@confirmPasswordRequired": {
+    "description": "Confirm password required error"
+  },
+
+  "passwordMismatch": "Passwords don't match",
+  "@passwordMismatch": {
+    "description": "Password mismatch error"
+  },
+
+  "termsAgreement": "By signing up, you agree to our Terms of Service and Privacy Policy",
+  "@termsAgreement": {
+    "description": "Terms agreement text"
+  },
+
+  "register": "Register",
+  "@register": {
+    "description": "Register button"
+  },
+
+  "hasAccount": "Already have an account?",
+  "@hasAccount": {
+    "description": "Has account prompt"
+  },
+
+  "loginNow": "Login now",
+  "@loginNow": {
+    "description": "Login now link"
+  },
+
+  "forgotPasswordInDevelopment": "Forgot password feature is under development",
+  "@forgotPasswordInDevelopment": {
+    "description": "Forgot password feature message"
+  },
+
+  "registerFailed": "Registration failed",
+  "@registerFailed": {
+    "description": "Registration failed error"
+  },
+
+  "coachHomeSummaryTitle": "Summary",
+  "@coachHomeSummaryTitle": {
+    "description": "Coach home summary section title"
+  },
+
+  "studentsCompletedTrainingToday": "{count} students completed training today",
+  "@studentsCompletedTrainingToday": {
+    "description": "Students completed training today message",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+
+  "unreadMessagesCount": "{count} unread messages",
+  "@unreadMessagesCount": {
+    "description": "Unread messages count",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+
+  "unreviewedTrainingsCount": "{count} training records need to be reviewed",
+  "@unreviewedTrainingsCount": {
+    "description": "Unreviewed trainings count",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+
+  "eventReminderTitle": "Event Reminder",
+  "@eventReminderTitle": {
+    "description": "Event reminder section title"
+  },
+
+  "noUpcomingEvents": "No upcoming events",
+  "@noUpcomingEvents": {
+    "description": "No upcoming events message"
+  },
+
+  "recentActivityTitle": "Recent Activity",
+  "@recentActivityTitle": {
+    "description": "Recent activity section title"
+  },
+
+  "noRecentActivity": "No recent activity",
+  "@noRecentActivity": {
+    "description": "No recent activity message"
+  },
+
+  "searchStudentPlaceholder": "Search by student name",
+  "@searchStudentPlaceholder": {
+    "description": "Search student placeholder"
+  },
+
+  "studentCount": "{count} students",
+  "@studentCount": {
+    "description": "Student count display",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "25"
+      }
+    }
+  },
+
+  "noStudentsFound": "No students found",
+  "@noStudentsFound": {
+    "description": "No students found message"
+  },
+
+  "noStudents": "No students",
+  "@noStudents": {
+    "description": "No students message"
+  },
+
+  "tryAdjustFilters": "Try adjusting filters",
+  "@tryAdjustFilters": {
+    "description": "Try adjust filters tip"
+  },
+
+  "inviteStudentsTip": "Tap the add button to invite students",
+  "@inviteStudentsTip": {
+    "description": "Invite students tip"
+  },
+
+  "clearFilters": "Clear filters",
+  "@clearFilters": {
+    "description": "Clear filters action"
+  },
+
+  "inviteStudents": "Invite students",
+  "@inviteStudents": {
+    "description": "Invite students action"
+  },
+
+  "studentDetails": "Student Details",
+  "@studentDetails": {
+    "description": "Student details title"
+  },
+
+  "studentDeleted": "Student deleted",
+  "@studentDeleted": {
+    "description": "Student deleted success message"
+  },
+
+  "deleteFailed": "Delete failed",
+  "@deleteFailed": {
+    "description": "Delete failed error"
+  },
+
+  "confirmDeleteStudent": "Are you sure to delete student \"{name}\"? This action cannot be undone.",
+  "@confirmDeleteStudent": {
+    "description": "Confirm delete student message",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "John"
+      }
+    }
+  },
+
+  "filterOptions": "Filter options",
+  "@filterOptions": {
+    "description": "Filter options title"
+  },
+
+  "noTrainingPlans": "No training plans",
+  "@noTrainingPlans": {
+    "description": "No training plans message"
+  },
+
+  "filterByTrainingPlan": "Filter by training plan",
+  "@filterByTrainingPlan": {
+    "description": "Filter by training plan label"
+  },
+
+  "invitationCodeManagement": "Invitation Code Management",
+  "@invitationCodeManagement": {
+    "description": "Invitation code management title"
+  },
+
+  "invitationCodeDescription": "Generate invitation codes for student registration",
+  "@invitationCodeDescription": {
+    "description": "Invitation code description"
+  },
+
+  "contractDurationDays": "Contract duration (days)",
+  "@contractDurationDays": {
+    "description": "Contract duration label"
+  },
+
+  "exampleDays": "e.g., 180",
+  "@exampleDays": {
+    "description": "Example days placeholder"
+  },
+
+  "remarkOptional": "Remark (optional)",
+  "@remarkOptional": {
+    "description": "Remark optional label"
+  },
+
+  "remarkExample": "e.g., VIP exclusive",
+  "@remarkExample": {
+    "description": "Remark example placeholder"
+  },
+
+  "existingInvitationCodes": "Existing invitation codes",
+  "@existingInvitationCodes": {
+    "description": "Existing invitation codes title"
+  },
+
+  "noInvitationCodes": "No invitation codes",
+  "@noInvitationCodes": {
+    "description": "No invitation codes message"
+  },
+
+  "loadFailed": "Load failed",
+  "@loadFailed": {
+    "description": "Load failed error"
+  },
+
+  "generateInvitationCode": "Generate invitation code",
+  "@generateInvitationCode": {
+    "description": "Generate invitation code action"
+  },
+
+  "pleaseEnterContractDuration": "Please enter contract duration",
+  "@pleaseEnterContractDuration": {
+    "description": "Please enter contract duration error"
+  },
+
+  "contractDurationRangeError": "Contract duration must be between 1 and 365 days",
+  "@contractDurationRangeError": {
+    "description": "Contract duration range error"
+  },
+
+  "generateFailed": "Generate failed",
+  "@generateFailed": {
+    "description": "Generate failed error"
+  },
+
+  "invitationCodeGenerated": "Invitation code generated successfully",
+  "@invitationCodeGenerated": {
+    "description": "Invitation code generated success"
+  },
+
+  "invitationCodeCopied": "Invitation code copied",
+  "@invitationCodeCopied": {
+    "description": "Invitation code copied message"
+  },
+
+  "selectAction": "Select action",
+  "@selectAction": {
+    "description": "Select action title"
+  },
+
+  "viewDetails": "View details",
+  "@viewDetails": {
+    "description": "View details action"
+  },
+
+  "assignPlan": "Assign plan",
+  "@assignPlan": {
+    "description": "Assign plan action"
+  },
+
+  "deleteStudent": "Delete student",
+  "@deleteStudent": {
+    "description": "Delete student action"
+  },
+
+  "confirmDelete": "Confirm delete",
+  "@confirmDelete": {
+    "description": "Confirm delete title"
+  },
+
+  "plansTitle": "Plans",
+  "@plansTitle": {
+    "description": "Plans page title"
+  },
+
+  "tabTraining": "Training",
+  "@tabTraining": {
+    "description": "Training tab label"
+  },
+
+  "tabDiet": "Diet",
+  "@tabDiet": {
+    "description": "Diet tab label"
+  },
+
+  "tabSupplements": "Supplements",
+  "@tabSupplements": {
+    "description": "Supplements tab label"
+  },
+
+  "copyPlan": "Copy plan",
+  "@copyPlan": {
+    "description": "Copy plan action"
+  },
+
+  "confirmCopyPlan": "Are you sure to copy \"{planName}\"?",
+  "@confirmCopyPlan": {
+    "description": "Confirm copy plan message",
+    "placeholders": {
+      "planName": {
+        "type": "String",
+        "example": "Beginner Plan"
+      }
+    }
+  },
+
+  "deletePlan": "Delete plan",
+  "@deletePlan": {
+    "description": "Delete plan action"
+  },
+
+  "confirmDeletePlan": "Are you sure to delete \"{planName}\"? This action cannot be undone.",
+  "@confirmDeletePlan": {
+    "description": "Confirm delete plan message",
+    "placeholders": {
+      "planName": {
+        "type": "String",
+        "example": "Beginner Plan"
+      }
+    }
+  },
+
+  "copySuccess": "Copy successful",
+  "@copySuccess": {
+    "description": "Copy success message"
+  },
+
+  "copyFailed": "Copy failed",
+  "@copyFailed": {
+    "description": "Copy failed error"
+  },
+
+  "deleteSuccess": "Delete successful",
+  "@deleteSuccess": {
+    "description": "Delete success message"
+  },
+
+  "refreshFailed": "Refresh failed",
+  "@refreshFailed": {
+    "description": "Refresh failed error"
+  },
+
+  "noResults": "No results",
+  "@noResults": {
+    "description": "No results message"
+  },
+
+  "noPlansFoundForQuery": "No plans found for \"{query}\"",
+  "@noPlansFoundForQuery": {
+    "description": "No plans found for query message",
+    "placeholders": {
+      "query": {
+        "type": "String",
+        "example": "cardio"
+      }
+    }
+  },
+
+  "clearSearch": "Clear search",
+  "@clearSearch": {
+    "description": "Clear search action"
+  },
+
+  "noPlansYet": "No plans yet",
+  "@noPlansYet": {
+    "description": "No plans yet message"
+  },
+
+  "createFirstPlan": "Create your first {planType} plan",
+  "@createFirstPlan": {
+    "description": "Create first plan message",
+    "placeholders": {
+      "planType": {
+        "type": "String",
+        "example": "training"
+      }
+    }
+  },
+
+  "createPlan": "Create plan",
+  "@createPlan": {
+    "description": "Create plan action"
+  },
+
+  "createNewPlanTitle": "Create New Plan",
+  "@createNewPlanTitle": {
+    "description": "Create new plan title"
+  },
+
+  "createPlanSubtitle": "What would you like to create today?",
+  "@createPlanSubtitle": {
+    "description": "Create plan subtitle"
+  },
+
+  "exercisePlanTitle": "Exercise Plan",
+  "@exercisePlanTitle": {
+    "description": "Exercise plan title"
+  },
+
+  "exercisePlanDesc": "Create training schedules and workout routines",
+  "@exercisePlanDesc": {
+    "description": "Exercise plan description"
+  },
+
+  "dietPlanTitle": "Diet Plan",
+  "@dietPlanTitle": {
+    "description": "Diet plan title"
+  },
+
+  "dietPlanDesc": "Design meal plans and nutrition guidelines",
+  "@dietPlanDesc": {
+    "description": "Diet plan description"
+  },
+
+  "supplementPlanTitle": "Supplement Plan",
+  "@supplementPlanTitle": {
+    "description": "Supplement plan title"
+  },
+
+  "supplementPlanDesc": "Plan supplement schedules and dosages",
+  "@supplementPlanDesc": {
+    "description": "Supplement plan description"
+  },
+
+  "assignToStudent": "Assign to student",
+  "@assignToStudent": {
+    "description": "Assign to student action"
+  },
+
+  "imperialUnit": "Imperial (ft, lbs)",
+  "@imperialUnit": {
+    "description": "Imperial unit display"
+  },
+
+  "metricUnit": "Metric (cm, kg)",
+  "@metricUnit": {
+    "description": "Metric unit display"
+  },
+
+  "updateFailed": "Update failed",
+  "@updateFailed": {
+    "description": "Update failed error"
+  },
+
+  "confirmLogOut": "Confirm log out",
+  "@confirmLogOut": {
+    "description": "Confirm log out title"
+  },
+
+  "confirmLogOutMessage": "Are you sure to log out?",
+  "@confirmLogOutMessage": {
+    "description": "Confirm log out message"
+  },
+
+  "addRecordTitle": "Add Record",
+  "@addRecordTitle": {
+    "description": "Add record title"
+  },
+
+  "chooseRecordType": "Choose a record type to add",
+  "@chooseRecordType": {
+    "description": "Choose record type message"
+  },
+
+  "trainingRecord": "Training Record",
+  "@trainingRecord": {
+    "description": "Training record type"
+  },
+
+  "dietRecord": "Diet Record",
+  "@dietRecord": {
+    "description": "Diet record type"
+  },
+
+  "supplementRecord": "Supplement Record",
+  "@supplementRecord": {
+    "description": "Supplement record type"
+  },
+
+  "bodyMeasurement": "Body Measurement",
+  "@bodyMeasurement": {
+    "description": "Body measurement type"
+  },
+
+  "studentHome": "Student Home",
+  "@studentHome": {
+    "description": "Student home title"
+  },
+
+  "toBeImplemented": "To be implemented",
+  "@toBeImplemented": {
+    "description": "To be implemented message"
+  },
+
+  "trainingPageTitle": "Training Page",
+  "@trainingPageTitle": {
+    "description": "Training page title"
+  },
+
+  "noCoachInfo": "No coach info",
+  "@noCoachInfo": {
+    "description": "No coach info message"
+  },
+
+  "loadCoachInfoFailed": "Failed to load coach info",
+  "@loadCoachInfoFailed": {
+    "description": "Load coach info failed error"
+  },
+
+  "privacySettings": "Privacy Settings",
+  "@privacySettings": {
+    "description": "Privacy settings option"
+  },
+
+  "messagesTitle": "Messages",
+  "@messagesTitle": {
+    "description": "Messages page title"
+  },
+
+  "noStudentsMessage": "No students yet, please add students first",
+  "@noStudentsMessage": {
+    "description": "No students message for coach"
+  },
+
+  "noConversations": "No conversations",
+  "@noConversations": {
+    "description": "No conversations message"
+  },
+
+  "noCoachOrConversations": "You don't have a coach or conversations yet",
+  "@noCoachOrConversations": {
+    "description": "No coach or conversations message for student"
+  },
+
+  "conversationTitle": "Conversation",
+  "@conversationTitle": {
+    "description": "Conversation title"
+  },
+
+  "chatTabLabel": "Chat",
+  "@chatTabLabel": {
+    "description": "Chat tab label in detail page"
+  },
+
+  "feedbackTabLabel": "Feedback",
+  "@feedbackTabLabel": {
+    "description": "Feedback tab label"
+  },
+
+  "messageInputPlaceholder": "Type a message...",
+  "@messageInputPlaceholder": {
+    "description": "Message input placeholder"
+  },
+
+  "sendFailed": "Send failed",
+  "@sendFailed": {
+    "description": "Send failed error"
+  },
+
+  "userNotLoggedIn": "User not logged in",
+  "@userNotLoggedIn": {
+    "description": "User not logged in error"
+  },
+
+  "errorTitle": "Something went wrong",
+  "@errorTitle": {
+    "description": "Error view title"
+  },
+
+  "supplementTimingNote": "Note",
+  "@supplementTimingNote": {
+    "description": "Supplement timing note label"
+  },
+
+  "supplementTimingNotePlaceholder": "Add note...",
+  "@supplementTimingNotePlaceholder": {
+    "description": "Supplement timing note input placeholder"
+  },
+
+  "weeklyStatus": "Weekly Status",
+  "@weeklyStatus": {
+    "description": "Weekly training status section title"
+  },
+
+  "daysRecorded": "{count} of 7 days recorded",
+  "@daysRecorded": {
+    "description": "Days recorded count",
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+
+  "todayRecord": "Today's Record",
+  "@todayRecord": {
+    "description": "Today's record section title"
+  },
+
+  "exerciseRecord": "Exercise Record",
+  "@exerciseRecord": {
+    "description": "Exercise record label"
+  },
+
+  "protein": "Protein",
+  "@protein": {
+    "description": "Protein macro label"
+  },
+
+  "carbs": "Carbs",
+  "@carbs": {
+    "description": "Carbs macro label"
+  },
+
+  "fat": "Fat",
+  "@fat": {
+    "description": "Fat macro label"
+  },
+
+  "calories": "Calories",
+  "@calories": {
+    "description": "Calories label"
+  },
+
+  "mealsCount": "{count} meals",
+  "@mealsCount": {
+    "description": "Meals count",
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+
+  "exercisesCount": "{count} exercises",
+  "@exercisesCount": {
+    "description": "Exercises count",
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+
+  "supplementsCount": "{count} supplements",
+  "@supplementsCount": {
+    "description": "Supplements count",
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+
+  "todayTraining": "Today: {name}",
+  "@todayTraining": {
+    "description": "Today's training name",
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+
+  "restDay": "Rest Day",
+  "@restDay": {
+    "description": "Rest day label"
+  },
+
+  "noPlanAssigned": "No Plan Assigned",
+  "@noPlanAssigned": {
+    "description": "No plan assigned message"
+  },
+
+  "contactCoachForPlan": "Contact your coach to get a training plan",
+  "@contactCoachForPlan": {
+    "description": "Contact coach for plan message"
+  },
+
+  "viewAvailablePlans": "View Available Plans",
+  "@viewAvailablePlans": {
+    "description": "View available plans button"
+  },
+
+  "detail": "Detail",
+  "@detail": {
+    "description": "Detail button label"
+  },
+
+  "dayNumber": "Day {day}",
+  "@dayNumber": {
+    "description": "Day number label",
+    "placeholders": {
+      "day": {"type": "int"}
+    }
+  },
+
+  "daysPerWeek": "{days} days/week",
+  "@daysPerWeek": {
+    "description": "Days per week label",
+    "placeholders": {
+      "days": {"type": "int"}
+    }
+  },
+
+  "noExercises": "No exercises",
+  "@noExercises": {
+    "description": "No exercises message"
+  },
+
+  "assignPlansToStudent": "Assign Plans to",
+  "@assignPlansToStudent": {
+    "description": "Assign plans to student dialog title"
+  },
+
+  "exercisePlanSection": "Training Plan",
+  "@exercisePlanSection": {
+    "description": "Exercise plan section header"
+  },
+
+  "dietPlanSection": "Diet Plan",
+  "@dietPlanSection": {
+    "description": "Diet plan section header"
+  },
+
+  "supplementPlanSection": "Supplement Plan",
+  "@supplementPlanSection": {
+    "description": "Supplement plan section header"
+  },
+
+  "noPlanOption": "No Plan (Remove Assignment)",
+  "@noPlanOption": {
+    "description": "Option to remove plan assignment"
+  },
+
+  "currentPlan": "Current",
+  "@currentPlan": {
+    "description": "Current plan indicator"
+  },
+
+  "loadingPlans": "Loading plans...",
+  "@loadingPlans": {
+    "description": "Loading plans message"
+  },
+
+  "noPlansAvailable": "No plans available",
+  "@noPlansAvailable": {
+    "description": "No plans available message"
+  },
+
+  "assignmentSaved": "Plans assigned successfully",
+  "@assignmentSaved": {
+    "description": "Assignment saved success message"
+  },
+
+  "assignmentFailed": "Assignment failed",
+  "@assignmentFailed": {
+    "description": "Assignment failed error message"
+  },
+
+  "notAssigned": "Not Assigned",
+  "@notAssigned": {
+    "description": "Not assigned status"
+  },
+
+  "done": "Done",
+  "@done": {
+    "description": "Done button label"
+  }
+}

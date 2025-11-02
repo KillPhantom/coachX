@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:coach_x/l10n/app_localizations.dart';
 import 'package:coach_x/core/theme/app_theme.dart';
 import '../../home/presentation/pages/coach_home_page.dart';
 import '../../students/presentation/pages/students_page.dart';
@@ -18,6 +19,7 @@ class CoachTabScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return CupertinoTabScaffold(
       tabBar: CupertinoTabBar(
         backgroundColor: AppColors.backgroundWhite.withValues(alpha: 0.9),
@@ -27,26 +29,26 @@ class CoachTabScaffold extends StatelessWidget {
           top: BorderSide(color: AppColors.dividerLight, width: 0.5),
         ),
         iconSize: 24.0,
-        items: const [
+        items: [
           // Tab 0 - Home
           BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.house),
-            activeIcon: Icon(CupertinoIcons.house_fill),
-            label: 'Home',
+            icon: const Icon(CupertinoIcons.house),
+            activeIcon: const Icon(CupertinoIcons.house_fill),
+            label: l10n.tabHome,
           ),
 
           // Tab 1 - Students
           BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.group),
-            activeIcon: Icon(CupertinoIcons.group_solid),
-            label: 'Students',
+            icon: const Icon(CupertinoIcons.group),
+            activeIcon: const Icon(CupertinoIcons.group_solid),
+            label: l10n.tabStudents,
           ),
 
           // Tab 2 - Plans
           BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.list_bullet),
-            activeIcon: Icon(CupertinoIcons.list_bullet),
-            label: 'Plans',
+            icon: const Icon(CupertinoIcons.list_bullet),
+            activeIcon: const Icon(CupertinoIcons.list_bullet),
+            label: l10n.tabPlans,
           ),
 
           // Tab 3 - Chat
@@ -56,16 +58,16 @@ class CoachTabScaffold extends StatelessWidget {
           // Collection: messages
           // Query: where('receiverId', '==', currentUserId).where('isRead', '==', false)
           BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.chat_bubble_2),
-            activeIcon: Icon(CupertinoIcons.chat_bubble_2_fill),
-            label: 'Chat',
+            icon: const Icon(CupertinoIcons.chat_bubble_2),
+            activeIcon: const Icon(CupertinoIcons.chat_bubble_2_fill),
+            label: l10n.tabChat,
           ),
 
           // Tab 4 - Profile
           BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.person),
-            activeIcon: Icon(CupertinoIcons.person_fill),
-            label: 'Profile',
+            icon: const Icon(CupertinoIcons.person),
+            activeIcon: const Icon(CupertinoIcons.person_fill),
+            label: l10n.tabProfile,
           ),
         ],
       ),

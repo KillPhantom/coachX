@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:coach_x/l10n/app_localizations.dart';
 import 'package:coach_x/core/theme/app_theme.dart';
 import 'package:coach_x/core/widgets/cupertino_card.dart';
 import 'package:coach_x/core/widgets/loading_indicator.dart';
@@ -15,18 +16,19 @@ class EventReminderSection extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final remindersAsync = ref.watch(eventRemindersProvider);
 
     return CupertinoCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Event Reminder', style: AppTextStyles.title3),
+          Text(l10n.eventReminderTitle, style: AppTextStyles.title3),
           const SizedBox(height: AppDimensions.spacingL),
           remindersAsync.when(
             data: (reminders) {
               if (reminders.isEmpty) {
-                return _buildEmptyState();
+                return _buildEmptyState(context);
               }
 
               return Column(
@@ -56,7 +58,8 @@ class EventReminderSection extends ConsumerWidget {
   }
 
   /// 构建空状态
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(AppDimensions.spacingXXL),
@@ -69,7 +72,7 @@ class EventReminderSection extends ConsumerWidget {
             ),
             const SizedBox(height: AppDimensions.spacingS),
             Text(
-              'No upcoming events',
+              l10n.noUpcomingEvents,
               style: AppTextStyles.subhead.copyWith(
                 color: AppColors.textTertiary,
               ),

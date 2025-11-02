@@ -24,7 +24,46 @@ from users.handlers import (
 from invitations.handlers import (
     verify_invitation_code,
     generate_invitation_codes,
+    fetch_invitation_codes,
     mark_invitation_code_used
+)
+
+# ==================== 导入学生管理模块 ====================
+from students.handlers import (
+    fetch_students,
+    delete_student,
+    fetch_latest_training
+)
+
+# ==================== 导入 AI 生成模块 ====================
+from ai.handlers import (
+    generate_ai_training_plan,
+    import_plan_from_image,
+    import_supplement_plan_from_image,
+    stream_training_plan,
+    edit_plan_conversation,
+    get_food_macros,
+    generate_diet_plan_with_skill,
+    edit_diet_plan_conversation,
+    generate_supplement_plan_conversation
+)
+
+# ==================== 导入计划管理模块 ====================
+from plans.handlers import (
+    exercise_plan,
+    diet_plan,
+    supplement_plan,
+    fetch_available_plans,
+    get_student_assigned_plans,
+    assign_plan
+)
+
+# ==================== 导入聊天模块 ====================
+from chat.handlers import (
+    send_message,
+    fetch_messages,
+    mark_messages_as_read,
+    get_or_create_conversation
 )
 
 # ==================== 导出所有函数 ====================
@@ -37,5 +76,36 @@ __all__ = [
     # 邀请码
     'verify_invitation_code',
     'generate_invitation_codes',
+    'fetch_invitation_codes',
     'mark_invitation_code_used',
+    
+    # 学生管理
+    'fetch_students',
+    'delete_student',
+    'fetch_latest_training',
+    
+    # AI 生成
+    'generate_ai_training_plan',
+    'import_plan_from_image',
+    'import_supplement_plan_from_image',
+    'stream_training_plan',
+    'edit_plan_conversation',
+    'get_food_macros',
+    'generate_diet_plan_with_skill',
+    'edit_diet_plan_conversation',
+    'generate_supplement_plan_conversation',
+
+    # 计划管理
+    'exercise_plan',
+    'diet_plan',
+    'supplement_plan',
+    'fetch_available_plans',
+    'get_student_assigned_plans',
+    'assign_plan',
+
+    # 聊天消息
+    'send_message',
+    'fetch_messages',
+    'mark_messages_as_read',
+    'get_or_create_conversation',
 ]
