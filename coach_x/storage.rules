@@ -1,0 +1,78 @@
+rules_version = '2';
+
+// Firebase Storage Security Rules for CoachX
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // Helper function to check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Helper function to check if user owns the resource
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Helper function to validate image file
+    function isValidImage() {
+      return request.resource.size < 10 * 1024 * 1024 // Max 10MB
+             && request.resource.contentType.matches('image/.*');
+    }
+
+    // ==================== 训练计划图片 ====================
+    // Path: training_plan_images/{userId}/{fileName}
+    match /training_plan_images/{userId}/{fileName} {
+      // 允许用户上传自己的训练计划图片
+      allow write: if isOwner(userId) && isValidImage();
+      // 允许用户读取自己的训练计划图片
+      allow read: if isOwner(userId);
+    }
+
+    // ==================== 补剂计划图片 ====================
+    // Path: supplement_plan_images/{userId}/{fileName}
+    match /supplement_plan_images/{userId}/{fileName} {
+      // 允许用户上传自己的补剂计划图片
+      allow write: if isOwner(userId) && isValidImage();
+      // 允许用户读取自己的补剂计划图片
+      allow read: if isOwner(userId);
+    }
+
+    // ==================== 饮食计划图片 ====================
+    // Path: diet_plan_images/{userId}/{fileName}
+    match /diet_plan_images/{userId}/{fileName} {
+      // 允许用户上传自己的饮食计划图片
+      allow write: if isOwner(userId) && isValidImage();
+      // 允许用户读取自己的饮食计划图片
+      allow read: if isOwner(userId);
+    }
+
+    // ==================== 身体数据图片 ====================
+    // Path: body_stats/{userId}/{fileName}
+    match /body_stats/{userId}/{fileName} {
+      allow write: if isOwner(userId) && isValidImage();
+      allow read: if isOwner(userId);
+    }
+
+    // ==================== 聊天图片 ====================
+    // Path: chat_images/{conversationId}/{fileName}
+    match /chat_images/{conversationId}/{fileName} {
+      // 允许认证用户上传聊天图片
+      allow write: if isAuthenticated() && isValidImage();
+      // 允许认证用户读取聊天图片
+      allow read: if isAuthenticated();
+    }
+
+    // ==================== 用户头像 ====================
+    // Path: avatars/{userId}
+    match /avatars/{userId} {
+      allow write: if isOwner(userId) && isValidImage();
+      allow read: if isAuthenticated();
+    }
+
+    // 默认：拒绝所有其他访问
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "360958815391",
+    "project_id": "coachx-9d219",
+    "storage_bucket": "coachx-9d219.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:360958815391:android:737380eae3d15ef25486aa",
+        "android_client_info": {
+          "package_name": "com.coachx.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCwMSXBkB7ziRNCIkZkAIRn_tlZxEWIvJc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

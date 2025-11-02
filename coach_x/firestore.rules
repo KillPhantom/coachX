@@ -1,0 +1,118 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ==================== Helper Functions ====================
+
+    // 检查用户是否已登录
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // 检查是否为文档拥有者
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    // ==================== Users Collection ====================
+
+    match /users/{userId} {
+      // 允许用户读取自己的文档
+      allow read: if isSignedIn() && request.auth.uid == userId;
+
+      // 允许用户创建和更新自己的文档
+      allow create, update: if isSignedIn() && request.auth.uid == userId;
+
+      // 不允许删除用户文档
+      allow delete: if false;
+    }
+
+    // ==================== Conversations Collection ====================
+
+    match /conversations/{conversationId} {
+      // 允许对话参与者读取
+      allow read: if isSignedIn() &&
+        (resource.data.coachId == request.auth.uid ||
+         resource.data.studentId == request.auth.uid);
+
+      // 允许对话参与者创建和更新
+      allow create, update: if isSignedIn() &&
+        (request.resource.data.coachId == request.auth.uid ||
+         request.resource.data.studentId == request.auth.uid);
+
+      // 不允许删除对话
+      allow delete: if false;
+    }
+
+    // ==================== Messages Collection ====================
+
+    match /messages/{messageId} {
+      // 允许消息的发送者和接收者读取
+      allow read: if isSignedIn() &&
+        (resource.data.senderId == request.auth.uid ||
+         resource.data.receiverId == request.auth.uid);
+
+      // 只允许发送者创建消息
+      allow create: if isSignedIn() &&
+        request.resource.data.senderId == request.auth.uid;
+
+      // 允许发送者和接收者更新消息状态（如标记已读）
+      allow update: if isSignedIn() &&
+        (resource.data.senderId == request.auth.uid ||
+         resource.data.receiverId == request.auth.uid);
+
+      // 不允许删除消息（使用软删除）
+      allow delete: if false;
+    }
+
+    // ==================== Exercise Plans Collection ====================
+
+    match /exercisePlans/{planId} {
+      // 允许计划拥有者读取
+      allow read: if isSignedIn() && resource.data.ownerId == request.auth.uid;
+
+      // 允许计划拥有者创建、更新、删除
+      allow create, update, delete: if isSignedIn() &&
+        request.resource.data.ownerId == request.auth.uid;
+    }
+
+    // ==================== Diet Plans Collection ====================
+
+    match /dietPlans/{planId} {
+      allow read: if isSignedIn() && resource.data.ownerId == request.auth.uid;
+      allow create, update, delete: if isSignedIn() &&
+        request.resource.data.ownerId == request.auth.uid;
+    }
+
+    // ==================== Supplement Plans Collection ====================
+
+    match /supplementPlans/{planId} {
+      allow read: if isSignedIn() && resource.data.ownerId == request.auth.uid;
+      allow create, update, delete: if isSignedIn() &&
+        request.resource.data.ownerId == request.auth.uid;
+    }
+
+    // ==================== Invitation Codes Collection ====================
+
+    match /invitationCodes/{codeId} {
+      // 允许所有已登录用户读取（用于验证邀请码）
+      allow read: if isSignedIn();
+
+      // 只允许教练创建邀请码
+      allow create: if isSignedIn();
+
+      // 允许教练更新自己的邀请码
+      allow update: if isSignedIn() && resource.data.coachId == request.auth.uid;
+
+      // 不允许删除邀请码
+      allow delete: if false;
+    }
+
+    // ==================== Default Deny ====================
+
+    // 默认拒绝所有其他访问
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
