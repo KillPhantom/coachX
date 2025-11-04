@@ -170,7 +170,7 @@ class _CreateTrainingPlanPageState
           onPressed: () => _onBack(context, notifier),
           child: const Icon(
             CupertinoIcons.back,
-            color: AppColors.primaryAction,
+            color: AppColors.primaryText,
           ),
         ),
         trailing: CupertinoButton(

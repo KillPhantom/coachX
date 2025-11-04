@@ -1,5 +1,6 @@
 import 'package:coach_x/core/services/cloud_functions_service.dart';
 import 'package:coach_x/core/utils/logger.dart';
+import 'package:coach_x/core/utils/json_utils.dart';
 import '../models/student_plans_model.dart';
 import '../models/daily_training_model.dart';
 import 'student_home_repository.dart';
@@ -17,7 +18,11 @@ class StudentHomeRepositoryImpl implements StudentHomeRepository {
         throw Exception('获取计划失败: ${response['message'] ?? '未知错误'}');
       }
 
-      final data = response['data'] as Map<String, dynamic>;
+      final data = safeMapCast(response['data'], 'data');
+      if (data == null) {
+        throw Exception('获取计划失败: 数据格式错误');
+      }
+
       final plansModel = StudentPlansModel.fromJson(data);
 
       AppLogger.info('获取计划成功: ${plansModel.toString()}');
@@ -40,8 +45,12 @@ class StudentHomeRepositoryImpl implements StudentHomeRepository {
         throw Exception('获取训练记录失败: ${response['message'] ?? '未知错误'}');
       }
 
-      final data = response['data'] as Map<String, dynamic>;
-      final trainingData = data['training'] as Map<String, dynamic>?;
+      final data = safeMapCast(response['data'], 'data');
+      if (data == null) {
+        throw Exception('获取训练记录失败: 数据格式错误');
+      }
+
+      final trainingData = safeMapCast(data['training'], 'training');
 
       if (trainingData == null) {
         AppLogger.info('学生无训练记录');

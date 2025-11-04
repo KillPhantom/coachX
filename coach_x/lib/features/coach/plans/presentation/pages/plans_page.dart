@@ -309,7 +309,7 @@ class _PlansPageState extends ConsumerState<PlansPage> {
                       child: CupertinoButton(
                         padding: EdgeInsets.zero,
                         onPressed: _showCreatePlanSheet,
-                        child: const Icon(CupertinoIcons.add, size: 28, color: AppColors.primaryAction),
+                        child: const Icon(CupertinoIcons.add, size: 28, color: AppColors.primaryText),
                       ),
                     ),
                   ],

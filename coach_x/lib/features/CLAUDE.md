@@ -22,10 +22,11 @@ factory Model.fromJson(Map<String, dynamic> json) {
 ```
 
 ### ✅ ALWAYS Do This
+
+**方法 1: 使用 safeMapCast 工具函数（推荐）**
 ```dart
 import 'package:coach_x/core/utils/json_utils.dart';
 
-// ✅ 正确 - 使用安全的类型转换
 factory Model.fromJson(Map<String, dynamic> json) {
   // 对于单个嵌套对象
   final nestedData = safeMapCast(json['nested'], 'nested');
@@ -40,12 +41,34 @@ factory Model.fromJson(Map<String, dynamic> json) {
 }
 ```
 
+**方法 2: 使用 Map.from() 手动转换（也可以）**
+```dart
+// ✅ 也正确 - 先转为 Map，再用 from() 转换
+factory Model.fromJson(Map<String, dynamic> json) {
+  final nestedData = json['nested'] != null
+      ? Map<String, dynamic>.from(json['nested'] as Map)
+      : null;
+
+  return Model(
+    nested: nestedData != null ? NestedModel.fromJson(nestedData) : null,
+  );
+}
+```
+
+**推荐使用方法 1**，因为：
+- 更简洁，可读性更好
+- 统一的错误处理和日志
+- 自动处理 null 值
+- 提供字段名称用于调试
+
 ### Required Tools
-**MUST import** `package:coach_x/core/utils/json_utils.dart` when parsing nested data:
+**MUST import** `package:coach_x/core/utils/json_utils.dart` when parsing data from Cloud Functions:
 
 - `safeMapCast(data, fieldName)` - 单个嵌套对象
 - `safeMapListCast(data, fieldName)` - 对象数组
 - `safeStringListCast(data, fieldName)` - 字符串数组
+- `safeIntCast(data, defaultValue, fieldName)` - 数字（支持字符串数字和日期字符串）
+- `safeDoubleCast(data, defaultValue, fieldName)` - 浮点数
 
 ### When to Apply
 ✅ **ALWAYS** use for data from:
@@ -88,6 +111,23 @@ if (trainingData != null) {
   }).toList();
 }
 ```
+
+### 4. Timestamp Fields
+```dart
+// JSON: { "createdAt": "Sun, 02 Nov 2025 21:52:15 GMT" }
+// 或: { "createdAt": 1730582035000 }
+// 或: { "createdAt": "1730582035000" }
+
+// ✅ safeIntCast 会自动处理所有这些格式
+createdAt: safeIntCast(json['createdAt'], 0, 'createdAt') ?? 0,
+updatedAt: safeIntCast(json['updatedAt'], 0, 'updatedAt') ?? 0,
+```
+
+**Important**: `safeIntCast` 支持以下格式：
+- 整数: `1730582035000`
+- 浮点数: `1730582035000.0` (会转换为 int)
+- 数字字符串: `"1730582035000"`
+- 日期字符串: `"Sun, 02 Nov 2025 21:52:15 GMT"` (会解析为毫秒时间戳)
 
 ## Checklist for New Models
 
