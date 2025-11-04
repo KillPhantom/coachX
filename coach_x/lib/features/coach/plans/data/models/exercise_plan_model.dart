@@ -36,8 +36,8 @@ class ExercisePlanModel extends PlanBaseModel {
               ?.map((e) => e as String)
               .toList() ??
           [],
-      createdAt: json['createdAt'] as int? ?? 0,
-      updatedAt: json['updatedAt'] as int? ?? 0,
+      createdAt: safeIntCast(json['createdAt'], 0, 'createdAt') ?? 0,
+      updatedAt: safeIntCast(json['updatedAt'], 0, 'updatedAt') ?? 0,
       days: days,
     );
   }

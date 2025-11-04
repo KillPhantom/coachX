@@ -16,7 +16,7 @@ class AppColors {
   static const Color primaryLight = Color(0xFFFDFAF3);
 
   /// 主色交互色
-  static const Color primaryAction = Color.fromRGBO(235, 206, 137, 0.5);
+  static const Color primaryAction =  Color(0xFF9F8B5E);
 
   // 别名（用于简化使用）
   static const Color primary = Color(0xFFf0e9d8);// 主要交互色

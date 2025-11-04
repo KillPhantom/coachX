@@ -1,3 +1,4 @@
+import 'package:coach_x/core/utils/json_utils.dart';
 import 'plan_base_model.dart';
 import 'supplement_day.dart';
 
@@ -44,8 +45,8 @@ class SupplementPlanModel extends PlanBaseModel {
               ?.map((e) => e as String)
               .toList() ??
           [],
-      createdAt: json['createdAt'] as int? ?? 0,
-      updatedAt: json['updatedAt'] as int? ?? 0,
+      createdAt: safeIntCast(json['createdAt'], 0, 'createdAt') ?? 0,
+      updatedAt: safeIntCast(json['updatedAt'], 0, 'updatedAt') ?? 0,
       cyclePattern: json['cyclePattern'] as String? ?? '',
       days: days,
     );
