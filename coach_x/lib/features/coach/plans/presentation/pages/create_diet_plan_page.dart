@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:coach_x/core/theme/app_colors.dart';
 import 'package:coach_x/core/theme/app_text_styles.dart';
 import 'package:coach_x/core/utils/logger.dart';
+import 'package:coach_x/core/widgets/dismiss_keyboard_on_scroll.dart';
 import 'package:coach_x/features/coach/plans/data/models/meal.dart';
 import 'package:coach_x/features/coach/plans/data/models/food_item.dart';
 import 'package:coach_x/features/coach/plans/data/models/diet_plan_model.dart';
@@ -272,9 +273,10 @@ class _CreateDietPlanPageState extends ConsumerState<CreateDietPlanPage> {
                   child:
                       _selectedDayIndex != null &&
                           _selectedDayIndex! < state.days.length
-                      ? SingleChildScrollView(
-                          controller: _mealsScrollController,
-                          child: DietDayEditor(
+                      ? DismissKeyboardOnScroll(
+                          child: SingleChildScrollView(
+                            controller: _mealsScrollController,
+                            child: DietDayEditor(
                             onAddMeal: () =>
                                 _onAddMeal(notifier, _selectedDayIndex!),
                             totalMacros: state.days[_selectedDayIndex!].macros,
@@ -285,6 +287,7 @@ class _CreateDietPlanPageState extends ConsumerState<CreateDietPlanPage> {
                               state.days[_selectedDayIndex!].meals,
                               reviewState,
                             ),
+                          ),
                           ),
                         )
                       : Center(
@@ -395,9 +398,7 @@ class _CreateDietPlanPageState extends ConsumerState<CreateDietPlanPage> {
             builder: (context, ref, child) {
               final isDietReviewMode = ref.watch(isDietReviewModeProvider);
               if (isDietReviewMode) {
-                return Container(
-                  child: const DietReviewModeOverlay(),
-                );
+                return Container(child: const DietReviewModeOverlay());
               }
               return const SizedBox.shrink();
             },

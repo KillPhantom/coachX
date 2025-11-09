@@ -197,4 +197,3 @@ MuscleGroup muscleGroupFromString(String value) {
       return MuscleGroup.chest;
   }
 }
-

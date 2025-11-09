@@ -9,12 +9,21 @@ import 'package:coach_x/features/coach/plans/presentation/providers/plans_provid
 
 /// 补剂对话状态 Provider
 final supplementConversationNotifierProvider =
-    StateNotifierProvider<SupplementConversationNotifier, SupplementCreationState>((ref) {
-  final supplementRepo = ref.watch(supplementPlanRepositoryProvider);
-  final planRepo = ref.watch(planRepositoryProvider);
-  final createNotifier = ref.watch(createSupplementPlanNotifierProvider.notifier);
-  return SupplementConversationNotifier(supplementRepo, planRepo, createNotifier);
-});
+    StateNotifierProvider<
+      SupplementConversationNotifier,
+      SupplementCreationState
+    >((ref) {
+      final supplementRepo = ref.watch(supplementPlanRepositoryProvider);
+      final planRepo = ref.watch(planRepositoryProvider);
+      final createNotifier = ref.watch(
+        createSupplementPlanNotifierProvider.notifier,
+      );
+      return SupplementConversationNotifier(
+        supplementRepo,
+        planRepo,
+        createNotifier,
+      );
+    });
 
 /// 补剂对话消息列表 Provider
 final supplementMessagesProvider = Provider<List<LLMChatMessage>>((ref) {

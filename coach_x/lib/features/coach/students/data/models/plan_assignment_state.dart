@@ -76,10 +76,7 @@ class PlanAssignmentState {
 
     // 检查饮食计划变更
     if (selectedDietPlanId != originalDietPlanId) {
-      changes['diet'] = {
-        'from': originalDietPlanId,
-        'to': selectedDietPlanId,
-      };
+      changes['diet'] = {'from': originalDietPlanId, 'to': selectedDietPlanId};
     }
 
     // 检查补剂计划变更
@@ -97,9 +94,7 @@ class PlanAssignmentState {
   ///
   /// 返回人类可读的变更描述列表
   /// 例如: ['训练计划: 增肌计划A → 减脂计划B', '饮食计划: 无 → 高蛋白饮食']
-  List<String> getChangeSummary({
-    required Map<String, String> planNames,
-  }) {
+  List<String> getChangeSummary({required Map<String, String> planNames}) {
     final summary = <String>[];
     final changes = getChanges();
 

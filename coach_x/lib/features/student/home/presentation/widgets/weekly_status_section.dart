@@ -41,10 +41,7 @@ class WeeklyStatusSection extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                l10n.weeklyStatus,
-                style: AppTextStyles.bodyMedium,
-              ),
+              Text(l10n.weeklyStatus, style: AppTextStyles.bodyMedium),
               Text(
                 l10n.daysRecorded(completedCount),
                 style: AppTextStyles.caption1.copyWith(
@@ -61,7 +58,8 @@ class WeeklyStatusSection extends StatelessWidget {
             children: List.generate(7, (index) {
               final isCompleted = completedDays[index];
               final isToday = index == todayIndex;
-              final dayLabel = Localizations.localeOf(context).languageCode == 'zh'
+              final dayLabel =
+                  Localizations.localeOf(context).languageCode == 'zh'
                   ? weekDaysCN[index]
                   : weekDays[index];
 
@@ -113,10 +111,7 @@ class WeeklyStatusSection extends StatelessWidget {
         decoration: BoxDecoration(
           color: AppColors.primaryColor,
           shape: BoxShape.circle,
-          border: Border.all(
-            color: AppColors.primaryColor,
-            width: 2,
-          ),
+          border: Border.all(color: AppColors.primaryColor, width: 2),
           boxShadow: [
             BoxShadow(
               color: AppColors.primaryColor.withValues(alpha: 0.3),

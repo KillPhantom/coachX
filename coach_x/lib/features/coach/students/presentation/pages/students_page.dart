@@ -5,6 +5,7 @@ import 'package:coach_x/core/theme/app_theme.dart';
 import 'package:coach_x/core/widgets/loading_indicator.dart';
 import 'package:coach_x/core/widgets/empty_state.dart';
 import 'package:coach_x/core/widgets/error_view.dart';
+import 'package:coach_x/core/widgets/dismiss_keyboard_on_scroll.dart';
 import '../providers/students_providers.dart';
 import '../widgets/student_card.dart';
 import '../widgets/student_list_header.dart';
@@ -31,7 +32,7 @@ class _StudentsPageState extends ConsumerState<StudentsPage>
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
-    
+
     // 初始加载
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(studentsStateProvider.notifier).loadStudents();
@@ -143,10 +144,11 @@ class _StudentsPageState extends ConsumerState<StudentsPage>
 
             // 学生列表
             Expanded(
-              child: CustomScrollView(
-                controller: _scrollController,
-                physics: const AlwaysScrollableScrollPhysics(),
-                slivers: [
+              child: DismissKeyboardOnScroll(
+                child: CustomScrollView(
+                  controller: _scrollController,
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  slivers: [
                   // 下拉刷新
                   CupertinoSliverRefreshControl(
                     onRefresh: () async {
@@ -172,6 +174,7 @@ class _StudentsPageState extends ConsumerState<StudentsPage>
                   ),
                 ],
               ),
+              ),
             ),
           ],
         ),
@@ -194,7 +197,8 @@ class _StudentsPageState extends ConsumerState<StudentsPage>
       return SliverFillRemaining(
         child: ErrorView(
           error: state.error!,
-          onRetry: () => ref.read(studentsStateProvider.notifier).loadStudents(),
+          onRetry: () =>
+              ref.read(studentsStateProvider.notifier).loadStudents(),
         ),
       );
     }
@@ -205,7 +209,9 @@ class _StudentsPageState extends ConsumerState<StudentsPage>
         child: EmptyState(
           icon: CupertinoIcons.person_2,
           title: state.hasFilter ? l10n.noStudentsFound : l10n.noStudents,
-          message: state.hasFilter ? l10n.tryAdjustFilters : l10n.inviteStudentsTip,
+          message: state.hasFilter
+              ? l10n.tryAdjustFilters
+              : l10n.inviteStudentsTip,
           actionText: state.hasFilter ? l10n.clearFilters : l10n.inviteStudents,
           onAction: state.hasFilter
               ? () => ref.read(studentsStateProvider.notifier).clearFilter()
@@ -218,17 +224,14 @@ class _StudentsPageState extends ConsumerState<StudentsPage>
     return SliverPadding(
       padding: const EdgeInsets.all(AppDimensions.spacingL),
       sliver: SliverList(
-        delegate: SliverChildBuilderDelegate(
-          (context, index) {
-            final student = state.students[index];
-            return StudentCard(
-              student: student,
-              onTap: () => _onStudentTap(student.id),
-              onMoreTap: () => _showActionSheet(student),
-            );
-          },
-          childCount: state.students.length,
-        ),
+        delegate: SliverChildBuilderDelegate((context, index) {
+          final student = state.students[index];
+          return StudentCard(
+            student: student,
+            onTap: () => _onStudentTap(student.id),
+            onMoreTap: () => _showActionSheet(student),
+          );
+        }, childCount: state.students.length),
       ),
     );
   }
@@ -321,7 +324,7 @@ class _StudentsPageState extends ConsumerState<StudentsPage>
   /// 执行搜索
   void _performSearch(String query) {
     ref.read(studentsStateProvider.notifier).search(query);
-    _searchFocusNode.unfocus();
+    // unfocus 已通过 DismissKeyboardOnScroll 自动处理
   }
 
   /// 取消搜索
@@ -330,8 +333,8 @@ class _StudentsPageState extends ConsumerState<StudentsPage>
       _isSearchExpanded = false;
       _searchController.clear();
     });
-    _searchFocusNode.unfocus();
-    
+    // unfocus 已通过 DismissKeyboardOnScroll 自动处理
+
     // 如果有搜索条件，清除它
     final state = ref.read(studentsStateProvider);
     if (state.searchQuery != null && state.searchQuery!.isNotEmpty) {

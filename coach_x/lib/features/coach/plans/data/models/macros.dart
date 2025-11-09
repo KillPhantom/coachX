@@ -14,12 +14,7 @@ class Macros {
 
   /// 创建零值营养数据
   factory Macros.zero() {
-    return const Macros(
-      protein: 0.0,
-      carbs: 0.0,
-      fat: 0.0,
-      calories: 0.0,
-    );
+    return const Macros(protein: 0.0, carbs: 0.0, fat: 0.0, calories: 0.0);
   }
 
   /// 从 JSON 创建

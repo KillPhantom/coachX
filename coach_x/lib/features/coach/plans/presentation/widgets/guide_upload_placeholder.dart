@@ -6,10 +6,7 @@ import 'package:coach_x/core/theme/app_text_styles.dart';
 class GuideUploadPlaceholder extends StatelessWidget {
   final VoidCallback? onTap;
 
-  const GuideUploadPlaceholder({
-    super.key,
-    this.onTap,
-  });
+  const GuideUploadPlaceholder({super.key, this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -78,7 +75,3 @@ class GuideUploadPlaceholder extends StatelessWidget {
     );
   }
 }
-
-
-
-

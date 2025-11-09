@@ -33,7 +33,8 @@ class SummarySection extends ConsumerWidget {
               children: [
                 SummaryItem(
                   icon: CupertinoIcons.sportscourt,
-                  text: '${summary.completionRate} students completed training today',
+                  text:
+                      '${summary.completionRate} students completed training today',
                   onTap: () {
                     // TODO: 跳转到学生列表（筛选已完成）
                     // 路由: /coach/students?filter=completed_today
@@ -53,7 +54,8 @@ class SummarySection extends ConsumerWidget {
                 _buildDivider(),
                 SummaryItem(
                   icon: CupertinoIcons.star,
-                  text: '${summary.unreviewedTrainings} training records need to be reviewed',
+                  text:
+                      '${summary.unreviewedTrainings} training records need to be reviewed',
                   onTap: () {
                     // TODO: 跳转到待审核训练记录列表
                     // 路由: /coach/training-reviews

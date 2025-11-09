@@ -17,10 +17,7 @@ import 'plan_type_section.dart';
 class AssignPlansToStudentDialog extends StatefulWidget {
   final StudentListItemModel student;
 
-  const AssignPlansToStudentDialog({
-    super.key,
-    required this.student,
-  });
+  const AssignPlansToStudentDialog({super.key, required this.student});
 
   @override
   State<AssignPlansToStudentDialog> createState() =>
@@ -217,9 +214,7 @@ class _AssignPlansToStudentDialogState
         throw Exception(result['message'] ?? '分配失败');
       }
 
-      AppLogger.debug(
-        '${unassign ? '取消' : ''}分配计划成功: $planType/$planId',
-      );
+      AppLogger.debug('${unassign ? '取消' : ''}分配计划成功: $planType/$planId');
     } catch (e) {
       AppLogger.error('分配计划失败: $planType/$planId', e);
       rethrow;
@@ -281,9 +276,7 @@ class _AssignPlansToStudentDialogState
               : Text(l10n.done),
         ),
       ),
-      child: SafeArea(
-        child: _buildContent(l10n),
-      ),
+      child: SafeArea(child: _buildContent(l10n)),
     );
   }
 
@@ -308,10 +301,7 @@ class _AssignPlansToStudentDialogState
                 color: AppColors.errorRed,
               ),
               const SizedBox(height: AppDimensions.spacingL),
-              Text(
-                l10n.loadingPlans,
-                style: AppTextStyles.title3,
-              ),
+              Text(l10n.loadingPlans, style: AppTextStyles.title3),
               const SizedBox(height: AppDimensions.spacingM),
               Text(
                 _errorMessage!,

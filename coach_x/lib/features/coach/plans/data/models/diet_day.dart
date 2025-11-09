@@ -52,10 +52,7 @@ class DietDay {
 
   /// 计算该天的总营养数据
   Macros get macros {
-    return meals.fold(
-      Macros.zero(),
-      (sum, meal) => sum + meal.macros,
-    );
+    return meals.fold(Macros.zero(), (sum, meal) => sum + meal.macros);
   }
 
   /// 复制并修改部分字段

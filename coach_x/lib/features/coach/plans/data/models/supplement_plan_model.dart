@@ -26,14 +26,19 @@ class SupplementPlanModel extends PlanBaseModel {
   int get totalDays => days.length;
 
   /// 计算属性 - 总补剂数
-  int get totalSupplements =>
-      days.fold(0, (sum, day) => sum + day.timings.fold(0, (s, t) => s + t.supplements.length));
+  int get totalSupplements => days.fold(
+    0,
+    (sum, day) => sum + day.timings.fold(0, (s, t) => s + t.supplements.length),
+  );
 
   /// 从JSON创建
   factory SupplementPlanModel.fromJson(Map<String, dynamic> json) {
     final daysJson = json['days'] as List<dynamic>? ?? [];
     final days = daysJson
-        .map((day) => SupplementDay.fromJson(Map<String, dynamic>.from(day as Map)))
+        .map(
+          (day) =>
+              SupplementDay.fromJson(Map<String, dynamic>.from(day as Map)),
+        )
         .toList();
 
     return SupplementPlanModel(
@@ -41,7 +46,8 @@ class SupplementPlanModel extends PlanBaseModel {
       name: json['name'] as String,
       description: json['description'] as String? ?? '',
       ownerId: json['ownerId'] as String,
-      studentIds: (json['studentIds'] as List<dynamic>?)
+      studentIds:
+          (json['studentIds'] as List<dynamic>?)
               ?.map((e) => e as String)
               .toList() ??
           [],
@@ -92,4 +98,3 @@ class SupplementPlanModel extends PlanBaseModel {
     );
   }
 }
-

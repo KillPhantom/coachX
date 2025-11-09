@@ -16,10 +16,10 @@ class AppColors {
   static const Color primaryLight = Color(0xFFFDFAF3);
 
   /// 主色交互色
-  static const Color primaryAction =  Color(0xFF9F8B5E);
+  static const Color primaryAction = Color(0xFF9F8B5E);
 
   // 别名（用于简化使用）
-  static const Color primary = Color(0xFFf0e9d8);// 主要交互色
+  static const Color primary = Color(0xFFf0e9d8); // 主要交互色
   static const Color primaryDark = Color(0xFF3D3424); // 主要交互色深色版
 
   // ==================== 辅助色系 ====================
@@ -31,7 +31,6 @@ class AppColors {
   static const Color secondaryRed = Color.fromARGB(255, 220, 108, 108);
 
   static const Color secondaryPurple = Color.fromARGB(255, 207, 134, 222);
-
 
   /// 辅助灰色
   static const Color secondaryGrey = Color(0xFFA0A0A0);

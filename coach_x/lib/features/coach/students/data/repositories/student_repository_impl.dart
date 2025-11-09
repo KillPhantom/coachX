@@ -31,13 +31,20 @@ class StudentRepositoryImpl implements StudentRepository {
 
       AppLogger.info('调用fetch_students: $params');
 
-      final response = await CloudFunctionsService.call('fetch_students', params);
+      final response = await CloudFunctionsService.call(
+        'fetch_students',
+        params,
+      );
       final data = Map<String, dynamic>.from(response['data'] as Map);
 
       // 解析学生列表
       final studentsList = List<dynamic>.from(data['students'] as List);
       final students = studentsList
-          .map((json) => StudentListItemModel.fromJson(Map<String, dynamic>.from(json as Map)))
+          .map(
+            (json) => StudentListItemModel.fromJson(
+              Map<String, dynamic>.from(json as Map),
+            ),
+          )
           .toList();
 
       final result = StudentsPageResult(
@@ -78,7 +85,9 @@ class StudentRepositoryImpl implements StudentRepository {
     try {
       AppLogger.info('调用fetch_available_plans');
 
-      final response = await CloudFunctionsService.call('fetch_available_plans');
+      final response = await CloudFunctionsService.call(
+        'fetch_available_plans',
+      );
       final data = Map<String, dynamic>.from(response['data'] as Map);
 
       // 转换为需要的格式
@@ -104,7 +113,9 @@ class StudentRepositoryImpl implements StudentRepository {
     try {
       AppLogger.info('调用fetch_available_plans（获取摘要）');
 
-      final response = await CloudFunctionsService.call('fetch_available_plans');
+      final response = await CloudFunctionsService.call(
+        'fetch_available_plans',
+      );
       final data = Map<String, dynamic>.from(response['data'] as Map);
 
       // 解析三类计划为PlanSummary列表
@@ -177,8 +188,9 @@ class StudentRepositoryImpl implements StudentRepository {
               id: itemMap['id'] as String? ?? '',
               name: itemMap['name'] as String? ?? '',
               description: itemMap['description'] as String?,
-              studentCount: itemMap['studentCount'] as int? ??
-                           (itemMap['student_count'] as int? ?? 0),
+              studentCount:
+                  itemMap['studentCount'] as int? ??
+                  (itemMap['student_count'] as int? ?? 0),
               planType: planType,
             );
           } catch (e) {
@@ -193,4 +205,3 @@ class StudentRepositoryImpl implements StudentRepository {
     return plans;
   }
 }
-

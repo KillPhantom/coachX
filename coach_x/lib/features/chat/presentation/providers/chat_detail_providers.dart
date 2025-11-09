@@ -6,10 +6,7 @@ import 'package:coach_x/features/chat/presentation/providers/chat_providers.dart
 // ==================== Enums ====================
 
 /// Tab 枚举
-enum ChatDetailTab {
-  chat,
-  feedback,
-}
+enum ChatDetailTab { chat, feedback }
 
 // ==================== State Classes ====================
 
@@ -49,23 +46,23 @@ final selectedChatTabProvider = StateProvider.autoDispose<ChatDetailTab>((ref) {
 /// 根据 conversationId 获取对话详情
 final conversationDetailProvider = FutureProvider.autoDispose
     .family<ConversationModel?, String>((ref, conversationId) async {
-  final chatRepository = ref.read(chatRepositoryProvider);
-  return chatRepository.getConversation(conversationId);
-});
+      final chatRepository = ref.read(chatRepositoryProvider);
+      return chatRepository.getConversation(conversationId);
+    });
 
 /// 消息列表 Stream Provider
 /// 监听指定对话的实时消息流
 final messagesStreamProvider = StreamProvider.autoDispose
     .family<List<MessageModel>, String>((ref, conversationId) {
-  final chatRepository = ref.read(chatRepositoryProvider);
-  return chatRepository.watchMessages(conversationId, limit: 50);
-});
+      final chatRepository = ref.read(chatRepositoryProvider);
+      return chatRepository.watchMessages(conversationId, limit: 50);
+    });
 
 /// 媒体上传进度 Provider
 final mediaUploadProgressProvider =
     StateProvider.autoDispose<MediaUploadProgress>((ref) {
-  return const MediaUploadProgress();
-});
+      return const MediaUploadProgress();
+    });
 
 /// 消息输入框文本 Provider
 final messageInputTextProvider = StateProvider.autoDispose<String>((ref) {

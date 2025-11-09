@@ -25,8 +25,9 @@ class MessageBubble extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       child: Row(
-        mainAxisAlignment:
-            _isMine ? MainAxisAlignment.end : MainAxisAlignment.start,
+        mainAxisAlignment: _isMine
+            ? MainAxisAlignment.end
+            : MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           // 对方消息：左侧显示
@@ -48,7 +49,8 @@ class MessageBubble extends StatelessWidget {
         ),
         decoration: BoxDecoration(
           color: _isMine
-              ? AppColors.primaryAction // 我的消息：暖色
+              ? AppColors
+                    .primaryAction // 我的消息：暖色
               : CupertinoColors.systemGrey5.resolveFrom(context), // 对方：灰色
           borderRadius: BorderRadius.circular(16),
         ),
@@ -91,10 +93,7 @@ class MessageBubble extends StatelessWidget {
       case MessageType.image:
       case MessageType.video:
       case MessageType.voice:
-        return MediaMessageWidget(
-          message: message,
-          isMine: _isMine,
-        );
+        return MediaMessageWidget(message: message, isMine: _isMine);
 
       default:
         return Text(
@@ -165,9 +164,7 @@ class MessageBubble extends StatelessWidget {
           ),
           child: Text(
             message,
-            style: AppTextStyles.body.copyWith(
-              color: CupertinoColors.white,
-            ),
+            style: AppTextStyles.body.copyWith(color: CupertinoColors.white),
           ),
         ),
       ),

@@ -11,4 +11,3 @@ abstract class InvitationCodeRepository {
     String note = '',
   });
 }
-

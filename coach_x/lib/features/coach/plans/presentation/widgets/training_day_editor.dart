@@ -53,9 +53,7 @@ class TrainingDayEditor extends StatelessWidget {
                       const SizedBox(width: 4),
                       const Text(
                         '添加',
-                        style: TextStyle(
-                          color: AppColors.primaryText,
-                        ),
+                        style: TextStyle(color: AppColors.primaryText),
                       ),
                     ],
                   ),
@@ -72,4 +70,3 @@ class TrainingDayEditor extends StatelessWidget {
     );
   }
 }
-

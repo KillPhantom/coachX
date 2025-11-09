@@ -10,10 +10,7 @@ import '../providers/chat_providers.dart';
 class ConversationCard extends ConsumerWidget {
   final ConversationItem item;
 
-  const ConversationCard({
-    super.key,
-    required this.item,
-  });
+  const ConversationCard({super.key, required this.item});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -25,10 +22,7 @@ class ConversationCard extends ConsumerWidget {
         decoration: const BoxDecoration(
           color: AppColors.backgroundWhite,
           border: Border(
-            bottom: BorderSide(
-              color: AppColors.dividerLight,
-              width: 0.5,
-            ),
+            bottom: BorderSide(color: AppColors.dividerLight, width: 0.5),
           ),
         ),
         child: Row(
@@ -49,9 +43,7 @@ class ConversationCard extends ConsumerWidget {
                       Expanded(
                         child: Text(
                           item.userName,
-                          style: AppTextStyles.bodyMedium.copyWith(
-                            height: 1.2,
-                          ),
+                          style: AppTextStyles.bodyMedium.copyWith(height: 1.2),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -153,10 +145,7 @@ class ConversationCard extends ConsumerWidget {
         color: CupertinoColors.systemRed,
         borderRadius: BorderRadius.circular(10),
       ),
-      constraints: const BoxConstraints(
-        minWidth: 18,
-        minHeight: 18,
-      ),
+      constraints: const BoxConstraints(minWidth: 18, minHeight: 18),
       child: Text(
         displayCount,
         style: AppTextStyles.caption2.copyWith(
@@ -236,14 +225,14 @@ class ConversationCard extends ConsumerWidget {
         showCupertinoDialog(
           context: context,
           barrierDismissible: false,
-          builder: (context) => const Center(
-            child: CupertinoActivityIndicator(radius: 16),
-          ),
+          builder: (context) =>
+              const Center(child: CupertinoActivityIndicator(radius: 16)),
         );
 
         // 获取或创建对话
-        final conversation =
-            await ref.read(conversationProvider(item.userId).future);
+        final conversation = await ref.read(
+          conversationProvider(item.userId).future,
+        );
         conversationId = conversation?.id;
 
         // 关闭加载对话框

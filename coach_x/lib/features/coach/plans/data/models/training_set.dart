@@ -12,11 +12,7 @@ class TrainingSet {
 
   /// 创建空的 Set
   factory TrainingSet.empty() {
-    return const TrainingSet(
-      reps: '',
-      weight: '',
-      completed: false,
-    );
+    return const TrainingSet(reps: '', weight: '', completed: false);
   }
 
   /// 从 JSON 创建
@@ -30,19 +26,11 @@ class TrainingSet {
 
   /// 转换为 JSON
   Map<String, dynamic> toJson() {
-    return {
-      'reps': reps,
-      'weight': weight,
-      'completed': completed,
-    };
+    return {'reps': reps, 'weight': weight, 'completed': completed};
   }
 
   /// 复制并修改部分字段
-  TrainingSet copyWith({
-    String? reps,
-    String? weight,
-    bool? completed,
-  }) {
+  TrainingSet copyWith({String? reps, String? weight, bool? completed}) {
     return TrainingSet(
       reps: reps ?? this.reps,
       weight: weight ?? this.weight,
@@ -73,5 +61,3 @@ class TrainingSet {
     return 'TrainingSet(reps: $reps, weight: $weight, completed: $completed)';
   }
 }
-
-

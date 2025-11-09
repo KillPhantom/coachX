@@ -8,6 +8,7 @@ import 'package:coach_x/core/theme/app_text_styles.dart';
 import 'package:coach_x/core/widgets/loading_indicator.dart';
 import 'package:coach_x/core/widgets/empty_state.dart';
 import 'package:coach_x/core/widgets/error_view.dart';
+import 'package:coach_x/core/widgets/dismiss_keyboard_on_scroll.dart';
 import 'package:coach_x/core/utils/logger.dart';
 import '../../data/models/plan_base_model.dart';
 import '../providers/plans_providers.dart';
@@ -51,7 +52,9 @@ class _PlansPageState extends ConsumerState<PlansPage> {
 
   /// 处理计划卡片点击
   void _handlePlanTap(PlanBaseModel plan) {
-    AppLogger.info('🎯 点击计划卡片 - 类型: ${plan.planType}, ID: ${plan.id}, 名称: ${plan.name}');
+    AppLogger.info(
+      '🎯 点击计划卡片 - 类型: ${plan.planType}, ID: ${plan.id}, 名称: ${plan.name}',
+    );
 
     // 根据计划类型跳转到不同页面
     if (plan.planType == 'exercise') {
@@ -281,10 +284,7 @@ class _PlansPageState extends ConsumerState<PlansPage> {
             decoration: const BoxDecoration(
               color: AppColors.backgroundWhite,
               border: Border(
-                bottom: BorderSide(
-                  color: AppColors.dividerLight,
-                  width: 0.5,
-                ),
+                bottom: BorderSide(color: AppColors.dividerLight, width: 0.5),
               ),
             ),
             child: SafeArea(
@@ -309,7 +309,11 @@ class _PlansPageState extends ConsumerState<PlansPage> {
                       child: CupertinoButton(
                         padding: EdgeInsets.zero,
                         onPressed: _showCreatePlanSheet,
-                        child: const Icon(CupertinoIcons.add, size: 28, color: AppColors.primaryText),
+                        child: const Icon(
+                          CupertinoIcons.add,
+                          size: 28,
+                          color: AppColors.primaryText,
+                        ),
                       ),
                     ),
                   ],
@@ -319,57 +323,57 @@ class _PlansPageState extends ConsumerState<PlansPage> {
           ),
           // Tab切换栏（带滑动动画的下划线）
           Container(
-              decoration: BoxDecoration(
-                color: AppColors.backgroundWhite,
-                border: Border(
-                  bottom: BorderSide(color: AppColors.dividerLight, width: 0.5),
+            decoration: BoxDecoration(
+              color: AppColors.backgroundWhite,
+              border: Border(
+                bottom: BorderSide(color: AppColors.dividerLight, width: 0.5),
+              ),
+            ),
+            child: Stack(
+              children: [
+                // Tab按钮行
+                Row(
+                  children: [
+                    _buildTab(l10n.tabTraining, 0),
+                    _buildTab(l10n.tabDiet, 1),
+                    _buildTab(l10n.tabSupplements, 2),
+                  ],
                 ),
-              ),
-              child: Stack(
-                children: [
-                  // Tab按钮行
-                  Row(
-                    children: [
-                      _buildTab(l10n.tabTraining, 0),
-                      _buildTab(l10n.tabDiet, 1),
-                      _buildTab(l10n.tabSupplements, 2),
-                    ],
+                // 滑动的下划线
+                Positioned(
+                  bottom: 0,
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 250),
+                    curve: Curves.easeInOut,
+                    width: tabWidth,
+                    height: 2,
+                    margin: EdgeInsets.only(left: tabWidth * _selectedTabIndex),
+                    decoration: const BoxDecoration(color: Color(0xFFEC1313)),
                   ),
-                  // 滑动的下划线
-                  Positioned(
-                    bottom: 0,
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 250),
-                      curve: Curves.easeInOut,
-                      width: tabWidth,
-                      height: 2,
-                      margin: EdgeInsets.only(
-                        left: tabWidth * _selectedTabIndex,
-                      ),
-                      decoration: const BoxDecoration(color: Color(0xFFEC1313)),
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
-            // 搜索栏
-            PlanSearchBar(
-              searchQuery: state.searchQuery,
-              onSearchChanged: (query) {
-                ref.read(plansNotifierProvider.notifier).searchPlans(query);
-              },
-              onClear: () {
-                ref.read(plansNotifierProvider.notifier).clearSearch();
-              },
-            ),
+          ),
+          // 搜索栏
+          PlanSearchBar(
+            searchQuery: state.searchQuery,
+            onSearchChanged: (query) {
+              ref.read(plansNotifierProvider.notifier).searchPlans(query);
+            },
+            onClear: () {
+              ref.read(plansNotifierProvider.notifier).clearSearch();
+            },
+          ),
           // 计划列表
           Expanded(
-            child: CustomScrollView(
-              slivers: [
-                CupertinoSliverRefreshControl(onRefresh: _handleRefresh),
-                _buildContent(state),
-                const SliverToBoxAdapter(child: SizedBox(height: 80)),
-              ],
+            child: DismissKeyboardOnScroll(
+              child: CustomScrollView(
+                slivers: [
+                  CupertinoSliverRefreshControl(onRefresh: _handleRefresh),
+                  _buildContent(state),
+                  const SliverToBoxAdapter(child: SizedBox(height: 80)),
+                ],
+              ),
             ),
           ),
         ],

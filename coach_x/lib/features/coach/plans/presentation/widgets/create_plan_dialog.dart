@@ -161,11 +161,7 @@ class _PlanOptionCard extends StatelessWidget {
                 color: iconBackground,
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Icon(
-                icon,
-                color: iconColor,
-                size: 32,
-              ),
+              child: Icon(icon, color: iconColor, size: 32),
             ),
             const SizedBox(width: 16),
             // 文字内容
@@ -181,10 +177,7 @@ class _PlanOptionCard extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 4),
-                  Text(
-                    description,
-                    style: AppTextStyles.footnote,
-                  ),
+                  Text(description, style: AppTextStyles.footnote),
                 ],
               ),
             ),
@@ -200,4 +193,3 @@ class _PlanOptionCard extends StatelessWidget {
     );
   }
 }
-

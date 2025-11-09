@@ -5,6 +5,7 @@ import 'package:coach_x/core/theme/app_colors.dart';
 import 'package:coach_x/core/theme/app_text_styles.dart';
 import 'package:coach_x/core/utils/logger.dart';
 import 'package:coach_x/core/enums/ai_status.dart';
+import 'package:coach_x/core/widgets/dismiss_keyboard_on_scroll.dart';
 import 'package:coach_x/features/coach/plans/data/models/exercise.dart';
 import 'package:coach_x/features/coach/plans/data/models/training_set.dart';
 import 'package:coach_x/features/coach/plans/data/models/create_training_plan_state.dart';
@@ -168,10 +169,7 @@ class _CreateTrainingPlanPageState
         leading: CupertinoButton(
           padding: EdgeInsets.zero,
           onPressed: () => _onBack(context, notifier),
-          child: const Icon(
-            CupertinoIcons.back,
-            color: AppColors.primaryText,
-          ),
+          child: const Icon(CupertinoIcons.back, color: AppColors.primaryText),
         ),
         trailing: CupertinoButton(
           padding: EdgeInsets.zero,
@@ -288,8 +286,9 @@ class _CreateTrainingPlanPageState
                   child:
                       _selectedDayIndex != null &&
                           _selectedDayIndex! < state.days.length
-                      ? SingleChildScrollView(
-                          child: TrainingDayEditor(
+                      ? DismissKeyboardOnScroll(
+                          child: SingleChildScrollView(
+                            child: TrainingDayEditor(
                             onAddExercise: () =>
                                 _onAddExercise(notifier, _selectedDayIndex!),
                             exercisesWidget: _buildExercisesList(
@@ -300,6 +299,7 @@ class _CreateTrainingPlanPageState
                               isReviewMode: isReviewMode,
                               reviewState: reviewState,
                             ),
+                          ),
                           ),
                         )
                       : Center(

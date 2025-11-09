@@ -32,14 +32,14 @@ class EditStreamEvent {
   /// 获取修改建议数据
   PlanEditSuggestion? get suggestion {
     if (!isSuggestion || data == null) return null;
-    
+
     try {
       // 提取 changes 和 summary
       final changes = data!['changes'] as List<dynamic>?;
       final summary = data!['summary'] as String?;
-      
+
       if (changes == null || summary == null) return null;
-      
+
       return null; // 在 Notifier 中组合两个事件的数据
     } catch (e) {
       return null;
@@ -58,10 +58,13 @@ class EditStreamEvent {
     // 说明数据直接在顶层，需要提取到 data 中
     if (data == null &&
         (json.containsKey('changes') ||
-         json.containsKey('analysis') ||
-         json.containsKey('summary'))) {
+            json.containsKey('analysis') ||
+            json.containsKey('summary'))) {
       // 将顶层的修改相关字段提取到 data 中
-      data = Map<String, dynamic>.from(json)..remove('type')..remove('content')..remove('error');
+      data = Map<String, dynamic>.from(json)
+        ..remove('type')
+        ..remove('content')
+        ..remove('error');
     }
 
     return EditStreamEvent(
@@ -108,4 +111,3 @@ class EditStreamEvent {
     return type.hashCode ^ content.hashCode ^ error.hashCode;
   }
 }
-

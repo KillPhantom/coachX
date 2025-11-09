@@ -4,13 +4,11 @@ import 'package:coach_x/l10n/app_localizations.dart';
 import 'package:coach_x/core/theme/app_theme.dart';
 import '../../data/models/student_plans_model.dart';
 import '../providers/student_home_providers.dart';
-import 'diet_record_card.dart';
-import 'exercise_record_card.dart';
-import 'supplement_record_card.dart';
+import 'diet_plan_card.dart';
 
-/// 今日记录区块
+/// 今日饮食计划区块
 ///
-/// 显示今日的训练、饮食、补剂目标（从计划中读取）
+/// 显示今日的饮食计划
 class TodayRecordSection extends ConsumerWidget {
   const TodayRecordSection({super.key});
 
@@ -46,13 +44,10 @@ class TodayRecordSection extends ConsumerWidget {
               // 标题
               Padding(
                 padding: const EdgeInsets.all(AppDimensions.spacingM),
-                child: Text(
-                  l10n.todayRecord,
-                  style: AppTextStyles.bodyMedium,
-                ),
+                child: Text(l10n.todayRecord, style: AppTextStyles.bodyMedium),
               ),
 
-              // 内容区域
+              // 内容区域（包含指示器）
               _buildRecordCards(context, plans, dayNumbersAsync),
             ],
           ),
@@ -66,72 +61,80 @@ class TodayRecordSection extends ConsumerWidget {
     StudentPlansModel plans,
     Map<String, int> dayNumbers,
   ) {
+    // 只显示饮食计划
+    if (plans.dietPlan == null) {
+      return const SizedBox.shrink();
+    }
+
+    return _DietPlanWithIndicator(plans: plans, dayNumbers: dayNumbers);
+  }
+}
+
+/// 内部 Widget：饮食计划卡片 + 指示器
+class _DietPlanWithIndicator extends StatefulWidget {
+  final StudentPlansModel plans;
+  final Map<String, int> dayNumbers;
+
+  const _DietPlanWithIndicator({required this.plans, required this.dayNumbers});
+
+  @override
+  State<_DietPlanWithIndicator> createState() => _DietPlanWithIndicatorState();
+}
+
+class _DietPlanWithIndicatorState extends State<_DietPlanWithIndicator> {
+  int _currentPage = 0;
+  int _totalPages = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    final dayNum = widget.dayNumbers['diet'] ?? 1;
+    final dietDay = widget.plans.dietPlan!.days.firstWhere(
+      (day) => day.day == dayNum,
+      orElse: () => widget.plans.dietPlan!.days.first,
+    );
+
+    _totalPages = dietDay.meals.length + 1;
+
     return Column(
       children: [
-        // 饮食记录
-        if (plans.dietPlan != null) _buildDietCard(plans, dayNumbers),
+        // 饮食计划卡片
+        DietPlanCard(
+          dietDay: dietDay,
+          // TBD: 未来从 todayRecord 计算进度
+          progress: null,
+          onPageChanged: (index) {
+            setState(() {
+              _currentPage = index;
+            });
+          },
+        ),
 
-        // 训练记录
-        if (plans.exercisePlan != null) _buildExerciseCard(plans, dayNumbers),
-
-        // 补剂记录
-        if (plans.supplementPlan != null)
-          _buildSupplementCard(plans, dayNumbers),
+        // 圆点指示器
+        if (_totalPages > 1) ...[
+          const SizedBox(height: AppDimensions.spacingS),
+          _buildPageIndicator(),
+          const SizedBox(height: AppDimensions.spacingM),
+        ],
       ],
     );
   }
 
-  Widget _buildDietCard(StudentPlansModel plans, Map<String, int> dayNumbers) {
-    final dayNum = dayNumbers['diet'] ?? 1;
-    final dietDay = plans.dietPlan!.days.firstWhere(
-      (day) => day.day == dayNum,
-      orElse: () => plans.dietPlan!.days.first,
-    );
-
-    return DietRecordCard(
-      mealsCount: dietDay.meals.length,
-      macros: dietDay.macros,
-      onTap: () {
-        // TODO: 跳转到饮食详情
-      },
-    );
-  }
-
-  Widget _buildExerciseCard(
-      StudentPlansModel plans, Map<String, int> dayNumbers) {
-    final dayNum = dayNumbers['exercise'] ?? 1;
-    final trainingDay = plans.exercisePlan!.days.firstWhere(
-      (day) => day.day == dayNum,
-      orElse: () => plans.exercisePlan!.days.first,
-    );
-
-    return ExerciseRecordCard(
-      exercisesCount: trainingDay.totalExercises,
-      onTap: () {
-        // TODO: 跳转到训练详情
-      },
-    );
-  }
-
-  Widget _buildSupplementCard(
-      StudentPlansModel plans, Map<String, int> dayNumbers) {
-    final dayNum = dayNumbers['supplement'] ?? 1;
-    final supplementDay = plans.supplementPlan!.days.firstWhere(
-      (day) => day.day == dayNum,
-      orElse: () => plans.supplementPlan!.days.first,
-    );
-
-    // 计算总补剂数
-    int totalSupplements = 0;
-    for (final timing in supplementDay.timings) {
-      totalSupplements += timing.supplements.length;
-    }
-
-    return SupplementRecordCard(
-      supplementsCount: totalSupplements,
-      onTap: () {
-        // TODO: 跳转到补剂详情
-      },
+  Widget _buildPageIndicator() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: List.generate(_totalPages, (index) {
+        return Container(
+          margin: const EdgeInsets.symmetric(horizontal: 4),
+          width: 6,
+          height: 6,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: _currentPage == index
+                ? AppColors.primaryColor
+                : AppColors.dividerLight,
+          ),
+        );
+      }),
     );
   }
 }

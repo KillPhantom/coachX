@@ -26,7 +26,7 @@ class AIGenerationResponse {
   factory AIGenerationResponse.fromJson(Map<String, dynamic> json) {
     final statusStr = json['status'] as String? ?? 'error';
     AIGenerationStatus status;
-    
+
     switch (statusStr.toLowerCase()) {
       case 'success':
         status = AIGenerationStatus.success;
@@ -57,8 +57,10 @@ class AIGenerationResponse {
       try {
         final daysJson = json['days'] as List<dynamic>;
         days = daysJson
-            .map((dayJson) =>
-                ExerciseTrainingDay.fromJson(dayJson as Map<String, dynamic>))
+            .map(
+              (dayJson) =>
+                  ExerciseTrainingDay.fromJson(dayJson as Map<String, dynamic>),
+            )
             .toList();
       } catch (e) {
         // 解析失败，忽略
@@ -71,8 +73,10 @@ class AIGenerationResponse {
       try {
         final exercisesJson = json['exercises'] as List<dynamic>;
         exercises = exercisesJson
-            .map((exerciseJson) =>
-                Exercise.fromJson(exerciseJson as Map<String, dynamic>))
+            .map(
+              (exerciseJson) =>
+                  Exercise.fromJson(exerciseJson as Map<String, dynamic>),
+            )
             .toList();
       } catch (e) {
         // 解析失败，忽略
@@ -85,8 +89,10 @@ class AIGenerationResponse {
       try {
         final setsJson = json['sets'] as List<dynamic>;
         sets = setsJson
-            .map((setJson) =>
-                TrainingSet.fromJson(setJson as Map<String, dynamic>))
+            .map(
+              (setJson) =>
+                  TrainingSet.fromJson(setJson as Map<String, dynamic>),
+            )
             .toList();
       } catch (e) {
         // 解析失败，忽略
@@ -137,5 +143,3 @@ class AIGenerationResponse {
     return 'AIGenerationResponse(status: $status, hasData: $hasData, error: $error)';
   }
 }
-
-

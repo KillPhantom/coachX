@@ -22,8 +22,8 @@ class ExerciseCard extends StatefulWidget {
   final Widget? setsWidget;
 
   // Review Mode 相关
-  final PlanChange? activeSuggestion;          // 当前激活的建议
-  final bool isHighlighted;                    // 是否被高亮
+  final PlanChange? activeSuggestion; // 当前激活的建议
+  final bool isHighlighted; // 是否被高亮
   final VoidCallback? onAcceptSuggestion;
   final VoidCallback? onRejectSuggestion;
   final VoidCallback? onAcceptAll;
@@ -75,12 +75,10 @@ class _ExerciseCardState extends State<ExerciseCard>
     );
     _pulseController = controller;
 
-    _pulseAnimation = Tween<double>(begin: 1.0, end: 1.05).animate(
-      CurvedAnimation(
-        parent: controller,
-        curve: Curves.easeInOut,
-      ),
-    );
+    _pulseAnimation = Tween<double>(
+      begin: 1.0,
+      end: 1.05,
+    ).animate(CurvedAnimation(parent: controller, curve: Curves.easeInOut));
 
     // 如果高亮，启动脉冲动画
     if (widget.isHighlighted) {
@@ -129,8 +127,8 @@ class _ExerciseCardState extends State<ExerciseCard>
         border: widget.isHighlighted
             ? Border.all(color: AppColors.primary, width: 2.5)
             : (widget.isExpanded
-                ? Border.all(color: AppColors.primary, width: 1.5)
-                : null),
+                  ? Border.all(color: AppColors.primary, width: 1.5)
+                  : null),
         boxShadow: widget.isHighlighted
             ? [
                 BoxShadow(
@@ -187,15 +185,23 @@ class _ExerciseCardState extends State<ExerciseCard>
                                 vertical: 1,
                               ),
                               decoration: BoxDecoration(
-                                color: widget.exercise.type == ExerciseType.strength
-                                    ? CupertinoColors.systemBlue.withOpacity(0.15)
-                                    : CupertinoColors.systemRed.withOpacity(0.15),
+                                color:
+                                    widget.exercise.type ==
+                                        ExerciseType.strength
+                                    ? CupertinoColors.systemBlue.withOpacity(
+                                        0.15,
+                                      )
+                                    : CupertinoColors.systemRed.withOpacity(
+                                        0.15,
+                                      ),
                                 borderRadius: BorderRadius.circular(2),
                               ),
                               child: Text(
                                 widget.exercise.type.displayName,
                                 style: AppTextStyles.tabLabel.copyWith(
-                                  color: widget.exercise.type == ExerciseType.strength
+                                  color:
+                                      widget.exercise.type ==
+                                          ExerciseType.strength
                                       ? CupertinoColors.systemBlue
                                       : CupertinoColors.systemRed,
                                 ),
@@ -206,7 +212,8 @@ class _ExerciseCardState extends State<ExerciseCard>
                             Text(
                               '${widget.exercise.totalSets} 组',
                               style: AppTextStyles.caption2.copyWith(
-                                color: CupertinoColors.secondaryLabel.resolveFrom(context),
+                                color: CupertinoColors.secondaryLabel
+                                    .resolveFrom(context),
                               ),
                             ),
                           ],
@@ -271,7 +278,9 @@ class _ExerciseCardState extends State<ExerciseCard>
                       vertical: 5,
                     ),
                     decoration: BoxDecoration(
-                      color: CupertinoColors.systemBackground.resolveFrom(context),
+                      color: CupertinoColors.systemBackground.resolveFrom(
+                        context,
+                      ),
                       borderRadius: BorderRadius.circular(4),
                     ),
                   ),
@@ -345,10 +354,14 @@ class _ExerciseCardState extends State<ExerciseCard>
                       child: Container(
                         padding: const EdgeInsets.all(7),
                         decoration: BoxDecoration(
-                          color: CupertinoColors.systemGrey5.resolveFrom(context),
+                          color: CupertinoColors.systemGrey5.resolveFrom(
+                            context,
+                          ),
                           borderRadius: BorderRadius.circular(4),
                           border: Border.all(
-                            color: CupertinoColors.separator.resolveFrom(context),
+                            color: CupertinoColors.separator.resolveFrom(
+                              context,
+                            ),
                             style: BorderStyle.solid,
                           ),
                         ),
@@ -357,14 +370,17 @@ class _ExerciseCardState extends State<ExerciseCard>
                           children: [
                             Icon(
                               CupertinoIcons.cloud_upload,
-                              color: CupertinoColors.secondaryLabel.resolveFrom(context),
+                              color: CupertinoColors.secondaryLabel.resolveFrom(
+                                context,
+                              ),
                               size: 8,
                             ),
                             const SizedBox(width: 5),
                             Text(
                               '上传指导图片/视频（预留）',
                               style: AppTextStyles.caption1.copyWith(
-                                color: CupertinoColors.secondaryLabel.resolveFrom(context),
+                                color: CupertinoColors.secondaryLabel
+                                    .resolveFrom(context),
                               ),
                             ),
                           ],
@@ -384,10 +400,7 @@ class _ExerciseCardState extends State<ExerciseCard>
       cardWidget = AnimatedBuilder(
         animation: _pulseAnimation!,
         builder: (context, child) {
-          return Transform.scale(
-            scale: _pulseAnimation!.value,
-            child: child,
-          );
+          return Transform.scale(scale: _pulseAnimation!.value, child: child);
         },
         child: cardWidget,
       );
@@ -499,7 +512,9 @@ class _ExerciseCardState extends State<ExerciseCard>
         final afterNote = after['note'] as String?;
 
         // 如果备注有变化，显示对比
-        if (beforeNote != null && afterNote != null && beforeNote != afterNote) {
+        if (beforeNote != null &&
+            afterNote != null &&
+            beforeNote != afterNote) {
           return Container(
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 5),
             decoration: BoxDecoration(
@@ -544,10 +559,7 @@ class _ExerciseCardState extends State<ExerciseCard>
       onChanged: widget.onNoteChanged,
       minLines: 1,
       maxLines: null,
-      padding: const EdgeInsets.symmetric(
-        horizontal: 6,
-        vertical: 5,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 5),
       style: AppTextStyles.caption1,
       decoration: BoxDecoration(
         color: CupertinoColors.systemBackground.resolveFrom(context),
@@ -627,4 +639,3 @@ class _ExerciseCardState extends State<ExerciseCard>
     );
   }
 }
-

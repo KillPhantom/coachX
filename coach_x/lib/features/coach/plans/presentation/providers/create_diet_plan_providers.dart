@@ -11,6 +11,6 @@ final dietPlanRepositoryProvider = Provider<DietPlanRepository>((ref) {
 /// 创建饮食计划状态管理 Provider
 final createDietPlanNotifierProvider =
     StateNotifierProvider<CreateDietPlanNotifier, CreateDietPlanState>((ref) {
-  final repository = ref.watch(dietPlanRepositoryProvider);
-  return CreateDietPlanNotifier(repository);
-});
+      final repository = ref.watch(dietPlanRepositoryProvider);
+      return CreateDietPlanNotifier(repository);
+    });

@@ -14,7 +14,7 @@ class CreateDietPlanNotifier extends StateNotifier<CreateDietPlanState> {
   final DietPlanRepository _dietPlanRepository;
 
   CreateDietPlanNotifier(this._dietPlanRepository)
-      : super(const CreateDietPlanState());
+    : super(const CreateDietPlanState());
 
   // ==================== 基础字段更新 ====================
 
@@ -188,11 +188,17 @@ class CreateDietPlanNotifier extends StateNotifier<CreateDietPlanState> {
     updateMeal(dayIndex, mealIndex, updatedMeal);
 
     AppLogger.debug(
-        '🗑️ 删除食物条目 - Day ${dayIndex + 1}, Meal ${mealIndex + 1}, Item ${itemIndex + 1}');
+      '🗑️ 删除食物条目 - Day ${dayIndex + 1}, Meal ${mealIndex + 1}, Item ${itemIndex + 1}',
+    );
   }
 
   /// 更新食物条目
-  void updateFoodItem(int dayIndex, int mealIndex, int itemIndex, FoodItem item) {
+  void updateFoodItem(
+    int dayIndex,
+    int mealIndex,
+    int itemIndex,
+    FoodItem item,
+  ) {
     if (dayIndex < 0 || dayIndex >= state.days.length) return;
 
     final day = state.days[dayIndex];
@@ -286,13 +292,11 @@ class CreateDietPlanNotifier extends StateNotifier<CreateDietPlanState> {
           final item = meal.items[k];
 
           if (item.food.trim().isEmpty) {
-            errors.add(
-                '第 ${i + 1} 天的第 ${j + 1} 个餐次的第 ${k + 1} 个食物需要名称');
+            errors.add('第 ${i + 1} 天的第 ${j + 1} 个餐次的第 ${k + 1} 个食物需要名称');
           }
 
           if (item.amount.trim().isEmpty) {
-            errors.add(
-                '第 ${i + 1} 天的第 ${j + 1} 个餐次的第 ${k + 1} 个食物需要分量');
+            errors.add('第 ${i + 1} 天的第 ${j + 1} 个餐次的第 ${k + 1} 个食物需要分量');
           }
         }
       }
@@ -337,10 +341,7 @@ class CreateDietPlanNotifier extends StateNotifier<CreateDietPlanState> {
     } catch (e) {
       AppLogger.error('❌ 加载饮食计划失败', e);
 
-      state = state.copyWith(
-        isLoading: false,
-        errorMessage: '加载失败: $e',
-      );
+      state = state.copyWith(isLoading: false, errorMessage: '加载失败: $e');
 
       return false;
     }
@@ -352,9 +353,7 @@ class CreateDietPlanNotifier extends StateNotifier<CreateDietPlanState> {
       // 验证
       validate();
       if (state.validationErrors.isNotEmpty) {
-        state = state.copyWith(
-          errorMessage: state.validationErrors.first,
-        );
+        state = state.copyWith(errorMessage: state.validationErrors.first);
         return false;
       }
 
@@ -376,7 +375,9 @@ class CreateDietPlanNotifier extends StateNotifier<CreateDietPlanState> {
 
       // 根据是否有planId判断是创建还是更新
       String planId;
-      if (state.isEditMode && state.planId != null && state.planId!.isNotEmpty) {
+      if (state.isEditMode &&
+          state.planId != null &&
+          state.planId!.isNotEmpty) {
         // 更新现有计划
         await _dietPlanRepository.updatePlan(plan);
         planId = state.planId!;
@@ -387,19 +388,13 @@ class CreateDietPlanNotifier extends StateNotifier<CreateDietPlanState> {
         AppLogger.info('✅ 饮食计划创建成功 - ID: $planId');
       }
 
-      state = state.copyWith(
-        isLoading: false,
-        planId: planId,
-      );
+      state = state.copyWith(isLoading: false, planId: planId);
 
       return true;
     } catch (e) {
       AppLogger.error('❌ 保存饮食计划失败', e);
 
-      state = state.copyWith(
-        isLoading: false,
-        errorMessage: '保存失败: $e',
-      );
+      state = state.copyWith(isLoading: false, errorMessage: '保存失败: $e');
 
       return false;
     }
@@ -456,10 +451,7 @@ class CreateDietPlanNotifier extends StateNotifier<CreateDietPlanState> {
     } catch (e, stackTrace) {
       AppLogger.error('❌ AI 生成饮食计划失败', e, stackTrace);
 
-      state = state.copyWith(
-        isLoading: false,
-        errorMessage: 'AI 生成失败: $e',
-      );
+      state = state.copyWith(isLoading: false, errorMessage: 'AI 生成失败: $e');
     }
   }
 

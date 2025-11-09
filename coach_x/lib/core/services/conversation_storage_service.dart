@@ -23,9 +23,7 @@ class ConversationStorageService {
       final key = _keyPrefix + planId;
 
       // 过滤掉加载中的消息（不需要持久化）
-      final messagesToSave = messages
-          .where((m) => !m.isLoading)
-          .toList();
+      final messagesToSave = messages.where((m) => !m.isLoading).toList();
 
       final data = {
         'planId': planId,
@@ -36,7 +34,9 @@ class ConversationStorageService {
       final jsonString = json.encode(data);
       await prefs.setString(key, jsonString);
 
-      AppLogger.debug('💾 保存对话历史: planId=$planId, 消息数=${messagesToSave.length}');
+      AppLogger.debug(
+        '💾 保存对话历史: planId=$planId, 消息数=${messagesToSave.length}',
+      );
     } catch (e, stackTrace) {
       AppLogger.error('❌ 保存对话历史失败', e, stackTrace);
     }

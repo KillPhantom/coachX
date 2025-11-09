@@ -29,7 +29,9 @@ class EditConversationNotifier extends StateNotifier<EditConversationState> {
     AppLogger.info('🆕 初始化编辑对话 - 计划: ${currentPlan.name}');
 
     // 尝试加载历史对话
-    final savedMessages = await ConversationStorageService.loadConversation(planId);
+    final savedMessages = await ConversationStorageService.loadConversation(
+      planId,
+    );
 
     if (savedMessages.isNotEmpty) {
       // 有历史对话，恢复状态
@@ -47,10 +49,7 @@ class EditConversationNotifier extends StateNotifier<EditConversationState> {
   }
 
   /// 发送用户消息
-  Future<void> sendMessage(
-    String message,
-    String planId,
-  ) async {
+  Future<void> sendMessage(String message, String planId) async {
     if (!_isMounted) return;
 
     if (state.currentPlan == null) {
@@ -67,15 +66,16 @@ class EditConversationNotifier extends StateNotifier<EditConversationState> {
     }
 
     try {
-      AppLogger.info('📤 发送用户消息: ${message.substring(0, message.length > 50 ? 50 : message.length)}...');
+      AppLogger.info(
+        '📤 发送用户消息: ${message.substring(0, message.length > 50 ? 50 : message.length)}...',
+      );
 
       // 1. 添加用户消息到对话
       final userMessage = LLMChatMessage.user(content: message);
       if (!_isMounted) return;
-      state = state.addMessage(userMessage).copyWith(
-        isAIResponding: true,
-        clearError: true,
-      );
+      state = state
+          .addMessage(userMessage)
+          .copyWith(isAIResponding: true, clearError: true);
 
       // 2. 添加 AI 加载消息
       final loadingMessage = LLMChatMessage.aiLoading();
@@ -126,16 +126,24 @@ class EditConversationNotifier extends StateNotifier<EditConversationState> {
         } else if (event.isComplete) {
           // 完成 - 组合所有数据创建建议
           // 如果analysisContent为空，尝试从最后一条消息获取内容
-          final lastMessage = state.messages.isNotEmpty ? state.messages.last : null;
+          final lastMessage = state.messages.isNotEmpty
+              ? state.messages.last
+              : null;
           final finalAnalysisContent = analysisContent.isNotEmpty
               ? analysisContent
               : (lastMessage?.content ?? '');
 
           // 诊断日志
           AppLogger.debug('📊 Complete 事件数据检查:');
-          AppLogger.debug('  - changes: ${changes != null ? '✅ ${changes!.length} 项' : '❌ null'}');
-          AppLogger.debug('  - summary: ${summary != null && summary!.isNotEmpty ? '✅ 有' : '⚠️ 空/null'}');
-          AppLogger.debug('  - analysisContent: ${analysisContent.isNotEmpty ? '✅ ${analysisContent.length} 字符' : '❌ 空'}');
+          AppLogger.debug(
+            '  - changes: ${changes != null ? '✅ ${changes!.length} 项' : '❌ null'}',
+          );
+          AppLogger.debug(
+            '  - summary: ${summary != null && summary!.isNotEmpty ? '✅ 有' : '⚠️ 空/null'}',
+          );
+          AppLogger.debug(
+            '  - analysisContent: ${analysisContent.isNotEmpty ? '✅ ${analysisContent.length} 字符' : '❌ 空'}',
+          );
 
           if (changes != null && changes.isNotEmpty) {
             // 有修改建议 - 创建编辑建议（主流程）
@@ -146,7 +154,9 @@ class EditConversationNotifier extends StateNotifier<EditConversationState> {
                 ? summary!
                 : '已生成 ${changes.length} 处修改';
 
-            AppLogger.debug('  - 使用 summary: ${summary != null ? '原值' : '默认值'}');
+            AppLogger.debug(
+              '  - 使用 summary: ${summary != null ? '原值' : '默认值'}',
+            );
 
             final suggestion = PlanEditSuggestion(
               analysis: finalAnalysisContent,
@@ -156,48 +166,43 @@ class EditConversationNotifier extends StateNotifier<EditConversationState> {
 
             // 更新最后一条 AI 消息，添加建议
             if (!_isMounted) return;
-            state = state.updateLastMessage(
-              lastMessage!.copyWith(
-                content: '$finalAnalysisContent\n\n$finalSummary',
-                suggestion: suggestion,
-                isLoading: false,
-              ),
-            ).copyWith(
-              pendingSuggestion: suggestion,
-              isAIResponding: false,
-            );
+            state = state
+                .updateLastMessage(
+                  lastMessage!.copyWith(
+                    content: '$finalAnalysisContent\n\n$finalSummary',
+                    suggestion: suggestion,
+                    isLoading: false,
+                  ),
+                )
+                .copyWith(pendingSuggestion: suggestion, isAIResponding: false);
 
             AppLogger.info('✅ AI 响应完成（编辑建议，${changes.length} 处修改）');
           } else if (finalAnalysisContent.isNotEmpty) {
             // 纯文本响应（没有tool调用，如总结请求）
             AppLogger.info('✅ AI 响应完成（纯文本总结，无修改建议）');
             if (!_isMounted) return;
-            state = state.updateLastMessage(
-              LLMChatMessage.ai(content: finalAnalysisContent),
-            ).copyWith(
-              isAIResponding: false,
-            );
+            state = state
+                .updateLastMessage(
+                  LLMChatMessage.ai(content: finalAnalysisContent),
+                )
+                .copyWith(isAIResponding: false);
           } else {
             // 真正的错误：既没有 changes 也没有 analysis
             AppLogger.warning('⚠️ AI 响应数据不完整（无 changes 且无 analysis）');
             if (!_isMounted) return;
-            state = state.updateLastMessage(
-              LLMChatMessage.ai(content: '抱歉，未能生成有效的响应'),
-            ).copyWith(
-              isAIResponding: false,
-              error: '响应数据不完整',
-            );
+            state = state
+                .updateLastMessage(LLMChatMessage.ai(content: '抱歉，未能生成有效的响应'))
+                .copyWith(isAIResponding: false, error: '响应数据不完整');
           }
         } else if (event.isError) {
           // 错误
           AppLogger.error('❌ AI 响应错误: ${event.error}');
           if (!_isMounted) return;
-          state = state.updateLastMessage(
-            LLMChatMessage.ai(content: '抱歉，处理您的请求时出现错误：${event.error}'),
-          ).copyWith(
-            isAIResponding: false,
-            error: event.error,
-          );
+          state = state
+              .updateLastMessage(
+                LLMChatMessage.ai(content: '抱歉，处理您的请求时出现错误：${event.error}'),
+              )
+              .copyWith(isAIResponding: false, error: event.error);
         }
       }
 
@@ -208,12 +213,9 @@ class EditConversationNotifier extends StateNotifier<EditConversationState> {
     } catch (e, stackTrace) {
       AppLogger.error('❌ 发送消息异常', e, stackTrace);
       if (!_isMounted) return;
-      state = state.updateLastMessage(
-        LLMChatMessage.ai(content: '抱歉，发生了意外错误'),
-      ).copyWith(
-        isAIResponding: false,
-        error: '发生意外错误: $e',
-      );
+      state = state
+          .updateLastMessage(LLMChatMessage.ai(content: '抱歉，发生了意外错误'))
+          .copyWith(isAIResponding: false, error: '发生意外错误: $e');
 
       // 即使出错也保存对话历史
       if (_isMounted) {
@@ -266,9 +268,7 @@ class EditConversationNotifier extends StateNotifier<EditConversationState> {
     );
 
     // 添加系统消息
-    final systemMessage = LLMChatMessage.system(
-      content: '已应用修改建议',
-    );
+    final systemMessage = LLMChatMessage.system(content: '已应用修改建议');
     if (!_isMounted) return;
     state = state.addMessage(systemMessage);
 
@@ -297,9 +297,7 @@ class EditConversationNotifier extends StateNotifier<EditConversationState> {
     );
 
     // 添加系统消息
-    final systemMessage = LLMChatMessage.system(
-      content: '已拒绝修改建议',
-    );
+    final systemMessage = LLMChatMessage.system(content: '已拒绝修改建议');
     if (!_isMounted) return;
     state = state.addMessage(systemMessage);
 
@@ -330,10 +328,7 @@ class EditConversationNotifier extends StateNotifier<EditConversationState> {
       final previewPlan = reviewNotifier.finishReview() ?? state.currentPlan!;
 
       if (!_isMounted) return;
-      state = state.copyWith(
-        previewPlan: previewPlan,
-        isPreviewMode: true,
-      );
+      state = state.copyWith(previewPlan: previewPlan, isPreviewMode: true);
     } else {
       // 如果没有 changes，使用当前计划作为预览
       if (!_isMounted) return;
@@ -350,10 +345,7 @@ class EditConversationNotifier extends StateNotifier<EditConversationState> {
 
     AppLogger.info('🚪 退出预览模式');
 
-    state = state.copyWith(
-      clearPreviewPlan: true,
-      isPreviewMode: false,
-    );
+    state = state.copyWith(clearPreviewPlan: true, isPreviewMode: false);
   }
 
   /// 清空对话
@@ -402,10 +394,7 @@ class EditConversationNotifier extends StateNotifier<EditConversationState> {
       return;
     }
 
-    await ConversationStorageService.saveConversation(
-      planId,
-      state.messages,
-    );
+    await ConversationStorageService.saveConversation(planId, state.messages);
   }
 
   @override
@@ -415,4 +404,3 @@ class EditConversationNotifier extends StateNotifier<EditConversationState> {
     super.dispose();
   }
 }
-

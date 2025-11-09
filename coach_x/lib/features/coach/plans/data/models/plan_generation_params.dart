@@ -6,7 +6,7 @@ import 'package:coach_x/core/enums/training_level.dart';
 import 'package:coach_x/core/enums/workload_level.dart';
 
 /// 训练计划生成参数
-/// 
+///
 /// 用于 AI 引导创建流程，传递给后端的结构化参数
 class PlanGenerationParams {
   /// 训练目标
@@ -242,4 +242,3 @@ class PlanGenerationParams {
         ')';
   }
 }
-

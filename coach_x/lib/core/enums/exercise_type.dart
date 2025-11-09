@@ -58,5 +58,3 @@ ExerciseType exerciseTypeFromString(String value) {
       return ExerciseType.strength; // 默认力量训练
   }
 }
-
-

@@ -17,7 +17,8 @@ initialize_app()
 from users.handlers import (
     create_user_document,
     fetch_user_info,
-    update_user_info
+    update_user_info,
+    update_active_plan
 )
 
 # ==================== 导入邀请码模块 ====================
@@ -34,6 +35,10 @@ from students.handlers import (
     delete_student,
     fetch_latest_training
 )
+from students.training_handlers import (
+    fetch_today_training,
+    upsert_today_training
+)
 
 # ==================== 导入 AI 生成模块 ====================
 from ai.handlers import (
@@ -48,6 +53,11 @@ from ai.handlers import (
     generate_supplement_plan_conversation
 )
 
+# ==================== 导入 AI 食物营养分析模块 ====================
+from ai.food_nutrition import (
+    analyze_food_nutrition
+)
+
 # ==================== 导入计划管理模块 ====================
 from plans.handlers import (
     exercise_plan,
@@ -55,6 +65,7 @@ from plans.handlers import (
     supplement_plan,
     fetch_available_plans,
     get_student_assigned_plans,
+    get_student_all_plans,
     assign_plan
 )
 
@@ -66,24 +77,35 @@ from chat.handlers import (
     get_or_create_conversation
 )
 
+# ==================== 导入身体测量模块 ====================
+from body_stats.handlers import (
+    save_body_measurement,
+    fetch_body_measurements,
+    update_body_measurement,
+    delete_body_measurement
+)
+
 # ==================== 导出所有函数 ====================
 __all__ = [
     # 用户管理
     'create_user_document',
     'fetch_user_info',
     'update_user_info',
-    
+    'update_active_plan',
+
     # 邀请码
     'verify_invitation_code',
     'generate_invitation_codes',
     'fetch_invitation_codes',
     'mark_invitation_code_used',
-    
+
     # 学生管理
     'fetch_students',
     'delete_student',
     'fetch_latest_training',
-    
+    'fetch_today_training',
+    'upsert_today_training',
+
     # AI 生成
     'generate_ai_training_plan',
     'import_plan_from_image',
@@ -94,6 +116,7 @@ __all__ = [
     'generate_diet_plan_with_skill',
     'edit_diet_plan_conversation',
     'generate_supplement_plan_conversation',
+    'analyze_food_nutrition',
 
     # 计划管理
     'exercise_plan',
@@ -101,6 +124,7 @@ __all__ = [
     'supplement_plan',
     'fetch_available_plans',
     'get_student_assigned_plans',
+    'get_student_all_plans',
     'assign_plan',
 
     # 聊天消息
@@ -108,4 +132,10 @@ __all__ = [
     'fetch_messages',
     'mark_messages_as_read',
     'get_or_create_conversation',
+
+    # 身体测量
+    'save_body_measurement',
+    'fetch_body_measurements',
+    'update_body_measurement',
+    'delete_body_measurement',
 ]

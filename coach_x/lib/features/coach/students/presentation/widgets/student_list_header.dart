@@ -34,10 +34,7 @@ class StudentListHeader extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           // 学生数量统计
-          Text(
-            l10n.studentCount(totalCount),
-            style: AppTextStyles.subhead,
-          ),
+          Text(l10n.studentCount(totalCount), style: AppTextStyles.subhead),
 
           // 搜索、筛选和添加按钮
           Row(
@@ -48,8 +45,8 @@ class StudentListHeader extends StatelessWidget {
                 child: Icon(
                   CupertinoIcons.search,
                   size: AppDimensions.iconM,
-                  color: isSearching 
-                      ? AppColors.primaryText 
+                  color: isSearching
+                      ? AppColors.primaryText
                       : AppColors.textSecondary,
                 ),
               ),
@@ -99,4 +96,3 @@ class StudentListHeader extends StatelessWidget {
     );
   }
 }
-

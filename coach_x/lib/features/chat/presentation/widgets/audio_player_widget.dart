@@ -147,10 +147,11 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
                     child: LinearProgressIndicator(
                       value: _totalDuration.inSeconds > 0
                           ? _currentPosition.inSeconds /
-                              _totalDuration.inSeconds
+                                _totalDuration.inSeconds
                           : 0,
-                      backgroundColor: CupertinoColors.systemGrey4
-                          .resolveFrom(context),
+                      backgroundColor: CupertinoColors.systemGrey4.resolveFrom(
+                        context,
+                      ),
                       valueColor: AlwaysStoppedAnimation<Color>(
                         widget.isMine
                             ? AppColors.primary

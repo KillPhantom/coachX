@@ -36,19 +36,14 @@ class CreateDietPlanState {
   int get totalDays => days.length;
 
   /// 计算属性 - 总餐次数
-  int get totalMeals =>
-      days.fold(0, (sum, day) => sum + day.meals.length);
+  int get totalMeals => days.fold(0, (sum, day) => sum + day.meals.length);
 
   /// 计算属性 - 总食物条目数
   int get totalFoodItems => days.fold(
-        0,
-        (sum, day) =>
-            sum +
-            day.meals.fold(
-              0,
-              (mealSum, meal) => mealSum + meal.items.length,
-            ),
-      );
+    0,
+    (sum, day) =>
+        sum + day.meals.fold(0, (mealSum, meal) => mealSum + meal.items.length),
+  );
 
   /// 复制并修改部分字段
   CreateDietPlanState copyWith({

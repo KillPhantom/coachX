@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:coach_x/core/theme/app_colors.dart';
 import 'package:coach_x/core/theme/app_text_styles.dart';
 import 'package:coach_x/core/utils/logger.dart';
+import 'package:coach_x/core/widgets/dismiss_keyboard_on_scroll.dart';
 import 'package:coach_x/features/coach/plans/data/models/diet_plan_model.dart';
 import 'package:coach_x/features/coach/plans/data/models/diet_plan_edit_suggestion.dart';
 import 'package:coach_x/features/coach/plans/presentation/providers/edit_diet_conversation_providers.dart';
@@ -25,7 +26,8 @@ class AIEditDietChatPanel extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<AIEditDietChatPanel> createState() => _AIEditDietChatPanelState();
+  ConsumerState<AIEditDietChatPanel> createState() =>
+      _AIEditDietChatPanelState();
 }
 
 class _AIEditDietChatPanelState extends ConsumerState<AIEditDietChatPanel> {
@@ -39,7 +41,8 @@ class _AIEditDietChatPanelState extends ConsumerState<AIEditDietChatPanel> {
     _messageController.addListener(_onTextChanged);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(editDietConversationNotifierProvider.notifier)
+      ref
+          .read(editDietConversationNotifierProvider.notifier)
           .initConversation(widget.currentPlan, widget.planId);
     });
   }
@@ -65,7 +68,8 @@ class _AIEditDietChatPanelState extends ConsumerState<AIEditDietChatPanel> {
     final message = _messageController.text.trim();
     if (message.isEmpty) return;
 
-    ref.read(editDietConversationNotifierProvider.notifier)
+    ref
+        .read(editDietConversationNotifierProvider.notifier)
         .sendMessage(message, widget.planId);
 
     _messageController.clear();
@@ -95,13 +99,16 @@ class _AIEditDietChatPanelState extends ConsumerState<AIEditDietChatPanel> {
       await notifier.applySuggestion();
 
       // 2. 获取应用修改后的计划
-      final updatedPlan = ref.read(editDietConversationNotifierProvider).currentPlan;
+      final updatedPlan = ref
+          .read(editDietConversationNotifierProvider)
+          .currentPlan;
       if (updatedPlan != null) {
         // 同步新计划到父组件
         widget.onPlanModified(updatedPlan);
 
         // 3. 🆕 使用新计划启动 Diet Review Mode
-        ref.read(dietSuggestionReviewNotifierProvider.notifier)
+        ref
+            .read(dietSuggestionReviewNotifierProvider.notifier)
             .startReview(suggestion, updatedPlan);
         ref.read(isDietReviewModeProvider.notifier).state = true;
       }
@@ -114,7 +121,9 @@ class _AIEditDietChatPanelState extends ConsumerState<AIEditDietChatPanel> {
   }
 
   Future<void> _rejectSuggestion() async {
-    await ref.read(editDietConversationNotifierProvider.notifier).rejectSuggestion();
+    await ref
+        .read(editDietConversationNotifierProvider.notifier)
+        .rejectSuggestion();
   }
 
   @override
@@ -125,7 +134,10 @@ class _AIEditDietChatPanelState extends ConsumerState<AIEditDietChatPanel> {
     final canSendMessage = ref.watch(canSendDietMessageProvider);
 
     // 🆕 当收到建议时，自动应用并启动 Review Mode
-    ref.listen<DietPlanEditSuggestion?>(pendingDietSuggestionProvider, (previous, next) {
+    ref.listen<DietPlanEditSuggestion?>(pendingDietSuggestionProvider, (
+      previous,
+      next,
+    ) {
       if (next != null && previous == null) {
         AppLogger.info('🚀 检测到新的饮食计划建议，自动应用并启动 Review Mode');
 
@@ -161,24 +173,25 @@ class _AIEditDietChatPanelState extends ConsumerState<AIEditDietChatPanel> {
           Expanded(
             child: Column(
               children: [
-
                 // 对话列表
                 Expanded(
                   child: messages.isEmpty
                       ? _buildWelcomeView(context)
-                      : ListView.builder(
-                          controller: _scrollController,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          itemCount: messages.length,
-                          itemBuilder: (context, index) {
-                            final message = messages[index];
-                            return ChatMessageBubble(
-                              message: message,
-                              onSuggestionTap: message.suggestion != null
-                                  ? () {}
-                                  : null,
-                            );
-                          },
+                      : DismissKeyboardOnScroll(
+                          child: ListView.builder(
+                            controller: _scrollController,
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            itemCount: messages.length,
+                            itemBuilder: (context, index) {
+                              final message = messages[index];
+                              return ChatMessageBubble(
+                                message: message,
+                                onSuggestionTap: message.suggestion != null
+                                    ? () {}
+                                    : null,
+                              );
+                            },
+                          ),
                         ),
                 ),
               ],
@@ -260,7 +273,6 @@ class _AIEditDietChatPanelState extends ConsumerState<AIEditDietChatPanel> {
     );
   }
 
-
   Widget _buildWelcomeView(BuildContext context) {
     return Center(
       child: Padding(
@@ -298,11 +310,7 @@ class _AIEditDietChatPanelState extends ConsumerState<AIEditDietChatPanel> {
   }
 
   Widget _buildQuickActions(BuildContext context) {
-    final quickActions = [
-      '减少10%碳水，增加10%蛋白质',
-      '减少10%碳水',
-      '增加10% kCal',
-    ];
+    final quickActions = ['减少10%碳水，增加10%蛋白质', '减少10%碳水', '增加10% kCal'];
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -313,7 +321,10 @@ class _AIEditDietChatPanelState extends ConsumerState<AIEditDietChatPanel> {
             return Padding(
               padding: const EdgeInsets.only(right: 8),
               child: CupertinoButton(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 10,
+                ),
                 color: CupertinoColors.systemGrey6.resolveFrom(context),
                 borderRadius: BorderRadius.circular(20),
                 minSize: 0,
@@ -332,7 +343,11 @@ class _AIEditDietChatPanelState extends ConsumerState<AIEditDietChatPanel> {
     );
   }
 
-  Widget _buildInputArea(BuildContext context, bool canSendMessage, bool isAIResponding) {
+  Widget _buildInputArea(
+    BuildContext context,
+    bool canSendMessage,
+    bool isAIResponding,
+  ) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
@@ -361,7 +376,9 @@ class _AIEditDietChatPanelState extends ConsumerState<AIEditDietChatPanel> {
                         controller: _messageController,
                         placeholder: 'Ask AI for suggestions...',
                         placeholderStyle: AppTextStyles.subhead.copyWith(
-                          color: CupertinoColors.secondaryLabel.resolveFrom(context),
+                          color: CupertinoColors.secondaryLabel.resolveFrom(
+                            context,
+                          ),
                         ),
                         style: AppTextStyles.subhead.copyWith(
                           color: CupertinoColors.label.resolveFrom(context),
@@ -383,9 +400,7 @@ class _AIEditDietChatPanelState extends ConsumerState<AIEditDietChatPanel> {
             ),
             const SizedBox(width: 12),
             GestureDetector(
-              onTap: canSendMessage && _hasText
-                  ? _sendMessage
-                  : null,
+              onTap: canSendMessage && _hasText ? _sendMessage : null,
               child: Container(
                 width: 44,
                 height: 44,

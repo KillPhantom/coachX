@@ -2,16 +2,16 @@ import 'package:coach_x/features/coach/plans/data/models/exercise_plan_model.dar
 
 /// 修改类型
 enum ChangeType {
-  modifyExercise,          // 修改动作名称
-  addExercise,             // 添加动作
-  removeExercise,          // 删除动作
-  modifyExerciseSets,      // 修改动作的训练组（exercise-level）
-  addDay,                  // 添加训练日
-  removeDay,               // 删除训练日
-  modifyDayName,           // 修改训练日名称
-  reorder,                 // 调整顺序
-  adjustIntensity,         // 调整强度
-  other,                   // 其他修改
+  modifyExercise, // 修改动作名称
+  addExercise, // 添加动作
+  removeExercise, // 删除动作
+  modifyExerciseSets, // 修改动作的训练组（exercise-level）
+  addDay, // 添加训练日
+  removeDay, // 删除训练日
+  modifyDayName, // 修改训练日名称
+  reorder, // 调整顺序
+  adjustIntensity, // 调整强度
+  other, // 其他修改
 }
 
 /// 单个计划修改
@@ -28,11 +28,11 @@ class PlanChange {
   final dynamic after;
 
   // 精确定位信息
-  final int dayIndex;              // 训练日索引
-  final int? exerciseIndex;        // 动作索引（可选，取决于修改类型）
+  final int dayIndex; // 训练日索引
+  final int? exerciseIndex; // 动作索引（可选，取决于修改类型）
 
   // 唯一标识
-  final String id;                 // 用于追踪已接受/拒绝的修改
+  final String id; // 用于追踪已接受/拒绝的修改
 
   const PlanChange({
     required this.type,
@@ -72,8 +72,12 @@ class PlanChange {
       // 先尝试 snake_case 转 camelCase
       if (typeStr.contains('_')) {
         final parts = typeStr.split('_');
-        typeStr = parts.first +
-            parts.skip(1).map((p) => p[0].toUpperCase() + p.substring(1)).join('');
+        typeStr =
+            parts.first +
+            parts
+                .skip(1)
+                .map((p) => p[0].toUpperCase() + p.substring(1))
+                .join('');
       }
 
       changeType = ChangeType.values.firstWhere(
@@ -86,8 +90,11 @@ class PlanChange {
 
     // 处理 dayIndex（兼容蛇形和驼峰命名）
     final dayIndex = (json['dayIndex'] ?? json['day_index'] ?? 0) as int;
-    final exerciseIndex = (json['exerciseIndex'] ?? json['exercise_index']) as int?;
-    final id = json['id'] as String? ?? 'change_${DateTime.now().millisecondsSinceEpoch}';
+    final exerciseIndex =
+        (json['exerciseIndex'] ?? json['exercise_index']) as int?;
+    final id =
+        json['id'] as String? ??
+        'change_${DateTime.now().millisecondsSinceEpoch}';
 
     // before/after 保持为 dynamic，可以是字符串、数组或Map
     final before = json['before'];
@@ -180,4 +187,3 @@ class PlanEditSuggestion {
         changes.length.hashCode;
   }
 }
-

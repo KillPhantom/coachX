@@ -54,9 +54,7 @@ class _PlanSearchBarState extends State<PlanSearchBar> {
       child: CupertinoSearchTextField(
         controller: _controller,
         placeholder: 'Search plans',
-        style: AppTextStyles.callout.copyWith(
-          color: AppColors.textPrimary,
-        ),
+        style: AppTextStyles.callout.copyWith(color: AppColors.textPrimary),
         placeholderStyle: AppTextStyles.callout.copyWith(
           color: AppColors.textTertiary,
         ),
@@ -76,4 +74,3 @@ class _PlanSearchBarState extends State<PlanSearchBar> {
     );
   }
 }
-

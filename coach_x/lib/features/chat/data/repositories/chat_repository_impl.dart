@@ -21,7 +21,9 @@ class ChatRepositoryImpl implements ChatRepository {
 
       return FirestoreService.watchCollection(
         'conversations',
-        where: [[fieldName, '==', userId]],
+        where: [
+          [fieldName, '==', userId],
+        ],
         orderBy: 'lastMessageTime',
         descending: true,
       ).map((snapshot) {
@@ -62,10 +64,7 @@ class ChatRepositoryImpl implements ChatRepository {
     try {
       final result = await CloudFunctionsService.call(
         'get_or_create_conversation',
-        {
-          'coachId': coachId,
-          'studentId': studentId,
-        },
+        {'coachId': coachId, 'studentId': studentId},
       );
 
       final data = Map<String, dynamic>.from(result['data'] as Map);
@@ -84,7 +83,9 @@ class ChatRepositoryImpl implements ChatRepository {
     try {
       return FirestoreService.watchCollection(
         'messages',
-        where: [['conversationId', '==', conversationId]],
+        where: [
+          ['conversationId', '==', conversationId],
+        ],
         orderBy: 'createdAt',
         descending: true,
         limit: limit,
@@ -114,17 +115,14 @@ class ChatRepositoryImpl implements ChatRepository {
         throw Exception('用户未登录');
       }
 
-      final result = await CloudFunctionsService.call(
-        'send_message',
-        {
-          'conversationId': conversationId,
-          'receiverId': receiverId,
-          'type': type.value,
-          'content': content,
-          if (mediaUrl != null) 'mediaUrl': mediaUrl,
-          if (mediaMetadata != null) 'mediaMetadata': mediaMetadata.toJson(),
-        },
-      );
+      final result = await CloudFunctionsService.call('send_message', {
+        'conversationId': conversationId,
+        'receiverId': receiverId,
+        'type': type.value,
+        'content': content,
+        if (mediaUrl != null) 'mediaUrl': mediaUrl,
+        if (mediaMetadata != null) 'mediaMetadata': mediaMetadata.toJson(),
+      });
 
       // 返回已发送的消息模型
       final data = Map<String, dynamic>.from(result['data'] as Map);
@@ -152,18 +150,12 @@ class ChatRepositoryImpl implements ChatRepository {
   }
 
   @override
-  Future<void> markMessagesAsRead(
-    String conversationId,
-    String userId,
-  ) async {
+  Future<void> markMessagesAsRead(String conversationId, String userId) async {
     try {
-      await CloudFunctionsService.call(
-        'mark_messages_as_read',
-        {
-          'conversationId': conversationId,
-          'lastReadTimestamp': DateTime.now().millisecondsSinceEpoch,
-        },
-      );
+      await CloudFunctionsService.call('mark_messages_as_read', {
+        'conversationId': conversationId,
+        'lastReadTimestamp': DateTime.now().millisecondsSinceEpoch,
+      });
 
       AppLogger.info('标记消息已读成功: $conversationId');
     } catch (e, stackTrace) {
@@ -179,14 +171,11 @@ class ChatRepositoryImpl implements ChatRepository {
     int limit = 50,
   }) async {
     try {
-      final result = await CloudFunctionsService.call(
-        'fetch_messages',
-        {
-          'conversationId': conversationId,
-          'beforeTimestamp': beforeTimestamp.millisecondsSinceEpoch,
-          'limit': limit,
-        },
-      );
+      final result = await CloudFunctionsService.call('fetch_messages', {
+        'conversationId': conversationId,
+        'beforeTimestamp': beforeTimestamp.millisecondsSinceEpoch,
+        'limit': limit,
+      });
 
       final data = Map<String, dynamic>.from(result['data'] as Map);
       final messagesList = data['messages'] as List<dynamic>;

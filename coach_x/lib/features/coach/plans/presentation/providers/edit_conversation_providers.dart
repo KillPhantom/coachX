@@ -9,11 +9,12 @@ import 'edit_conversation_notifier.dart';
 
 /// 编辑对话 Notifier Provider
 final editConversationNotifierProvider =
-    StateNotifierProvider.autoDispose<EditConversationNotifier, EditConversationState>(
-  (ref) {
-    return EditConversationNotifier();
-  },
-);
+    StateNotifierProvider.autoDispose<
+      EditConversationNotifier,
+      EditConversationState
+    >((ref) {
+      return EditConversationNotifier();
+    });
 
 // ==================== 计算 Providers ====================
 
@@ -30,7 +31,9 @@ final isAIRespondingProvider = Provider.autoDispose<bool>((ref) {
 });
 
 /// 待确认的修改建议 Provider
-final pendingSuggestionProvider = Provider.autoDispose<PlanEditSuggestion?>((ref) {
+final pendingSuggestionProvider = Provider.autoDispose<PlanEditSuggestion?>((
+  ref,
+) {
   final state = ref.watch(editConversationNotifierProvider);
   return state.pendingSuggestion;
 });
@@ -82,4 +85,3 @@ final messageCountProvider = Provider.autoDispose<int>((ref) {
   final state = ref.watch(editConversationNotifierProvider);
   return state.messages.length;
 });
-

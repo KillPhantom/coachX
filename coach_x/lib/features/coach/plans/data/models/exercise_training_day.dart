@@ -84,8 +84,8 @@ class ExerciseTrainingDay {
     newExercises.removeAt(index);
     // 至少保留一个 Exercise
     return copyWith(
-        exercises:
-            newExercises.isEmpty ? [Exercise.empty()] : newExercises);
+      exercises: newExercises.isEmpty ? [Exercise.empty()] : newExercises,
+    );
   }
 
   /// 更新 Exercise
@@ -135,5 +135,3 @@ class ExerciseTrainingDay {
     return 'ExerciseTrainingDay(day: $day, name: $name, note: $note, exercises: ${exercises.length}, completed: $completed)';
   }
 }
-
-

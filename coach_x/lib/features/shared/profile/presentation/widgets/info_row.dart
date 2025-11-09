@@ -26,9 +26,7 @@ class InfoRow extends StatelessWidget {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.symmetric(
-            vertical: AppDimensions.paddingM,
-          ),
+          padding: const EdgeInsets.symmetric(vertical: AppDimensions.paddingM),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -38,18 +36,11 @@ class InfoRow extends StatelessWidget {
                   color: AppColors.textSecondary,
                 ),
               ),
-              Text(
-                value,
-                style: AppTextStyles.bodyMedium,
-              ),
+              Text(value, style: AppTextStyles.bodyMedium),
             ],
           ),
         ),
-        if (showDivider)
-          Container(
-            height: 1,
-            color: AppColors.dividerLight,
-          ),
+        if (showDivider) Container(height: 1, color: AppColors.dividerLight),
       ],
     );
   }

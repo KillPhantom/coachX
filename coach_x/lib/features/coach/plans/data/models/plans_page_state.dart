@@ -101,4 +101,3 @@ class PlansPageState {
     return copyWith(searchQuery: '');
   }
 }
-

@@ -5,7 +5,8 @@ Google docs: https://docs.google.com/document/d/1yKQgZWjdeALkwrl2SHf6RjUnsCmeLxt
 - 用户
   - fetchUserInfo(userId?)
   - login(userInfo)
-  - updateUserInfo(name?, avatarUrl?, role?, gender?, bornDate?, height?, initialWeight?, coachId?)
+  - updateUserInfo(name?, avatarUrl?, role?, gender?, bornDate?, height?, initialWeight?, coachId?, activeExercisePlanId?, activeDietPlanId?, activeSupplementPlanId?)
+  - updateActivePlan(planType, planId)
 
 - 学员与统计
   - fetchStudents(pageSize?, pageNumber?, otherParams?)
@@ -16,7 +17,8 @@ Google docs: https://docs.google.com/document/d/1yKQgZWjdeALkwrl2SHf6RjUnsCmeLxt
   - dietPlan: action in [create | update | delete | get | list | copy]
   - supplementPlan: action in [create | update | delete | get | list | copy]
   - assignPlan: action in [assign | unassign] with { planType, planId, studentId }
-  - getStudentPlans(planType?, studentId?)
+  - getStudentAssignedPlans() - 获取分配给学生的计划（每类返回最新一个）
+  - getStudentAllPlans() - 获取学生所有可见计划（教练分配 + 自己创建）
 
 - 学生训练
   - upsertTodayTraining(dailyTraining, studentID, date, overwrite?)
@@ -71,6 +73,9 @@ Google docs: https://docs.google.com/document/d/1yKQgZWjdeALkwrl2SHf6RjUnsCmeLxt
 | bornDate | string |
 | height | number |
 | initialWeight | number |
+| activeExercisePlanId | string (optional) |
+| activeDietPlanId | string (optional) |
+| activeSupplementPlanId | string (optional) |
 | createdAt | timestamp |
 | updatedAt | timestamp |
 

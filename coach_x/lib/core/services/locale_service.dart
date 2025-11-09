@@ -16,12 +16,9 @@ class LocaleService {
     try {
       AppLogger.info('更新用户语言偏好: $languageCode');
 
-      await CloudFunctionsService.call(
-        'update_user_info',
-        {
-          'languageCode': languageCode,
-        },
-      );
+      await CloudFunctionsService.call('update_user_info', {
+        'languageCode': languageCode,
+      });
 
       AppLogger.info('语言偏好更新成功');
     } catch (e, stackTrace) {

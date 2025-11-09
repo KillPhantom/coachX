@@ -358,7 +358,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get deleteStudent => '删除学生';
 
   @override
-  String get confirmDelete => '确认删除';
+  String get confirmDelete => '确定要删除这条记录吗？';
 
   @override
   String get plansTitle => '计划';
@@ -465,7 +465,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get confirmLogOutMessage => '确定要登出吗？';
 
   @override
-  String get addRecordTitle => '添加记录';
+  String get addRecordTitle => '记录你的活动';
+
+  @override
+  String get addRecordSubtitle => '今天想添加什么记录？';
 
   @override
   String get chooseRecordType => '选择要添加的记录类型';
@@ -474,13 +477,33 @@ class AppLocalizationsZh extends AppLocalizations {
   String get trainingRecord => '训练记录';
 
   @override
-  String get dietRecord => '饮食记录';
+  String get trainingRecordDesc => '记录组数、次数、重量和视频。';
+
+  @override
+  String get dietRecord => '记录饮食';
+
+  @override
+  String get todayMealPlan => '今日饮食计划';
+
+  @override
+  String get dietRecordDesc => '记录食物、份量和照片。';
 
   @override
   String get supplementRecord => '补剂记录';
 
   @override
-  String get bodyMeasurement => '身体测量';
+  String get supplementPlan => '补剂计划';
+
+  @override
+  String supplementsToTake(int count) {
+    return '$count 个补剂需服用';
+  }
+
+  @override
+  String get bodyMeasurement => '记录身体数据';
+
+  @override
+  String get bodyMeasurementDesc => '记录体重并上传身体照片。';
 
   @override
   String get studentHome => '学生首页';
@@ -548,10 +571,7 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get todayRecord => '今日记录';
-
-  @override
-  String get exerciseRecord => '训练记录';
+  String get todayRecord => '今日饮食计划';
 
   @override
   String get protein => '蛋白质';
@@ -561,6 +581,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get fat => '脂肪';
+
+  @override
+  String get totalNutrition => '总营养值';
+
+  @override
+  String get kcal => '千卡';
 
   @override
   String get calories => '卡路里';
@@ -611,7 +637,43 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get noExercises => '暂无动作';
+  String get noExercises => '暂无训练动作';
+
+  @override
+  String get sets => '组';
+
+  @override
+  String get reps => '次';
+
+  @override
+  String exerciseSetsWithWeight(int sets, String reps, String weight) {
+    return '$sets组 x $reps次 @ $weight';
+  }
+
+  @override
+  String exerciseSetsNoWeight(int sets, String reps) {
+    return '$sets组 x $reps次';
+  }
+
+  @override
+  String exerciseSetsOnly(int sets) {
+    return '$sets组';
+  }
+
+  @override
+  String get video => '视频';
+
+  @override
+  String get coachNotes => '教练备注：';
+
+  @override
+  String get aiGuidanceInDevelopment => 'AI指导功能开发中';
+
+  @override
+  String get comingSoon => '即将推出';
+
+  @override
+  String get ok => '确定';
 
   @override
   String get assignPlansToStudent => '分配计划给';
@@ -648,4 +710,310 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get done => '完成';
+
+  @override
+  String get save => '保存';
+
+  @override
+  String get noCoachTitle => '暂无教练';
+
+  @override
+  String get noCoachMessage => '请联系客服获取教练';
+
+  @override
+  String get planTabTraining => '训练';
+
+  @override
+  String get planTabDiet => '饮食';
+
+  @override
+  String get planTabSupplements => '补剂';
+
+  @override
+  String get coachsPlan => '教练计划';
+
+  @override
+  String get coachNote => '教练备注';
+
+  @override
+  String get kg => '公斤';
+
+  @override
+  String get lbs => '磅';
+
+  @override
+  String get noExercisesForBodyPart => '该部位暂无动作';
+
+  @override
+  String get mealRecord => '饮食记录';
+
+  @override
+  String get coachSuggestion => '教练建议';
+
+  @override
+  String get totalMacros => '总营养';
+
+  @override
+  String get addRecord => '添加记录';
+
+  @override
+  String get editRecord => '编辑记录';
+
+  @override
+  String get takePicture => '拍照';
+
+  @override
+  String get uploadImage => '上传图片';
+
+  @override
+  String get commentsOrQuestions => '评论或问题';
+
+  @override
+  String get saveMealRecord => '保存饮食记录';
+
+  @override
+  String get typeYourMessageHere => '在此输入您的消息...';
+
+  @override
+  String get mealCompleted => '已完成';
+
+  @override
+  String get markAsComplete => '标记为完成';
+
+  @override
+  String get editMeal => '编辑';
+
+  @override
+  String get recordSaved => '记录保存成功';
+
+  @override
+  String get recordSaveFailed => '保存记录失败';
+
+  @override
+  String get noMealsToday => '今天没有安排餐次';
+
+  @override
+  String macrosFormat(int protein, int carbs, int fat) {
+    return '${protein}P/${carbs}C/${fat}F';
+  }
+
+  @override
+  String get aiFoodScanner => 'AI食物扫描';
+
+  @override
+  String get scanFood => '扫描食物';
+
+  @override
+  String get uploadPhoto => '上传照片';
+
+  @override
+  String get analyzing => '分析中...';
+
+  @override
+  String get positionFoodInFrame => '将食物置于框内';
+
+  @override
+  String get foodAnalysisResults => '分析结果';
+
+  @override
+  String get estimatedWeight => '估算重量';
+
+  @override
+  String get adjustValues => '如需要可调整数值';
+
+  @override
+  String get selectMeal => '选择餐次';
+
+  @override
+  String get saveToMeal => '保存到餐次';
+
+  @override
+  String recognizedFoods(int count) {
+    return '识别到 $count 种食物';
+  }
+
+  @override
+  String get cameraPermissionDenied => '相机权限被拒绝，请在设置中启用相机访问权限。';
+
+  @override
+  String get analysisFailed => '分析失败';
+
+  @override
+  String get plannedNutrition => '计划营养';
+
+  @override
+  String get mealProgress => '本餐进度';
+
+  @override
+  String get aiDetectedFoods => '包含食物';
+
+  @override
+  String get caloriesInput => '热量';
+
+  @override
+  String get proteinInput => '蛋白质 (g)';
+
+  @override
+  String get carbsInput => '碳水 (g)';
+
+  @override
+  String get fatInput => '脂肪 (g)';
+
+  @override
+  String get aiDetectButton => 'AI 智能检测';
+
+  @override
+  String get addFoodRecord => '添加食物记录';
+
+  @override
+  String get selectMealToAnalyze => '选择餐次';
+
+  @override
+  String get recordSavedSuccess => '食物记录已成功保存';
+
+  @override
+  String get aiScannerMode => 'AI扫描';
+
+  @override
+  String get simpleRecordMode => '简单记录';
+
+  @override
+  String get aiAnalyzing => 'AI正在分析您的食物...';
+
+  @override
+  String get aiAnalysisProgress => '分析进度';
+
+  @override
+  String get selectMealToSave => '选择要保存的餐次';
+
+  @override
+  String get bodyStatsHistory => '身体数据历史';
+
+  @override
+  String get recordBodyStats => '记录身体数据';
+
+  @override
+  String get bodyFat => '体脂率 %';
+
+  @override
+  String get bodyFatOptional => '体脂率 %（可选）';
+
+  @override
+  String get skipPhoto => '跳过拍照';
+
+  @override
+  String get enterWeight => '输入体重';
+
+  @override
+  String get enterBodyFat => '输入体脂率 %';
+
+  @override
+  String get last14Days => '最近14天';
+
+  @override
+  String get last30Days => '最近30天';
+
+  @override
+  String get last90Days => '最近90天';
+
+  @override
+  String get deleteRecord => '删除记录';
+
+  @override
+  String get noBodyStatsData => '暂无身体数据';
+
+  @override
+  String get weightTrend => '体重趋势';
+
+  @override
+  String get recordDeleted => '记录已删除';
+
+  @override
+  String get recordUpdated => '记录已更新';
+
+  @override
+  String get maxPhotosReached => '最多上传3张照片';
+
+  @override
+  String get history => '历史记录';
+
+  @override
+  String get photos => '照片';
+
+  @override
+  String get takePhoto => '拍照';
+
+  @override
+  String get myRecordings => '我的录制';
+
+  @override
+  String get recordVideo => '录制视频';
+
+  @override
+  String get set => '组';
+
+  @override
+  String get quickComplete => '快捷完成';
+
+  @override
+  String get completed => '已完成';
+
+  @override
+  String get videoDurationExceeded => '视频时长不能超过1分钟';
+
+  @override
+  String get recordingVideo => '录制中...';
+
+  @override
+  String get selectFromGallery => '从相册选择';
+
+  @override
+  String get startTimerConfirmTitle => '开始计时';
+
+  @override
+  String get startTimerConfirmMessage => '确认开始训练计时吗？';
+
+  @override
+  String get startTimerButton => '开始';
+
+  @override
+  String get weightPlaceholder => '自重/60kg';
+
+  @override
+  String get timeSpentLabel => '用时';
+
+  @override
+  String get addCustomExerciseHint => '点击右上角\"+\"添加自定义动作';
+
+  @override
+  String completedCount(int count) {
+    return '$count 已完成';
+  }
+
+  @override
+  String get currentExercise => '当前动作';
+
+  @override
+  String get totalDuration => '总时长';
+
+  @override
+  String get congratsTitle => '恭喜！';
+
+  @override
+  String get congratsMessage => '你已完成今天的所有训练动作！';
+
+  @override
+  String get congratsMessageCompact => '恭喜！所有训练已完成！';
+
+  @override
+  String get createNewPlan => '创建新计划';
+
+  @override
+  String get selectPlan => '选择计划';
+
+  @override
+  String get myPlans => '我的计划';
+
+  @override
+  String get coachPlan => '教练计划';
 }

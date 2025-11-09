@@ -47,7 +47,8 @@ class Exercise {
       sets: sets.isNotEmpty ? sets : [TrainingSet.empty()],
       completed: json['completed'] as bool? ?? false,
       detailGuide: json['detailGuide'] as String?,
-      demoVideos: (json['demoVideos'] as List<dynamic>?)
+      demoVideos:
+          (json['demoVideos'] as List<dynamic>?)
               ?.map((e) => e as String)
               .toList() ??
           [],
@@ -143,5 +144,3 @@ class Exercise {
     return 'Exercise(name: $name, type: $type, sets: ${sets.length}, completed: $completed)';
   }
 }
-
-

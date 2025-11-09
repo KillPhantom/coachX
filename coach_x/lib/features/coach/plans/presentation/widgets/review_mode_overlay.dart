@@ -50,43 +50,43 @@ class ReviewModeOverlay extends ConsumerWidget {
       onTap: () {}, // 阻止点击穿透
       behavior: HitTestBehavior.translucent,
       child: Column(
-          children: [
-            // 顶部紧凑区域（可滚动，占据剩余空间）
-            Expanded(
-              child: SafeArea(
-                bottom: false,
-                child: LayoutBuilder(
-                  builder: (context, constraints) {
-                    return SingleChildScrollView(
-                      physics: const BouncingScrollPhysics(),
-                      child: ConstrainedBox(
-                        constraints: BoxConstraints(
-                          maxHeight: MediaQuery.of(context).size.height * 0.8,
-                        ),
-                        child: isShowingAll
-                            ? _buildAllChangesView(context, ref, reviewState)
-                            : _buildCompactHeader(
-                                context,
-                                ref,
-                                progressText,
-                                acceptedCount,
-                                rejectedCount,
-                                currentChange,
-                                reviewState,
-                              ),
+        children: [
+          // 顶部紧凑区域（可滚动，占据剩余空间）
+          Expanded(
+            child: SafeArea(
+              bottom: false,
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  return SingleChildScrollView(
+                    physics: const BouncingScrollPhysics(),
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxHeight: MediaQuery.of(context).size.height * 0.8,
                       ),
-                    );
-                  },
-                ),
+                      child: isShowingAll
+                          ? _buildAllChangesView(context, ref, reviewState)
+                          : _buildCompactHeader(
+                              context,
+                              ref,
+                              progressText,
+                              acceptedCount,
+                              rejectedCount,
+                              currentChange,
+                              reviewState,
+                            ),
+                    ),
+                  );
+                },
               ),
             ),
+          ),
 
-            // 控制按钮（固定底部，不参与滚动）
-            SafeArea(
-              top: false,
-              child: _buildControlButtons(context, ref, hasNext, isShowingAll),
-            ),
-          ],
+          // 控制按钮（固定底部，不参与滚动）
+          SafeArea(
+            top: false,
+            child: _buildControlButtons(context, ref, hasNext, isShowingAll),
+          ),
+        ],
       ),
     );
   }
@@ -147,8 +147,9 @@ class ReviewModeOverlay extends ConsumerWidget {
               CupertinoButton(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 minSize: 0,
-                onPressed: () =>
-                    ref.read(suggestionReviewNotifierProvider.notifier).toggleShowAllChanges(),
+                onPressed: () => ref
+                    .read(suggestionReviewNotifierProvider.notifier)
+                    .toggleShowAllChanges(),
                 child: Text(
                   '查看全部',
                   style: AppTextStyles.caption1.copyWith(
@@ -180,7 +181,10 @@ class ReviewModeOverlay extends ConsumerWidget {
             ],
           ),
 
-          Divider(height: 16, color: CupertinoColors.separator.resolveFrom(context)),
+          Divider(
+            height: 16,
+            color: CupertinoColors.separator.resolveFrom(context),
+          ),
 
           // 第二行：修改类型 + 简短描述
           Row(
@@ -276,17 +280,16 @@ class ReviewModeOverlay extends ConsumerWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         const SizedBox(height: 12),
-        Divider(height: 1, color: CupertinoColors.separator.resolveFrom(context)),
+        Divider(
+          height: 1,
+          color: CupertinoColors.separator.resolveFrom(context),
+        ),
         const SizedBox(height: 12),
 
         // 动作详情标题
         Row(
           children: [
-            Icon(
-              CupertinoIcons.flame,
-              size: 16,
-              color: AppColors.primary,
-            ),
+            Icon(CupertinoIcons.flame, size: 16, color: AppColors.primary),
             const SizedBox(width: 6),
             Expanded(
               child: Text(
@@ -323,7 +326,9 @@ class ReviewModeOverlay extends ConsumerWidget {
                   child: Text(
                     note,
                     style: AppTextStyles.caption1.copyWith(
-                      color: CupertinoColors.secondaryLabel.resolveFrom(context),
+                      color: CupertinoColors.secondaryLabel.resolveFrom(
+                        context,
+                      ),
                     ),
                   ),
                 ),
@@ -382,7 +387,9 @@ class ReviewModeOverlay extends ConsumerWidget {
                         Text(
                           '次数',
                           style: AppTextStyles.tabLabel.copyWith(
-                            color: CupertinoColors.secondaryLabel.resolveFrom(context),
+                            color: CupertinoColors.secondaryLabel.resolveFrom(
+                              context,
+                            ),
                           ),
                         ),
                         const SizedBox(height: 2),
@@ -407,7 +414,9 @@ class ReviewModeOverlay extends ConsumerWidget {
                         Text(
                           '重量',
                           style: AppTextStyles.tabLabel.copyWith(
-                            color: CupertinoColors.secondaryLabel.resolveFrom(context),
+                            color: CupertinoColors.secondaryLabel.resolveFrom(
+                              context,
+                            ),
                           ),
                         ),
                         const SizedBox(height: 2),
@@ -469,7 +478,10 @@ class ReviewModeOverlay extends ConsumerWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         const SizedBox(height: 12),
-        Divider(height: 1, color: CupertinoColors.separator.resolveFrom(context)),
+        Divider(
+          height: 1,
+          color: CupertinoColors.separator.resolveFrom(context),
+        ),
         const SizedBox(height: 12),
 
         // 训练日详情标题
@@ -743,7 +755,12 @@ class ReviewModeOverlay extends ConsumerWidget {
                 ),
               ),
               const SizedBox(width: 12),
-              _buildStatChip(context, '已接受', state.acceptedCount, AppColors.success),
+              _buildStatChip(
+                context,
+                '已接受',
+                state.acceptedCount,
+                AppColors.success,
+              ),
               const SizedBox(width: 6),
               _buildStatChip(
                 context,
@@ -755,8 +772,9 @@ class ReviewModeOverlay extends ConsumerWidget {
               CupertinoButton(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 minSize: 0,
-                onPressed: () =>
-                    ref.read(suggestionReviewNotifierProvider.notifier).toggleShowAllChanges(),
+                onPressed: () => ref
+                    .read(suggestionReviewNotifierProvider.notifier)
+                    .toggleShowAllChanges(),
                 child: Text(
                   '收起',
                   style: AppTextStyles.caption1.copyWith(
@@ -786,7 +804,10 @@ class ReviewModeOverlay extends ConsumerWidget {
             ],
           ),
 
-          Divider(height: 16, color: CupertinoColors.separator.resolveFrom(context)),
+          Divider(
+            height: 16,
+            color: CupertinoColors.separator.resolveFrom(context),
+          ),
 
           // 修改摘要
           if (state.allChanges.isNotEmpty)
@@ -832,7 +853,9 @@ class ReviewModeOverlay extends ConsumerWidget {
                       Text(
                         '${index + 1}.',
                         style: AppTextStyles.caption1.copyWith(
-                          color: CupertinoColors.secondaryLabel.resolveFrom(context),
+                          color: CupertinoColors.secondaryLabel.resolveFrom(
+                            context,
+                          ),
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -840,7 +863,10 @@ class ReviewModeOverlay extends ConsumerWidget {
 
                       // 位置标签 (Day{x}-{ExerciseName})
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 6,
+                          vertical: 2,
+                        ),
                         decoration: BoxDecoration(
                           color: AppColors.primary.withOpacity(0.15),
                           borderRadius: BorderRadius.circular(4),
@@ -928,7 +954,12 @@ class ReviewModeOverlay extends ConsumerWidget {
   }
 
   /// 构建控制按钮（两个按钮：拒绝 + 接受）
-  Widget _buildControlButtons(BuildContext context, WidgetRef ref, bool hasNext, bool isShowingAll) {
+  Widget _buildControlButtons(
+    BuildContext context,
+    WidgetRef ref,
+    bool hasNext,
+    bool isShowingAll,
+  ) {
     // 根据展开状态决定右侧按钮的文本和行为
     final String acceptText;
     final VoidCallback acceptAction;
@@ -1046,11 +1077,9 @@ class ReviewModeOverlay extends ConsumerWidget {
           CupertinoDialogAction(
             onPressed: () => Navigator.of(context).pop(),
             child: Text(
-                '继续审查',
-                style: AppTextStyles.body.copyWith(
-                  color: AppColors.textPrimary,
-                ),
-              ),
+              '继续审查',
+              style: AppTextStyles.body.copyWith(color: AppColors.textPrimary),
+            ),
           ),
           CupertinoDialogAction(
             isDestructiveAction: true,
@@ -1059,12 +1088,12 @@ class ReviewModeOverlay extends ConsumerWidget {
               // 保存已接受的修改并退出 Review Mode
               _finishReview(context, ref);
             },
-            child:  Text(
-                '取消',
-                style: AppTextStyles.body.copyWith(
-                  color: CupertinoColors.systemRed,
-                ),
+            child: Text(
+              '取消',
+              style: AppTextStyles.body.copyWith(
+                color: CupertinoColors.systemRed,
               ),
+            ),
           ),
         ],
       ),
@@ -1074,22 +1103,30 @@ class ReviewModeOverlay extends ConsumerWidget {
   /// 完成审查（保存已接受的修改并退出 Review Mode）
   void _finishReview(BuildContext context, WidgetRef ref) {
     // 获取当前的最终计划（包含已接受的修改）
-    final finalPlan = ref.read(suggestionReviewNotifierProvider.notifier).finishReview();
+    final finalPlan = ref
+        .read(suggestionReviewNotifierProvider.notifier)
+        .finishReview();
 
     // 关闭 Review Mode
     ref.read(isReviewModeProvider.notifier).state = false;
 
     // 应用最终计划到编辑状态
     if (finalPlan != null) {
-      ref.read(createTrainingPlanNotifierProvider.notifier).applyModifiedPlan(finalPlan);
+      ref
+          .read(createTrainingPlanNotifierProvider.notifier)
+          .applyModifiedPlan(finalPlan);
     }
   }
 
   /// 获取修改位置标签 (Day{x}-{ExerciseName})
-  String _getChangeLocationLabel(PlanChange change, SuggestionReviewState state) {
+  String _getChangeLocationLabel(
+    PlanChange change,
+    SuggestionReviewState state,
+  ) {
     try {
       // 确保 dayIndex 有效
-      if (change.dayIndex < 0 || change.dayIndex >= state.workingPlan.days.length) {
+      if (change.dayIndex < 0 ||
+          change.dayIndex >= state.workingPlan.days.length) {
         return 'Day${change.dayIndex + 1}';
       }
 

@@ -18,9 +18,7 @@ class StudentSelectionItem {
     required this.hasConflictPlan,
   });
 
-  StudentSelectionItem copyWith({
-    bool? isSelected,
-  }) {
+  StudentSelectionItem copyWith({bool? isSelected}) {
     return StudentSelectionItem(
       student: student,
       isSelected: isSelected ?? this.isSelected,
@@ -86,10 +84,7 @@ class _StudentSelectionTile extends StatelessWidget {
   final StudentSelectionItem item;
   final VoidCallback onTap;
 
-  const _StudentSelectionTile({
-    required this.item,
-    required this.onTap,
-  });
+  const _StudentSelectionTile({required this.item, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -103,10 +98,7 @@ class _StudentSelectionTile extends StatelessWidget {
         ),
         decoration: const BoxDecoration(
           border: Border(
-            bottom: BorderSide(
-              color: AppColors.dividerLight,
-              width: 0.5,
-            ),
+            bottom: BorderSide(color: AppColors.dividerLight, width: 0.5),
           ),
         ),
         child: Row(
@@ -118,7 +110,8 @@ class _StudentSelectionTile extends StatelessWidget {
               decoration: BoxDecoration(
                 color: AppColors.backgroundLight,
                 shape: BoxShape.circle,
-                image: item.student.avatarUrl != null &&
+                image:
+                    item.student.avatarUrl != null &&
                         item.student.avatarUrl!.isNotEmpty
                     ? DecorationImage(
                         image: NetworkImage(item.student.avatarUrl!),
@@ -126,7 +119,8 @@ class _StudentSelectionTile extends StatelessWidget {
                       )
                     : null,
               ),
-              child: item.student.avatarUrl == null ||
+              child:
+                  item.student.avatarUrl == null ||
                       item.student.avatarUrl!.isEmpty
                   ? Center(
                       child: Text(
@@ -170,8 +164,9 @@ class _StudentSelectionTile extends StatelessWidget {
                           ),
                           decoration: BoxDecoration(
                             color: AppColors.successGreen.withOpacity(0.1),
-                            borderRadius:
-                                BorderRadius.circular(AppDimensions.radiusS),
+                            borderRadius: BorderRadius.circular(
+                              AppDimensions.radiusS,
+                            ),
                           ),
                           child: Text(
                             'Assigned',
@@ -191,8 +186,9 @@ class _StudentSelectionTile extends StatelessWidget {
                           ),
                           decoration: BoxDecoration(
                             color: AppColors.warningYellow.withOpacity(0.1),
-                            borderRadius:
-                                BorderRadius.circular(AppDimensions.radiusS),
+                            borderRadius: BorderRadius.circular(
+                              AppDimensions.radiusS,
+                            ),
                           ),
                           child: Text(
                             'Has Plan',
@@ -232,4 +228,3 @@ class _StudentSelectionTile extends StatelessWidget {
     );
   }
 }
-

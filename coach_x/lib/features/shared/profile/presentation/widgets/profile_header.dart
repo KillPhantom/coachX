@@ -42,11 +42,7 @@ class ProfileHeader extends StatelessWidget {
         const SizedBox(height: AppDimensions.spacingL),
 
         // 姓名
-        Text(
-          name,
-          style: AppTextStyles.title1,
-          textAlign: TextAlign.center,
-        ),
+        Text(name, style: AppTextStyles.title1, textAlign: TextAlign.center),
 
         const SizedBox(height: AppDimensions.spacingS),
 
@@ -54,15 +50,12 @@ class ProfileHeader extends StatelessWidget {
         if (roleText != null && (tags == null || tags!.isEmpty))
           Text(
             roleText!,
-            style: AppTextStyles.body.copyWith(
-              color: AppColors.textSecondary,
-            ),
+            style: AppTextStyles.body.copyWith(color: AppColors.textSecondary),
             textAlign: TextAlign.center,
           ),
 
         // 认证标签
-        if (tags != null && tags!.isNotEmpty)
-          _buildTags(),
+        if (tags != null && tags!.isNotEmpty) _buildTags(),
       ],
     );
   }

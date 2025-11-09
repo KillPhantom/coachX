@@ -2,10 +2,11 @@ import 'package:coach_x/features/coach/plans/data/models/plan_edit_suggestion.da
 
 /// 交互式选项
 class InteractiveOption {
-  final String id;           // plan_id 或 option_id
-  final String label;        // "增肌训练计划 A"
-  final String? subtitle;    // "5天 · 创建于2025-01-15"
-  final String type;         // 'training_plan' | 'diet_plan' | 'two_step' | 'training_only' | 'diet_only' | 'basic'
+  final String id; // plan_id 或 option_id
+  final String label; // "增肌训练计划 A"
+  final String? subtitle; // "5天 · 创建于2025-01-15"
+  final String
+  type; // 'training_plan' | 'diet_plan' | 'two_step' | 'training_only' | 'diet_only' | 'basic'
   final Map<String, dynamic>? metadata;
 
   const InteractiveOption({
@@ -56,9 +57,9 @@ class InteractiveOption {
 
 /// LLM 聊天消息类型
 enum LLMMessageType {
-  user,    // 用户消息
-  ai,      // AI 消息
-  system,  // 系统消息
+  user, // 用户消息
+  ai, // AI 消息
+  system, // 系统消息
 }
 
 /// LLM 聊天消息模型
@@ -69,7 +70,8 @@ class LLMChatMessage {
   final String content;
   final LLMMessageType type;
   final DateTime timestamp;
-  final dynamic suggestion; // AI 的修改建议（可以是 PlanEditSuggestion 或 DietPlanEditSuggestion，仅 AI 消息有）
+  final dynamic
+  suggestion; // AI 的修改建议（可以是 PlanEditSuggestion 或 DietPlanEditSuggestion，仅 AI 消息有）
   final bool isLoading; // 是否正在加载中（AI 思考中）
   final List<InteractiveOption>? options; // 交互式选项列表
   final String? interactionType; // 交互类型，如 'plan_selection'
@@ -86,9 +88,7 @@ class LLMChatMessage {
   });
 
   /// 创建用户消息
-  factory LLMChatMessage.user({
-    required String content,
-  }) {
+  factory LLMChatMessage.user({required String content}) {
     return LLMChatMessage(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       content: content,
@@ -116,9 +116,7 @@ class LLMChatMessage {
   }
 
   /// 创建系统消息
-  factory LLMChatMessage.system({
-    required String content,
-  }) {
+  factory LLMChatMessage.system({required String content}) {
     return LLMChatMessage(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       content: content,
@@ -128,9 +126,7 @@ class LLMChatMessage {
   }
 
   /// 创建加载中的 AI 消息
-  factory LLMChatMessage.aiLoading({
-    String content = '思考中...',
-  }) {
+  factory LLMChatMessage.aiLoading({String content = '思考中...'}) {
     return LLMChatMessage(
       id: 'loading_${DateTime.now().millisecondsSinceEpoch}',
       content: content,
@@ -180,9 +176,9 @@ class LLMChatMessage {
   /// 从 JSON 创建
   factory LLMChatMessage.fromJson(Map<String, dynamic> json) {
     final optionsJson = json['options'] as List<dynamic>?;
-    final options = optionsJson?.map((o) =>
-      InteractiveOption.fromJson(o as Map<String, dynamic>)
-    ).toList();
+    final options = optionsJson
+        ?.map((o) => InteractiveOption.fromJson(o as Map<String, dynamic>))
+        .toList();
 
     return LLMChatMessage(
       id: json['id'] as String,
@@ -193,7 +189,9 @@ class LLMChatMessage {
       ),
       timestamp: DateTime.fromMillisecondsSinceEpoch(json['timestamp'] as int),
       suggestion: json['suggestion'] != null
-          ? PlanEditSuggestion.fromJson(json['suggestion'] as Map<String, dynamic>)
+          ? PlanEditSuggestion.fromJson(
+              json['suggestion'] as Map<String, dynamic>,
+            )
           : null,
       isLoading: json['isLoading'] as bool? ?? false,
       options: options,
@@ -227,4 +225,3 @@ class LLMChatMessage {
         isLoading.hashCode;
   }
 }
-

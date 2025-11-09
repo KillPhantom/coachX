@@ -113,7 +113,9 @@ class EditDietConversationState {
       currentPlan: currentPlan ?? this.currentPlan,
       messages: messages ?? this.messages,
       isAIResponding: isAIResponding ?? this.isAIResponding,
-      pendingSuggestion: clearSuggestion ? null : (pendingSuggestion ?? this.pendingSuggestion),
+      pendingSuggestion: clearSuggestion
+          ? null
+          : (pendingSuggestion ?? this.pendingSuggestion),
       error: clearError ? null : (error ?? this.error),
       previewPlan: clearPreview ? null : (previewPlan ?? this.previewPlan),
       isPreviewMode: isPreviewMode ?? this.isPreviewMode,

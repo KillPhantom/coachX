@@ -43,4 +43,3 @@ abstract class StudentRepository {
     int maxPerType = 100,
   });
 }
-

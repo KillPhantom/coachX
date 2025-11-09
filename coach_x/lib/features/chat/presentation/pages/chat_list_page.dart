@@ -24,10 +24,7 @@ class ChatListPage extends ConsumerWidget {
           backgroundColor: AppColors.backgroundWhite,
           largeTitle: Text(l10n.messagesTitle),
           border: const Border(
-            bottom: BorderSide(
-              color: AppColors.dividerLight,
-              width: 0.5,
-            ),
+            bottom: BorderSide(color: AppColors.dividerLight, width: 0.5),
           ),
         ),
 
@@ -43,41 +40,33 @@ class ChatListPage extends ConsumerWidget {
 
         // 对话列表内容
         conversationsAsync.when(
-            // 加载中
-            loading: () => const SliverFillRemaining(
-              child: Center(
-                child: CupertinoActivityIndicator(radius: 16),
-              ),
-            ),
-
-            // 加载错误
-            error: (error, stack) => SliverFillRemaining(
-              child: _buildErrorState(context, ref, error),
-            ),
-
-            // 加载成功
-            data: (conversations) {
-              // 空状态
-              if (conversations.isEmpty) {
-                return SliverFillRemaining(
-                  child: _buildEmptyState(context, ref),
-                );
-              }
-
-              // 显示对话列表
-              return SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  (context, index) {
-                    final conversation = conversations[index];
-                    return ConversationCard(item: conversation);
-                  },
-                  childCount: conversations.length,
-                ),
-              );
-            },
+          // 加载中
+          loading: () => const SliverFillRemaining(
+            child: Center(child: CupertinoActivityIndicator(radius: 16)),
           ),
-        ],
-      );
+
+          // 加载错误
+          error: (error, stack) =>
+              SliverFillRemaining(child: _buildErrorState(context, ref, error)),
+
+          // 加载成功
+          data: (conversations) {
+            // 空状态
+            if (conversations.isEmpty) {
+              return SliverFillRemaining(child: _buildEmptyState(context, ref));
+            }
+
+            // 显示对话列表
+            return SliverList(
+              delegate: SliverChildBuilderDelegate((context, index) {
+                final conversation = conversations[index];
+                return ConversationCard(item: conversation);
+              }, childCount: conversations.length),
+            );
+          },
+        ),
+      ],
+    );
   }
 
   /// 构建空状态
@@ -116,11 +105,7 @@ class ChatListPage extends ConsumerWidget {
   }
 
   /// 构建错误状态
-  Widget _buildErrorState(
-    BuildContext context,
-    WidgetRef ref,
-    Object error,
-  ) {
+  Widget _buildErrorState(BuildContext context, WidgetRef ref, Object error) {
     final l10n = AppLocalizations.of(context)!;
 
     return Center(
@@ -135,10 +120,7 @@ class ChatListPage extends ConsumerWidget {
               color: CupertinoColors.systemRed,
             ),
             const SizedBox(height: 20),
-            Text(
-              l10n.loadFailed,
-              style: AppTextStyles.title3,
-            ),
+            Text(l10n.loadFailed, style: AppTextStyles.title3),
             const SizedBox(height: 8),
             Text(
               error.toString(),

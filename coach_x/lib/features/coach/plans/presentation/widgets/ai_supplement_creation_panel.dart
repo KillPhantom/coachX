@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:coach_x/core/theme/app_colors.dart';
 import 'package:coach_x/core/theme/app_text_styles.dart';
 import 'package:coach_x/core/utils/logger.dart';
+import 'package:coach_x/core/widgets/dismiss_keyboard_on_scroll.dart';
 import 'package:coach_x/features/coach/plans/presentation/providers/supplement_conversation_providers.dart';
 import 'package:coach_x/features/coach/plans/presentation/widgets/chat_message_bubble.dart';
 import 'package:coach_x/features/coach/plans/presentation/widgets/supplement_suggestion_card.dart';
@@ -12,10 +13,12 @@ class AISupplementCreationPanel extends ConsumerStatefulWidget {
   const AISupplementCreationPanel({super.key});
 
   @override
-  ConsumerState<AISupplementCreationPanel> createState() => _AISupplementCreationPanelState();
+  ConsumerState<AISupplementCreationPanel> createState() =>
+      _AISupplementCreationPanelState();
 }
 
-class _AISupplementCreationPanelState extends ConsumerState<AISupplementCreationPanel> {
+class _AISupplementCreationPanelState
+    extends ConsumerState<AISupplementCreationPanel> {
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   bool _hasText = false;
@@ -26,7 +29,9 @@ class _AISupplementCreationPanelState extends ConsumerState<AISupplementCreation
     _messageController.addListener(_onTextChanged);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(supplementConversationNotifierProvider.notifier).initConversation();
+      ref
+          .read(supplementConversationNotifierProvider.notifier)
+          .initConversation();
     });
   }
 
@@ -51,7 +56,9 @@ class _AISupplementCreationPanelState extends ConsumerState<AISupplementCreation
     final message = _messageController.text.trim();
     if (message.isEmpty) return;
 
-    ref.read(supplementConversationNotifierProvider.notifier).sendMessage(message);
+    ref
+        .read(supplementConversationNotifierProvider.notifier)
+        .sendMessage(message);
     _messageController.clear();
 
     _scrollToBottom();
@@ -61,10 +68,9 @@ class _AISupplementCreationPanelState extends ConsumerState<AISupplementCreation
     AppLogger.info('🚀 快捷操作: $optionId - $label');
 
     // 添加用户消息
-    ref.read(supplementConversationNotifierProvider.notifier).sendMessage(
-      label,
-      optionType: optionId,
-    );
+    ref
+        .read(supplementConversationNotifierProvider.notifier)
+        .sendMessage(label, optionType: optionId);
 
     _scrollToBottom();
   }
@@ -72,7 +78,9 @@ class _AISupplementCreationPanelState extends ConsumerState<AISupplementCreation
   void _handleOptionSelected(dynamic option) {
     AppLogger.info('✅ 选项选择: ${option.id} - ${option.label}');
 
-    ref.read(supplementConversationNotifierProvider.notifier).handleOptionSelected(option);
+    ref
+        .read(supplementConversationNotifierProvider.notifier)
+        .handleOptionSelected(option);
 
     _scrollToBottom();
   }
@@ -100,7 +108,9 @@ class _AISupplementCreationPanelState extends ConsumerState<AISupplementCreation
   }
 
   void _rejectSuggestion() {
-    ref.read(supplementConversationNotifierProvider.notifier).rejectSuggestion();
+    ref
+        .read(supplementConversationNotifierProvider.notifier)
+        .rejectSuggestion();
   }
 
   @override
@@ -130,35 +140,50 @@ class _AISupplementCreationPanelState extends ConsumerState<AISupplementCreation
           Expanded(
             child: messages.isEmpty
                 ? _buildWelcomeView(context)
-                : ListView.builder(
-                    controller: _scrollController,
-                    padding: const EdgeInsets.only(top: 16, bottom: 16, left: 0, right: 0),
-                    itemCount: messages.length + (pendingSuggestion != null ? 1 : 0),
-                    itemBuilder: (context, index) {
-                      // 如果是最后一项且有待处理建议，显示建议卡片
-                      if (index == messages.length && pendingSuggestion != null) {
-                        return Padding(
-                          padding: const EdgeInsets.only(top: 8, left: 16, right: 16),
-                          child: SupplementSuggestionCard(
-                            supplementDay: pendingSuggestion,
-                            onApply: _applySuggestion,
-                            onReject: _rejectSuggestion,
-                          ),
-                        );
-                      }
+                : DismissKeyboardOnScroll(
+                    child: ListView.builder(
+                      controller: _scrollController,
+                      padding: const EdgeInsets.only(
+                        top: 16,
+                        bottom: 16,
+                        left: 0,
+                        right: 0,
+                      ),
+                      itemCount:
+                          messages.length + (pendingSuggestion != null ? 1 : 0),
+                      itemBuilder: (context, index) {
+                        // 如果是最后一项且有待处理建议，显示建议卡片
+                        if (index == messages.length &&
+                            pendingSuggestion != null) {
+                          return Padding(
+                            padding: const EdgeInsets.only(
+                              top: 8,
+                              left: 16,
+                              right: 16,
+                            ),
+                            child: SupplementSuggestionCard(
+                              supplementDay: pendingSuggestion,
+                              onApply: _applySuggestion,
+                              onReject: _rejectSuggestion,
+                            ),
+                          );
+                        }
 
-                      // 显示聊天消息
-                      final message = messages[index];
-                      return ChatMessageBubble(
-                        message: message,
-                        onOptionSelected: _handleOptionSelected,
-                      );
-                    },
+                        // 显示聊天消息
+                        final message = messages[index];
+                        return ChatMessageBubble(
+                          message: message,
+                          onOptionSelected: _handleOptionSelected,
+                        );
+                      },
+                    ),
                   ),
           ),
 
           // 快捷操作（当没有待处理建议且AI不在响应时显示）
-          if (pendingSuggestion == null && !isAIResponding && messages.isNotEmpty)
+          if (pendingSuggestion == null &&
+              !isAIResponding &&
+              messages.isNotEmpty)
             _buildQuickActions(context),
 
           _buildInputArea(context, canSendMessage, isAIResponding),
@@ -284,14 +309,15 @@ class _AISupplementCreationPanelState extends ConsumerState<AISupplementCreation
             return Padding(
               padding: const EdgeInsets.only(right: 8),
               child: CupertinoButton(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 10,
+                ),
                 color: CupertinoColors.systemGrey6.resolveFrom(context),
                 borderRadius: BorderRadius.circular(20),
                 minSize: 0,
-                onPressed: () => _handleQuickAction(
-                  action['id']!,
-                  action['label']!,
-                ),
+                onPressed: () =>
+                    _handleQuickAction(action['id']!, action['label']!),
                 child: Text(
                   '"${action['label']}"',
                   style: AppTextStyles.footnote.copyWith(
@@ -306,7 +332,11 @@ class _AISupplementCreationPanelState extends ConsumerState<AISupplementCreation
     );
   }
 
-  Widget _buildInputArea(BuildContext context, bool canSendMessage, bool isAIResponding) {
+  Widget _buildInputArea(
+    BuildContext context,
+    bool canSendMessage,
+    bool isAIResponding,
+  ) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
@@ -335,7 +365,9 @@ class _AISupplementCreationPanelState extends ConsumerState<AISupplementCreation
                         controller: _messageController,
                         placeholder: 'Ask AI for suggestions...',
                         placeholderStyle: AppTextStyles.subhead.copyWith(
-                          color: CupertinoColors.secondaryLabel.resolveFrom(context),
+                          color: CupertinoColors.secondaryLabel.resolveFrom(
+                            context,
+                          ),
                         ),
                         style: AppTextStyles.subhead.copyWith(
                           color: CupertinoColors.label.resolveFrom(context),
@@ -357,9 +389,7 @@ class _AISupplementCreationPanelState extends ConsumerState<AISupplementCreation
             ),
             const SizedBox(width: 12),
             GestureDetector(
-              onTap: canSendMessage && _hasText
-                  ? _sendMessage
-                  : null,
+              onTap: canSendMessage && _hasText ? _sendMessage : null,
               child: Container(
                 width: 44,
                 height: 44,

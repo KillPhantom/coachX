@@ -28,7 +28,11 @@ class SupplementDay {
   factory SupplementDay.fromJson(Map<String, dynamic> json) {
     final timingsJson = json['timings'] as List<dynamic>? ?? [];
     final timings = timingsJson
-        .map((timing) => SupplementTiming.fromJson(Map<String, dynamic>.from(timing as Map)))
+        .map(
+          (timing) => SupplementTiming.fromJson(
+            Map<String, dynamic>.from(timing as Map),
+          ),
+        )
         .toList();
 
     return SupplementDay(
@@ -83,4 +87,3 @@ class SupplementDay {
     return 'SupplementDay(day: $day, name: $name, timings: ${timings.length})';
   }
 }
-

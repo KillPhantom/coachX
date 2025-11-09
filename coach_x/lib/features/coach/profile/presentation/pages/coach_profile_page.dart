@@ -31,9 +31,7 @@ class _CoachProfilePageState extends ConsumerState<CoachProfilePage> {
 
     if (currentUser == null) {
       return const CupertinoPageScaffold(
-        child: Center(
-          child: CupertinoActivityIndicator(),
-        ),
+        child: Center(child: CupertinoActivityIndicator()),
       );
     }
 
@@ -47,10 +45,7 @@ class _CoachProfilePageState extends ConsumerState<CoachProfilePage> {
               child: Padding(
                 padding: const EdgeInsets.all(AppDimensions.paddingL),
                 child: Center(
-                  child: Text(
-                    l10n.profile,
-                    style: AppTextStyles.title2,
-                  ),
+                  child: Text(l10n.profile, style: AppTextStyles.title2),
                 ),
               ),
             ),
@@ -101,7 +96,9 @@ class _CoachProfilePageState extends ConsumerState<CoachProfilePage> {
                     child: Column(
                       children: [
                         // Notifications Toggle
-                        _buildNotificationsRow(currentUser.notificationsEnabled),
+                        _buildNotificationsRow(
+                          currentUser.notificationsEnabled,
+                        ),
 
                         // Unit Preference
                         SettingsRow(
@@ -158,11 +155,14 @@ class _CoachProfilePageState extends ConsumerState<CoachProfilePage> {
                               context: context,
                               builder: (dialogContext) => CupertinoAlertDialog(
                                 title: Text(l10n.alert),
-                                content: Text(l10n.accountSettingsInDevelopment),
+                                content: Text(
+                                  l10n.accountSettingsInDevelopment,
+                                ),
                                 actions: [
                                   CupertinoDialogAction(
                                     child: Text(l10n.confirm),
-                                    onPressed: () => Navigator.of(dialogContext).pop(),
+                                    onPressed: () =>
+                                        Navigator.of(dialogContext).pop(),
                                   ),
                                 ],
                               ),
@@ -183,7 +183,8 @@ class _CoachProfilePageState extends ConsumerState<CoachProfilePage> {
                                 actions: [
                                   CupertinoDialogAction(
                                     child: Text(l10n.confirm),
-                                    onPressed: () => Navigator.of(dialogContext).pop(),
+                                    onPressed: () =>
+                                        Navigator.of(dialogContext).pop(),
                                   ),
                                 ],
                               ),
@@ -225,10 +226,7 @@ class _CoachProfilePageState extends ConsumerState<CoachProfilePage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            l10n.notifications,
-            style: AppTextStyles.body,
-          ),
+          Text(l10n.notifications, style: AppTextStyles.body),
           CupertinoSwitch(
             value: enabled,
             onChanged: (value) {
@@ -247,10 +245,9 @@ class _CoachProfilePageState extends ConsumerState<CoachProfilePage> {
 
     try {
       final userRepo = ref.read(userRepositoryProvider);
-      await userRepo.updateUser(
-        currentUser.id,
-        {'notificationsEnabled': enabled},
-      );
+      await userRepo.updateUser(currentUser.id, {
+        'notificationsEnabled': enabled,
+      });
     } catch (e) {
       if (mounted) {
         final l10n = AppLocalizations.of(context)!;
@@ -313,10 +310,7 @@ class _CoachProfilePageState extends ConsumerState<CoachProfilePage> {
 
     try {
       final userRepo = ref.read(userRepositoryProvider);
-      await userRepo.updateUser(
-        currentUser.id,
-        {'unitPreference': preference},
-      );
+      await userRepo.updateUser(currentUser.id, {'unitPreference': preference});
     } catch (e) {
       if (mounted) {
         final l10n = AppLocalizations.of(context)!;

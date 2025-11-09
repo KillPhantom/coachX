@@ -46,110 +46,15 @@ class TodayTrainingPlanSection extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // 计划标题和描述
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          plans.exercisePlan!.name,
-                          style: AppTextStyles.title3,
-                        ),
-                        if (plans.exercisePlan!.description.isNotEmpty) ...[
-                          const SizedBox(height: 4),
-                          Text(
-                            plans.exercisePlan!.description,
-                            style: AppTextStyles.callout.copyWith(
-                              color: AppColors.textSecondary,
-                            ),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ],
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: AppDimensions.spacingM),
-                  // 计划频率标签
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppDimensions.spacingS,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: AppColors.dividerLight,
-                      borderRadius: BorderRadius.circular(AppDimensions.radiusS),
-                    ),
-                    child: Text(
-                      l10n.daysPerWeek(plans.exercisePlan!.totalDays),
-                      style: AppTextStyles.caption1.copyWith(
-                        color: AppColors.textSecondary,
-                      ),
-                    ),
-                  ),
-                ],
+              // 训练日名称
+              Text(
+                trainingDay.name,
+                style: AppTextStyles.title3,
               ),
               const SizedBox(height: AppDimensions.spacingM),
 
-              // 今日训练卡片
-              Container(
-                padding: const EdgeInsets.all(AppDimensions.spacingM),
-                decoration: BoxDecoration(
-                  color: AppColors.backgroundLight,
-                  borderRadius: BorderRadius.circular(AppDimensions.radiusM),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                l10n.todayTraining(trainingDay.name),
-                                style: AppTextStyles.bodyMedium,
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                _getExercisesSummary(trainingDay, l10n),
-                                style: AppTextStyles.callout.copyWith(
-                                  color: AppColors.textSecondary,
-                                ),
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: AppDimensions.spacingM),
-                        CupertinoButton(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: AppDimensions.spacingM,
-                            vertical: AppDimensions.spacingS,
-                          ),
-                          color: AppColors.primaryColor,
-                          borderRadius: BorderRadius.circular(AppDimensions.radiusM),
-                          onPressed: () {
-                            // TODO: 跳转到训练计划详情
-                          },
-                          child: Text(
-                            l10n.detail,
-                            style: AppTextStyles.buttonSmall.copyWith(
-                              color: AppColors.primaryText,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
+              // 动作列表
+              _buildExercisesList(trainingDay.exercises, l10n, context),
             ],
           ),
         );
@@ -157,17 +62,184 @@ class TodayTrainingPlanSection extends ConsumerWidget {
     );
   }
 
-  String _getExercisesSummary(dynamic trainingDay, AppLocalizations l10n) {
-    final exercises = trainingDay.exercises as List;
+  /// 构建动作列表
+  Widget _buildExercisesList(
+    List exercises,
+    AppLocalizations l10n,
+    BuildContext context,
+  ) {
     if (exercises.isEmpty) {
-      return l10n.noExercises;
+      return Text(
+        l10n.noExercises,
+        style: AppTextStyles.callout.copyWith(
+          color: AppColors.textSecondary,
+        ),
+      );
     }
 
-    // 取前3个动作名称
-    final names = exercises.take(3).map((e) => e.name).join(', ');
-    if (exercises.length > 3) {
-      return '$names...';
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: exercises.asMap().entries.map((entry) {
+        final index = entry.key;
+        final exercise = entry.value;
+        final isLast = index == exercises.length - 1;
+
+        return Padding(
+          padding: EdgeInsets.only(
+            bottom: isLast ? 0 : AppDimensions.spacingS,
+          ),
+          child: _buildExerciseCard(exercise, l10n, context),
+        );
+      }).toList(),
+    );
+  }
+
+  /// 构建单个动作卡片
+  Widget _buildExerciseCard(
+    dynamic exercise,
+    AppLocalizations l10n,
+    BuildContext context,
+  ) {
+    return Container(
+      padding: const EdgeInsets.all(AppDimensions.spacingM),
+      decoration: BoxDecoration(
+        color: AppColors.backgroundLight,
+        borderRadius: BorderRadius.circular(AppDimensions.radiusM),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // 左侧内容区
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Exercise 名称
+                Text(
+                  exercise.name,
+                  style: AppTextStyles.callout.copyWith(
+                    color: AppColors.primaryText,
+                  ),
+                ),
+                const SizedBox(height: 4),
+
+                // Sets 信息
+                Text(
+                  'x ${_formatExerciseSets(exercise.sets, l10n)}',
+                  style: AppTextStyles.footnote.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+
+                // Coach Notes (如果有)
+                if (exercise.note != null && exercise.note.isNotEmpty) ...[
+                  const SizedBox(height: AppDimensions.spacingS),
+                  const SizedBox(height: 2),
+                  Text(
+                    exercise.note,
+                    style: AppTextStyles.caption1.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+
+          const SizedBox(width: AppDimensions.spacingM),
+
+          // 右侧 Video 按钮
+          GestureDetector(
+            onTap: () => _showVideoOrPlaceholder(context, exercise, l10n),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(
+                  CupertinoIcons.play_circle,
+                  color: CupertinoColors.systemBlue,
+                  size: 16,
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  l10n.video,
+                  style: AppTextStyles.footnote.copyWith(
+                    color: CupertinoColors.systemBlue,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// 显示视频或 placeholder
+  void _showVideoOrPlaceholder(
+    BuildContext context,
+    dynamic exercise,
+    AppLocalizations l10n,
+  ) {
+    // 检查是否有视频
+    if (exercise.demoVideos == null || exercise.demoVideos.isEmpty) {
+      _showComingSoonDialog(context, l10n);
+    } else {
+      // TODO: 未来实现视频播放功能
+      _showComingSoonDialog(context, l10n);
     }
-    return names;
+  }
+
+  /// 显示即将推出的提示弹窗
+  void _showComingSoonDialog(BuildContext context, AppLocalizations l10n) {
+    showCupertinoDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return CupertinoAlertDialog(
+          title: Text(l10n.comingSoon),
+          content: Text(l10n.aiGuidanceInDevelopment),
+          actions: [
+            CupertinoDialogAction(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text(l10n.ok),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  /// 格式化 Sets 信息
+  /// 规则：
+  /// 1. 如果所有 sets 的 reps 和 weight 相同: "4组 x 12次 @ 20kg"
+  /// 2. 如果 reps 相同但 weight 不同: "4组 x 12次" (不显示重量)
+  /// 3. 如果都不相同: "4组" (只显示组数)
+  String _formatExerciseSets(List sets, AppLocalizations l10n) {
+    if (sets.isEmpty) {
+      return '';
+    }
+
+    final totalSets = sets.length;
+
+    // 检查所有 reps 是否相同
+    final firstReps = sets[0].reps;
+    final allRepsSame = sets.every((set) => set.reps == firstReps);
+
+    // 检查所有 weight 是否相同且非空
+    final firstWeight = sets[0].weight;
+    final allWeightsSame = sets.every((set) => set.weight == firstWeight);
+    final hasWeight = firstWeight.isNotEmpty;
+
+    if (allRepsSame && allWeightsSame && hasWeight) {
+      // 情况1: reps 和 weight 都相同
+      return l10n.exerciseSetsWithWeight(totalSets, firstReps, firstWeight);
+    } else if (allRepsSame) {
+      // 情况2: reps 相同但 weight 不同或为空
+      return l10n.exerciseSetsNoWeight(totalSets, firstReps);
+    } else {
+      // 情况3: reps 不同
+      return l10n.exerciseSetsOnly(totalSets);
+    }
   }
 }

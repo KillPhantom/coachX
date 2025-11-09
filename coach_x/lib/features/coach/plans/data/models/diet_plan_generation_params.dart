@@ -78,8 +78,9 @@ class DietPlanGenerationParams {
     }
 
     if (dietaryPreferences != null && dietaryPreferences!.isNotEmpty) {
-      json['dietary_preferences'] =
-          dietaryPreferences!.map((p) => p.apiValue).toList();
+      json['dietary_preferences'] = dietaryPreferences!
+          .map((p) => p.apiValue)
+          .toList();
     }
 
     if (mealCount != null) {

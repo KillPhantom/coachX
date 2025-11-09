@@ -12,21 +12,15 @@ abstract class PlanRepository {
   /// 创建训练计划
   /// [plan] 计划数据
   /// 返回新计划的ID
-  Future<String> createPlan({
-    required ExercisePlanModel plan,
-  });
+  Future<String> createPlan({required ExercisePlanModel plan});
 
   /// 更新训练计划
   /// [plan] 计划数据（必须包含ID）
-  Future<void> updatePlan({
-    required ExercisePlanModel plan,
-  });
+  Future<void> updatePlan({required ExercisePlanModel plan});
 
   /// 获取训练计划详情
   /// [planId] 计划ID
-  Future<ExercisePlanModel> getPlanDetail({
-    required String planId,
-  });
+  Future<ExercisePlanModel> getPlanDetail({required String planId});
 
   /// 删除计划
   /// [planId] 计划ID
@@ -81,4 +75,3 @@ class PlansData {
     );
   }
 }
-

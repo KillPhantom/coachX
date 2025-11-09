@@ -30,10 +30,7 @@ class InfoCard extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              title,
-              style: AppTextStyles.title3,
-            ),
+            Text(title, style: AppTextStyles.title3),
             if (action != null) action!,
           ],
         ),

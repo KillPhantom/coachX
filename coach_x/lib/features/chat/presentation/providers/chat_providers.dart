@@ -91,35 +91,35 @@ class ConversationItem {
 /// 根据当前用户角色加载对话列表
 final conversationItemsProvider =
     FutureProvider.autoDispose<List<ConversationItem>>((ref) async {
-  final currentUser = ref.watch(currentUserProvider).value;
+      final currentUser = ref.watch(currentUserProvider).value;
 
-  // 如果用户未登录，返回空列表
-  if (currentUser == null) {
-    return [];
-  }
+      // 如果用户未登录，返回空列表
+      if (currentUser == null) {
+        return [];
+      }
 
-  final chatRepository = ref.read(chatRepositoryProvider);
-  final userId = currentUser.id;
-  final userRole = currentUser.role;
+      final chatRepository = ref.read(chatRepositoryProvider);
+      final userId = currentUser.id;
+      final userRole = currentUser.role;
 
-  // 根据用户角色加载对话列表
-  if (userRole.isCoach) {
-    // 教练端：从学生列表生成对话列表
-    return _loadCoachConversations(
-      userId,
-      chatRepository,
-      ref.read(_studentRepositoryProvider),
-    );
-  } else {
-    // 学生端：显示与教练的对话
-    return _loadStudentConversations(
-      userId,
-      currentUser.coachId,
-      chatRepository,
-      ref.read(_userRepositoryProvider),
-    );
-  }
-});
+      // 根据用户角色加载对话列表
+      if (userRole.isCoach) {
+        // 教练端：从学生列表生成对话列表
+        return _loadCoachConversations(
+          userId,
+          chatRepository,
+          ref.read(_studentRepositoryProvider),
+        );
+      } else {
+        // 学生端：显示与教练的对话
+        return _loadStudentConversations(
+          userId,
+          currentUser.coachId,
+          chatRepository,
+          ref.read(_userRepositoryProvider),
+        );
+      }
+    });
 
 /// 加载教练端对话列表
 Future<List<ConversationItem>> _loadCoachConversations(
@@ -146,15 +146,18 @@ Future<List<ConversationItem>> _loadCoachConversations(
     // 尝试获取对话
     final conversation = await chatRepository.getConversation(conversationId);
 
-    items.add(ConversationItem(
-      userId: student.id,
-      userName: student.name,
-      avatarUrl: student.avatarUrl,
-      conversationId: conversation?.id,
-      lastMessage: conversation?.lastMessage,
-      unreadCount: conversation?.getUnreadCount(coachId) ?? 0,
-      lastMessageTime: conversation?.lastMessageTime.millisecondsSinceEpoch ?? 0,
-    ));
+    items.add(
+      ConversationItem(
+        userId: student.id,
+        userName: student.name,
+        avatarUrl: student.avatarUrl,
+        conversationId: conversation?.id,
+        lastMessage: conversation?.lastMessage,
+        unreadCount: conversation?.getUnreadCount(coachId) ?? 0,
+        lastMessageTime:
+            conversation?.lastMessageTime.millisecondsSinceEpoch ?? 0,
+      ),
+    );
   }
 
   // 按最后消息时间排序（最新的在前）
@@ -195,42 +198,43 @@ Future<List<ConversationItem>> _loadStudentConversations(
       conversationId: conversation?.id,
       lastMessage: conversation?.lastMessage,
       unreadCount: conversation?.getUnreadCount(studentId) ?? 0,
-      lastMessageTime: conversation?.lastMessageTime.millisecondsSinceEpoch ?? 0,
+      lastMessageTime:
+          conversation?.lastMessageTime.millisecondsSinceEpoch ?? 0,
     ),
   ];
 }
 
 /// 单个对话Provider (Family)
 /// 用于获取或创建对话
-final conversationProvider =
-    FutureProvider.autoDispose.family<ConversationModel?, String>(
-  (ref, otherUserId) async {
-    final currentUser = ref.watch(currentUserProvider).value;
-    if (currentUser == null) {
-      return null;
-    }
+final conversationProvider = FutureProvider.autoDispose
+    .family<ConversationModel?, String>((ref, otherUserId) async {
+      final currentUser = ref.watch(currentUserProvider).value;
+      if (currentUser == null) {
+        return null;
+      }
 
-    final chatRepository = ref.read(chatRepositoryProvider);
-    final currentUserId = currentUser.id;
-    final userRole = currentUser.role;
+      final chatRepository = ref.read(chatRepositoryProvider);
+      final currentUserId = currentUser.id;
+      final userRole = currentUser.role;
 
-    // 根据角色确定coachId和studentId
-    String coachId;
-    String studentId;
+      // 根据角色确定coachId和studentId
+      String coachId;
+      String studentId;
 
-    if (userRole.isCoach) {
-      coachId = currentUserId;
-      studentId = otherUserId;
-    } else {
-      coachId = otherUserId;
-      studentId = currentUserId;
-    }
+      if (userRole.isCoach) {
+        coachId = currentUserId;
+        studentId = otherUserId;
+      } else {
+        coachId = otherUserId;
+        studentId = currentUserId;
+      }
 
-    // 获取或创建对话
-    final conversationId =
-        await chatRepository.getOrCreateConversation(coachId, studentId);
+      // 获取或创建对话
+      final conversationId = await chatRepository.getOrCreateConversation(
+        coachId,
+        studentId,
+      );
 
-    // 返回对话详情
-    return chatRepository.getConversation(conversationId);
-  },
-);
+      // 返回对话详情
+      return chatRepository.getConversation(conversationId);
+    });

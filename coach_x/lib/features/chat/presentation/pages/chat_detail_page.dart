@@ -14,10 +14,7 @@ import 'package:coach_x/features/chat/presentation/widgets/chat_ai_panel.dart';
 class ChatDetailPage extends ConsumerWidget {
   final String conversationId;
 
-  const ChatDetailPage({
-    super.key,
-    required this.conversationId,
-  });
+  const ChatDetailPage({super.key, required this.conversationId});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -31,15 +28,6 @@ class ChatDetailPage extends ConsumerWidget {
       backgroundColor: AppColors.backgroundLight,
       navigationBar: CupertinoNavigationBar(
         backgroundColor: AppColors.backgroundWhite,
-        leading: CupertinoButton(
-          padding: EdgeInsets.zero,
-          onPressed: () => context.pop(),
-          child: const Icon(
-            CupertinoIcons.back,
-            color: AppColors.primaryAction,
-            size: 28,
-          ),
-        ),
         middle: conversationAsync.when(
           data: (conversation) {
             if (conversation == null) {
@@ -62,10 +50,7 @@ class ChatDetailPage extends ConsumerWidget {
           ),
         ),
         border: const Border(
-          bottom: BorderSide(
-            color: AppColors.dividerLight,
-            width: 0.5,
-          ),
+          bottom: BorderSide(color: AppColors.dividerLight, width: 0.5),
         ),
       ),
       child: Column(
@@ -106,10 +91,7 @@ class ChatDetailPage extends ConsumerWidget {
       decoration: const BoxDecoration(
         color: AppColors.backgroundWhite,
         border: Border(
-          bottom: BorderSide(
-            color: AppColors.dividerLight,
-            width: 0.5,
-          ),
+          bottom: BorderSide(color: AppColors.dividerLight, width: 0.5),
         ),
       ),
       child: Row(
@@ -155,7 +137,7 @@ class ChatDetailPage extends ConsumerWidget {
           border: Border(
             bottom: BorderSide(
               color: isSelected
-                  ? AppColors.primary
+                  ? AppColors.primaryText
                   : CupertinoColors.transparent,
               width: 2,
             ),
@@ -164,7 +146,7 @@ class ChatDetailPage extends ConsumerWidget {
         child: Text(
           label,
           style: AppTextStyles.body.copyWith(
-            color: isSelected ? AppColors.primary : AppColors.textSecondary,
+            color: isSelected ? AppColors.primaryText : AppColors.textSecondary,
             fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
           ),
           textAlign: TextAlign.center,

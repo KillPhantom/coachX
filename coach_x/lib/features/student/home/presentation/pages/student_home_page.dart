@@ -6,6 +6,7 @@ import 'package:coach_x/core/widgets/error_view.dart';
 import '../providers/student_home_providers.dart';
 import '../widgets/weekly_status_section.dart';
 import '../widgets/today_record_section.dart';
+import '../widgets/today_supplement_section.dart';
 import '../widgets/today_training_plan_section.dart';
 import '../widgets/empty_plan_placeholder.dart';
 
@@ -18,6 +19,13 @@ class StudentHomePage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final plansAsync = ref.watch(studentPlansProvider);
+
+    // 刷新逻辑
+    Future<void> handleRefresh() async {
+      ref.invalidate(studentPlansProvider);
+      ref.invalidate(latestTrainingProvider);
+      await Future.delayed(const Duration(milliseconds: 500));
+    }
 
     return CupertinoPageScaffold(
       child: SafeArea(
@@ -33,20 +41,14 @@ class StudentHomePage extends ConsumerWidget {
           data: (plans) {
             // 如果没有任何计划，显示空状态
             if (plans.hasNoPlan) {
-              return const EmptyPlanPlaceholder();
+              return EmptyPlanPlaceholder(onRefresh: handleRefresh);
             }
 
             // 有计划，显示完整首页
             return CustomScrollView(
               slivers: [
                 // 下拉刷新
-                CupertinoSliverRefreshControl(
-                  onRefresh: () async {
-                    ref.invalidate(studentPlansProvider);
-                    ref.invalidate(latestTrainingProvider);
-                    await Future.delayed(const Duration(milliseconds: 500));
-                  },
-                ),
+                CupertinoSliverRefreshControl(onRefresh: handleRefresh),
 
                 // 内容区域
                 SliverPadding(
@@ -62,8 +64,12 @@ class StudentHomePage extends ConsumerWidget {
                       const WeeklyStatusSection(),
                       const SizedBox(height: AppDimensions.spacingL),
 
-                      // Today's Record
+                      // Today's Meal Plan
                       const TodayRecordSection(),
+                      const SizedBox(height: AppDimensions.spacingL),
+
+                      // Today's Supplement Plan
+                      const TodaySupplementSection(),
                       const SizedBox(height: AppDimensions.spacingL),
 
                       // Today's Training Plan

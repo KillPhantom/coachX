@@ -10,11 +10,12 @@ import 'edit_diet_conversation_notifier.dart';
 
 /// 饮食计划编辑对话 Notifier Provider
 final editDietConversationNotifierProvider =
-    StateNotifierProvider.autoDispose<EditDietConversationNotifier, EditDietConversationState>(
-  (ref) {
-    return EditDietConversationNotifier();
-  },
-);
+    StateNotifierProvider.autoDispose<
+      EditDietConversationNotifier,
+      EditDietConversationState
+    >((ref) {
+      return EditDietConversationNotifier();
+    });
 
 // ==================== 计算 Providers ====================
 
@@ -31,10 +32,11 @@ final isDietAIRespondingProvider = Provider.autoDispose<bool>((ref) {
 });
 
 /// 待确认的修改建议 Provider
-final pendingDietSuggestionProvider = Provider.autoDispose<DietPlanEditSuggestion?>((ref) {
-  final state = ref.watch(editDietConversationNotifierProvider);
-  return state.pendingSuggestion;
-});
+final pendingDietSuggestionProvider =
+    Provider.autoDispose<DietPlanEditSuggestion?>((ref) {
+      final state = ref.watch(editDietConversationNotifierProvider);
+      return state.pendingSuggestion;
+    });
 
 /// 当前计划 Provider
 final currentEditDietPlanProvider = Provider.autoDispose<DietPlanModel?>((ref) {

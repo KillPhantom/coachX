@@ -47,6 +47,15 @@ service firebase.storage {
       allow read: if isOwner(userId);
     }
 
+    // ==================== AI食物扫描图片 ====================
+    // Path: food_images/{userId}/{fileName}
+    match /food_images/{userId}/{fileName} {
+      // 允许用户上传自己的食物图片
+      allow write: if isOwner(userId) && isValidImage();
+      // 允许用户读取自己的食物图片
+      allow read: if isOwner(userId);
+    }
+
     // ==================== 身体数据图片 ====================
     // Path: body_stats/{userId}/{fileName}
     match /body_stats/{userId}/{fileName} {

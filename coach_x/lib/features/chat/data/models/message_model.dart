@@ -179,7 +179,9 @@ class MessageModel {
       content: data['content'] as String? ?? '',
       mediaUrl: data['mediaUrl'] as String?,
       mediaMetadata: data['mediaMetadata'] != null
-          ? MessageMetadata.fromJson(data['mediaMetadata'] as Map<String, dynamic>)
+          ? MessageMetadata.fromJson(
+              data['mediaMetadata'] as Map<String, dynamic>,
+            )
           : null,
       status: MessageStatus.fromString(data['status'] as String? ?? 'sent'),
       isDeleted: data['isDeleted'] as bool? ?? false,

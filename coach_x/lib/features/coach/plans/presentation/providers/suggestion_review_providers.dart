@@ -12,11 +12,11 @@ final isReviewModeProvider = StateProvider<bool>((ref) => false);
 /// Review State Notifier Provider
 /// 注意：不使用 autoDispose，避免生命周期冲突
 final suggestionReviewNotifierProvider =
-    StateNotifierProvider<SuggestionReviewNotifier, SuggestionReviewState?>(
-  (ref) {
-    return SuggestionReviewNotifier();
-  },
-);
+    StateNotifierProvider<SuggestionReviewNotifier, SuggestionReviewState?>((
+      ref,
+    ) {
+      return SuggestionReviewNotifier();
+    });
 
 // ==================== 计算 Providers ====================
 // 注意：这些派生 providers 也不使用 autoDispose，与主 provider 保持一致

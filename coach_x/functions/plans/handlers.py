@@ -1558,6 +1558,8 @@ def _get_student_assigned_plan(db, student_id: str, collection_name: str):
         计划数据 或 None（如果没有分配计划）
     """
     try:
+        logger.info(f'🔍 开始查询 {collection_name} - 学生ID: {student_id}')
+
         # 查询 studentIds 包含当前学生ID的计划
         plans_query = db.collection(collection_name) \
             .where('studentIds', 'array_contains', student_id) \
@@ -1565,12 +1567,17 @@ def _get_student_assigned_plan(db, student_id: str, collection_name: str):
             .limit(1) \
             .get()
 
+        # 转换为列表以获取结果数量
+        results = list(plans_query)
+        logger.info(f'🔍 查询返回文档数量: {len(results)}')
+
         # 如果找到计划，返回第一个（最新的）
-        if plans_query:
-            for plan_doc in plans_query:
+        if results:
+            for plan_doc in results:
                 plan_data = plan_doc.to_dict()
                 plan_data['id'] = plan_doc.id
                 logger.info(f'📋 找到学生计划: {collection_name}, ID: {plan_doc.id}')
+                logger.info(f'📋 计划的 studentIds: {plan_data.get("studentIds", [])}')
                 return plan_data
 
         # 没有找到计划
@@ -1580,6 +1587,105 @@ def _get_student_assigned_plan(db, student_id: str, collection_name: str):
     except Exception as e:
         logger.error(f'❌ 查询学生计划失败: {collection_name}, 错误: {str(e)}', exc_info=True)
         return None
+
+
+@https_fn.on_call()
+def get_student_all_plans(req: https_fn.CallableRequest):
+    """
+    获取学生所有可见计划（包括教练分配的和自己创建的）
+
+    返回:
+        {
+            'status': 'success',
+            'data': {
+                'exercise_plans': [...],
+                'diet_plans': [...],
+                'supplement_plans': [...]
+            }
+        }
+    """
+    try:
+        # 检查认证
+        if not req.auth:
+            raise https_fn.HttpsError('unauthenticated', '用户未登录')
+
+        student_id = req.auth.uid
+
+        logger.info(f'📚 获取学生所有计划 - 学生ID: {student_id}')
+
+        # 获取 Firestore 实例
+        db = firestore.client()
+
+        # 查询三种计划（教练分配 + 自己创建）
+        exercise_plans = _get_student_all_plans_by_type(db, student_id, 'exercisePlans')
+        diet_plans = _get_student_all_plans_by_type(db, student_id, 'dietPlans')
+        supplement_plans = _get_student_all_plans_by_type(db, student_id, 'supplementPlans')
+
+        logger.info(f'✅ 获取学生所有计划成功 - 学生ID: {student_id}, '
+                   f'训练:{len(exercise_plans)}, 饮食:{len(diet_plans)}, 补剂:{len(supplement_plans)}')
+
+        return {
+            'status': 'success',
+            'data': {
+                'exercise_plans': exercise_plans,
+                'diet_plans': diet_plans,
+                'supplement_plans': supplement_plans
+            }
+        }
+
+    except https_fn.HttpsError:
+        raise
+    except Exception as e:
+        logger.error(f'❌ 获取学生所有计划失败: {str(e)}', exc_info=True)
+        raise https_fn.HttpsError('internal', f'服务器错误: {str(e)}')
+
+
+def _get_student_all_plans_by_type(db, student_id: str, collection_name: str):
+    """
+    获取学生某一类型的所有计划（教练分配 + 自己创建）
+
+    Args:
+        db: Firestore 实例
+        student_id: 学生ID
+        collection_name: 集合名称（exercisePlans, dietPlans, supplementPlans）
+
+    Returns:
+        计划列表
+    """
+    try:
+        plans = []
+
+        # 查询1: studentIds 包含当前学生ID的计划（教练分配的）
+        assigned_query = db.collection(collection_name) \
+            .where('studentIds', 'array_contains', student_id) \
+            .order_by('createdAt', direction=firestore.Query.DESCENDING) \
+            .get()
+
+        for plan_doc in assigned_query:
+            plan_data = plan_doc.to_dict()
+            plan_data['id'] = plan_doc.id
+            plans.append(plan_data)
+
+        # 查询2: ownerId 等于当前学生ID的计划（自己创建的）
+        owned_query = db.collection(collection_name) \
+            .where('ownerId', '==', student_id) \
+            .order_by('createdAt', direction=firestore.Query.DESCENDING) \
+            .get()
+
+        # 去重：避免同一个计划被添加两次（如果学生既是owner又在studentIds中）
+        existing_ids = {plan['id'] for plan in plans}
+        for plan_doc in owned_query:
+            if plan_doc.id not in existing_ids:
+                plan_data = plan_doc.to_dict()
+                plan_data['id'] = plan_doc.id
+                plans.append(plan_data)
+
+        logger.info(f'📋 获取学生计划成功: {collection_name}, 数量: {len(plans)}')
+        return plans
+
+    except Exception as e:
+        logger.error(f'❌ 获取学生计划失败: {collection_name}, 错误: {str(e)}', exc_info=True)
+        return []
 
 
 @https_fn.on_call()

@@ -106,161 +106,174 @@ class _SupplementTimingCardState extends State<SupplementTimingCard> {
                               vertical: 6,
                             ),
                             decoration: BoxDecoration(
-                              color: CupertinoColors.systemGrey6.resolveFrom(context),
+                              color: CupertinoColors.systemGrey6.resolveFrom(
+                                context,
+                              ),
                               borderRadius: BorderRadius.circular(6),
                             ),
                           ),
                         ),
                       ],
                     ),
-                const SizedBox(height: 8),
-                // 补剂数量汇总
-                Text(
-                  '${widget.timing.supplements.length} 个补剂',
-                  style: AppTextStyles.footnote.copyWith(
-                    color: CupertinoColors.secondaryLabel.resolveFrom(context),
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          // Content
-          Container(
-            height: 1,
-            color: CupertinoColors.separator.resolveFrom(context),
-          ),
-
-          Padding(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // 补剂列表标题 & 添加按钮
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        '补剂列表',
-                        style: AppTextStyles.callout.copyWith(
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      if (widget.onAddSupplement != null)
-                        CupertinoButton(
-                          padding: EdgeInsets.zero,
-                          minSize: 0,
-                          onPressed: widget.onAddSupplement,
-                          child: Row(
-                            children: [
-                              Icon(
-                                CupertinoIcons.add_circled_solid,
-                                color: AppColors.primaryText,
-                                size: 18,
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                '添加补剂',
-                                style: AppTextStyles.footnote.copyWith(
-                                  color: AppColors.primaryText,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 8),
-
-                  // 补剂列表
-                  if (widget.timing.supplements.isEmpty)
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      child: Center(
-                        child: Text(
-                          '暂无补剂，点击"添加补剂"按钮添加',
-                          style: AppTextStyles.footnote.copyWith(
-                            color: CupertinoColors.secondaryLabel.resolveFrom(context),
-                          ),
-                        ),
-                      ),
-                    )
-                  else
-                    ...widget.timing.supplements.asMap().entries.map((entry) {
-                      final supplementIndex = entry.key;
-                      final supplement = entry.value;
-                      return SupplementRow(
-                        supplement: supplement,
-                        index: supplementIndex,
-                        onNameChanged: (name) =>
-                            widget.onSupplementNameChanged?.call(supplementIndex, name),
-                        onAmountChanged: (amount) =>
-                            widget.onSupplementAmountChanged?.call(supplementIndex, amount),
-                        onDelete: () => widget.onDeleteSupplement?.call(supplementIndex),
-                      );
-                    }),
-
-                  // 备注区域（仅当补剂列表不为空时显示）
-                  if (widget.timing.supplements.isNotEmpty) ...[
-                    const SizedBox(height: 16),
-                    Text(
-                      AppLocalizations.of(context)!.supplementTimingNote,
-                      style: AppTextStyles.footnote.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
                     const SizedBox(height: 8),
-                    CupertinoTextField(
-                      controller: _noteController,
-                      onChanged: widget.onNoteChanged,
-                      placeholder: AppLocalizations.of(context)!.supplementTimingNotePlaceholder,
-                      minLines: 1,
-                      maxLines: 3,
-                      style: AppTextStyles.footnote,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
-                      ),
-                      decoration: BoxDecoration(
-                        color: CupertinoColors.systemGrey6.resolveFrom(context),
-                        borderRadius: BorderRadius.circular(6),
+                    // 补剂数量汇总
+                    Text(
+                      '${widget.timing.supplements.length} 个补剂',
+                      style: AppTextStyles.footnote.copyWith(
+                        color: CupertinoColors.secondaryLabel.resolveFrom(
+                          context,
+                        ),
                       ),
                     ),
                   ],
-                ],
+                ),
+              ),
+
+              // Content
+              Container(
+                height: 1,
+                color: CupertinoColors.separator.resolveFrom(context),
+              ),
+
+              Padding(
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // 补剂列表标题 & 添加按钮
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          '补剂列表',
+                          style: AppTextStyles.callout.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        if (widget.onAddSupplement != null)
+                          CupertinoButton(
+                            padding: EdgeInsets.zero,
+                            minSize: 0,
+                            onPressed: widget.onAddSupplement,
+                            child: Row(
+                              children: [
+                                Icon(
+                                  CupertinoIcons.add_circled_solid,
+                                  color: AppColors.primaryText,
+                                  size: 18,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  '添加补剂',
+                                  style: AppTextStyles.footnote.copyWith(
+                                    color: AppColors.primaryText,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 8),
+
+                    // 补剂列表
+                    if (widget.timing.supplements.isEmpty)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        child: Center(
+                          child: Text(
+                            '暂无补剂，点击"添加补剂"按钮添加',
+                            style: AppTextStyles.footnote.copyWith(
+                              color: CupertinoColors.secondaryLabel.resolveFrom(
+                                context,
+                              ),
+                            ),
+                          ),
+                        ),
+                      )
+                    else
+                      ...widget.timing.supplements.asMap().entries.map((entry) {
+                        final supplementIndex = entry.key;
+                        final supplement = entry.value;
+                        return SupplementRow(
+                          supplement: supplement,
+                          index: supplementIndex,
+                          onNameChanged: (name) => widget
+                              .onSupplementNameChanged
+                              ?.call(supplementIndex, name),
+                          onAmountChanged: (amount) => widget
+                              .onSupplementAmountChanged
+                              ?.call(supplementIndex, amount),
+                          onDelete: () =>
+                              widget.onDeleteSupplement?.call(supplementIndex),
+                        );
+                      }),
+
+                    // 备注区域（仅当补剂列表不为空时显示）
+                    if (widget.timing.supplements.isNotEmpty) ...[
+                      const SizedBox(height: 16),
+                      Text(
+                        AppLocalizations.of(context)!.supplementTimingNote,
+                        style: AppTextStyles.footnote.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      CupertinoTextField(
+                        controller: _noteController,
+                        onChanged: widget.onNoteChanged,
+                        placeholder: AppLocalizations.of(
+                          context,
+                        )!.supplementTimingNotePlaceholder,
+                        minLines: 1,
+                        maxLines: 3,
+                        style: AppTextStyles.footnote,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 8,
+                        ),
+                        decoration: BoxDecoration(
+                          color: CupertinoColors.systemGrey6.resolveFrom(
+                            context,
+                          ),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ],
+          ),
+
+          // 右上角删除按钮
+          if (widget.onDelete != null)
+            Positioned(
+              top: -6,
+              right: -6,
+              child: CupertinoButton(
+                padding: EdgeInsets.zero,
+                minSize: 0,
+                onPressed: widget.onDelete,
+                child: Container(
+                  width: 18,
+                  height: 18,
+                  decoration: const BoxDecoration(
+                    color: CupertinoColors.systemRed,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    CupertinoIcons.xmark,
+                    color: CupertinoColors.white,
+                    size: 12,
+                  ),
+                ),
               ),
             ),
         ],
       ),
-
-      // 右上角删除按钮
-      if (widget.onDelete != null)
-        Positioned(
-          top: -6,
-          right: -6,
-          child: CupertinoButton(
-            padding: EdgeInsets.zero,
-            minSize: 0,
-            onPressed: widget.onDelete,
-            child: Container(
-              width: 18,
-              height: 18,
-              decoration: const BoxDecoration(
-                color: CupertinoColors.systemRed,
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                CupertinoIcons.xmark,
-                color: CupertinoColors.white,
-                size: 12,
-              ),
-            ),
-          ),
-        ),
-      ],
-    ),
-  );
-}
+    );
+  }
 }

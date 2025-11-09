@@ -5,9 +5,9 @@ import 'package:coach_x/core/theme/app_text_styles.dart';
 
 /// Set 修改类型
 enum SetChangeType {
-  modified,  // 修改（显示 before │ after 对比）
-  added,     // 新增（绿色边框）
-  deleted,   // 删除（红色背景 + 删除线）
+  modified, // 修改（显示 before │ after 对比）
+  added, // 新增（绿色边框）
+  deleted, // 删除（红色背景 + 删除线）
 }
 
 /// 训练组行组件
@@ -19,9 +19,9 @@ class SetRow extends StatefulWidget {
   final VoidCallback? onDelete;
 
   // Review Mode 参数
-  final TrainingSet? beforeSet;         // 修改前的值（可选）
-  final SetChangeType? changeType;      // 修改类型
-  final bool isInReviewMode;            // 是否处于 Review Mode
+  final TrainingSet? beforeSet; // 修改前的值（可选）
+  final SetChangeType? changeType; // 修改类型
+  final bool isInReviewMode; // 是否处于 Review Mode
 
   const SetRow({
     super.key,
@@ -107,18 +107,12 @@ class _SetRowState extends State<SetRow> {
           const SizedBox(width: 6),
 
           // Reps Input
-          Expanded(
-            flex: 2,
-            child: _buildRepsInput(context, editable: true),
-          ),
+          Expanded(flex: 2, child: _buildRepsInput(context, editable: true)),
 
           const SizedBox(width: 6),
 
           // Weight Input
-          Expanded(
-            flex: 2,
-            child: _buildWeightInput(context, editable: true),
-          ),
+          Expanded(flex: 2, child: _buildWeightInput(context, editable: true)),
 
           const SizedBox(width: 5),
 
@@ -159,9 +153,7 @@ class _SetRowState extends State<SetRow> {
           const SizedBox(width: 6),
 
           // Before (左侧，红色删除线)
-          Expanded(
-            child: _buildBeforeDisplay(context),
-          ),
+          Expanded(child: _buildBeforeDisplay(context)),
 
           // 分隔线
           Container(
@@ -172,9 +164,7 @@ class _SetRowState extends State<SetRow> {
           ),
 
           // After (右侧，绿色)
-          Expanded(
-            child: _buildAfterDisplay(context),
-          ),
+          Expanded(child: _buildAfterDisplay(context)),
         ],
       ),
     );
@@ -188,10 +178,7 @@ class _SetRowState extends State<SetRow> {
       decoration: BoxDecoration(
         color: AppColors.success.withOpacity(0.05),
         borderRadius: BorderRadius.circular(4),
-        border: Border.all(
-          color: AppColors.success,
-          width: 2,
-        ),
+        border: Border.all(color: AppColors.success, width: 2),
       ),
       child: Row(
         children: [
@@ -381,10 +368,7 @@ class _SetRowState extends State<SetRow> {
       enabled: editable,
       keyboardType: TextInputType.text,
       textAlign: TextAlign.center,
-      padding: const EdgeInsets.symmetric(
-        horizontal: 5,
-        vertical: 4,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 4),
       decoration: BoxDecoration(
         color: CupertinoColors.systemGrey6.resolveFrom(context),
         borderRadius: BorderRadius.circular(2),
@@ -402,10 +386,7 @@ class _SetRowState extends State<SetRow> {
       enabled: editable,
       keyboardType: TextInputType.text,
       textAlign: TextAlign.center,
-      padding: const EdgeInsets.symmetric(
-        horizontal: 5,
-        vertical: 4,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 4),
       decoration: BoxDecoration(
         color: CupertinoColors.systemGrey6.resolveFrom(context),
         borderRadius: BorderRadius.circular(2),

@@ -21,11 +21,7 @@ class StudentPlanInfo {
 
   /// 转换为JSON
   Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'name': name,
-      'type': type,
-    };
+    return {'id': id, 'name': name, 'type': type};
   }
 
   /// 是否为训练计划
@@ -37,4 +33,3 @@ class StudentPlanInfo {
   /// 是否为补剂计划
   bool get isSupplementPlan => type == 'supplement';
 }
-

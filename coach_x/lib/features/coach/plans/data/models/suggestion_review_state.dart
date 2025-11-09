@@ -3,13 +3,13 @@ import 'package:coach_x/features/coach/plans/data/models/exercise_plan_model.dar
 
 /// Suggestion Review Mode 状态
 class SuggestionReviewState {
-  final List<PlanChange> allChanges;        // 所有待确认的修改
-  final int currentIndex;                    // 当前查看的索引
-  final Set<String> acceptedIds;            // 已接受的修改 ID
-  final Set<String> rejectedIds;            // 已拒绝的修改 ID
-  final ExercisePlanModel originalPlan;     // 原始计划
-  final ExercisePlanModel workingPlan;      // 工作中的计划（逐步应用修改）
-  final bool isShowingAllChanges;           // 是否展开显示全部改动
+  final List<PlanChange> allChanges; // 所有待确认的修改
+  final int currentIndex; // 当前查看的索引
+  final Set<String> acceptedIds; // 已接受的修改 ID
+  final Set<String> rejectedIds; // 已拒绝的修改 ID
+  final ExercisePlanModel originalPlan; // 原始计划
+  final ExercisePlanModel workingPlan; // 工作中的计划（逐步应用修改）
+  final bool isShowingAllChanges; // 是否展开显示全部改动
 
   const SuggestionReviewState({
     required this.allChanges,
@@ -90,7 +90,9 @@ class SuggestionReviewState {
   }
 
   /// 接受当前修改并移动到下一个
-  SuggestionReviewState acceptCurrentAndMoveNext(ExercisePlanModel updatedPlan) {
+  SuggestionReviewState acceptCurrentAndMoveNext(
+    ExercisePlanModel updatedPlan,
+  ) {
     if (currentChange == null) return this;
 
     return copyWith(
