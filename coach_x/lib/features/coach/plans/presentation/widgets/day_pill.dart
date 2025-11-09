@@ -30,14 +30,9 @@ class DayPill extends StatelessWidget {
         margin: const EdgeInsets.only(right: 8),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
         decoration: BoxDecoration(
-          color: isSelected
-              ? AppColors.primary
-              : AppColors.primaryLight,
+          color: isSelected ? AppColors.primary : AppColors.primaryLight,
           borderRadius: BorderRadius.circular(20),
-          border: isSelected
-              ? Border.all(
-                  color: AppColors.primaryText,
-                ):null
+          border: isSelected ? Border.all(color: AppColors.primaryText) : null,
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -54,7 +49,7 @@ class DayPill extends StatelessWidget {
               child: Text(
                 '$dayNumber',
                 style: AppTextStyles.caption1.copyWith(
-                  color:  AppColors.primaryText,
+                  color: AppColors.primaryText,
                   fontWeight: FontWeight.bold,
                 ),
               ),

@@ -60,4 +60,3 @@ abstract class PlanBaseModel {
   @override
   int get hashCode => id.hashCode;
 }
-

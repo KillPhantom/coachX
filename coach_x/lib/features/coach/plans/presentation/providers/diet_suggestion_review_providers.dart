@@ -12,11 +12,12 @@ final isDietReviewModeProvider = StateProvider<bool>((ref) => false);
 /// Diet Plan Review State Notifier Provider
 /// 注意：不使用 autoDispose，避免生命周期冲突
 final dietSuggestionReviewNotifierProvider =
-    StateNotifierProvider<DietSuggestionReviewNotifier, DietSuggestionReviewState?>(
-  (ref) {
-    return DietSuggestionReviewNotifier();
-  },
-);
+    StateNotifierProvider<
+      DietSuggestionReviewNotifier,
+      DietSuggestionReviewState?
+    >((ref) {
+      return DietSuggestionReviewNotifier();
+    });
 
 // ==================== 计算 Providers ====================
 // 注意：这些派生 providers 也不使用 autoDispose，与主 provider 保持一致

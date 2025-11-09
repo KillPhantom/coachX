@@ -2,18 +2,18 @@ import 'package:coach_x/features/coach/plans/data/models/macros.dart';
 
 /// 饮食计划修改类型
 enum DietChangeType {
-  modifyMeal,          // 修改餐次名称
-  addMeal,             // 添加餐次
-  removeMeal,          // 删除餐次
-  modifyFoodItem,      // 修改食物
-  addFoodItem,         // 添加食物
-  removeFoodItem,      // 删除食物
-  adjustMacros,        // 调整营养比例
-  addDay,              // 添加饮食日
-  removeDay,           // 删除饮食日
-  modifyDayName,       // 修改饮食日名称
-  reorder,             // 调整顺序
-  other,               // 其他修改
+  modifyMeal, // 修改餐次名称
+  addMeal, // 添加餐次
+  removeMeal, // 删除餐次
+  modifyFoodItem, // 修改食物
+  addFoodItem, // 添加食物
+  removeFoodItem, // 删除食物
+  adjustMacros, // 调整营养比例
+  addDay, // 添加饮食日
+  removeDay, // 删除饮食日
+  modifyDayName, // 修改饮食日名称
+  reorder, // 调整顺序
+  other, // 其他修改
 }
 
 /// 饮食计划单个修改
@@ -28,9 +28,9 @@ class DietPlanChange {
   final dynamic after;
 
   // 精确定位信息
-  final int dayIndex;              // 饮食日索引
-  final int? mealIndex;            // 餐次索引（可选）
-  final int? foodItemIndex;        // 食物条目索引（可选）
+  final int dayIndex; // 饮食日索引
+  final int? mealIndex; // 餐次索引（可选）
+  final int? foodItemIndex; // 食物条目索引（可选）
 
   // 唯一标识
   final String id;
@@ -75,8 +75,12 @@ class DietPlanChange {
       // 先尝试 snake_case 转 camelCase
       if (typeStr.contains('_')) {
         final parts = typeStr.split('_');
-        typeStr = parts.first +
-            parts.skip(1).map((p) => p[0].toUpperCase() + p.substring(1)).join('');
+        typeStr =
+            parts.first +
+            parts
+                .skip(1)
+                .map((p) => p[0].toUpperCase() + p.substring(1))
+                .join('');
       }
 
       changeType = DietChangeType.values.firstWhere(
@@ -90,8 +94,11 @@ class DietPlanChange {
     // 处理 dayIndex（兼容蛇形和驼峰命名）
     final dayIndex = (json['dayIndex'] ?? json['day_index'] ?? 0) as int;
     final mealIndex = (json['mealIndex'] ?? json['meal_index']) as int?;
-    final foodItemIndex = (json['foodItemIndex'] ?? json['food_item_index']) as int?;
-    final id = json['id'] as String? ?? 'change_${DateTime.now().millisecondsSinceEpoch}';
+    final foodItemIndex =
+        (json['foodItemIndex'] ?? json['food_item_index']) as int?;
+    final id =
+        json['id'] as String? ??
+        'change_${DateTime.now().millisecondsSinceEpoch}';
 
     // before/after 保持为 dynamic
     final before = json['before'];
@@ -181,7 +188,9 @@ class DietPlanEditSuggestion {
   factory DietPlanEditSuggestion.fromJson(Map<String, dynamic> json) {
     final changesJson = json['changes'] as List<dynamic>? ?? [];
     final changes = changesJson
-        .map((c) => DietPlanChange.fromJson(Map<String, dynamic>.from(c as Map)))
+        .map(
+          (c) => DietPlanChange.fromJson(Map<String, dynamic>.from(c as Map)),
+        )
         .toList();
 
     MacrosChange? macrosChange;
@@ -215,7 +224,9 @@ class DietPlanEditSuggestion {
       analysis: analysis ?? this.analysis,
       changes: changes ?? this.changes,
       summary: clearSummary ? null : (summary ?? this.summary),
-      macrosChange: clearMacrosChange ? null : (macrosChange ?? this.macrosChange),
+      macrosChange: clearMacrosChange
+          ? null
+          : (macrosChange ?? this.macrosChange),
     );
   }
 

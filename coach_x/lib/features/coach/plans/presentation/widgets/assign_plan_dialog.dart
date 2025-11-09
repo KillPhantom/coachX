@@ -13,10 +13,7 @@ import 'student_selection_list.dart';
 class AssignPlanDialog extends ConsumerStatefulWidget {
   final PlanBaseModel plan;
 
-  const AssignPlanDialog({
-    super.key,
-    required this.plan,
-  });
+  const AssignPlanDialog({super.key, required this.plan});
 
   @override
   ConsumerState<AssignPlanDialog> createState() => _AssignPlanDialogState();
@@ -51,8 +48,7 @@ class _AssignPlanDialogState extends ConsumerState<AssignPlanDialog> {
 
       // 构建选择项列表
       final items = students.map((student) {
-        final hasCurrentPlan =
-            widget.plan.studentIds.contains(student.id);
+        final hasCurrentPlan = widget.plan.studentIds.contains(student.id);
         final hasConflictPlan = _checkConflictPlan(student);
 
         return StudentSelectionItem(
@@ -78,7 +74,7 @@ class _AssignPlanDialogState extends ConsumerState<AssignPlanDialog> {
 
   /// 检查学生是否有同类计划冲突
   bool _checkConflictPlan(StudentListItemModel student) {
-      switch (widget.plan.planType) {
+    switch (widget.plan.planType) {
       case 'exercise':
         return student.exercisePlan != null &&
             student.exercisePlan!.id != widget.plan.id;
@@ -96,7 +92,9 @@ class _AssignPlanDialogState extends ConsumerState<AssignPlanDialog> {
   /// 切换学生选择状态
   void _toggleStudent(String studentId) {
     setState(() {
-      final index = _students.indexWhere((item) => item.student.id == studentId);
+      final index = _students.indexWhere(
+        (item) => item.student.id == studentId,
+      );
       if (index != -1) {
         _students[index] = _students[index].copyWith(
           isSelected: !_students[index].isSelected,
@@ -135,14 +133,20 @@ class _AssignPlanDialogState extends ConsumerState<AssignPlanDialog> {
     try {
       // 计算需要分配和取消分配的学生
       final originalAssignedIds = widget.plan.studentIds.toSet();
-      final newAssignedIds = selectedStudents.map((item) => item.student.id).toSet();
+      final newAssignedIds = selectedStudents
+          .map((item) => item.student.id)
+          .toSet();
 
       final toAssign = newAssignedIds.difference(originalAssignedIds).toList();
-      final toUnassign = originalAssignedIds.difference(newAssignedIds).toList();
+      final toUnassign = originalAssignedIds
+          .difference(newAssignedIds)
+          .toList();
 
       // 执行分配
       if (toAssign.isNotEmpty) {
-        await ref.read(plansNotifierProvider.notifier).assignPlan(
+        await ref
+            .read(plansNotifierProvider.notifier)
+            .assignPlan(
               planId: widget.plan.id,
               planType: widget.plan.planType,
               studentIds: toAssign,
@@ -152,7 +156,9 @@ class _AssignPlanDialogState extends ConsumerState<AssignPlanDialog> {
 
       // 执行取消分配
       if (toUnassign.isNotEmpty) {
-        await ref.read(plansNotifierProvider.notifier).assignPlan(
+        await ref
+            .read(plansNotifierProvider.notifier)
+            .assignPlan(
               planId: widget.plan.id,
               planType: widget.plan.planType,
               studentIds: toUnassign,
@@ -179,7 +185,9 @@ class _AssignPlanDialogState extends ConsumerState<AssignPlanDialog> {
   }
 
   /// 显示冲突警告
-  Future<bool> _showConflictWarning(List<StudentSelectionItem> conflicts) async {
+  Future<bool> _showConflictWarning(
+    List<StudentSelectionItem> conflicts,
+  ) async {
     final result = await showCupertinoDialog<bool>(
       context: context,
       builder: (context) => CupertinoAlertDialog(
@@ -280,9 +288,7 @@ class _AssignPlanDialogState extends ConsumerState<AssignPlanDialog> {
               ),
             ),
             // 学生列表
-            Expanded(
-              child: _buildContent(),
-            ),
+            Expanded(child: _buildContent()),
           ],
         ),
       ),
@@ -329,9 +335,7 @@ class _AssignPlanDialogState extends ConsumerState<AssignPlanDialog> {
       return Center(
         child: Text(
           'No students available',
-          style: AppTextStyles.callout.copyWith(
-            color: AppColors.textSecondary,
-          ),
+          style: AppTextStyles.callout.copyWith(color: AppColors.textSecondary),
         ),
       );
     }
@@ -343,4 +347,3 @@ class _AssignPlanDialogState extends ConsumerState<AssignPlanDialog> {
     );
   }
 }
-

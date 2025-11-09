@@ -205,6 +205,16 @@ def update_user_info(req: https_fn.CallableRequest):
                 raise https_fn.HttpsError('invalid-argument', 'languageCode 必须是字符串')
             update_data['languageCode'] = language_code
 
+        # Active plan IDs
+        if 'activeExercisePlanId' in req.data:
+            update_data['activeExercisePlanId'] = req.data['activeExercisePlanId']
+
+        if 'activeDietPlanId' in req.data:
+            update_data['activeDietPlanId'] = req.data['activeDietPlanId']
+
+        if 'activeSupplementPlanId' in req.data:
+            update_data['activeSupplementPlanId'] = req.data['activeSupplementPlanId']
+
         if not update_data:
             raise https_fn.HttpsError('invalid-argument', '没有要更新的数据')
         
@@ -318,10 +328,10 @@ def update_user_preferences(req: https_fn.CallableRequest):
 def clear_conversation_history(req: https_fn.CallableRequest):
     """
     清空对话历史
-    
+
     请求参数:
         无（使用当前登录用户）
-    
+
     返回:
         - status: 状态码
         - message: 消息
@@ -330,25 +340,84 @@ def clear_conversation_history(req: https_fn.CallableRequest):
         # 检查认证
         if not req.auth:
             raise https_fn.HttpsError('unauthenticated', '用户未登录')
-        
+
         user_id = req.auth.uid
-        
+
         # 清空对话历史
         success = MemoryManager.clear_conversation_history(user_id)
-        
+
         if not success:
             raise https_fn.HttpsError('internal', '清空对话历史失败')
-        
+
         logger.info(f'清空对话历史成功: {user_id}')
-        
+
         return {
             'status': 'success',
             'message': '对话历史已清空'
         }
-    
+
     except https_fn.HttpsError:
         raise
     except Exception as e:
         logger.error(f'清空对话历史失败', e)
+        raise https_fn.HttpsError('internal', f'服务器错误: {str(e)}')
+
+
+@https_fn.on_call()
+def update_active_plan(req: https_fn.CallableRequest):
+    """
+    更新学生的 active plan ID
+
+    请求参数:
+        - planType: str, 计划类型 ('exercise' | 'diet' | 'supplement')
+        - planId: str, 计划ID
+
+    返回:
+        - status: 状态码
+        - message: 消息
+    """
+    try:
+        # 检查认证
+        if not req.auth:
+            raise https_fn.HttpsError('unauthenticated', '用户未登录')
+
+        user_id = req.auth.uid
+        plan_type = req.data.get('planType', '').lower()
+        plan_id = req.data.get('planId')
+
+        # 验证参数
+        if plan_type not in ['exercise', 'diet', 'supplement']:
+            raise https_fn.HttpsError(
+                'invalid-argument',
+                f'无效的计划类型: {plan_type}，必须是 exercise, diet 或 supplement'
+            )
+
+        if not plan_id:
+            raise https_fn.HttpsError('invalid-argument', 'planId 不能为空')
+
+        # 映射字段名
+        field_map = {
+            'exercise': 'activeExercisePlanId',
+            'diet': 'activeDietPlanId',
+            'supplement': 'activeSupplementPlanId'
+        }
+
+        field_name = field_map[plan_type]
+
+        # 更新用户文档
+        update_data = {field_name: plan_id}
+        db_helper.update_document('users', user_id, update_data)
+
+        logger.info(f'更新 Active Plan 成功: user={user_id}, type={plan_type}, planId={plan_id}')
+
+        return {
+            'status': 'success',
+            'message': 'Active plan 更新成功'
+        }
+
+    except https_fn.HttpsError:
+        raise
+    except Exception as e:
+        logger.error(f'更新 Active Plan 失败', e)
         raise https_fn.HttpsError('internal', f'服务器错误: {str(e)}')
 

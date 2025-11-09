@@ -159,7 +159,11 @@ int? safeIntCast(dynamic data, [int? defaultValue, String? fieldName]) {
 /// - 如果 data 是 int，转换为 double
 /// - 如果 data 是 String，尝试解析为 double
 /// - 否则返回 defaultValue 或 null
-double? safeDoubleCast(dynamic data, [double? defaultValue, String? fieldName]) {
+double? safeDoubleCast(
+  dynamic data, [
+  double? defaultValue,
+  String? fieldName,
+]) {
   if (data == null) return defaultValue;
 
   // 已经是 double，直接返回

@@ -188,4 +188,3 @@ Equipment equipmentFromString(String value) {
       return Equipment.dumbbell;
   }
 }
-

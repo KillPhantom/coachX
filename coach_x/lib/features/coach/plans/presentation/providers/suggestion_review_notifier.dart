@@ -14,7 +14,10 @@ class SuggestionReviewNotifier extends StateNotifier<SuggestionReviewState?> {
   SuggestionReviewNotifier() : super(null);
 
   /// 开始 Review Mode
-  void startReview(PlanEditSuggestion suggestion, ExercisePlanModel originalPlan) {
+  void startReview(
+    PlanEditSuggestion suggestion,
+    ExercisePlanModel originalPlan,
+  ) {
     AppLogger.info('🔍 开始 Review Mode - ${suggestion.changes.length} 处修改');
 
     state = SuggestionReviewState.initial(
@@ -172,7 +175,10 @@ class SuggestionReviewNotifier extends StateNotifier<SuggestionReviewState?> {
     if (change.exerciseIndex! >= exercises.length) return plan;
 
     final currentExercise = exercises[change.exerciseIndex!];
-    final modifications = _parseExerciseModification(change.after, currentExercise);
+    final modifications = _parseExerciseModification(
+      change.after,
+      currentExercise,
+    );
 
     // 解析 sets（如果有）
     List<TrainingSet>? newSets;
@@ -180,7 +186,10 @@ class SuggestionReviewNotifier extends StateNotifier<SuggestionReviewState?> {
       final setsData = modifications['sets'];
       if (setsData is List) {
         newSets = setsData
-            .map((setJson) => TrainingSet.fromJson(setJson as Map<String, dynamic>))
+            .map(
+              (setJson) =>
+                  TrainingSet.fromJson(setJson as Map<String, dynamic>),
+            )
             .toList();
       } else if (setsData is String) {
         newSets = _parseSetsData(setsData);
@@ -239,7 +248,10 @@ class SuggestionReviewNotifier extends StateNotifier<SuggestionReviewState?> {
   }
 
   /// 修改动作的训练组（exercise-level）
-  ExercisePlanModel _modifyExerciseSets(ExercisePlanModel plan, PlanChange change) {
+  ExercisePlanModel _modifyExerciseSets(
+    ExercisePlanModel plan,
+    PlanChange change,
+  ) {
     if (change.exerciseIndex == null) return plan;
 
     final days = List<ExerciseTrainingDay>.from(plan.days);
@@ -254,7 +266,9 @@ class SuggestionReviewNotifier extends StateNotifier<SuggestionReviewState?> {
     // change.after 应该是 List<Map<String, String>>
     final afterData = change.after;
     if (afterData is! List) {
-      AppLogger.warning('⚠️ modifyExerciseSets 需要数组类型的 after，但得到了 ${afterData.runtimeType}');
+      AppLogger.warning(
+        '⚠️ modifyExerciseSets 需要数组类型的 after，但得到了 ${afterData.runtimeType}',
+      );
       return plan;
     }
 
@@ -310,7 +324,10 @@ class SuggestionReviewNotifier extends StateNotifier<SuggestionReviewState?> {
   }
 
   /// 调整强度
-  ExercisePlanModel _adjustIntensity(ExercisePlanModel plan, PlanChange change) {
+  ExercisePlanModel _adjustIntensity(
+    ExercisePlanModel plan,
+    PlanChange change,
+  ) {
     final adjustment = _parseIntensityAdjustment(
       change.after ?? change.description,
     );
@@ -457,11 +474,7 @@ class SuggestionReviewNotifier extends StateNotifier<SuggestionReviewState?> {
 
       if (percentMatch != null) {
         final value = double.tryParse(percentMatch.group(1) ?? '0') ?? 0;
-        return {
-          'type': 'percentage',
-          'value': value,
-          'unit': '%',
-        };
+        return {'type': 'percentage', 'value': value, 'unit': '%'};
       }
 
       // 绝对值格式: "+5kg", "-10lb", "add 5kg"
@@ -474,11 +487,7 @@ class SuggestionReviewNotifier extends StateNotifier<SuggestionReviewState?> {
       if (absoluteMatch != null) {
         final value = double.tryParse(absoluteMatch.group(1) ?? '0') ?? 0;
         final unit = absoluteMatch.group(2)?.toLowerCase() ?? 'kg';
-        return {
-          'type': 'absolute',
-          'value': value,
-          'unit': unit,
-        };
+        return {'type': 'absolute', 'value': value, 'unit': unit};
       }
 
       return null;
@@ -627,9 +636,7 @@ class SuggestionReviewNotifier extends StateNotifier<SuggestionReviewState?> {
 
         // 尝试 JSON 格式
         if (trimmed.startsWith('{')) {
-          final json = Map<String, dynamic>.from(
-            jsonDecode(trimmed) as Map,
-          );
+          final json = Map<String, dynamic>.from(jsonDecode(trimmed) as Map);
 
           return {
             if (json.containsKey('name')) 'name': json['name'] as String,
@@ -668,7 +675,10 @@ class SuggestionReviewNotifier extends StateNotifier<SuggestionReviewState?> {
             // JSON 数组格式
             final setsJson = data['sets'] as List;
             sets = setsJson
-                .map((setJson) => TrainingSet.fromJson(setJson as Map<String, dynamic>))
+                .map(
+                  (setJson) =>
+                      TrainingSet.fromJson(setJson as Map<String, dynamic>),
+                )
                 .toList();
           } else if (data['sets'] is String) {
             // 字符串格式，需要解析
@@ -700,9 +710,7 @@ class SuggestionReviewNotifier extends StateNotifier<SuggestionReviewState?> {
 
         // 尝试 JSON 格式
         if (trimmed.startsWith('{')) {
-          final json = Map<String, dynamic>.from(
-            jsonDecode(trimmed) as Map,
-          );
+          final json = Map<String, dynamic>.from(jsonDecode(trimmed) as Map);
 
           // 解析 sets 数据
           List<TrainingSet> sets = [TrainingSet.empty()];
@@ -711,7 +719,10 @@ class SuggestionReviewNotifier extends StateNotifier<SuggestionReviewState?> {
               // JSON 数组格式
               final setsJson = json['sets'] as List;
               sets = setsJson
-                  .map((setJson) => TrainingSet.fromJson(setJson as Map<String, dynamic>))
+                  .map(
+                    (setJson) =>
+                        TrainingSet.fromJson(setJson as Map<String, dynamic>),
+                  )
                   .toList();
             } else if (json['sets'] is String) {
               // 字符串格式，需要解析
@@ -763,9 +774,7 @@ class SuggestionReviewNotifier extends StateNotifier<SuggestionReviewState?> {
 
         // 尝试 JSON 格式
         if (trimmed.startsWith('{')) {
-          final json = Map<String, dynamic>.from(
-            jsonDecode(trimmed) as Map,
-          );
+          final json = Map<String, dynamic>.from(jsonDecode(trimmed) as Map);
 
           // 解析 exercises 数据
           List<Exercise> exercises = [];
@@ -779,7 +788,11 @@ class SuggestionReviewNotifier extends StateNotifier<SuggestionReviewState?> {
                   if (exerciseJson['sets'] is List) {
                     final setsJson = exerciseJson['sets'] as List;
                     sets = setsJson
-                        .map((setJson) => TrainingSet.fromJson(setJson as Map<String, dynamic>))
+                        .map(
+                          (setJson) => TrainingSet.fromJson(
+                            setJson as Map<String, dynamic>,
+                          ),
+                        )
                         .toList();
                   }
                 }
@@ -833,7 +846,11 @@ class SuggestionReviewNotifier extends StateNotifier<SuggestionReviewState?> {
                 if (exerciseJson['sets'] is List) {
                   final setsJson = exerciseJson['sets'] as List;
                   sets = setsJson
-                      .map((setJson) => TrainingSet.fromJson(setJson as Map<String, dynamic>))
+                      .map(
+                        (setJson) => TrainingSet.fromJson(
+                          setJson as Map<String, dynamic>,
+                        ),
+                      )
                       .toList();
                 }
               }

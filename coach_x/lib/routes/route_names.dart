@@ -31,6 +31,21 @@ class RouteNames {
   /// 学生资料页
   static const String studentProfile = '/student/profile';
 
+  /// 学生饮食记录页
+  static const String studentDietRecord = '/student/diet-record';
+
+  /// AI食物扫描页
+  static const String studentAIFoodScanner = '/student/ai-food-scanner';
+
+  /// 身体数据记录页
+  static const String studentBodyStatsRecord = '/student/body-stats-record';
+
+  /// 身体数据历史页
+  static const String studentBodyStatsHistory = '/student/body-stats-history';
+
+  /// 训练记录页
+  static const String studentExerciseRecord = '/student/exercise-record';
+
   // ==================== 教练端路由 ====================
 
   /// 教练首页

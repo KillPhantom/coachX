@@ -247,7 +247,8 @@ class StorageService {
       final timestamp = DateTime.now().millisecondsSinceEpoch;
       final extension = file.path.split('.').last;
       final randomId = DateTime.now().microsecondsSinceEpoch.toString();
-      final path = 'chat_images/$userId/$conversationId/${timestamp}_$randomId.$extension';
+      final path =
+          'chat_images/$userId/$conversationId/${timestamp}_$randomId.$extension';
 
       return await uploadFile(file, path, onProgress: onProgress);
     } catch (e, stackTrace) {
@@ -276,7 +277,8 @@ class StorageService {
       final timestamp = DateTime.now().millisecondsSinceEpoch;
       final extension = file.path.split('.').last;
       final randomId = DateTime.now().microsecondsSinceEpoch.toString();
-      final path = 'chat_videos/$userId/$conversationId/${timestamp}_$randomId.$extension';
+      final path =
+          'chat_videos/$userId/$conversationId/${timestamp}_$randomId.$extension';
 
       return await uploadFile(file, path, onProgress: onProgress);
     } catch (e, stackTrace) {
@@ -305,7 +307,8 @@ class StorageService {
       final timestamp = DateTime.now().millisecondsSinceEpoch;
       final extension = file.path.split('.').last;
       final randomId = DateTime.now().microsecondsSinceEpoch.toString();
-      final path = 'chat_voices/$userId/$conversationId/${timestamp}_$randomId.$extension';
+      final path =
+          'chat_voices/$userId/$conversationId/${timestamp}_$randomId.$extension';
 
       return await uploadFile(file, path, onProgress: onProgress);
     } catch (e, stackTrace) {

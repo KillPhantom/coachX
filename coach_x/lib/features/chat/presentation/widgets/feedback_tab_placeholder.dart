@@ -110,9 +110,7 @@ class FeedbackTabPlaceholder extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 8),
       child: Text(
         text,
-        style: AppTextStyles.body.copyWith(
-          color: AppColors.textSecondary,
-        ),
+        style: AppTextStyles.body.copyWith(color: AppColors.textSecondary),
       ),
     );
   }

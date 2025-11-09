@@ -28,7 +28,10 @@ class SupplementTiming {
   factory SupplementTiming.fromJson(Map<String, dynamic> json) {
     final supplementsJson = json['supplements'] as List<dynamic>? ?? [];
     final supplements = supplementsJson
-        .map((supplement) => Supplement.fromJson(Map<String, dynamic>.from(supplement as Map)))
+        .map(
+          (supplement) =>
+              Supplement.fromJson(Map<String, dynamic>.from(supplement as Map)),
+        )
         .toList();
 
     return SupplementTiming(
@@ -44,7 +47,9 @@ class SupplementTiming {
     return {
       'name': name,
       'note': note,
-      'supplements': supplements.map((supplement) => supplement.toJson()).toList(),
+      'supplements': supplements
+          .map((supplement) => supplement.toJson())
+          .toList(),
       'completed': completed,
     };
   }

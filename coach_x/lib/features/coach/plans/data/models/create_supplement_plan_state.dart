@@ -36,8 +36,10 @@ class CreateSupplementPlanState {
   int get totalDays => days.length;
 
   /// 计算属性 - 总补剂数
-  int get totalSupplements =>
-      days.fold(0, (sum, day) => sum + day.timings.fold(0, (s, t) => s + t.supplements.length));
+  int get totalSupplements => days.fold(
+    0,
+    (sum, day) => sum + day.timings.fold(0, (s, t) => s + t.supplements.length),
+  );
 
   /// 复制并修改部分字段
   CreateSupplementPlanState copyWith({

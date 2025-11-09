@@ -175,4 +175,3 @@ TrainingStyle trainingStyleFromString(String value) {
       return TrainingStyle.pyramid;
   }
 }
-

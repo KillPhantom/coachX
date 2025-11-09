@@ -7,6 +7,7 @@ import 'package:coach_x/core/theme/app_text_styles.dart';
 import 'package:coach_x/core/theme/app_dimensions.dart';
 import 'package:coach_x/core/widgets/custom_button.dart';
 import 'package:coach_x/core/widgets/custom_text_field.dart';
+import 'package:coach_x/core/widgets/dismiss_keyboard.dart';
 import 'package:coach_x/core/utils/validation_utils.dart';
 import 'package:coach_x/features/auth/presentation/controllers/register_controller.dart';
 import 'package:coach_x/routes/route_names.dart';
@@ -77,11 +78,12 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
     return CupertinoPageScaffold(
       backgroundColor: AppColors.backgroundLight,
       child: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(AppDimensions.paddingXL),
-          child: Form(
-            key: _formKey,
-            child: Column(
+        child: DismissKeyboard(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(AppDimensions.paddingXL),
+            child: Form(
+              key: _formKey,
+              child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 // 返回按钮
@@ -252,6 +254,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
               ],
             ),
           ),
+        ),
         ),
       ),
     );

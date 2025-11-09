@@ -12,7 +12,6 @@ final planRepositoryProvider = Provider<PlanRepository>((ref) {
 /// 计划状态管理Provider
 final plansNotifierProvider =
     StateNotifierProvider<PlansNotifier, PlansPageState>((ref) {
-  final repository = ref.watch(planRepositoryProvider);
-  return PlansNotifier(repository);
-});
-
+      final repository = ref.watch(planRepositoryProvider);
+      return PlansNotifier(repository);
+    });

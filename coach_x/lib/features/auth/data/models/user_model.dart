@@ -27,6 +27,11 @@ class UserModel {
   final String? unitPreference; // 单位偏好: 'metric' | 'imperial'
   final String? languageCode; // 语言偏好: 'en' | 'zh'
 
+  // Active plan IDs (学生当前激活的计划)
+  final String? activeExercisePlanId; // 当前激活的训练计划ID
+  final String? activeDietPlanId; // 当前激活的饮食计划ID
+  final String? activeSupplementPlanId; // 当前激活的补剂计划ID
+
   const UserModel({
     required this.id,
     required this.email,
@@ -48,6 +53,9 @@ class UserModel {
     this.notificationsEnabled = true,
     this.unitPreference,
     this.languageCode,
+    this.activeExercisePlanId,
+    this.activeDietPlanId,
+    this.activeSupplementPlanId,
   });
 
   /// 从Firestore文档创建
@@ -103,10 +111,14 @@ class UserModel {
       tags: parsedTags,
       contractExpiresAt: (data['contractExpiresAt'] as Timestamp?)?.toDate(),
       subscriptionPlan: data['subscriptionPlan'] as String?,
-      subscriptionRenewsAt: (data['subscriptionRenewsAt'] as Timestamp?)?.toDate(),
+      subscriptionRenewsAt: (data['subscriptionRenewsAt'] as Timestamp?)
+          ?.toDate(),
       notificationsEnabled: data['notificationsEnabled'] as bool? ?? true,
       unitPreference: data['unitPreference'] as String?,
       languageCode: data['languageCode'] as String?,
+      activeExercisePlanId: data['activeExercisePlanId'] as String?,
+      activeDietPlanId: data['activeDietPlanId'] as String?,
+      activeSupplementPlanId: data['activeSupplementPlanId'] as String?,
     );
   }
 
@@ -129,7 +141,13 @@ class UserModel {
       if (tags != null) 'tags': tags,
       if (contractExpiresAt != null) 'contractExpiresAt': contractExpiresAt,
       if (subscriptionPlan != null) 'subscriptionPlan': subscriptionPlan,
-      if (subscriptionRenewsAt != null) 'subscriptionRenewsAt': subscriptionRenewsAt,
+      if (subscriptionRenewsAt != null)
+        'subscriptionRenewsAt': subscriptionRenewsAt,
+      if (activeExercisePlanId != null)
+        'activeExercisePlanId': activeExercisePlanId,
+      if (activeDietPlanId != null) 'activeDietPlanId': activeDietPlanId,
+      if (activeSupplementPlanId != null)
+        'activeSupplementPlanId': activeSupplementPlanId,
       // createdAt和updatedAt由FirestoreService自动管理
     };
   }
@@ -161,6 +179,9 @@ class UserModel {
     bool? notificationsEnabled,
     String? unitPreference,
     String? languageCode,
+    String? activeExercisePlanId,
+    String? activeDietPlanId,
+    String? activeSupplementPlanId,
   }) {
     return UserModel(
       id: id ?? this.id,
@@ -183,6 +204,10 @@ class UserModel {
       notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
       unitPreference: unitPreference ?? this.unitPreference,
       languageCode: languageCode ?? this.languageCode,
+      activeExercisePlanId: activeExercisePlanId ?? this.activeExercisePlanId,
+      activeDietPlanId: activeDietPlanId ?? this.activeDietPlanId,
+      activeSupplementPlanId:
+          activeSupplementPlanId ?? this.activeSupplementPlanId,
     );
   }
 

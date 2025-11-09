@@ -14,10 +14,7 @@ import 'package:coach_x/features/coach/plans/data/models/import_result.dart';
 class ImportPlanSheet extends ConsumerStatefulWidget {
   final Function(ImportResult) onImportSuccess;
 
-  const ImportPlanSheet({
-    super.key,
-    required this.onImportSuccess,
-  });
+  const ImportPlanSheet({super.key, required this.onImportSuccess});
 
   @override
   ConsumerState<ImportPlanSheet> createState() => _ImportPlanSheetState();
@@ -342,10 +339,7 @@ class _ImportPlanSheetState extends ConsumerState<ImportPlanSheet> {
         children: [
           CupertinoActivityIndicator(),
           const SizedBox(width: 12),
-          Text(
-            'AI 正在识别...',
-            style: TextStyle(color: AppColors.textPrimary),
-          ),
+          Text('AI 正在识别...', style: TextStyle(color: AppColors.textPrimary)),
         ],
       ),
     );
@@ -361,10 +355,7 @@ class _ImportPlanSheetState extends ConsumerState<ImportPlanSheet> {
       ),
       child: Row(
         children: [
-          Icon(
-            CupertinoIcons.exclamationmark_circle,
-            color: AppColors.error,
-          ),
+          Icon(CupertinoIcons.exclamationmark_circle, color: AppColors.error),
           const SizedBox(width: 12),
           Expanded(
             child: Text(
@@ -391,10 +382,7 @@ class _ImportPlanSheetState extends ConsumerState<ImportPlanSheet> {
         children: [
           Row(
             children: [
-              Icon(
-                CupertinoIcons.check_mark_circled,
-                color: AppColors.success,
-              ),
+              Icon(CupertinoIcons.check_mark_circled, color: AppColors.success),
               const SizedBox(width: 12),
               Text(
                 '识别成功',
@@ -428,15 +416,17 @@ class _ImportPlanSheetState extends ConsumerState<ImportPlanSheet> {
               ),
             ),
             const SizedBox(height: 4),
-            ...result.warnings.map((warning) => Padding(
-                  padding: const EdgeInsets.only(left: 8, top: 4),
-                  child: Text(
-                    '• $warning',
-                    style: AppTextStyles.caption1.copyWith(
-                      color: AppColors.textSecondary,
-                    ),
+            ...result.warnings.map(
+              (warning) => Padding(
+                padding: const EdgeInsets.only(left: 8, top: 4),
+                child: Text(
+                  '• $warning',
+                  style: AppTextStyles.caption1.copyWith(
+                    color: AppColors.textSecondary,
                   ),
-                )),
+                ),
+              ),
+            ),
           ],
         ],
       ),
@@ -501,4 +491,3 @@ class _ImportPlanSheetState extends ConsumerState<ImportPlanSheet> {
     );
   }
 }
-

@@ -19,10 +19,10 @@ class CreateTrainingPlanState {
   final int? selectedExerciseIndex;
   final List<String> validationErrors;
   final bool isEditMode;
-  
+
   /// 正在构建中的训练日
   final ExerciseTrainingDay? currentDayInProgress;
-  
+
   /// 当前正在生成的天数
   final int? currentDayNumber;
 
@@ -70,7 +70,8 @@ class CreateTrainingPlanState {
       suggestions: suggestions ?? this.suggestions,
       errorMessage: errorMessage ?? this.errorMessage,
       selectedDayIndex: selectedDayIndex ?? this.selectedDayIndex,
-      selectedExerciseIndex: selectedExerciseIndex ?? this.selectedExerciseIndex,
+      selectedExerciseIndex:
+          selectedExerciseIndex ?? this.selectedExerciseIndex,
       validationErrors: validationErrors ?? this.validationErrors,
       isEditMode: isEditMode ?? this.isEditMode,
       currentDayInProgress: currentDayInProgress ?? this.currentDayInProgress,
@@ -80,18 +81,12 @@ class CreateTrainingPlanState {
 
   /// 清空错误信息
   CreateTrainingPlanState clearError() {
-    return copyWith(
-      errorMessage: '',
-      validationErrors: [],
-    );
+    return copyWith(errorMessage: '', validationErrors: []);
   }
 
   /// 清空选择
   CreateTrainingPlanState clearSelection() {
-    return copyWith(
-      selectedDayIndex: -1,
-      selectedExerciseIndex: -1,
-    );
+    return copyWith(selectedDayIndex: -1, selectedExerciseIndex: -1);
   }
 
   /// 验证当前状态
@@ -124,7 +119,7 @@ class CreateTrainingPlanState {
       // 如果训练日有动作，验证这些动作
       if (day.exercises.isNotEmpty) {
         hasAtLeastOneExercise = true;
-        
+
         // 每个动作要有名称和至少一组
         for (final exercise in day.exercises) {
           if (exercise.name.trim().isEmpty || exercise.sets.isEmpty) {
@@ -220,5 +215,3 @@ class CreateTrainingPlanState {
         'canSave: $canSave)';
   }
 }
-
-

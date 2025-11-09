@@ -51,9 +51,7 @@ class MediaMessageWidget extends StatelessWidget {
             width: 200,
             height: 200,
             color: AppColors.backgroundSecondary,
-            child: const Center(
-              child: CupertinoActivityIndicator(),
-            ),
+            child: const Center(child: CupertinoActivityIndicator()),
           ),
           errorWidget: (context, url, error) => Container(
             width: 200,
@@ -107,9 +105,7 @@ class MediaMessageWidget extends StatelessWidget {
     Navigator.of(context).push(
       CupertinoPageRoute(
         fullscreenDialog: true,
-        builder: (context) => _ImageFullScreenPage(
-          imageUrl: message.mediaUrl!,
-        ),
+        builder: (context) => _ImageFullScreenPage(imageUrl: message.mediaUrl!),
       ),
     );
   }
@@ -119,9 +115,7 @@ class MediaMessageWidget extends StatelessWidget {
 class _ImageFullScreenPage extends StatelessWidget {
   final String imageUrl;
 
-  const _ImageFullScreenPage({
-    required this.imageUrl,
-  });
+  const _ImageFullScreenPage({required this.imageUrl});
 
   @override
   Widget build(BuildContext context) {
@@ -132,10 +126,7 @@ class _ImageFullScreenPage extends StatelessWidget {
         leading: CupertinoButton(
           padding: EdgeInsets.zero,
           onPressed: () => Navigator.of(context).pop(),
-          child: const Icon(
-            CupertinoIcons.xmark,
-            color: CupertinoColors.white,
-          ),
+          child: const Icon(CupertinoIcons.xmark, color: CupertinoColors.white),
         ),
         middle: const Text(
           '图片',
@@ -152,9 +143,7 @@ class _ImageFullScreenPage extends StatelessWidget {
             color: CupertinoColors.black,
           ),
           loadingBuilder: (context, event) => const Center(
-            child: CupertinoActivityIndicator(
-              color: CupertinoColors.white,
-            ),
+            child: CupertinoActivityIndicator(color: CupertinoColors.white),
           ),
         ),
       ),

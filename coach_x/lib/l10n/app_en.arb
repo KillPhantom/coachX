@@ -785,9 +785,14 @@
     "description": "Confirm log out message"
   },
 
-  "addRecordTitle": "Add Record",
+  "addRecordTitle": "Record Your Activity",
   "@addRecordTitle": {
     "description": "Add record title"
+  },
+
+  "addRecordSubtitle": "What would you like to add today?",
+  "@addRecordSubtitle": {
+    "description": "Add record subtitle"
   },
 
   "chooseRecordType": "Choose a record type to add",
@@ -795,14 +800,29 @@
     "description": "Choose record type message"
   },
 
-  "trainingRecord": "Training Record",
+  "trainingRecord": "Record Exercise",
   "@trainingRecord": {
     "description": "Training record type"
   },
 
-  "dietRecord": "Diet Record",
+  "trainingRecordDesc": "Log sets, reps, weight, and videos.",
+  "@trainingRecordDesc": {
+    "description": "Training record description"
+  },
+
+  "dietRecord": "Record Meal",
   "@dietRecord": {
     "description": "Diet record type"
+  },
+
+  "todayMealPlan": "Today's Meal Plan",
+  "@todayMealPlan": {
+    "description": "Today's meal plan title"
+  },
+
+  "dietRecordDesc": "Log food, quantity, and photos.",
+  "@dietRecordDesc": {
+    "description": "Diet record description"
   },
 
   "supplementRecord": "Supplement Record",
@@ -810,9 +830,27 @@
     "description": "Supplement record type"
   },
 
-  "bodyMeasurement": "Body Measurement",
+  "supplementPlan": "Supplement Plan",
+  "@supplementPlan": {
+    "description": "Supplement plan title"
+  },
+
+  "supplementsToTake": "{count} supplements to take",
+  "@supplementsToTake": {
+    "description": "Supplements count with action label",
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+
+  "bodyMeasurement": "Record Body Stats",
   "@bodyMeasurement": {
     "description": "Body measurement type"
+  },
+
+  "bodyMeasurementDesc": "Log weight and upload body pictures.",
+  "@bodyMeasurementDesc": {
+    "description": "Body measurement description"
   },
 
   "studentHome": "Student Home",
@@ -923,14 +961,9 @@
     }
   },
 
-  "todayRecord": "Today's Record",
+  "todayRecord": "Today's Meal Plan",
   "@todayRecord": {
-    "description": "Today's record section title"
-  },
-
-  "exerciseRecord": "Exercise Record",
-  "@exerciseRecord": {
-    "description": "Exercise record label"
+    "description": "Today's meal plan section title"
   },
 
   "protein": "Protein",
@@ -946,6 +979,16 @@
   "fat": "Fat",
   "@fat": {
     "description": "Fat macro label"
+  },
+
+  "totalNutrition": "Total Nutrition",
+  "@totalNutrition": {
+    "description": "Total nutrition label"
+  },
+
+  "kcal": "kcal",
+  "@kcal": {
+    "description": "Kilocalories unit"
   },
 
   "calories": "Calories",
@@ -1031,6 +1074,68 @@
     "description": "No exercises message"
   },
 
+  "sets": "sets",
+  "@sets": {
+    "description": "Sets label"
+  },
+
+  "reps": "reps",
+  "@reps": {
+    "description": "Reps label"
+  },
+
+  "exerciseSetsWithWeight": "{sets} sets x {reps} reps @ {weight}",
+  "@exerciseSetsWithWeight": {
+    "description": "Exercise sets format with weight",
+    "placeholders": {
+      "sets": {"type": "int"},
+      "reps": {"type": "String"},
+      "weight": {"type": "String"}
+    }
+  },
+
+  "exerciseSetsNoWeight": "{sets} sets x {reps} reps",
+  "@exerciseSetsNoWeight": {
+    "description": "Exercise sets format without weight",
+    "placeholders": {
+      "sets": {"type": "int"},
+      "reps": {"type": "String"}
+    }
+  },
+
+  "exerciseSetsOnly": "{sets} sets",
+  "@exerciseSetsOnly": {
+    "description": "Exercise sets only",
+    "placeholders": {
+      "sets": {"type": "int"}
+    }
+  },
+
+  "video": "Video",
+  "@video": {
+    "description": "Video label"
+  },
+
+  "coachNotes": "Coach Notes:",
+  "@coachNotes": {
+    "description": "Coach notes label"
+  },
+
+  "aiGuidanceInDevelopment": "AI Guidance Feature Coming Soon",
+  "@aiGuidanceInDevelopment": {
+    "description": "AI guidance feature placeholder message"
+  },
+
+  "comingSoon": "Coming Soon",
+  "@comingSoon": {
+    "description": "Coming soon dialog title"
+  },
+
+  "ok": "OK",
+  "@ok": {
+    "description": "OK button"
+  },
+
   "assignPlansToStudent": "Assign Plans to",
   "@assignPlansToStudent": {
     "description": "Assign plans to student dialog title"
@@ -1089,5 +1194,573 @@
   "done": "Done",
   "@done": {
     "description": "Done button label"
+  },
+
+  "ok": "OK",
+  "@ok": {
+    "description": "OK button label"
+  },
+
+  "save": "Save",
+  "@save": {
+    "description": "Save button label"
+  },
+
+  "noCoachTitle": "No Coach Assigned",
+  "@noCoachTitle": {
+    "description": "No coach assigned title"
+  },
+
+  "noCoachMessage": "Please contact support to get a coach assigned",
+  "@noCoachMessage": {
+    "description": "No coach assigned message"
+  },
+
+  "planTabTraining": "Training",
+  "@planTabTraining": {
+    "description": "Plan tab training label"
+  },
+
+  "planTabDiet": "Diet",
+  "@planTabDiet": {
+    "description": "Plan tab diet label"
+  },
+
+  "planTabSupplements": "Supplements",
+  "@planTabSupplements": {
+    "description": "Plan tab supplements label"
+  },
+
+  "coachsPlan": "Coach's Plan",
+  "@coachsPlan": {
+    "description": "Coach's plan header"
+  },
+
+  "coachNote": "Coach Note",
+  "@coachNote": {
+    "description": "Coach note label"
+  },
+
+  "video": "Video",
+  "@video": {
+    "description": "Video label"
+  },
+
+  "reps": "reps",
+  "@reps": {
+    "description": "Reps unit"
+  },
+
+  "sets": "sets",
+  "@sets": {
+    "description": "Sets unit"
+  },
+
+  "kg": "kg",
+  "@kg": {
+    "description": "Kilogram unit"
+  },
+
+  "lbs": "lbs",
+  "@lbs": {
+    "description": "Pounds unit"
+  },
+
+  "noExercisesForBodyPart": "No exercises for this body part",
+  "@noExercisesForBodyPart": {
+    "description": "No exercises for body part message"
+  },
+
+  "mealRecord": "Meal Record",
+  "@mealRecord": {
+    "description": "Meal record page title"
+  },
+
+  "coachSuggestion": "Coach Suggestion",
+  "@coachSuggestion": {
+    "description": "Coach suggestion section title"
+  },
+
+  "totalMacros": "Total Macros",
+  "@totalMacros": {
+    "description": "Total macros label"
+  },
+
+  "addRecord": "Add Record",
+  "@addRecord": {
+    "description": "Add record button label"
+  },
+
+  "editRecord": "Edit Record",
+  "@editRecord": {
+    "description": "Edit record button label"
+  },
+
+  "takePicture": "Take Picture",
+  "@takePicture": {
+    "description": "Take picture button label"
+  },
+
+  "uploadImage": "Upload Image",
+  "@uploadImage": {
+    "description": "Upload image button label"
+  },
+
+  "commentsOrQuestions": "Comments or Questions",
+  "@commentsOrQuestions": {
+    "description": "Comments section label"
+  },
+
+  "saveMealRecord": "Save Meal Record",
+  "@saveMealRecord": {
+    "description": "Save meal record button label"
+  },
+
+  "typeYourMessageHere": "Type your message here...",
+  "@typeYourMessageHere": {
+    "description": "Comments placeholder text"
+  },
+
+  "mealCompleted": "Completed",
+  "@mealCompleted": {
+    "description": "Meal completed status label"
+  },
+
+  "markAsComplete": "Mark as Complete",
+  "@markAsComplete": {
+    "description": "Mark as complete button label"
+  },
+
+  "editMeal": "Edit",
+  "@editMeal": {
+    "description": "Edit meal button label"
+  },
+
+  "recordSaved": "Record saved successfully",
+  "@recordSaved": {
+    "description": "Record saved success message"
+  },
+
+  "recordSaveFailed": "Failed to save record",
+  "@recordSaveFailed": {
+    "description": "Record save failed message"
+  },
+
+  "noMealsToday": "No meals planned for today",
+  "@noMealsToday": {
+    "description": "No meals planned message"
+  },
+
+  "macrosFormat": "{protein}P/{carbs}C/{fat}F",
+  "@macrosFormat": {
+    "description": "Macros format string",
+    "placeholders": {
+      "protein": {"type": "int"},
+      "carbs": {"type": "int"},
+      "fat": {"type": "int"}
+    }
+  },
+
+  "aiFoodScanner": "AI Food Scanner",
+  "@aiFoodScanner": {
+    "description": "AI food scanner page title"
+  },
+
+  "scanFood": "Scan Food",
+  "@scanFood": {
+    "description": "Scan food button label"
+  },
+
+  "uploadPhoto": "Upload Photo",
+  "@uploadPhoto": {
+    "description": "Upload photo button label"
+  },
+
+  "analyzing": "Analyzing...",
+  "@analyzing": {
+    "description": "Analyzing progress message"
+  },
+
+  "positionFoodInFrame": "Position food within the frame",
+  "@positionFoodInFrame": {
+    "description": "Camera focus area hint text"
+  },
+
+  "foodAnalysisResults": "Analysis Results",
+  "@foodAnalysisResults": {
+    "description": "Food analysis results title"
+  },
+
+  "estimatedWeight": "Estimated Weight",
+  "@estimatedWeight": {
+    "description": "Estimated weight label"
+  },
+
+  "adjustValues": "Adjust values if needed",
+  "@adjustValues": {
+    "description": "Adjust values hint"
+  },
+
+  "selectMeal": "Select Meal",
+  "@selectMeal": {
+    "description": "Select meal label"
+  },
+
+  "saveToMeal": "Save to Meal",
+  "@saveToMeal": {
+    "description": "Save to meal button"
+  },
+
+  "recognizedFoods": "{count} foods recognized",
+  "@recognizedFoods": {
+    "description": "Number of recognized foods",
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+
+  "cameraPermissionDenied": "Camera permission denied. Please enable camera access in Settings.",
+  "@cameraPermissionDenied": {
+    "description": "Camera permission denied message"
+  },
+
+  "analysisFailed": "Analysis Failed",
+  "@analysisFailed": {
+    "description": "Analysis failed title"
+  },
+
+  "plannedNutrition": "Planned",
+  "@plannedNutrition": {
+    "description": "Planned nutrition label"
+  },
+
+  "mealProgress": "Progress",
+  "@mealProgress": {
+    "description": "Meal progress label"
+  },
+
+  "aiDetectedFoods": "Detected Foods",
+  "@aiDetectedFoods": {
+    "description": "AI detected foods label"
+  },
+
+  "caloriesInput": "Calories",
+  "@caloriesInput": {
+    "description": "Calories input label"
+  },
+
+  "proteinInput": "Protein (g)",
+  "@proteinInput": {
+    "description": "Protein input label"
+  },
+
+  "carbsInput": "Carbs (g)",
+  "@carbsInput": {
+    "description": "Carbs input label"
+  },
+
+  "fatInput": "Fat (g)",
+  "@fatInput": {
+    "description": "Fat input label"
+  },
+
+  "aiDetectButton": "AI Smart Detection",
+  "@aiDetectButton": {
+    "description": "AI detect button label"
+  },
+
+  "addFoodRecord": "Add Food Record",
+  "@addFoodRecord": {
+    "description": "Add food record title"
+  },
+
+  "selectMealToAnalyze": "Select meal to analyze",
+  "@selectMealToAnalyze": {
+    "description": "Select meal placeholder"
+  },
+
+  "recordSavedSuccess": "Food record saved successfully",
+  "@recordSavedSuccess": {
+    "description": "Record saved success message"
+  },
+
+  "aiScannerMode": "AI Scanner",
+  "@aiScannerMode": {
+    "description": "AI scanner mode label"
+  },
+
+  "simpleRecordMode": "Simple Record",
+  "@simpleRecordMode": {
+    "description": "Simple record mode label"
+  },
+
+  "aiAnalyzing": "AI analyzing your food...",
+  "@aiAnalyzing": {
+    "description": "AI analyzing message"
+  },
+
+  "aiAnalysisProgress": "Analysis Progress",
+  "@aiAnalysisProgress": {
+    "description": "AI analysis progress label"
+  },
+
+  "totalNutrition": "Total Nutrition",
+  "@totalNutrition": {
+    "description": "Total nutrition section title"
+  },
+
+  "selectMealToSave": "Select meal to save",
+  "@selectMealToSave": {
+    "description": "Select meal to save prompt"
+  },
+
+  "bodyStatsHistory": "Body Stats History",
+  "@bodyStatsHistory": {
+    "description": "Body stats history page title"
+  },
+
+  "recordBodyStats": "Record Body Stats",
+  "@recordBodyStats": {
+    "description": "Record body stats action"
+  },
+
+  "bodyFat": "Body Fat %",
+  "@bodyFat": {
+    "description": "Body fat percentage label"
+  },
+
+  "bodyFatOptional": "Body Fat % (Optional)",
+  "@bodyFatOptional": {
+    "description": "Body fat percentage optional field"
+  },
+
+  "skipPhoto": "Skip Photo",
+  "@skipPhoto": {
+    "description": "Skip photo button"
+  },
+
+  "enterWeight": "Enter Weight",
+  "@enterWeight": {
+    "description": "Enter weight placeholder"
+  },
+
+  "enterBodyFat": "Enter Body Fat %",
+  "@enterBodyFat": {
+    "description": "Enter body fat percentage placeholder"
+  },
+
+  "last14Days": "Last 14 Days",
+  "@last14Days": {
+    "description": "Last 14 days filter"
+  },
+
+  "last30Days": "Last 30 Days",
+  "@last30Days": {
+    "description": "Last 30 days filter"
+  },
+
+  "last90Days": "Last 90 Days",
+  "@last90Days": {
+    "description": "Last 90 days filter"
+  },
+
+  "editRecord": "Edit Record",
+  "@editRecord": {
+    "description": "Edit record action"
+  },
+
+  "deleteRecord": "Delete Record",
+  "@deleteRecord": {
+    "description": "Delete record action"
+  },
+
+  "confirmDelete": "Are you sure you want to delete this record?",
+  "@confirmDelete": {
+    "description": "Confirm delete dialog message"
+  },
+
+  "noBodyStatsData": "No body stats data yet",
+  "@noBodyStatsData": {
+    "description": "Empty state message for body stats"
+  },
+
+  "weightTrend": "Weight Trend",
+  "@weightTrend": {
+    "description": "Weight trend chart title"
+  },
+
+  "recordDeleted": "Record deleted successfully",
+  "@recordDeleted": {
+    "description": "Record deleted success message"
+  },
+
+  "recordUpdated": "Record updated successfully",
+  "@recordUpdated": {
+    "description": "Record updated success message"
+  },
+
+  "maxPhotosReached": "Maximum 3 photos allowed",
+  "@maxPhotosReached": {
+    "description": "Maximum photos limit message"
+  },
+
+  "history": "History",
+  "@history": {
+    "description": "History section label"
+  },
+
+  "photos": "Photos",
+  "@photos": {
+    "description": "Photos label"
+  },
+
+  "takePhoto": "Take Photo",
+  "@takePhoto": {
+    "description": "Take photo action"
+  },
+
+  "myRecordings": "My Recordings",
+  "@myRecordings": {
+    "description": "My recordings section title"
+  },
+
+  "recordVideo": "Record Video",
+  "@recordVideo": {
+    "description": "Record video button label"
+  },
+
+  "set": "Set",
+  "@set": {
+    "description": "Training set label"
+  },
+
+  "quickComplete": "Quick Complete",
+  "@quickComplete": {
+    "description": "Quick complete button label"
+  },
+
+  "completed": "Completed",
+  "@completed": {
+    "description": "Completed status label"
+  },
+
+  "videoDurationExceeded": "Video must be ≤ 1 minute",
+  "@videoDurationExceeded": {
+    "description": "Video duration exceeded error message"
+  },
+
+  "recordingVideo": "Recording...",
+  "@recordingVideo": {
+    "description": "Recording video status"
+  },
+
+  "selectFromGallery": "Select from gallery",
+  "@selectFromGallery": {
+    "description": "Select from gallery action"
+  },
+
+  "startTimerConfirmTitle": "Start Timer",
+  "@startTimerConfirmTitle": {
+    "description": "Start timer dialog title"
+  },
+
+  "startTimerConfirmMessage": "Start training timer?",
+  "@startTimerConfirmMessage": {
+    "description": "Start timer confirmation message"
+  },
+
+  "startTimerButton": "Start",
+  "@startTimerButton": {
+    "description": "Start timer button"
+  },
+
+  "weightPlaceholder": "Bodyweight/60kg",
+  "@weightPlaceholder": {
+    "description": "Weight input placeholder"
+  },
+
+  "timeSpentLabel": "Time Spent",
+  "@timeSpentLabel": {
+    "description": "Time spent label for exercise"
+  },
+
+  "trainingRecord": "Training Record",
+  "@trainingRecord": {
+    "description": "Training record page title"
+  },
+
+  "loadFailed": "Load Failed",
+  "@loadFailed": {
+    "description": "Load failed error title"
+  },
+
+  "retry": "Retry",
+  "@retry": {
+    "description": "Retry button"
+  },
+
+  "noExercises": "No Exercises",
+  "@noExercises": {
+    "description": "No exercises placeholder title"
+  },
+
+  "addCustomExerciseHint": "Tap '+' to add custom exercise",
+  "@addCustomExerciseHint": {
+    "description": "Add custom exercise hint"
+  },
+
+  "completedCount": "{count} completed",
+  "@completedCount": {
+    "description": "Number of completed exercises",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+
+  "currentExercise": "Current Exercise",
+  "@currentExercise": {
+    "description": "Current exercise label in timer"
+  },
+
+  "totalDuration": "Total Duration",
+  "@totalDuration": {
+    "description": "Total duration label in timer"
+  },
+
+  "congratsTitle": "Congrats!",
+  "@congratsTitle": {
+    "description": "Congratulations title when all exercises are completed"
+  },
+
+  "congratsMessage": "You have finished all the exercises today!",
+  "@congratsMessage": {
+    "description": "Congratulations message when all exercises are completed"
+  },
+
+  "congratsMessageCompact": "Congrats! All exercises done!",
+  "@congratsMessageCompact": {
+    "description": "Compact congratulations message for single-line display"
+  },
+
+  "createNewPlan": "Create New Plan",
+  "@createNewPlan": {
+    "description": "Button text to create a new plan"
+  },
+
+  "selectPlan": "Select Plan",
+  "@selectPlan": {
+    "description": "Dropdown header to select a plan"
+  },
+
+  "myPlans": "My Plans",
+  "@myPlans": {
+    "description": "Section label for user's own plans"
+  },
+
+  "coachPlan": "Coach's Plan",
+  "@coachPlan": {
+    "description": "Label for coach-assigned plans"
   }
 }

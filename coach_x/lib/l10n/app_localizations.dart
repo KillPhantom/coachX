@@ -224,7 +224,7 @@ abstract class AppLocalizations {
   /// **'An error occurred'**
   String get errorOccurred;
 
-  /// Retry button text
+  /// Retry button
   ///
   /// In en, this message translates to:
   /// **'Retry'**
@@ -710,10 +710,10 @@ abstract class AppLocalizations {
   /// **'No invitation codes'**
   String get noInvitationCodes;
 
-  /// Load failed error
+  /// Load failed error title
   ///
   /// In en, this message translates to:
-  /// **'Load failed'**
+  /// **'Load Failed'**
   String get loadFailed;
 
   /// Generate invitation code action
@@ -776,10 +776,10 @@ abstract class AppLocalizations {
   /// **'Delete student'**
   String get deleteStudent;
 
-  /// Confirm delete title
+  /// Confirm delete dialog message
   ///
   /// In en, this message translates to:
-  /// **'Confirm delete'**
+  /// **'Are you sure you want to delete this record?'**
   String get confirmDelete;
 
   /// Plans page title
@@ -977,8 +977,14 @@ abstract class AppLocalizations {
   /// Add record title
   ///
   /// In en, this message translates to:
-  /// **'Add Record'**
+  /// **'Record Your Activity'**
   String get addRecordTitle;
+
+  /// Add record subtitle
+  ///
+  /// In en, this message translates to:
+  /// **'What would you like to add today?'**
+  String get addRecordSubtitle;
 
   /// Choose record type message
   ///
@@ -986,17 +992,35 @@ abstract class AppLocalizations {
   /// **'Choose a record type to add'**
   String get chooseRecordType;
 
-  /// Training record type
+  /// Training record page title
   ///
   /// In en, this message translates to:
   /// **'Training Record'**
   String get trainingRecord;
 
+  /// Training record description
+  ///
+  /// In en, this message translates to:
+  /// **'Log sets, reps, weight, and videos.'**
+  String get trainingRecordDesc;
+
   /// Diet record type
   ///
   /// In en, this message translates to:
-  /// **'Diet Record'**
+  /// **'Record Meal'**
   String get dietRecord;
+
+  /// Today's meal plan title
+  ///
+  /// In en, this message translates to:
+  /// **'Today\'s Meal Plan'**
+  String get todayMealPlan;
+
+  /// Diet record description
+  ///
+  /// In en, this message translates to:
+  /// **'Log food, quantity, and photos.'**
+  String get dietRecordDesc;
 
   /// Supplement record type
   ///
@@ -1004,11 +1028,29 @@ abstract class AppLocalizations {
   /// **'Supplement Record'**
   String get supplementRecord;
 
+  /// Supplement plan title
+  ///
+  /// In en, this message translates to:
+  /// **'Supplement Plan'**
+  String get supplementPlan;
+
+  /// Supplements count with action label
+  ///
+  /// In en, this message translates to:
+  /// **'{count} supplements to take'**
+  String supplementsToTake(int count);
+
   /// Body measurement type
   ///
   /// In en, this message translates to:
-  /// **'Body Measurement'**
+  /// **'Record Body Stats'**
   String get bodyMeasurement;
+
+  /// Body measurement description
+  ///
+  /// In en, this message translates to:
+  /// **'Log weight and upload body pictures.'**
+  String get bodyMeasurementDesc;
 
   /// Student home title
   ///
@@ -1136,17 +1178,11 @@ abstract class AppLocalizations {
   /// **'{count} of 7 days recorded'**
   String daysRecorded(int count);
 
-  /// Today's record section title
+  /// Today's meal plan section title
   ///
   /// In en, this message translates to:
-  /// **'Today\'s Record'**
+  /// **'Today\'s Meal Plan'**
   String get todayRecord;
-
-  /// Exercise record label
-  ///
-  /// In en, this message translates to:
-  /// **'Exercise Record'**
-  String get exerciseRecord;
 
   /// Protein macro label
   ///
@@ -1165,6 +1201,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Fat'**
   String get fat;
+
+  /// Total nutrition section title
+  ///
+  /// In en, this message translates to:
+  /// **'Total Nutrition'**
+  String get totalNutrition;
+
+  /// Kilocalories unit
+  ///
+  /// In en, this message translates to:
+  /// **'kcal'**
+  String get kcal;
 
   /// Calories label
   ///
@@ -1238,11 +1286,71 @@ abstract class AppLocalizations {
   /// **'{days} days/week'**
   String daysPerWeek(int days);
 
-  /// No exercises message
+  /// No exercises placeholder title
   ///
   /// In en, this message translates to:
-  /// **'No exercises'**
+  /// **'No Exercises'**
   String get noExercises;
+
+  /// Sets unit
+  ///
+  /// In en, this message translates to:
+  /// **'sets'**
+  String get sets;
+
+  /// Reps unit
+  ///
+  /// In en, this message translates to:
+  /// **'reps'**
+  String get reps;
+
+  /// Exercise sets format with weight
+  ///
+  /// In en, this message translates to:
+  /// **'{sets} sets x {reps} reps @ {weight}'**
+  String exerciseSetsWithWeight(int sets, String reps, String weight);
+
+  /// Exercise sets format without weight
+  ///
+  /// In en, this message translates to:
+  /// **'{sets} sets x {reps} reps'**
+  String exerciseSetsNoWeight(int sets, String reps);
+
+  /// Exercise sets only
+  ///
+  /// In en, this message translates to:
+  /// **'{sets} sets'**
+  String exerciseSetsOnly(int sets);
+
+  /// Video label
+  ///
+  /// In en, this message translates to:
+  /// **'Video'**
+  String get video;
+
+  /// Coach notes label
+  ///
+  /// In en, this message translates to:
+  /// **'Coach Notes:'**
+  String get coachNotes;
+
+  /// AI guidance feature placeholder message
+  ///
+  /// In en, this message translates to:
+  /// **'AI Guidance Feature Coming Soon'**
+  String get aiGuidanceInDevelopment;
+
+  /// Coming soon dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Coming Soon'**
+  String get comingSoon;
+
+  /// OK button label
+  ///
+  /// In en, this message translates to:
+  /// **'OK'**
+  String get ok;
 
   /// Assign plans to student dialog title
   ///
@@ -1315,6 +1423,606 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Done'**
   String get done;
+
+  /// Save button label
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get save;
+
+  /// No coach assigned title
+  ///
+  /// In en, this message translates to:
+  /// **'No Coach Assigned'**
+  String get noCoachTitle;
+
+  /// No coach assigned message
+  ///
+  /// In en, this message translates to:
+  /// **'Please contact support to get a coach assigned'**
+  String get noCoachMessage;
+
+  /// Plan tab training label
+  ///
+  /// In en, this message translates to:
+  /// **'Training'**
+  String get planTabTraining;
+
+  /// Plan tab diet label
+  ///
+  /// In en, this message translates to:
+  /// **'Diet'**
+  String get planTabDiet;
+
+  /// Plan tab supplements label
+  ///
+  /// In en, this message translates to:
+  /// **'Supplements'**
+  String get planTabSupplements;
+
+  /// Coach's plan header
+  ///
+  /// In en, this message translates to:
+  /// **'Coach\'s Plan'**
+  String get coachsPlan;
+
+  /// Coach note label
+  ///
+  /// In en, this message translates to:
+  /// **'Coach Note'**
+  String get coachNote;
+
+  /// Kilogram unit
+  ///
+  /// In en, this message translates to:
+  /// **'kg'**
+  String get kg;
+
+  /// Pounds unit
+  ///
+  /// In en, this message translates to:
+  /// **'lbs'**
+  String get lbs;
+
+  /// No exercises for body part message
+  ///
+  /// In en, this message translates to:
+  /// **'No exercises for this body part'**
+  String get noExercisesForBodyPart;
+
+  /// Meal record page title
+  ///
+  /// In en, this message translates to:
+  /// **'Meal Record'**
+  String get mealRecord;
+
+  /// Coach suggestion section title
+  ///
+  /// In en, this message translates to:
+  /// **'Coach Suggestion'**
+  String get coachSuggestion;
+
+  /// Total macros label
+  ///
+  /// In en, this message translates to:
+  /// **'Total Macros'**
+  String get totalMacros;
+
+  /// Add record button label
+  ///
+  /// In en, this message translates to:
+  /// **'Add Record'**
+  String get addRecord;
+
+  /// Edit record action
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Record'**
+  String get editRecord;
+
+  /// Take picture button label
+  ///
+  /// In en, this message translates to:
+  /// **'Take Picture'**
+  String get takePicture;
+
+  /// Upload image button label
+  ///
+  /// In en, this message translates to:
+  /// **'Upload Image'**
+  String get uploadImage;
+
+  /// Comments section label
+  ///
+  /// In en, this message translates to:
+  /// **'Comments or Questions'**
+  String get commentsOrQuestions;
+
+  /// Save meal record button label
+  ///
+  /// In en, this message translates to:
+  /// **'Save Meal Record'**
+  String get saveMealRecord;
+
+  /// Comments placeholder text
+  ///
+  /// In en, this message translates to:
+  /// **'Type your message here...'**
+  String get typeYourMessageHere;
+
+  /// Meal completed status label
+  ///
+  /// In en, this message translates to:
+  /// **'Completed'**
+  String get mealCompleted;
+
+  /// Mark as complete button label
+  ///
+  /// In en, this message translates to:
+  /// **'Mark as Complete'**
+  String get markAsComplete;
+
+  /// Edit meal button label
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get editMeal;
+
+  /// Record saved success message
+  ///
+  /// In en, this message translates to:
+  /// **'Record saved successfully'**
+  String get recordSaved;
+
+  /// Record save failed message
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to save record'**
+  String get recordSaveFailed;
+
+  /// No meals planned message
+  ///
+  /// In en, this message translates to:
+  /// **'No meals planned for today'**
+  String get noMealsToday;
+
+  /// Macros format string
+  ///
+  /// In en, this message translates to:
+  /// **'{protein}P/{carbs}C/{fat}F'**
+  String macrosFormat(int protein, int carbs, int fat);
+
+  /// AI food scanner page title
+  ///
+  /// In en, this message translates to:
+  /// **'AI Food Scanner'**
+  String get aiFoodScanner;
+
+  /// Scan food button label
+  ///
+  /// In en, this message translates to:
+  /// **'Scan Food'**
+  String get scanFood;
+
+  /// Upload photo button label
+  ///
+  /// In en, this message translates to:
+  /// **'Upload Photo'**
+  String get uploadPhoto;
+
+  /// Analyzing progress message
+  ///
+  /// In en, this message translates to:
+  /// **'Analyzing...'**
+  String get analyzing;
+
+  /// Camera focus area hint text
+  ///
+  /// In en, this message translates to:
+  /// **'Position food within the frame'**
+  String get positionFoodInFrame;
+
+  /// Food analysis results title
+  ///
+  /// In en, this message translates to:
+  /// **'Analysis Results'**
+  String get foodAnalysisResults;
+
+  /// Estimated weight label
+  ///
+  /// In en, this message translates to:
+  /// **'Estimated Weight'**
+  String get estimatedWeight;
+
+  /// Adjust values hint
+  ///
+  /// In en, this message translates to:
+  /// **'Adjust values if needed'**
+  String get adjustValues;
+
+  /// Select meal label
+  ///
+  /// In en, this message translates to:
+  /// **'Select Meal'**
+  String get selectMeal;
+
+  /// Save to meal button
+  ///
+  /// In en, this message translates to:
+  /// **'Save to Meal'**
+  String get saveToMeal;
+
+  /// Number of recognized foods
+  ///
+  /// In en, this message translates to:
+  /// **'{count} foods recognized'**
+  String recognizedFoods(int count);
+
+  /// Camera permission denied message
+  ///
+  /// In en, this message translates to:
+  /// **'Camera permission denied. Please enable camera access in Settings.'**
+  String get cameraPermissionDenied;
+
+  /// Analysis failed title
+  ///
+  /// In en, this message translates to:
+  /// **'Analysis Failed'**
+  String get analysisFailed;
+
+  /// Planned nutrition label
+  ///
+  /// In en, this message translates to:
+  /// **'Planned'**
+  String get plannedNutrition;
+
+  /// Meal progress label
+  ///
+  /// In en, this message translates to:
+  /// **'Progress'**
+  String get mealProgress;
+
+  /// AI detected foods label
+  ///
+  /// In en, this message translates to:
+  /// **'Detected Foods'**
+  String get aiDetectedFoods;
+
+  /// Calories input label
+  ///
+  /// In en, this message translates to:
+  /// **'Calories'**
+  String get caloriesInput;
+
+  /// Protein input label
+  ///
+  /// In en, this message translates to:
+  /// **'Protein (g)'**
+  String get proteinInput;
+
+  /// Carbs input label
+  ///
+  /// In en, this message translates to:
+  /// **'Carbs (g)'**
+  String get carbsInput;
+
+  /// Fat input label
+  ///
+  /// In en, this message translates to:
+  /// **'Fat (g)'**
+  String get fatInput;
+
+  /// AI detect button label
+  ///
+  /// In en, this message translates to:
+  /// **'AI Smart Detection'**
+  String get aiDetectButton;
+
+  /// Add food record title
+  ///
+  /// In en, this message translates to:
+  /// **'Add Food Record'**
+  String get addFoodRecord;
+
+  /// Select meal placeholder
+  ///
+  /// In en, this message translates to:
+  /// **'Select meal to analyze'**
+  String get selectMealToAnalyze;
+
+  /// Record saved success message
+  ///
+  /// In en, this message translates to:
+  /// **'Food record saved successfully'**
+  String get recordSavedSuccess;
+
+  /// AI scanner mode label
+  ///
+  /// In en, this message translates to:
+  /// **'AI Scanner'**
+  String get aiScannerMode;
+
+  /// Simple record mode label
+  ///
+  /// In en, this message translates to:
+  /// **'Simple Record'**
+  String get simpleRecordMode;
+
+  /// AI analyzing message
+  ///
+  /// In en, this message translates to:
+  /// **'AI analyzing your food...'**
+  String get aiAnalyzing;
+
+  /// AI analysis progress label
+  ///
+  /// In en, this message translates to:
+  /// **'Analysis Progress'**
+  String get aiAnalysisProgress;
+
+  /// Select meal to save prompt
+  ///
+  /// In en, this message translates to:
+  /// **'Select meal to save'**
+  String get selectMealToSave;
+
+  /// Body stats history page title
+  ///
+  /// In en, this message translates to:
+  /// **'Body Stats History'**
+  String get bodyStatsHistory;
+
+  /// Record body stats action
+  ///
+  /// In en, this message translates to:
+  /// **'Record Body Stats'**
+  String get recordBodyStats;
+
+  /// Body fat percentage label
+  ///
+  /// In en, this message translates to:
+  /// **'Body Fat %'**
+  String get bodyFat;
+
+  /// Body fat percentage optional field
+  ///
+  /// In en, this message translates to:
+  /// **'Body Fat % (Optional)'**
+  String get bodyFatOptional;
+
+  /// Skip photo button
+  ///
+  /// In en, this message translates to:
+  /// **'Skip Photo'**
+  String get skipPhoto;
+
+  /// Enter weight placeholder
+  ///
+  /// In en, this message translates to:
+  /// **'Enter Weight'**
+  String get enterWeight;
+
+  /// Enter body fat percentage placeholder
+  ///
+  /// In en, this message translates to:
+  /// **'Enter Body Fat %'**
+  String get enterBodyFat;
+
+  /// Last 14 days filter
+  ///
+  /// In en, this message translates to:
+  /// **'Last 14 Days'**
+  String get last14Days;
+
+  /// Last 30 days filter
+  ///
+  /// In en, this message translates to:
+  /// **'Last 30 Days'**
+  String get last30Days;
+
+  /// Last 90 days filter
+  ///
+  /// In en, this message translates to:
+  /// **'Last 90 Days'**
+  String get last90Days;
+
+  /// Delete record action
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Record'**
+  String get deleteRecord;
+
+  /// Empty state message for body stats
+  ///
+  /// In en, this message translates to:
+  /// **'No body stats data yet'**
+  String get noBodyStatsData;
+
+  /// Weight trend chart title
+  ///
+  /// In en, this message translates to:
+  /// **'Weight Trend'**
+  String get weightTrend;
+
+  /// Record deleted success message
+  ///
+  /// In en, this message translates to:
+  /// **'Record deleted successfully'**
+  String get recordDeleted;
+
+  /// Record updated success message
+  ///
+  /// In en, this message translates to:
+  /// **'Record updated successfully'**
+  String get recordUpdated;
+
+  /// Maximum photos limit message
+  ///
+  /// In en, this message translates to:
+  /// **'Maximum 3 photos allowed'**
+  String get maxPhotosReached;
+
+  /// History section label
+  ///
+  /// In en, this message translates to:
+  /// **'History'**
+  String get history;
+
+  /// Photos label
+  ///
+  /// In en, this message translates to:
+  /// **'Photos'**
+  String get photos;
+
+  /// Take photo action
+  ///
+  /// In en, this message translates to:
+  /// **'Take Photo'**
+  String get takePhoto;
+
+  /// My recordings section title
+  ///
+  /// In en, this message translates to:
+  /// **'My Recordings'**
+  String get myRecordings;
+
+  /// Record video button label
+  ///
+  /// In en, this message translates to:
+  /// **'Record Video'**
+  String get recordVideo;
+
+  /// Training set label
+  ///
+  /// In en, this message translates to:
+  /// **'Set'**
+  String get set;
+
+  /// Quick complete button label
+  ///
+  /// In en, this message translates to:
+  /// **'Quick Complete'**
+  String get quickComplete;
+
+  /// Completed status label
+  ///
+  /// In en, this message translates to:
+  /// **'Completed'**
+  String get completed;
+
+  /// Video duration exceeded error message
+  ///
+  /// In en, this message translates to:
+  /// **'Video must be ≤ 1 minute'**
+  String get videoDurationExceeded;
+
+  /// Recording video status
+  ///
+  /// In en, this message translates to:
+  /// **'Recording...'**
+  String get recordingVideo;
+
+  /// Select from gallery action
+  ///
+  /// In en, this message translates to:
+  /// **'Select from gallery'**
+  String get selectFromGallery;
+
+  /// Start timer dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Start Timer'**
+  String get startTimerConfirmTitle;
+
+  /// Start timer confirmation message
+  ///
+  /// In en, this message translates to:
+  /// **'Start training timer?'**
+  String get startTimerConfirmMessage;
+
+  /// Start timer button
+  ///
+  /// In en, this message translates to:
+  /// **'Start'**
+  String get startTimerButton;
+
+  /// Weight input placeholder
+  ///
+  /// In en, this message translates to:
+  /// **'Bodyweight/60kg'**
+  String get weightPlaceholder;
+
+  /// Time spent label for exercise
+  ///
+  /// In en, this message translates to:
+  /// **'Time Spent'**
+  String get timeSpentLabel;
+
+  /// Add custom exercise hint
+  ///
+  /// In en, this message translates to:
+  /// **'Tap \'+\' to add custom exercise'**
+  String get addCustomExerciseHint;
+
+  /// Number of completed exercises
+  ///
+  /// In en, this message translates to:
+  /// **'{count} completed'**
+  String completedCount(int count);
+
+  /// Current exercise label in timer
+  ///
+  /// In en, this message translates to:
+  /// **'Current Exercise'**
+  String get currentExercise;
+
+  /// Total duration label in timer
+  ///
+  /// In en, this message translates to:
+  /// **'Total Duration'**
+  String get totalDuration;
+
+  /// Congratulations title when all exercises are completed
+  ///
+  /// In en, this message translates to:
+  /// **'Congrats!'**
+  String get congratsTitle;
+
+  /// Congratulations message when all exercises are completed
+  ///
+  /// In en, this message translates to:
+  /// **'You have finished all the exercises today!'**
+  String get congratsMessage;
+
+  /// Compact congratulations message for single-line display
+  ///
+  /// In en, this message translates to:
+  /// **'Congrats! All exercises done!'**
+  String get congratsMessageCompact;
+
+  /// Button text to create a new plan
+  ///
+  /// In en, this message translates to:
+  /// **'Create New Plan'**
+  String get createNewPlan;
+
+  /// Dropdown header to select a plan
+  ///
+  /// In en, this message translates to:
+  /// **'Select Plan'**
+  String get selectPlan;
+
+  /// Section label for user's own plans
+  ///
+  /// In en, this message translates to:
+  /// **'My Plans'**
+  String get myPlans;
+
+  /// Label for coach-assigned plans
+  ///
+  /// In en, this message translates to:
+  /// **'Coach\'s Plan'**
+  String get coachPlan;
 }
 
 class _AppLocalizationsDelegate

@@ -7,10 +7,7 @@ import '../../data/models/invitation_code_model.dart';
 class InvitationCodeItem extends StatelessWidget {
   final InvitationCodeModel code;
 
-  const InvitationCodeItem({
-    super.key,
-    required this.code,
-  });
+  const InvitationCodeItem({super.key, required this.code});
 
   @override
   Widget build(BuildContext context) {
@@ -130,4 +127,3 @@ class InvitationCodeItem extends StatelessWidget {
     );
   }
 }
-

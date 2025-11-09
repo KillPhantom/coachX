@@ -15,7 +15,9 @@ final studentRepositoryProvider = Provider<StudentRepository>((ref) {
 });
 
 /// 邀请码Repository Provider
-final invitationCodeRepositoryProvider = Provider<InvitationCodeRepository>((ref) {
+final invitationCodeRepositoryProvider = Provider<InvitationCodeRepository>((
+  ref,
+) {
   return InvitationCodeRepositoryImpl();
 });
 
@@ -24,21 +26,22 @@ final invitationCodeRepositoryProvider = Provider<InvitationCodeRepository>((ref
 /// 学生列表状态Provider
 final studentsStateProvider =
     StateNotifierProvider<StudentsNotifier, StudentsPageState>((ref) {
-  final repository = ref.watch(studentRepositoryProvider);
-  return StudentsNotifier(repository);
-});
+      final repository = ref.watch(studentRepositoryProvider);
+      return StudentsNotifier(repository);
+    });
 
 /// 邀请码列表Provider
 final invitationCodesProvider =
     FutureProvider.autoDispose<List<InvitationCodeModel>>((ref) async {
-  final repository = ref.watch(invitationCodeRepositoryProvider);
-  return repository.fetchInvitationCodes();
-});
+      final repository = ref.watch(invitationCodeRepositoryProvider);
+      return repository.fetchInvitationCodes();
+    });
 
 /// 可用计划列表Provider
-final availablePlansProvider = FutureProvider.autoDispose<
-    Map<String, List<Map<String, String>>>>((ref) async {
-  final repository = ref.watch(studentRepositoryProvider);
-  return repository.fetchAvailablePlans();
-});
-
+final availablePlansProvider =
+    FutureProvider.autoDispose<Map<String, List<Map<String, String>>>>((
+      ref,
+    ) async {
+      final repository = ref.watch(studentRepositoryProvider);
+      return repository.fetchAvailablePlans();
+    });

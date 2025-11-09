@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:coach_x/core/theme/app_colors.dart';
 import 'package:coach_x/core/theme/app_text_styles.dart';
+import 'package:coach_x/core/widgets/dismiss_keyboard_on_scroll.dart';
 import 'package:coach_x/features/coach/plans/data/models/exercise_plan_model.dart';
 import 'package:coach_x/features/coach/plans/data/models/plan_edit_suggestion.dart';
 import 'package:coach_x/features/coach/plans/presentation/providers/edit_conversation_providers.dart';
@@ -40,7 +41,8 @@ class _AIEditChatPanelState extends ConsumerState<AIEditChatPanel> {
 
     // 初始化对话并自动总结
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(editConversationNotifierProvider.notifier)
+      ref
+          .read(editConversationNotifierProvider.notifier)
           .initConversation(widget.currentPlan, widget.planId);
     });
   }
@@ -66,7 +68,8 @@ class _AIEditChatPanelState extends ConsumerState<AIEditChatPanel> {
     final message = _messageController.text.trim();
     if (message.isEmpty) return;
 
-    ref.read(editConversationNotifierProvider.notifier)
+    ref
+        .read(editConversationNotifierProvider.notifier)
         .sendMessage(message, widget.planId);
 
     _messageController.clear();
@@ -97,13 +100,16 @@ class _AIEditChatPanelState extends ConsumerState<AIEditChatPanel> {
       await notifier.applySuggestion();
 
       // 2. 获取应用修改后的计划
-      final updatedPlan = ref.read(editConversationNotifierProvider).currentPlan;
+      final updatedPlan = ref
+          .read(editConversationNotifierProvider)
+          .currentPlan;
       if (updatedPlan != null) {
         // 同步新计划到父组件
         widget.onPlanModified(updatedPlan);
 
         // 3. 使用新计划启动 Review Mode
-        ref.read(suggestionReviewNotifierProvider.notifier)
+        ref
+            .read(suggestionReviewNotifierProvider.notifier)
             .startReview(suggestion, updatedPlan);
         ref.read(isReviewModeProvider.notifier).state = true;
       }
@@ -116,7 +122,9 @@ class _AIEditChatPanelState extends ConsumerState<AIEditChatPanel> {
   }
 
   Future<void> _rejectSuggestion() async {
-    await ref.read(editConversationNotifierProvider.notifier).rejectSuggestion();
+    await ref
+        .read(editConversationNotifierProvider.notifier)
+        .rejectSuggestion();
   }
 
   void _previewChanges() {
@@ -144,7 +152,10 @@ class _AIEditChatPanelState extends ConsumerState<AIEditChatPanel> {
     final canSendMessage = ref.watch(canSendMessageProvider);
 
     // 监听建议卡片出现，自动滚动到底部
-    ref.listen<PlanEditSuggestion?>(pendingSuggestionProvider, (previous, next) {
+    ref.listen<PlanEditSuggestion?>(pendingSuggestionProvider, (
+      previous,
+      next,
+    ) {
       if (next != null && previous == null) {
         // 建议卡片刚出现，延迟滚动确保布局完成
         WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -168,29 +179,30 @@ class _AIEditChatPanelState extends ConsumerState<AIEditChatPanel> {
         children: [
           // 顶部标题栏
           _buildHeader(context),
-          
+
           // 对话列表
           Expanded(
             child: messages.isEmpty
                 ? _buildWelcomeView(context)
-                : ListView.builder(
-                    controller: _scrollController,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    itemCount: messages.length,
-                    itemBuilder: (context, index) {
-                      final message = messages[index];
-                      return ChatMessageBubble(
-                        message: message,
-                        onSuggestionTap: message.suggestion != null
-                            ? () {
-                                // 滚动到建议卡片
-                              }
-                            : null,
-                      );
-                    },
+                : DismissKeyboardOnScroll(
+                    child: ListView.builder(
+                      controller: _scrollController,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      itemCount: messages.length,
+                      itemBuilder: (context, index) {
+                        final message = messages[index];
+                        return ChatMessageBubble(
+                          message: message,
+                          onSuggestionTap: message.suggestion != null
+                              ? () {
+                                  // 滚动到建议卡片
+                                }
+                              : null,
+                        );
+                      },
+                    ),
                   ),
           ),
-
 
           // 快捷操作按钮（没有待处理建议时显示）
           if (pendingSuggestion == null && !isAIResponding)
@@ -314,10 +326,7 @@ class _AIEditChatPanelState extends ConsumerState<AIEditChatPanel> {
 
   /// 构建快捷操作按钮
   Widget _buildQuickActions(BuildContext context) {
-    final quickActions = [
-      '分析一下计划的优缺点',
-      '降低所有重量 10%',
-    ];
+    final quickActions = ['分析一下计划的优缺点', '降低所有重量 10%'];
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -328,7 +337,10 @@ class _AIEditChatPanelState extends ConsumerState<AIEditChatPanel> {
             return Padding(
               padding: const EdgeInsets.only(right: 8),
               child: CupertinoButton(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 10,
+                ),
                 color: CupertinoColors.systemGrey6.resolveFrom(context),
                 borderRadius: BorderRadius.circular(20),
                 minSize: 0,
@@ -348,7 +360,11 @@ class _AIEditChatPanelState extends ConsumerState<AIEditChatPanel> {
   }
 
   /// 构建输入区域
-  Widget _buildInputArea(BuildContext context, bool canSendMessage, bool isAIResponding) {
+  Widget _buildInputArea(
+    BuildContext context,
+    bool canSendMessage,
+    bool isAIResponding,
+  ) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
@@ -378,7 +394,9 @@ class _AIEditChatPanelState extends ConsumerState<AIEditChatPanel> {
                         controller: _messageController,
                         placeholder: 'Ask AI for suggestions...',
                         placeholderStyle: AppTextStyles.subhead.copyWith(
-                          color: CupertinoColors.secondaryLabel.resolveFrom(context),
+                          color: CupertinoColors.secondaryLabel.resolveFrom(
+                            context,
+                          ),
                         ),
                         style: AppTextStyles.subhead.copyWith(
                           color: CupertinoColors.label.resolveFrom(context),
@@ -401,9 +419,7 @@ class _AIEditChatPanelState extends ConsumerState<AIEditChatPanel> {
             const SizedBox(width: 12),
             // 发送按钮
             GestureDetector(
-              onTap: canSendMessage && _hasText
-                  ? _sendMessage
-                  : null,
+              onTap: canSendMessage && _hasText ? _sendMessage : null,
               child: Container(
                 width: 44,
                 height: 44,

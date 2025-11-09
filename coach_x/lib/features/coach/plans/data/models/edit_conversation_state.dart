@@ -23,12 +23,8 @@ class EditConversationState {
   });
 
   /// 初始状态
-  factory EditConversationState.initial({
-    ExercisePlanModel? currentPlan,
-  }) {
-    return EditConversationState(
-      currentPlan: currentPlan,
-    );
+  factory EditConversationState.initial({ExercisePlanModel? currentPlan}) {
+    return EditConversationState(currentPlan: currentPlan);
   }
 
   /// 复制并修改
@@ -47,7 +43,9 @@ class EditConversationState {
     return EditConversationState(
       messages: messages ?? this.messages,
       isAIResponding: isAIResponding ?? this.isAIResponding,
-      pendingSuggestion: clearPendingSuggestion ? null : (pendingSuggestion ?? this.pendingSuggestion),
+      pendingSuggestion: clearPendingSuggestion
+          ? null
+          : (pendingSuggestion ?? this.pendingSuggestion),
       currentPlan: currentPlan ?? this.currentPlan,
       previewPlan: clearPreviewPlan ? null : (previewPlan ?? this.previewPlan),
       error: clearError ? null : (error ?? this.error),
@@ -57,9 +55,7 @@ class EditConversationState {
 
   /// 添加消息
   EditConversationState addMessage(LLMChatMessage message) {
-    return copyWith(
-      messages: [...messages, message],
-    );
+    return copyWith(messages: [...messages, message]);
   }
 
   /// 更新最后一条消息
@@ -142,4 +138,3 @@ class EditConversationState {
         isPreviewMode.hashCode;
   }
 }
-

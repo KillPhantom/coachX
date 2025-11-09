@@ -29,8 +29,9 @@ class ChatMessageBubble extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Row(
-        mainAxisAlignment:
-            isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
+        mainAxisAlignment: isUser
+            ? MainAxisAlignment.end
+            : MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (!isUser) ...[
@@ -39,8 +40,9 @@ class ChatMessageBubble extends StatelessWidget {
           ],
           Flexible(
             child: Column(
-              crossAxisAlignment:
-                  isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+              crossAxisAlignment: isUser
+                  ? CrossAxisAlignment.end
+                  : CrossAxisAlignment.start,
               children: [
                 _buildMessageBubble(context, isUser),
                 if (message.options != null && message.options!.isNotEmpty)
@@ -64,10 +66,7 @@ class ChatMessageBubble extends StatelessWidget {
       height: 36,
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [
-            AppColors.primary,
-            AppColors.primary.withValues(alpha: 0.7),
-          ],
+          colors: [AppColors.primary, AppColors.primary.withValues(alpha: 0.7)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -87,9 +86,7 @@ class ChatMessageBubble extends StatelessWidget {
     final maxWidth = MediaQuery.of(context).size.width - 100;
 
     return Container(
-      constraints: BoxConstraints(
-        maxWidth: maxWidth,
-      ),
+      constraints: BoxConstraints(maxWidth: maxWidth),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
         color: isUser
@@ -159,7 +156,9 @@ class ChatMessageBubble extends StatelessWidget {
                 // 行内代码
                 code: AppTextStyles.footnote.copyWith(
                   color: CupertinoColors.label.resolveFrom(context),
-                  backgroundColor: CupertinoColors.systemGrey5.resolveFrom(context),
+                  backgroundColor: CupertinoColors.systemGrey5.resolveFrom(
+                    context,
+                  ),
                   fontFamily: 'monospace',
                 ),
                 // 代码块
@@ -271,11 +270,7 @@ class ChatMessageBubble extends StatelessWidget {
                   color: AppColors.primaryLight,
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: Icon(
-                  icon,
-                  color: AppColors.primaryText,
-                  size: 20,
-                ),
+                child: Icon(icon, color: AppColors.primaryText, size: 20),
               ),
               const SizedBox(width: 12),
               // 文本内容
@@ -295,7 +290,9 @@ class ChatMessageBubble extends StatelessWidget {
                       Text(
                         option.subtitle!,
                         style: AppTextStyles.caption1.copyWith(
-                          color: CupertinoColors.secondaryLabel.resolveFrom(context),
+                          color: CupertinoColors.secondaryLabel.resolveFrom(
+                            context,
+                          ),
                         ),
                       ),
                     ],

@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:coach_x/core/theme/app_theme.dart';
+import 'package:coach_x/core/widgets/dismiss_keyboard_on_scroll.dart';
 
 /// Chat AI 面板组件
 /// 用于生成回复建议
@@ -38,10 +39,7 @@ class _ChatAIPanelState extends ConsumerState<ChatAIPanel> {
 
     // 添加用户消息
     setState(() {
-      _messages.add(_AIMessage(
-        text: prompt,
-        isUser: true,
-      ));
+      _messages.add(_AIMessage(text: prompt, isUser: true));
       _isGenerating = true;
     });
 
@@ -58,10 +56,12 @@ class _ChatAIPanelState extends ConsumerState<ChatAIPanel> {
 
     if (mounted) {
       setState(() {
-        _messages.add(_AIMessage(
-          text: '这是一个 AI 生成的回复建议示例。\n\n您可以点击下方的"应用建议"按钮将其填充到输入框中。',
-          isUser: false,
-        ));
+        _messages.add(
+          _AIMessage(
+            text: '这是一个 AI 生成的回复建议示例。\n\n您可以点击下方的"应用建议"按钮将其填充到输入框中。',
+            isUser: false,
+          ),
+        );
         _isGenerating = false;
       });
 
@@ -138,23 +138,22 @@ class _ChatAIPanelState extends ConsumerState<ChatAIPanel> {
             ),
           ),
 
-          Container(
-            height: 0.5,
-            color: AppColors.dividerLight,
-          ),
+          Container(height: 0.5, color: AppColors.dividerLight),
 
           // 对话区域
           Expanded(
             child: _messages.isEmpty
                 ? _buildEmptyState()
-                : ListView.builder(
-                    controller: _scrollController,
-                    padding: const EdgeInsets.all(16),
-                    itemCount: _messages.length,
-                    itemBuilder: (context, index) {
-                      final message = _messages[index];
-                      return _buildMessageBubble(message);
-                    },
+                : DismissKeyboardOnScroll(
+                    child: ListView.builder(
+                      controller: _scrollController,
+                      padding: const EdgeInsets.all(16),
+                      itemCount: _messages.length,
+                      itemBuilder: (context, index) {
+                        final message = _messages[index];
+                        return _buildMessageBubble(message);
+                      },
+                    ),
                   ),
           ),
 
@@ -177,10 +176,7 @@ class _ChatAIPanelState extends ConsumerState<ChatAIPanel> {
               ),
             ),
 
-          Container(
-            height: 0.5,
-            color: AppColors.dividerLight,
-          ),
+          Container(height: 0.5, color: AppColors.dividerLight),
 
           // 输入栏
           _buildInputBar(),
@@ -228,8 +224,9 @@ class _ChatAIPanelState extends ConsumerState<ChatAIPanel> {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Row(
-        mainAxisAlignment:
-            message.isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
+        mainAxisAlignment: message.isUser
+            ? MainAxisAlignment.end
+            : MainAxisAlignment.start,
         children: [
           if (!message.isUser) ...[
             Container(
@@ -345,8 +342,5 @@ class _AIMessage {
   final String text;
   final bool isUser;
 
-  _AIMessage({
-    required this.text,
-    required this.isUser,
-  });
+  _AIMessage({required this.text, required this.isUser});
 }

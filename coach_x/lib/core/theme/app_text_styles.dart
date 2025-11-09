@@ -131,6 +131,7 @@ class AppTextStyles {
     fontFamily: _fontFamily,
     fontSize: 17,
     fontWeight: FontWeight.w600,
+    color: AppColors.primaryText,
     height: 1.2,
   );
 
@@ -139,6 +140,7 @@ class AppTextStyles {
     fontFamily: _fontFamily,
     fontSize: 15,
     fontWeight: FontWeight.w600,
+    color: AppColors.primaryText,
     height: 1.2,
   );
 
@@ -147,6 +149,7 @@ class AppTextStyles {
     fontFamily: _fontFamily,
     fontSize: 13,
     fontWeight: FontWeight.w500,
+        color: AppColors.primaryText,
     height: 1.2,
   );
 

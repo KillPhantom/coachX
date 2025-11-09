@@ -67,13 +67,8 @@ class _PlanHeaderWidgetState extends State<PlanHeaderWidget> {
             placeholder: '计划名称（必填）',
             controller: _nameController,
             onChanged: widget.onNameChanged,
-            style: AppTextStyles.body.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
-            padding: const EdgeInsets.symmetric(
-              horizontal: 12,
-              vertical: 10,
-            ),
+            style: AppTextStyles.body.copyWith(fontWeight: FontWeight.bold),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             decoration: BoxDecoration(
               color: CupertinoColors.systemGrey6.resolveFrom(context),
               borderRadius: BorderRadius.circular(8),
@@ -153,7 +148,3 @@ class _PlanHeaderWidgetState extends State<PlanHeaderWidget> {
     );
   }
 }
-
-
-
-

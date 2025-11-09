@@ -1,7 +1,7 @@
 import 'package:coach_x/features/coach/plans/data/models/exercise_plan_model.dart';
 
 /// 导入结果模型
-/// 
+///
 /// 用于图片/文件导入后返回的识别结果
 class ImportResult {
   /// 识别出的计划（失败时为 null）
@@ -42,9 +42,7 @@ class ImportResult {
   }
 
   /// 创建失败结果
-  factory ImportResult.failure({
-    required String errorMessage,
-  }) {
+  factory ImportResult.failure({required String errorMessage}) {
     return ImportResult(
       plan: null,
       confidence: 0.0,
@@ -57,9 +55,12 @@ class ImportResult {
   factory ImportResult.fromJson(Map<String, dynamic> json) {
     if (json['status'] == 'success') {
       return ImportResult.success(
-        plan: ExercisePlanModel.fromJson(json['data']['plan'] as Map<String, dynamic>),
+        plan: ExercisePlanModel.fromJson(
+          json['data']['plan'] as Map<String, dynamic>,
+        ),
         confidence: (json['data']['confidence'] as num?)?.toDouble() ?? 1.0,
-        warnings: (json['data']['warnings'] as List<dynamic>?)
+        warnings:
+            (json['data']['warnings'] as List<dynamic>?)
                 ?.map((w) => w.toString())
                 .toList() ??
             [],
@@ -83,10 +84,7 @@ class ImportResult {
         },
       };
     } else {
-      return {
-        'status': 'error',
-        'error': errorMessage,
-      };
+      return {'status': 'error', 'error': errorMessage};
     }
   }
 
@@ -140,4 +138,3 @@ class ImportResult {
     }
   }
 }
-

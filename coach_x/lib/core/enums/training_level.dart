@@ -114,4 +114,3 @@ TrainingLevel trainingLevelFromString(String value) {
       return TrainingLevel.intermediate;
   }
 }
-

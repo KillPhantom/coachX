@@ -15,11 +15,12 @@ import 'package:coach_x/features/coach/plans/data/models/plan_generation_params.
 import 'package:coach_x/features/coach/plans/data/repositories/plan_repository.dart';
 
 /// 创建训练计划状态管理
-class CreateTrainingPlanNotifier extends StateNotifier<CreateTrainingPlanState> {
+class CreateTrainingPlanNotifier
+    extends StateNotifier<CreateTrainingPlanState> {
   final PlanRepository _planRepository;
 
   CreateTrainingPlanNotifier(this._planRepository)
-      : super(const CreateTrainingPlanState());
+    : super(const CreateTrainingPlanState());
 
   // ==================== 基础字段更新 ====================
 
@@ -121,7 +122,9 @@ class CreateTrainingPlanNotifier extends StateNotifier<CreateTrainingPlanState> 
 
     updateDay(dayIndex, updatedDay);
 
-    AppLogger.debug('🗑️ 删除动作 - Day ${dayIndex + 1}, Exercise ${exerciseIndex + 1}');
+    AppLogger.debug(
+      '🗑️ 删除动作 - Day ${dayIndex + 1}, Exercise ${exerciseIndex + 1}',
+    );
   }
 
   /// 更新动作
@@ -173,7 +176,9 @@ class CreateTrainingPlanNotifier extends StateNotifier<CreateTrainingPlanState> 
 
     updateExercise(dayIndex, exerciseIndex, updatedExercise);
 
-    AppLogger.debug('➕ 添加Set - Day ${dayIndex + 1}, Exercise ${exerciseIndex + 1}');
+    AppLogger.debug(
+      '➕ 添加Set - Day ${dayIndex + 1}, Exercise ${exerciseIndex + 1}',
+    );
   }
 
   /// 删除 Set
@@ -188,12 +193,18 @@ class CreateTrainingPlanNotifier extends StateNotifier<CreateTrainingPlanState> 
 
     updateExercise(dayIndex, exerciseIndex, updatedExercise);
 
-    AppLogger.debug('🗑️ 删除Set - Day ${dayIndex + 1}, Exercise ${exerciseIndex + 1}, Set ${setIndex + 1}');
+    AppLogger.debug(
+      '🗑️ 删除Set - Day ${dayIndex + 1}, Exercise ${exerciseIndex + 1}, Set ${setIndex + 1}',
+    );
   }
 
   /// 更新 Set
   void updateSet(
-      int dayIndex, int exerciseIndex, int setIndex, TrainingSet set) {
+    int dayIndex,
+    int exerciseIndex,
+    int setIndex,
+    TrainingSet set,
+  ) {
     if (dayIndex < 0 || dayIndex >= state.days.length) return;
 
     final day = state.days[dayIndex];
@@ -290,9 +301,7 @@ class CreateTrainingPlanNotifier extends StateNotifier<CreateTrainingPlanState> 
       // 验证
       validate();
       if (state.validationErrors.isNotEmpty) {
-        state = state.copyWith(
-          errorMessage: state.validationErrors.first,
-        );
+        state = state.copyWith(errorMessage: state.validationErrors.first);
         return false;
       }
 
@@ -314,7 +323,9 @@ class CreateTrainingPlanNotifier extends StateNotifier<CreateTrainingPlanState> 
 
       // 根据是否有planId判断是创建还是更新
       String planId;
-      if (state.isEditMode && state.planId != null && state.planId!.isNotEmpty) {
+      if (state.isEditMode &&
+          state.planId != null &&
+          state.planId!.isNotEmpty) {
         // 更新现有计划
         await _planRepository.updatePlan(plan: plan);
         planId = state.planId!;
@@ -377,9 +388,7 @@ class CreateTrainingPlanNotifier extends StateNotifier<CreateTrainingPlanState> 
         errorMessage: '',
       );
 
-      final response = await AIService.suggestSets(
-        exerciseName: exerciseName,
-      );
+      final response = await AIService.suggestSets(exerciseName: exerciseName);
 
       if (response.isSuccess && response.sets != null) {
         // 成功：替换该动作的 Sets
@@ -453,10 +462,7 @@ class CreateTrainingPlanNotifier extends StateNotifier<CreateTrainingPlanState> 
 
   /// 重置 AI 状态
   void resetAIStatus() {
-    state = state.copyWith(
-      aiStatus: AIGenerationStatus.idle,
-      errorMessage: '',
-    );
+    state = state.copyWith(aiStatus: AIGenerationStatus.idle, errorMessage: '');
   }
 
   // ==================== 导入和引导式创建 ====================
@@ -478,9 +484,7 @@ class CreateTrainingPlanNotifier extends StateNotifier<CreateTrainingPlanState> 
 
     if (errors.isNotEmpty) {
       AppLogger.warning('导入的计划存在验证错误: ${errors.join(", ")}');
-      state = state.copyWith(
-        errorMessage: '导入的计划数据不完整：${errors.first}',
-      );
+      state = state.copyWith(errorMessage: '导入的计划数据不完整：${errors.first}');
       return;
     }
 
@@ -570,9 +574,7 @@ class CreateTrainingPlanNotifier extends StateNotifier<CreateTrainingPlanState> 
         return day.copyWith(day: currentDays.length + day.day);
       }).toList();
 
-      state = state.copyWith(
-        days: [...currentDays, ...importedDays],
-      );
+      state = state.copyWith(days: [...currentDays, ...importedDays]);
       AppLogger.info('✅ 计划已合并 - 新增 ${importedDays.length} 个训练日');
     }
   }
@@ -581,9 +583,7 @@ class CreateTrainingPlanNotifier extends StateNotifier<CreateTrainingPlanState> 
   ///
   /// 使用 SSE 实时接收生成进度
   /// [params] 结构化参数
-  Future<void> generateFromParamsStreaming(
-    PlanGenerationParams params,
-  ) async {
+  Future<void> generateFromParamsStreaming(PlanGenerationParams params) async {
     try {
       AppLogger.info('🔄 开始流式生成训练计划');
 
@@ -597,7 +597,9 @@ class CreateTrainingPlanNotifier extends StateNotifier<CreateTrainingPlanState> 
       );
 
       // 监听流式事件
-      await for (final event in AIService.generatePlanStreaming(params: params)) {
+      await for (final event in AIService.generatePlanStreaming(
+        params: params,
+      )) {
         if (event.isThinking) {
           // 思考过程（目前不需要显示，但保留日志）
           if (event.content != null) {
@@ -613,15 +615,19 @@ class CreateTrainingPlanNotifier extends StateNotifier<CreateTrainingPlanState> 
         } else if (event.isExerciseStart) {
           // 动作开始（可选，仅记录日志）
           AppLogger.debug(
-              '🏋️ 开始添加动作 ${event.exerciseIndex}/${event.totalExercises}: ${event.exerciseName}');
+            '🏋️ 开始添加动作 ${event.exerciseIndex}/${event.totalExercises}: ${event.exerciseName}',
+          );
         } else if (event.isExerciseComplete) {
           // 动作完成 - 追加到当前训练日
-          if (state.currentDayInProgress != null && event.exerciseData != null) {
-            final updatedDay =
-                state.currentDayInProgress!.addExercise(event.exerciseData!);
+          if (state.currentDayInProgress != null &&
+              event.exerciseData != null) {
+            final updatedDay = state.currentDayInProgress!.addExercise(
+              event.exerciseData!,
+            );
             state = state.copyWith(currentDayInProgress: updatedDay);
             AppLogger.info(
-                '✅ 第 ${event.day} 天第 ${event.exerciseIndex} 个动作已添加: ${event.exerciseData!.name}');
+              '✅ 第 ${event.day} 天第 ${event.exerciseIndex} 个动作已添加: ${event.exerciseData!.name}',
+            );
           }
         } else if (event.isDayComplete) {
           // 一天完成 - 将当前训练日添加到列表
@@ -671,15 +677,13 @@ class CreateTrainingPlanNotifier extends StateNotifier<CreateTrainingPlanState> 
   /// [modifiedPlan] AI 修改后的完整计划
   void applyModifiedPlan(ExercisePlanModel modifiedPlan) {
     AppLogger.info('✅ 应用 AI 修改的计划');
-    
+
     state = state.copyWith(
       planName: modifiedPlan.name,
       description: modifiedPlan.description,
       days: modifiedPlan.days,
     );
-    
+
     AppLogger.info('计划已更新 - ${modifiedPlan.days.length} 个训练日');
   }
 }
-
-

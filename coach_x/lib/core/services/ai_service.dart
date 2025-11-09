@@ -658,7 +658,7 @@ class AIService {
 
         // 安全地转换为 Map<String, dynamic>
         final macrosData = data is Map
-            ? Map<String, dynamic>.from(data as Map)
+            ? Map<String, dynamic>.from(data)
             : <String, dynamic>{};
 
         final macros = Macros.fromJson(macrosData);
@@ -791,11 +791,15 @@ class AIService {
 
               final event = EditStreamEvent.fromJson(json);
 
-              AppLogger.debug('收到事件: ${event.type}, hasData=${event.data != null}, hasContent=${event.content != null}');
+              AppLogger.debug(
+                '收到事件: ${event.type}, hasData=${event.data != null}, hasContent=${event.content != null}',
+              );
 
               // 🆕 如果有 data 字段，打印其 keys
               if (event.data != null) {
-                AppLogger.debug('事件 data 包含的 keys: ${event.data!.keys.join(", ")}');
+                AppLogger.debug(
+                  '事件 data 包含的 keys: ${event.data!.keys.join(", ")}',
+                );
               }
 
               yield event;
@@ -805,7 +809,9 @@ class AIService {
                 return;
               }
             } catch (e) {
-              AppLogger.warning('解析 SSE 数据失败: $e, 原始行: ${line.substring(0, line.length > 100 ? 100 : line.length)}');
+              AppLogger.warning(
+                '解析 SSE 数据失败: $e, 原始行: ${line.substring(0, line.length > 100 ? 100 : line.length)}',
+              );
               // 继续处理下一个事件
             }
           }
@@ -869,10 +875,7 @@ class AIService {
 
       if (response.statusCode != 200) {
         AppLogger.error('❌ 请求失败: ${response.statusCode}');
-        yield {
-          'type': 'error',
-          'error': '请求失败: HTTP ${response.statusCode}',
-        };
+        yield {'type': 'error', 'error': '请求失败: HTTP ${response.statusCode}'};
         return;
       }
 
@@ -911,6 +914,51 @@ class AIService {
     } catch (e, stackTrace) {
       AppLogger.error('❌ 补剂计划生成异常', e, stackTrace);
       yield {'type': 'error', 'error': '生成失败: $e'};
+    }
+  }
+
+  /// AI 分析食物图片并估算营养成分
+  ///
+  /// [imageUrl] 食物图片的 Firebase Storage URL
+  /// [language] 输出语言（默认"中文"）
+  /// 返回识别的食物列表及营养数据
+  static Future<List<Map<String, dynamic>>> analyzeFoodNutrition({
+    required String imageUrl,
+    String language = '中文',
+  }) async {
+    try {
+      AppLogger.info('🍽️ AI分析食物营养: $imageUrl');
+
+      final result = await CloudFunctionsService.call(
+        'analyze_food_nutrition',
+        {
+          'image_url': imageUrl,
+          'language': language,
+        },
+      );
+
+      if (result['status'] == 'success') {
+        final data = result['data'];
+
+        // 安全地转换为 Map<String, dynamic>
+        final analysisData = data is Map
+            ? Map<String, dynamic>.from(data as Map)
+            : <String, dynamic>{};
+
+        final foodsList = analysisData['foods'] as List<dynamic>? ?? [];
+        final foods = foodsList
+            .map((food) => Map<String, dynamic>.from(food as Map))
+            .toList();
+
+        AppLogger.info('✅ 食物营养分析成功: ${foods.length} 种食物');
+        return foods;
+      } else {
+        AppLogger.warning('⚠️ AI分析失败: ${result['error']}');
+        throw Exception(result['error'] ?? '分析失败');
+      }
+    } catch (e, stackTrace) {
+      AppLogger.error('❌ 分析食物营养失败', e, stackTrace);
+      rethrow;
     }
   }
 }

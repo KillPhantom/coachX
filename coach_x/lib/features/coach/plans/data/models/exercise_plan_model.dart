@@ -32,7 +32,8 @@ class ExercisePlanModel extends PlanBaseModel {
       name: json['name'] as String,
       description: json['description'] as String? ?? '',
       ownerId: json['ownerId'] as String,
-      studentIds: (json['studentIds'] as List<dynamic>?)
+      studentIds:
+          (json['studentIds'] as List<dynamic>?)
               ?.map((e) => e as String)
               .toList() ??
           [],
@@ -110,5 +111,3 @@ class ExercisePlanModel extends PlanBaseModel {
   /// 获取所有 Sets 总数
   int get totalSets => days.fold(0, (sum, day) => sum + day.totalSets);
 }
-
-

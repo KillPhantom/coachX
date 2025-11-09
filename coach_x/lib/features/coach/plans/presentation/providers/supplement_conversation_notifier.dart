@@ -11,7 +11,8 @@ import 'package:coach_x/features/coach/plans/data/repositories/plan_repository.d
 import 'package:coach_x/features/coach/plans/presentation/providers/create_supplement_plan_notifier.dart';
 
 /// 补剂对话状态管理
-class SupplementConversationNotifier extends StateNotifier<SupplementCreationState> {
+class SupplementConversationNotifier
+    extends StateNotifier<SupplementCreationState> {
   final SupplementPlanRepository _supplementPlanRepository;
   final PlanRepository _planRepository;
   final CreateSupplementPlanNotifier _createNotifier;
@@ -54,17 +55,12 @@ class SupplementConversationNotifier extends StateNotifier<SupplementCreationSta
         interactionType: 'quick_action',
       );
 
-      state = state.copyWith(
-        messages: [welcomeMessage],
-        canSendMessage: true,
-      );
+      state = state.copyWith(messages: [welcomeMessage], canSendMessage: true);
 
       AppLogger.info('✅ 对话初始化完成');
     } catch (e) {
       AppLogger.error('❌ 初始化对话失败', e);
-      state = state.copyWith(
-        errorMessage: '初始化失败：$e',
-      );
+      state = state.copyWith(errorMessage: '初始化失败：$e');
     }
   }
 
@@ -79,7 +75,9 @@ class SupplementConversationNotifier extends StateNotifier<SupplementCreationSta
       _exercisePlans = List<ExercisePlanModel>.from(plansData.exercisePlans);
       _dietPlans = List<DietPlanModel>.from(plansData.dietPlans);
 
-      AppLogger.debug('✅ 计划加载完成：训练${_exercisePlans.length}个，饮食${_dietPlans.length}个');
+      AppLogger.debug(
+        '✅ 计划加载完成：训练${_exercisePlans.length}个，饮食${_dietPlans.length}个',
+      );
     } catch (e) {
       AppLogger.warning('⚠️ 加载计划失败: $e');
       _exercisePlans = <ExercisePlanModel>[];
@@ -99,10 +97,7 @@ class SupplementConversationNotifier extends StateNotifier<SupplementCreationSta
       newMessages.add(LLMChatMessage.user(content: userMessage));
     }
 
-    state = state.copyWith(
-      messages: newMessages,
-      canSendMessage: false,
-    );
+    state = state.copyWith(messages: newMessages, canSendMessage: false);
 
     // 根据选项类型处理
     if (optionType == 'basic') {
@@ -143,15 +138,15 @@ class SupplementConversationNotifier extends StateNotifier<SupplementCreationSta
       }).toList();
 
       if (options.isEmpty) {
-        newMessages.add(LLMChatMessage.ai(
-          content: '暂无可用的训练计划，请先创建训练计划。',
-        ));
+        newMessages.add(LLMChatMessage.ai(content: '暂无可用的训练计划，请先创建训练计划。'));
       } else {
-        newMessages.add(LLMChatMessage.ai(
-          content: '请选择训练计划：',
-          options: options,
-          interactionType: 'plan_selection',
-        ));
+        newMessages.add(
+          LLMChatMessage.ai(
+            content: '请选择训练计划：',
+            options: options,
+            interactionType: 'plan_selection',
+          ),
+        );
       }
     } else if (planType == 'diet') {
       // 饮食计划选择
@@ -165,15 +160,15 @@ class SupplementConversationNotifier extends StateNotifier<SupplementCreationSta
       }).toList();
 
       if (options.isEmpty) {
-        newMessages.add(LLMChatMessage.ai(
-          content: '暂无可用的饮食计划，请先创建饮食计划。',
-        ));
+        newMessages.add(LLMChatMessage.ai(content: '暂无可用的饮食计划，请先创建饮食计划。'));
       } else {
-        newMessages.add(LLMChatMessage.ai(
-          content: '接下来请选择饮食计划：',
-          options: options,
-          interactionType: 'plan_selection',
-        ));
+        newMessages.add(
+          LLMChatMessage.ai(
+            content: '接下来请选择饮食计划：',
+            options: options,
+            interactionType: 'plan_selection',
+          ),
+        );
       }
     }
 
@@ -187,10 +182,7 @@ class SupplementConversationNotifier extends StateNotifier<SupplementCreationSta
     // 添加用户选择消息
     final newMessages = List<LLMChatMessage>.from(state.messages);
 
-    state = state.copyWith(
-      messages: newMessages,
-      canSendMessage: false,
-    );
+    state = state.copyWith(messages: newMessages, canSendMessage: false);
 
     if (option.type == 'training_plan') {
       // 选择了训练计划
@@ -242,10 +234,7 @@ class SupplementConversationNotifier extends StateNotifier<SupplementCreationSta
   ) async {
     AppLogger.info('🤖 开始生成补剂推荐');
 
-    state = state.copyWith(
-      isAIResponding: true,
-      canSendMessage: false,
-    );
+    state = state.copyWith(isAIResponding: true, canSendMessage: false);
 
     // 添加思考消息
     final newMessages = List<LLMChatMessage>.from(state.messages);
@@ -291,12 +280,11 @@ class SupplementConversationNotifier extends StateNotifier<SupplementCreationSta
           // 接收补剂建议
           final data = event['data'] as Map<String, dynamic>?;
           if (data != null) {
-            final supplementDayData = data['supplement_day'] as Map<String, dynamic>?;
+            final supplementDayData =
+                data['supplement_day'] as Map<String, dynamic>?;
             if (supplementDayData != null) {
               final supplementDay = SupplementDay.fromJson(supplementDayData);
-              state = state.copyWith(
-                pendingSuggestion: supplementDay,
-              );
+              state = state.copyWith(pendingSuggestion: supplementDay);
 
               // 添加建议消息
               final summary = data['summary'] as String? ?? '已生成补剂方案';
@@ -307,10 +295,7 @@ class SupplementConversationNotifier extends StateNotifier<SupplementCreationSta
           }
         } else if (eventType == 'complete') {
           // 完成
-          state = state.copyWith(
-            isAIResponding: false,
-            canSendMessage: true,
-          );
+          state = state.copyWith(isAIResponding: false, canSendMessage: true);
         } else if (eventType == 'error') {
           // 错误
           final error = event['error'] as String? ?? '生成失败';
@@ -348,7 +333,10 @@ class SupplementConversationNotifier extends StateNotifier<SupplementCreationSta
     final dayCount = existingDayCount > 0 ? existingDayCount : 7;
 
     // 调用 CreateSupplementPlanNotifier 应用
-    _createNotifier.applyAIGeneratedDay(state.pendingSuggestion!, dayCount: dayCount);
+    _createNotifier.applyAIGeneratedDay(
+      state.pendingSuggestion!,
+      dayCount: dayCount,
+    );
 
     // 添加成功消息
     final newMessages = List<LLMChatMessage>.from(state.messages);
@@ -368,9 +356,7 @@ class SupplementConversationNotifier extends StateNotifier<SupplementCreationSta
 
     // 添加简单的问询消息
     final newMessages = List<LLMChatMessage>.from(state.messages);
-    newMessages.add(LLMChatMessage.ai(
-      content: '好的，我来重新为您推荐。请告诉我您希望如何调整补剂方案？',
-    ));
+    newMessages.add(LLMChatMessage.ai(content: '好的，我来重新为您推荐。请告诉我您希望如何调整补剂方案？'));
 
     // 清空建议并更新消息
     state = state.copyWith(

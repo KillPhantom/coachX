@@ -137,4 +137,3 @@ WorkloadLevel workloadLevelFromValue(double value) {
     return WorkloadLevel.high;
   }
 }
-

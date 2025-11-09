@@ -9,11 +9,12 @@ import 'package:coach_x/features/coach/plans/data/models/supplement_import_resul
 import 'package:coach_x/features/coach/plans/data/repositories/supplement_plan_repository.dart';
 
 /// 创建补剂计划状态管理
-class CreateSupplementPlanNotifier extends StateNotifier<CreateSupplementPlanState> {
+class CreateSupplementPlanNotifier
+    extends StateNotifier<CreateSupplementPlanState> {
   final SupplementPlanRepository _supplementPlanRepository;
 
   CreateSupplementPlanNotifier(this._supplementPlanRepository)
-      : super(const CreateSupplementPlanState());
+    : super(const CreateSupplementPlanState());
 
   // ==================== 基础字段更新 ====================
 
@@ -110,7 +111,9 @@ class CreateSupplementPlanNotifier extends StateNotifier<CreateSupplementPlanSta
 
     updateDay(dayIndex, updatedDay);
 
-    AppLogger.debug('🗑️ 删除时间段 - Day ${dayIndex + 1}, Timing ${timingIndex + 1}');
+    AppLogger.debug(
+      '🗑️ 删除时间段 - Day ${dayIndex + 1}, Timing ${timingIndex + 1}',
+    );
   }
 
   /// 更新时间段
@@ -178,7 +181,8 @@ class CreateSupplementPlanNotifier extends StateNotifier<CreateSupplementPlanSta
     if (timingIndex < 0 || timingIndex >= day.timings.length) return;
 
     final timing = day.timings[timingIndex];
-    if (supplementIndex < 0 || supplementIndex >= timing.supplements.length) return;
+    if (supplementIndex < 0 || supplementIndex >= timing.supplements.length)
+      return;
 
     final updatedSupplements = List<Supplement>.from(timing.supplements);
     updatedSupplements.removeAt(supplementIndex);
@@ -186,18 +190,26 @@ class CreateSupplementPlanNotifier extends StateNotifier<CreateSupplementPlanSta
 
     updateTiming(dayIndex, timingIndex, updatedTiming);
 
-    AppLogger.debug('🗑️ 删除补剂 - Day ${dayIndex + 1}, Timing ${timingIndex + 1}, Supplement ${supplementIndex + 1}');
+    AppLogger.debug(
+      '🗑️ 删除补剂 - Day ${dayIndex + 1}, Timing ${timingIndex + 1}, Supplement ${supplementIndex + 1}',
+    );
   }
 
   /// 更新补剂
-  void updateSupplement(int dayIndex, int timingIndex, int supplementIndex, Supplement supplement) {
+  void updateSupplement(
+    int dayIndex,
+    int timingIndex,
+    int supplementIndex,
+    Supplement supplement,
+  ) {
     if (dayIndex < 0 || dayIndex >= state.days.length) return;
 
     final day = state.days[dayIndex];
     if (timingIndex < 0 || timingIndex >= day.timings.length) return;
 
     final timing = day.timings[timingIndex];
-    if (supplementIndex < 0 || supplementIndex >= timing.supplements.length) return;
+    if (supplementIndex < 0 || supplementIndex >= timing.supplements.length)
+      return;
 
     final updatedSupplements = List<Supplement>.from(timing.supplements);
     updatedSupplements[supplementIndex] = supplement;
@@ -220,13 +232,11 @@ class CreateSupplementPlanNotifier extends StateNotifier<CreateSupplementPlanSta
     if (timingIndex < 0 || timingIndex >= day.timings.length) return;
 
     final timing = day.timings[timingIndex];
-    if (supplementIndex < 0 || supplementIndex >= timing.supplements.length) return;
+    if (supplementIndex < 0 || supplementIndex >= timing.supplements.length)
+      return;
 
     final supplement = timing.supplements[supplementIndex];
-    final updatedSupplement = supplement.copyWith(
-      name: name,
-      amount: amount,
-    );
+    final updatedSupplement = supplement.copyWith(name: name, amount: amount);
 
     updateSupplement(dayIndex, timingIndex, supplementIndex, updatedSupplement);
   }
@@ -244,10 +254,7 @@ class CreateSupplementPlanNotifier extends StateNotifier<CreateSupplementPlanSta
     final List<SupplementDay> newDays = [];
     for (int i = 0; i < dayCount; i++) {
       final dayNumber = i + 1;
-      final newDay = day.copyWith(
-        day: dayNumber,
-        name: 'Day $dayNumber',
-      );
+      final newDay = day.copyWith(day: dayNumber, name: 'Day $dayNumber');
       newDays.add(newDay);
     }
 
@@ -354,10 +361,7 @@ class CreateSupplementPlanNotifier extends StateNotifier<CreateSupplementPlanSta
     } catch (e) {
       AppLogger.error('❌ 加载补剂计划失败', e);
 
-      state = state.copyWith(
-        isLoading: false,
-        errorMessage: '加载失败: $e',
-      );
+      state = state.copyWith(isLoading: false, errorMessage: '加载失败: $e');
 
       return false;
     }
@@ -394,9 +398,7 @@ class CreateSupplementPlanNotifier extends StateNotifier<CreateSupplementPlanSta
       // 验证
       validate();
       if (state.validationErrors.isNotEmpty) {
-        state = state.copyWith(
-          errorMessage: state.validationErrors.first,
-        );
+        state = state.copyWith(errorMessage: state.validationErrors.first);
         return false;
       }
 
@@ -419,7 +421,9 @@ class CreateSupplementPlanNotifier extends StateNotifier<CreateSupplementPlanSta
 
       // 根据是否有planId判断是创建还是更新
       String planId;
-      if (state.isEditMode && state.planId != null && state.planId!.isNotEmpty) {
+      if (state.isEditMode &&
+          state.planId != null &&
+          state.planId!.isNotEmpty) {
         // 更新现有计划
         await _supplementPlanRepository.updatePlan(plan);
         planId = state.planId!;
@@ -430,19 +434,13 @@ class CreateSupplementPlanNotifier extends StateNotifier<CreateSupplementPlanSta
         AppLogger.info('✅ 补剂计划创建成功 - ID: $planId');
       }
 
-      state = state.copyWith(
-        isLoading: false,
-        planId: planId,
-      );
+      state = state.copyWith(isLoading: false, planId: planId);
 
       return true;
     } catch (e) {
       AppLogger.error('❌ 保存补剂计划失败', e);
 
-      state = state.copyWith(
-        isLoading: false,
-        errorMessage: '保存失败: $e',
-      );
+      state = state.copyWith(isLoading: false, errorMessage: '保存失败: $e');
 
       return false;
     }

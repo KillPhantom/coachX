@@ -3,6 +3,7 @@ import 'package:coach_x/features/coach/plans/data/models/supplement_day.dart';
 import 'package:coach_x/features/coach/plans/presentation/widgets/supplement_timing_card.dart';
 import 'package:coach_x/core/theme/app_colors.dart';
 import 'package:coach_x/core/theme/app_text_styles.dart';
+import 'package:coach_x/core/widgets/dismiss_keyboard_on_scroll.dart';
 
 /// 补剂日编辑器
 class SupplementDayEditor extends StatefulWidget {
@@ -50,7 +51,10 @@ class _SupplementDayEditorState extends State<SupplementDayEditor> {
                 CupertinoButton(
                   onPressed: widget.onAddTiming,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 12,
+                    ),
                     decoration: BoxDecoration(
                       color: AppColors.primary,
                       borderRadius: BorderRadius.circular(12),
@@ -81,9 +85,10 @@ class _SupplementDayEditorState extends State<SupplementDayEditor> {
       );
     }
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(12),
-      child: Column(
+    return DismissKeyboardOnScroll(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(12),
+        child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Timing Cards
@@ -97,15 +102,19 @@ class _SupplementDayEditorState extends State<SupplementDayEditor> {
               timingIndex: timingIndex,
               isExpanded: true,
               onDelete: () => widget.onDeleteTiming?.call(timingIndex),
-              onNameChanged: (name) => widget.onTimingNameChanged?.call(timingIndex, name),
-              onNoteChanged: (note) => widget.onTimingNoteChanged?.call(timingIndex, note),
+              onNameChanged: (name) =>
+                  widget.onTimingNameChanged?.call(timingIndex, name),
+              onNoteChanged: (note) =>
+                  widget.onTimingNoteChanged?.call(timingIndex, note),
               onAddSupplement: () => widget.onAddSupplement?.call(timingIndex),
               onDeleteSupplement: (supplementIndex) =>
                   widget.onDeleteSupplement?.call(timingIndex, supplementIndex),
-              onSupplementNameChanged: (supplementIndex, name) =>
-                  widget.onSupplementNameChanged?.call(timingIndex, supplementIndex, name),
-              onSupplementAmountChanged: (supplementIndex, amount) =>
-                  widget.onSupplementAmountChanged?.call(timingIndex, supplementIndex, amount),
+              onSupplementNameChanged: (supplementIndex, name) => widget
+                  .onSupplementNameChanged
+                  ?.call(timingIndex, supplementIndex, name),
+              onSupplementAmountChanged: (supplementIndex, amount) => widget
+                  .onSupplementAmountChanged
+                  ?.call(timingIndex, supplementIndex, amount),
             );
           }),
 
@@ -118,7 +127,10 @@ class _SupplementDayEditorState extends State<SupplementDayEditor> {
                 onPressed: widget.onAddTiming,
                 padding: EdgeInsets.zero,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 12,
+                  ),
                   decoration: BoxDecoration(
                     color: AppColors.primaryLight,
                     borderRadius: BorderRadius.circular(12),
@@ -146,6 +158,7 @@ class _SupplementDayEditorState extends State<SupplementDayEditor> {
               ),
             ),
         ],
+      ),
       ),
     );
   }

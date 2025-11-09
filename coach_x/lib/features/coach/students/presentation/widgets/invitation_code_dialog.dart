@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:coach_x/core/theme/app_theme.dart';
 import 'package:coach_x/core/widgets/loading_indicator.dart';
+import 'package:coach_x/core/widgets/dismiss_keyboard.dart';
 import 'package:coach_x/l10n/app_localizations.dart';
 import '../providers/students_providers.dart';
 import 'invitation_code_item.dart';
@@ -45,7 +46,8 @@ class _InvitationCodeDialogState extends ConsumerState<InvitationCodeDialog> {
         height: MediaQuery.of(context).size.height * 0.85,
         padding: const EdgeInsets.all(AppDimensions.spacingL),
         child: SafeArea(
-          child: Column(
+          child: DismissKeyboard(
+            child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // 标题和关闭按钮
@@ -67,10 +69,7 @@ class _InvitationCodeDialogState extends ConsumerState<InvitationCodeDialog> {
               const SizedBox(height: AppDimensions.spacingL),
 
               // 分割线
-              Container(
-                height: 1,
-                color: AppColors.dividerLight,
-              ),
+              Container(height: 1, color: AppColors.dividerLight),
 
               const SizedBox(height: AppDimensions.spacingL),
 
@@ -114,6 +113,7 @@ class _InvitationCodeDialogState extends ConsumerState<InvitationCodeDialog> {
               ),
             ],
           ),
+          ),
         ),
       ),
     );
@@ -124,10 +124,7 @@ class _InvitationCodeDialogState extends ConsumerState<InvitationCodeDialog> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          l10n.invitationCodeManagement,
-          style: AppTextStyles.title3,
-        ),
+        Text(l10n.invitationCodeManagement, style: AppTextStyles.title3),
         CupertinoButton(
           padding: EdgeInsets.zero,
           onPressed: () => Navigator.of(context).pop(),
@@ -154,10 +151,7 @@ class _InvitationCodeDialogState extends ConsumerState<InvitationCodeDialog> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // 签约时长输入
-          Text(
-            l10n.contractDurationDays,
-            style: AppTextStyles.footnote,
-          ),
+          Text(l10n.contractDurationDays, style: AppTextStyles.footnote),
           const SizedBox(height: AppDimensions.spacingS),
           CupertinoTextField(
             controller: _totalDaysController,
@@ -173,10 +167,7 @@ class _InvitationCodeDialogState extends ConsumerState<InvitationCodeDialog> {
           const SizedBox(height: AppDimensions.spacingL),
 
           // 备注输入
-          Text(
-            l10n.remarkOptional,
-            style: AppTextStyles.footnote,
-          ),
+          Text(l10n.remarkOptional, style: AppTextStyles.footnote),
           const SizedBox(height: AppDimensions.spacingS),
           CupertinoTextField(
             controller: _noteController,
@@ -234,10 +225,7 @@ class _InvitationCodeDialogState extends ConsumerState<InvitationCodeDialog> {
 
     try {
       final repository = ref.read(invitationCodeRepositoryProvider);
-      await repository.generateInvitationCode(
-        totalDays: totalDays,
-        note: note,
-      );
+      await repository.generateInvitationCode(totalDays: totalDays, note: note);
 
       // 清空输入
       _noteController.clear();
@@ -318,9 +306,7 @@ class _InvitationCodeDialogState extends ConsumerState<InvitationCodeDialog> {
               const SizedBox(width: AppDimensions.spacingM),
               Text(
                 l10n.invitationCodeGenerated,
-                style: AppTextStyles.body.copyWith(
-                  color: AppColors.textWhite,
-                ),
+                style: AppTextStyles.body.copyWith(color: AppColors.textWhite),
               ),
             ],
           ),
@@ -336,4 +322,3 @@ class _InvitationCodeDialogState extends ConsumerState<InvitationCodeDialog> {
     });
   }
 }
-

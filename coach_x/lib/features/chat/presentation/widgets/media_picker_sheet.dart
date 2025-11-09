@@ -28,10 +28,7 @@ class MediaPickerSheet extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(
-                CupertinoIcons.camera,
-                color: AppColors.textPrimary,
-              ),
+              const Icon(CupertinoIcons.camera, color: AppColors.textPrimary),
               const SizedBox(width: 8),
               Text(
                 '拍照',
@@ -52,10 +49,7 @@ class MediaPickerSheet extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(
-                CupertinoIcons.photo,
-                color: AppColors.textPrimary,
-              ),
+              const Icon(CupertinoIcons.photo, color: AppColors.textPrimary),
               const SizedBox(width: 8),
               Text(
                 '选择图片',
@@ -76,10 +70,7 @@ class MediaPickerSheet extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(
-                CupertinoIcons.videocam,
-                color: AppColors.textPrimary,
-              ),
+              const Icon(CupertinoIcons.videocam, color: AppColors.textPrimary),
               const SizedBox(width: 8),
               Text(
                 '录制视频',
@@ -100,10 +91,7 @@ class MediaPickerSheet extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(
-                CupertinoIcons.film,
-                color: AppColors.textPrimary,
-              ),
+              const Icon(CupertinoIcons.film, color: AppColors.textPrimary),
               const SizedBox(width: 8),
               Text(
                 '选择视频',
@@ -124,10 +112,7 @@ class MediaPickerSheet extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(
-                CupertinoIcons.mic,
-                color: AppColors.textPrimary,
-              ),
+              const Icon(CupertinoIcons.mic, color: AppColors.textPrimary),
               const SizedBox(width: 8),
               Text(
                 '录制语音',
@@ -215,9 +200,7 @@ class MediaPickerSheet extends StatelessWidget {
           ),
           child: Text(
             message,
-            style: AppTextStyles.body.copyWith(
-              color: CupertinoColors.white,
-            ),
+            style: AppTextStyles.body.copyWith(color: CupertinoColors.white),
           ),
         ),
       ),

@@ -28,10 +28,7 @@ class CoachXApp extends ConsumerWidget {
         ...GlobalMaterialLocalizations.delegates,
         GlobalCupertinoLocalizations.delegate,
       ],
-      supportedLocales: const [
-        Locale('en', 'US'),
-        Locale('zh', 'CN'),
-      ],
+      supportedLocales: const [Locale('en', 'US'), Locale('zh', 'CN')],
     );
   }
 }

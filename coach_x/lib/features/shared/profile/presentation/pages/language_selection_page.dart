@@ -32,10 +32,7 @@ class LanguageSelectionPage extends ConsumerWidget {
             children: [
               // English
               CupertinoListTile(
-                title: Text(
-                  l10n.languageEnglish,
-                  style: AppTextStyles.body,
-                ),
+                title: Text(l10n.languageEnglish, style: AppTextStyles.body),
                 trailing: currentLanguage.startsWith('en')
                     ? Icon(
                         CupertinoIcons.checkmark_alt,
@@ -48,10 +45,7 @@ class LanguageSelectionPage extends ConsumerWidget {
 
               // 中文
               CupertinoListTile(
-                title: Text(
-                  l10n.languageChinese,
-                  style: AppTextStyles.body,
-                ),
+                title: Text(l10n.languageChinese, style: AppTextStyles.body),
                 trailing: currentLanguage.startsWith('zh')
                     ? Icon(
                         CupertinoIcons.checkmark_alt,

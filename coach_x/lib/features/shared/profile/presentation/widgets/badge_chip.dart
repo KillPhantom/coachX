@@ -8,10 +8,7 @@ class BadgeChip extends StatelessWidget {
   /// 标签文字
   final String tag;
 
-  const BadgeChip({
-    super.key,
-    required this.tag,
-  });
+  const BadgeChip({super.key, required this.tag});
 
   @override
   Widget build(BuildContext context) {
@@ -25,10 +22,7 @@ class BadgeChip extends StatelessWidget {
       decoration: BoxDecoration(
         color: badgeColor.withOpacity(0.15),
         borderRadius: BorderRadius.circular(AppDimensions.radiusFull),
-        border: Border.all(
-          color: badgeColor.withOpacity(0.3),
-          width: 1,
-        ),
+        border: Border.all(color: badgeColor.withOpacity(0.3), width: 1),
       ),
       child: Text(
         tag,

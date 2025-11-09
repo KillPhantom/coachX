@@ -86,8 +86,9 @@ class PlansNotifier extends StateNotifier<PlansPageState> {
           break;
         case 'diet':
           state = state.copyWith(
-            dietPlans:
-                state.dietPlans.where((plan) => plan.id != planId).toList(),
+            dietPlans: state.dietPlans
+                .where((plan) => plan.id != planId)
+                .toList(),
           );
           break;
         case 'supplement':
@@ -147,4 +148,3 @@ class PlansNotifier extends StateNotifier<PlansPageState> {
     }
   }
 }
-

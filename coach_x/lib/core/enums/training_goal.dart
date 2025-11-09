@@ -107,4 +107,3 @@ TrainingGoal trainingGoalFromString(String value) {
       return TrainingGoal.muscleGain;
   }
 }
-

@@ -15,10 +15,7 @@ class StudentsNotifier extends StateNotifier<StudentsPageState> {
   Future<void> loadStudents() async {
     if (state.isLoading) return;
 
-    state = state.copyWith(
-      isLoading: true,
-      clearError: true,
-    );
+    state = state.copyWith(isLoading: true, clearError: true);
 
     try {
       final result = await _repository.fetchStudents(
@@ -40,10 +37,7 @@ class StudentsNotifier extends StateNotifier<StudentsPageState> {
       AppLogger.info('学生列表加载成功: ${result.students.length}个学生');
     } catch (e, stackTrace) {
       AppLogger.error('加载学生列表失败', e, stackTrace);
-      state = state.copyWith(
-        isLoading: false,
-        error: '加载失败: ${e.toString()}',
-      );
+      state = state.copyWith(isLoading: false, error: '加载失败: ${e.toString()}');
     }
   }
 
@@ -175,4 +169,3 @@ class StudentsNotifier extends StateNotifier<StudentsPageState> {
     );
   }
 }
-

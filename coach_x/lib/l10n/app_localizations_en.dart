@@ -329,7 +329,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noInvitationCodes => 'No invitation codes';
 
   @override
-  String get loadFailed => 'Load failed';
+  String get loadFailed => 'Load Failed';
 
   @override
   String get generateInvitationCode => 'Generate invitation code';
@@ -364,7 +364,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get deleteStudent => 'Delete student';
 
   @override
-  String get confirmDelete => 'Confirm delete';
+  String get confirmDelete => 'Are you sure you want to delete this record?';
 
   @override
   String get plansTitle => 'Plans';
@@ -472,7 +472,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get confirmLogOutMessage => 'Are you sure to log out?';
 
   @override
-  String get addRecordTitle => 'Add Record';
+  String get addRecordTitle => 'Record Your Activity';
+
+  @override
+  String get addRecordSubtitle => 'What would you like to add today?';
 
   @override
   String get chooseRecordType => 'Choose a record type to add';
@@ -481,13 +484,33 @@ class AppLocalizationsEn extends AppLocalizations {
   String get trainingRecord => 'Training Record';
 
   @override
-  String get dietRecord => 'Diet Record';
+  String get trainingRecordDesc => 'Log sets, reps, weight, and videos.';
+
+  @override
+  String get dietRecord => 'Record Meal';
+
+  @override
+  String get todayMealPlan => 'Today\'s Meal Plan';
+
+  @override
+  String get dietRecordDesc => 'Log food, quantity, and photos.';
 
   @override
   String get supplementRecord => 'Supplement Record';
 
   @override
-  String get bodyMeasurement => 'Body Measurement';
+  String get supplementPlan => 'Supplement Plan';
+
+  @override
+  String supplementsToTake(int count) {
+    return '$count supplements to take';
+  }
+
+  @override
+  String get bodyMeasurement => 'Record Body Stats';
+
+  @override
+  String get bodyMeasurementDesc => 'Log weight and upload body pictures.';
 
   @override
   String get studentHome => 'Student Home';
@@ -556,10 +579,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get todayRecord => 'Today\'s Record';
-
-  @override
-  String get exerciseRecord => 'Exercise Record';
+  String get todayRecord => 'Today\'s Meal Plan';
 
   @override
   String get protein => 'Protein';
@@ -569,6 +589,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get fat => 'Fat';
+
+  @override
+  String get totalNutrition => 'Total Nutrition';
+
+  @override
+  String get kcal => 'kcal';
 
   @override
   String get calories => 'Calories';
@@ -619,7 +645,43 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get noExercises => 'No exercises';
+  String get noExercises => 'No Exercises';
+
+  @override
+  String get sets => 'sets';
+
+  @override
+  String get reps => 'reps';
+
+  @override
+  String exerciseSetsWithWeight(int sets, String reps, String weight) {
+    return '$sets sets x $reps reps @ $weight';
+  }
+
+  @override
+  String exerciseSetsNoWeight(int sets, String reps) {
+    return '$sets sets x $reps reps';
+  }
+
+  @override
+  String exerciseSetsOnly(int sets) {
+    return '$sets sets';
+  }
+
+  @override
+  String get video => 'Video';
+
+  @override
+  String get coachNotes => 'Coach Notes:';
+
+  @override
+  String get aiGuidanceInDevelopment => 'AI Guidance Feature Coming Soon';
+
+  @override
+  String get comingSoon => 'Coming Soon';
+
+  @override
+  String get ok => 'OK';
 
   @override
   String get assignPlansToStudent => 'Assign Plans to';
@@ -656,4 +718,311 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get done => 'Done';
+
+  @override
+  String get save => 'Save';
+
+  @override
+  String get noCoachTitle => 'No Coach Assigned';
+
+  @override
+  String get noCoachMessage => 'Please contact support to get a coach assigned';
+
+  @override
+  String get planTabTraining => 'Training';
+
+  @override
+  String get planTabDiet => 'Diet';
+
+  @override
+  String get planTabSupplements => 'Supplements';
+
+  @override
+  String get coachsPlan => 'Coach\'s Plan';
+
+  @override
+  String get coachNote => 'Coach Note';
+
+  @override
+  String get kg => 'kg';
+
+  @override
+  String get lbs => 'lbs';
+
+  @override
+  String get noExercisesForBodyPart => 'No exercises for this body part';
+
+  @override
+  String get mealRecord => 'Meal Record';
+
+  @override
+  String get coachSuggestion => 'Coach Suggestion';
+
+  @override
+  String get totalMacros => 'Total Macros';
+
+  @override
+  String get addRecord => 'Add Record';
+
+  @override
+  String get editRecord => 'Edit Record';
+
+  @override
+  String get takePicture => 'Take Picture';
+
+  @override
+  String get uploadImage => 'Upload Image';
+
+  @override
+  String get commentsOrQuestions => 'Comments or Questions';
+
+  @override
+  String get saveMealRecord => 'Save Meal Record';
+
+  @override
+  String get typeYourMessageHere => 'Type your message here...';
+
+  @override
+  String get mealCompleted => 'Completed';
+
+  @override
+  String get markAsComplete => 'Mark as Complete';
+
+  @override
+  String get editMeal => 'Edit';
+
+  @override
+  String get recordSaved => 'Record saved successfully';
+
+  @override
+  String get recordSaveFailed => 'Failed to save record';
+
+  @override
+  String get noMealsToday => 'No meals planned for today';
+
+  @override
+  String macrosFormat(int protein, int carbs, int fat) {
+    return '${protein}P/${carbs}C/${fat}F';
+  }
+
+  @override
+  String get aiFoodScanner => 'AI Food Scanner';
+
+  @override
+  String get scanFood => 'Scan Food';
+
+  @override
+  String get uploadPhoto => 'Upload Photo';
+
+  @override
+  String get analyzing => 'Analyzing...';
+
+  @override
+  String get positionFoodInFrame => 'Position food within the frame';
+
+  @override
+  String get foodAnalysisResults => 'Analysis Results';
+
+  @override
+  String get estimatedWeight => 'Estimated Weight';
+
+  @override
+  String get adjustValues => 'Adjust values if needed';
+
+  @override
+  String get selectMeal => 'Select Meal';
+
+  @override
+  String get saveToMeal => 'Save to Meal';
+
+  @override
+  String recognizedFoods(int count) {
+    return '$count foods recognized';
+  }
+
+  @override
+  String get cameraPermissionDenied =>
+      'Camera permission denied. Please enable camera access in Settings.';
+
+  @override
+  String get analysisFailed => 'Analysis Failed';
+
+  @override
+  String get plannedNutrition => 'Planned';
+
+  @override
+  String get mealProgress => 'Progress';
+
+  @override
+  String get aiDetectedFoods => 'Detected Foods';
+
+  @override
+  String get caloriesInput => 'Calories';
+
+  @override
+  String get proteinInput => 'Protein (g)';
+
+  @override
+  String get carbsInput => 'Carbs (g)';
+
+  @override
+  String get fatInput => 'Fat (g)';
+
+  @override
+  String get aiDetectButton => 'AI Smart Detection';
+
+  @override
+  String get addFoodRecord => 'Add Food Record';
+
+  @override
+  String get selectMealToAnalyze => 'Select meal to analyze';
+
+  @override
+  String get recordSavedSuccess => 'Food record saved successfully';
+
+  @override
+  String get aiScannerMode => 'AI Scanner';
+
+  @override
+  String get simpleRecordMode => 'Simple Record';
+
+  @override
+  String get aiAnalyzing => 'AI analyzing your food...';
+
+  @override
+  String get aiAnalysisProgress => 'Analysis Progress';
+
+  @override
+  String get selectMealToSave => 'Select meal to save';
+
+  @override
+  String get bodyStatsHistory => 'Body Stats History';
+
+  @override
+  String get recordBodyStats => 'Record Body Stats';
+
+  @override
+  String get bodyFat => 'Body Fat %';
+
+  @override
+  String get bodyFatOptional => 'Body Fat % (Optional)';
+
+  @override
+  String get skipPhoto => 'Skip Photo';
+
+  @override
+  String get enterWeight => 'Enter Weight';
+
+  @override
+  String get enterBodyFat => 'Enter Body Fat %';
+
+  @override
+  String get last14Days => 'Last 14 Days';
+
+  @override
+  String get last30Days => 'Last 30 Days';
+
+  @override
+  String get last90Days => 'Last 90 Days';
+
+  @override
+  String get deleteRecord => 'Delete Record';
+
+  @override
+  String get noBodyStatsData => 'No body stats data yet';
+
+  @override
+  String get weightTrend => 'Weight Trend';
+
+  @override
+  String get recordDeleted => 'Record deleted successfully';
+
+  @override
+  String get recordUpdated => 'Record updated successfully';
+
+  @override
+  String get maxPhotosReached => 'Maximum 3 photos allowed';
+
+  @override
+  String get history => 'History';
+
+  @override
+  String get photos => 'Photos';
+
+  @override
+  String get takePhoto => 'Take Photo';
+
+  @override
+  String get myRecordings => 'My Recordings';
+
+  @override
+  String get recordVideo => 'Record Video';
+
+  @override
+  String get set => 'Set';
+
+  @override
+  String get quickComplete => 'Quick Complete';
+
+  @override
+  String get completed => 'Completed';
+
+  @override
+  String get videoDurationExceeded => 'Video must be ≤ 1 minute';
+
+  @override
+  String get recordingVideo => 'Recording...';
+
+  @override
+  String get selectFromGallery => 'Select from gallery';
+
+  @override
+  String get startTimerConfirmTitle => 'Start Timer';
+
+  @override
+  String get startTimerConfirmMessage => 'Start training timer?';
+
+  @override
+  String get startTimerButton => 'Start';
+
+  @override
+  String get weightPlaceholder => 'Bodyweight/60kg';
+
+  @override
+  String get timeSpentLabel => 'Time Spent';
+
+  @override
+  String get addCustomExerciseHint => 'Tap \'+\' to add custom exercise';
+
+  @override
+  String completedCount(int count) {
+    return '$count completed';
+  }
+
+  @override
+  String get currentExercise => 'Current Exercise';
+
+  @override
+  String get totalDuration => 'Total Duration';
+
+  @override
+  String get congratsTitle => 'Congrats!';
+
+  @override
+  String get congratsMessage => 'You have finished all the exercises today!';
+
+  @override
+  String get congratsMessageCompact => 'Congrats! All exercises done!';
+
+  @override
+  String get createNewPlan => 'Create New Plan';
+
+  @override
+  String get selectPlan => 'Select Plan';
+
+  @override
+  String get myPlans => 'My Plans';
+
+  @override
+  String get coachPlan => 'Coach\'s Plan';
 }

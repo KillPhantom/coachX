@@ -131,9 +131,7 @@ class PlanTypeSection extends StatelessWidget {
     if (isLoading) {
       return Container(
         padding: const EdgeInsets.all(AppDimensions.spacingXL),
-        child: const Center(
-          child: CupertinoActivityIndicator(),
-        ),
+        child: const Center(child: CupertinoActivityIndicator()),
       );
     }
 
@@ -214,13 +212,9 @@ class PlanTypeSection extends StatelessWidget {
           children: [
             // 单选圆圈
             Icon(
-              isSelected
-                  ? CupertinoIcons.circle_fill
-                  : CupertinoIcons.circle,
+              isSelected ? CupertinoIcons.circle_fill : CupertinoIcons.circle,
               size: 20,
-              color: isSelected
-                  ? AppColors.primary
-                  : AppColors.textTertiary,
+              color: isSelected ? AppColors.primary : AppColors.textTertiary,
             ),
 
             const SizedBox(width: AppDimensions.spacingM),
@@ -302,13 +296,9 @@ class PlanTypeSection extends StatelessWidget {
           children: [
             // 单选圆圈
             Icon(
-              isSelected
-                  ? CupertinoIcons.circle_fill
-                  : CupertinoIcons.circle,
+              isSelected ? CupertinoIcons.circle_fill : CupertinoIcons.circle,
               size: 20,
-              color: isSelected
-                  ? AppColors.primary
-                  : AppColors.textTertiary,
+              color: isSelected ? AppColors.primary : AppColors.textTertiary,
             ),
 
             const SizedBox(width: AppDimensions.spacingM),

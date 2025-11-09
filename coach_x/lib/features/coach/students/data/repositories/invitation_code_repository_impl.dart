@@ -10,13 +10,18 @@ class InvitationCodeRepositoryImpl implements InvitationCodeRepository {
     try {
       AppLogger.info('调用fetch_invitation_codes');
 
-      final response = await CloudFunctionsService.call('fetch_invitation_codes');
+      final response = await CloudFunctionsService.call(
+        'fetch_invitation_codes',
+      );
       final data = response['data'] as Map<String, dynamic>;
 
       // 解析邀请码列表
       final codesList = data['codes'] as List<dynamic>;
       final codes = codesList
-          .map((json) => InvitationCodeModel.fromJson(json as Map<String, dynamic>))
+          .map(
+            (json) =>
+                InvitationCodeModel.fromJson(json as Map<String, dynamic>),
+          )
           .toList();
 
       AppLogger.info('fetch_invitation_codes成功: ${codes.length}个邀请码');
@@ -49,4 +54,3 @@ class InvitationCodeRepositoryImpl implements InvitationCodeRepository {
     }
   }
 }
-

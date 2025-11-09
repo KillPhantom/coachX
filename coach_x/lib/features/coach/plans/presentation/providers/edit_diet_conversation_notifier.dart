@@ -12,7 +12,8 @@ import 'package:coach_x/features/coach/plans/data/models/meal.dart';
 import 'package:coach_x/features/coach/plans/data/models/food_item.dart';
 
 /// 饮食计划编辑对话状态管理
-class EditDietConversationNotifier extends StateNotifier<EditDietConversationState> {
+class EditDietConversationNotifier
+    extends StateNotifier<EditDietConversationState> {
   EditDietConversationNotifier() : super(const EditDietConversationState());
 
   // 当前编辑的计划 ID
@@ -36,7 +37,9 @@ class EditDietConversationNotifier extends StateNotifier<EditDietConversationSta
     AppLogger.info('🆕 初始化饮食计划编辑对话 - 计划: ${currentPlan.name}');
 
     // 尝试加载历史对话
-    final savedMessages = await ConversationStorageService.loadConversation(planId);
+    final savedMessages = await ConversationStorageService.loadConversation(
+      planId,
+    );
 
     if (savedMessages.isNotEmpty) {
       AppLogger.info('📂 恢复历史对话 - 消息数: ${savedMessages.length}');
@@ -44,7 +47,9 @@ class EditDietConversationNotifier extends StateNotifier<EditDietConversationSta
         currentPlan: currentPlan,
         messages: savedMessages,
         isAIResponding: false,
-        currentTotalMacros: EditDietConversationState.calculatePlanMacros(currentPlan),
+        currentTotalMacros: EditDietConversationState.calculatePlanMacros(
+          currentPlan,
+        ),
       );
     } else {
       state = EditDietConversationState.initial(currentPlan: currentPlan);
@@ -53,10 +58,7 @@ class EditDietConversationNotifier extends StateNotifier<EditDietConversationSta
   }
 
   /// 发送用户消息
-  Future<void> sendMessage(
-    String message,
-    String planId,
-  ) async {
+  Future<void> sendMessage(String message, String planId) async {
     if (!_isMounted) return;
 
     if (state.currentPlan == null) {
@@ -73,15 +75,16 @@ class EditDietConversationNotifier extends StateNotifier<EditDietConversationSta
     }
 
     try {
-      AppLogger.info('📤 发送用户消息: ${message.substring(0, message.length > 50 ? 50 : message.length)}...');
+      AppLogger.info(
+        '📤 发送用户消息: ${message.substring(0, message.length > 50 ? 50 : message.length)}...',
+      );
 
       // 1. 添加用户消息
       final userMessage = LLMChatMessage.user(content: message);
       if (!_isMounted) return;
-      state = state.addMessage(userMessage).copyWith(
-        isAIResponding: true,
-        clearError: true,
-      );
+      state = state
+          .addMessage(userMessage)
+          .copyWith(isAIResponding: true, clearError: true);
 
       // 2. 添加 AI 加载消息
       final loadingMessage = LLMChatMessage.aiLoading();
@@ -102,9 +105,13 @@ class EditDietConversationNotifier extends StateNotifier<EditDietConversationSta
         if (!_isMounted) return;
 
         // 🆕 添加详细日志
-        AppLogger.debug('🔔 收到事件: type=${event.type}, hasData=${event.data != null}, hasContent=${event.content != null}');
+        AppLogger.debug(
+          '🔔 收到事件: type=${event.type}, hasData=${event.data != null}, hasContent=${event.content != null}',
+        );
         if (event.data != null) {
-          AppLogger.debug('📦 事件数据: ${event.data.toString().substring(0, event.data.toString().length > 200 ? 200 : event.data.toString().length)}...');
+          AppLogger.debug(
+            '📦 事件数据: ${event.data.toString().substring(0, event.data.toString().length > 200 ? 200 : event.data.toString().length)}...',
+          );
         }
 
         if (event.isThinking) {
@@ -146,10 +153,12 @@ class EditDietConversationNotifier extends StateNotifier<EditDietConversationSta
               );
 
               if (!_isMounted) return;
-              state = state.updateLastMessage(aiMessage).copyWith(
-                isAIResponding: false,
-                pendingSuggestion: suggestion,
-              );
+              state = state
+                  .updateLastMessage(aiMessage)
+                  .copyWith(
+                    isAIResponding: false,
+                    pendingSuggestion: suggestion,
+                  );
 
               AppLogger.info('🎯 pendingSuggestion 已设置');
             } catch (e, stackTrace) {
@@ -176,7 +185,9 @@ class EditDietConversationNotifier extends StateNotifier<EditDietConversationSta
               summary = suggestion.summary;
               macrosChange = suggestion.macrosChange;
 
-              AppLogger.info('✅ 从 complete 事件解析成功 - ${changes?.length ?? 0} 个修改');
+              AppLogger.info(
+                '✅ 从 complete 事件解析成功 - ${changes?.length ?? 0} 个修改',
+              );
 
               // 更新最后一条消息，附加建议
               final aiMessage = LLMChatMessage.ai(
@@ -185,10 +196,12 @@ class EditDietConversationNotifier extends StateNotifier<EditDietConversationSta
               );
 
               if (!_isMounted) return;
-              state = state.updateLastMessage(aiMessage).copyWith(
-                isAIResponding: false,
-                pendingSuggestion: suggestion,
-              );
+              state = state
+                  .updateLastMessage(aiMessage)
+                  .copyWith(
+                    isAIResponding: false,
+                    pendingSuggestion: suggestion,
+                  );
 
               AppLogger.info('🎯 pendingSuggestion 已设置（来自 complete 事件）');
             } catch (e, stackTrace) {
@@ -199,18 +212,15 @@ class EditDietConversationNotifier extends StateNotifier<EditDietConversationSta
           // 如果没有使用 tool，说明是纯对话
           if (changes == null) {
             final aiMessage = LLMChatMessage.ai(content: analysisContent);
-            state = state.updateLastMessage(aiMessage).copyWith(
-              isAIResponding: false,
-            );
+            state = state
+                .updateLastMessage(aiMessage)
+                .copyWith(isAIResponding: false);
           }
         } else if (event.isError) {
           AppLogger.error('❌ AI 响应错误: ${event.error}');
 
           if (!_isMounted) return;
-          state = state.copyWith(
-            isAIResponding: false,
-            error: event.error,
-          );
+          state = state.copyWith(isAIResponding: false, error: event.error);
         } else {
           // 🆕 未识别的事件类型
           AppLogger.warning('⚠️ 未识别的事件类型: ${event.type}');
@@ -237,10 +247,12 @@ class EditDietConversationNotifier extends StateNotifier<EditDietConversationSta
               );
 
               if (!_isMounted) return;
-              state = state.updateLastMessage(aiMessage).copyWith(
-                isAIResponding: false,
-                pendingSuggestion: suggestion,
-              );
+              state = state
+                  .updateLastMessage(aiMessage)
+                  .copyWith(
+                    isAIResponding: false,
+                    pendingSuggestion: suggestion,
+                  );
 
               AppLogger.info('🎯 pendingSuggestion 已设置（来自未知事件类型）');
             } catch (e, stackTrace) {
@@ -252,15 +264,15 @@ class EditDietConversationNotifier extends StateNotifier<EditDietConversationSta
 
       // 保存对话历史
       if (_currentPlanId != null) {
-        await ConversationStorageService.saveConversation(_currentPlanId!, state.messages);
+        await ConversationStorageService.saveConversation(
+          _currentPlanId!,
+          state.messages,
+        );
       }
     } catch (e, stackTrace) {
       AppLogger.error('❌ 发送消息失败', e, stackTrace);
       if (!_isMounted) return;
-      state = state.copyWith(
-        isAIResponding: false,
-        error: '发送失败: $e',
-      );
+      state = state.copyWith(isAIResponding: false, error: '发送失败: $e');
     }
   }
 
@@ -274,7 +286,9 @@ class EditDietConversationNotifier extends StateNotifier<EditDietConversationSta
     }
 
     try {
-      AppLogger.info('✅ 应用修改建议 - ${state.pendingSuggestion!.changes.length} 个修改');
+      AppLogger.info(
+        '✅ 应用修改建议 - ${state.pendingSuggestion!.changes.length} 个修改',
+      );
 
       // 应用修改到当前计划
       final updatedPlan = _applyChangesToPlan(
@@ -288,7 +302,9 @@ class EditDietConversationNotifier extends StateNotifier<EditDietConversationSta
       state = state.copyWith(
         currentPlan: updatedPlan,
         clearSuggestion: true,
-        currentTotalMacros: EditDietConversationState.calculatePlanMacros(updatedPlan),
+        currentTotalMacros: EditDietConversationState.calculatePlanMacros(
+          updatedPlan,
+        ),
       );
 
       AppLogger.info('✅ 修改已应用');
@@ -404,9 +420,7 @@ class EditDietConversationNotifier extends StateNotifier<EditDietConversationSta
       items: const [],
     );
 
-    final updatedDay = day.copyWith(
-      meals: [...day.meals, newMeal],
-    );
+    final updatedDay = day.copyWith(meals: [...day.meals, newMeal]);
 
     final updatedDays = List<DietDay>.from(days);
     updatedDays[change.dayIndex] = updatedDay;
@@ -419,7 +433,8 @@ class EditDietConversationNotifier extends StateNotifier<EditDietConversationSta
     if (change.mealIndex == null) return days;
 
     final day = days[change.dayIndex];
-    if (change.mealIndex! < 0 || change.mealIndex! >= day.meals.length) return days;
+    if (change.mealIndex! < 0 || change.mealIndex! >= day.meals.length)
+      return days;
 
     final updatedMeals = List<Meal>.from(day.meals);
     updatedMeals.removeAt(change.mealIndex!);
@@ -437,12 +452,11 @@ class EditDietConversationNotifier extends StateNotifier<EditDietConversationSta
     if (change.mealIndex == null) return days;
 
     final day = days[change.dayIndex];
-    if (change.mealIndex! < 0 || change.mealIndex! >= day.meals.length) return days;
+    if (change.mealIndex! < 0 || change.mealIndex! >= day.meals.length)
+      return days;
 
     final meal = day.meals[change.mealIndex!];
-    final updatedMeal = meal.copyWith(
-      name: change.after as String,
-    );
+    final updatedMeal = meal.copyWith(name: change.after as String);
 
     final updatedMeals = List<Meal>.from(day.meals);
     updatedMeals[change.mealIndex!] = updatedMeal;
@@ -460,7 +474,8 @@ class EditDietConversationNotifier extends StateNotifier<EditDietConversationSta
     if (change.mealIndex == null) return days;
 
     final day = days[change.dayIndex];
-    if (change.mealIndex! < 0 || change.mealIndex! >= day.meals.length) return days;
+    if (change.mealIndex! < 0 || change.mealIndex! >= day.meals.length)
+      return days;
 
     final meal = day.meals[change.mealIndex!];
 
@@ -480,9 +495,7 @@ class EditDietConversationNotifier extends StateNotifier<EditDietConversationSta
       newItem = FoodItem.empty();
     }
 
-    final updatedMeal = meal.copyWith(
-      items: [...meal.items, newItem],
-    );
+    final updatedMeal = meal.copyWith(items: [...meal.items, newItem]);
 
     final updatedMeals = List<Meal>.from(day.meals);
     updatedMeals[change.mealIndex!] = updatedMeal;
@@ -495,15 +508,20 @@ class EditDietConversationNotifier extends StateNotifier<EditDietConversationSta
     return updatedDays;
   }
 
-  List<DietDay> _applyRemoveFoodItem(List<DietDay> days, DietPlanChange change) {
+  List<DietDay> _applyRemoveFoodItem(
+    List<DietDay> days,
+    DietPlanChange change,
+  ) {
     if (change.dayIndex < 0 || change.dayIndex >= days.length) return days;
     if (change.mealIndex == null || change.foodItemIndex == null) return days;
 
     final day = days[change.dayIndex];
-    if (change.mealIndex! < 0 || change.mealIndex! >= day.meals.length) return days;
+    if (change.mealIndex! < 0 || change.mealIndex! >= day.meals.length)
+      return days;
 
     final meal = day.meals[change.mealIndex!];
-    if (change.foodItemIndex! < 0 || change.foodItemIndex! >= meal.items.length) return days;
+    if (change.foodItemIndex! < 0 || change.foodItemIndex! >= meal.items.length)
+      return days;
 
     final updatedItems = List<FoodItem>.from(meal.items);
     updatedItems.removeAt(change.foodItemIndex!);
@@ -521,15 +539,20 @@ class EditDietConversationNotifier extends StateNotifier<EditDietConversationSta
     return updatedDays;
   }
 
-  List<DietDay> _applyModifyFoodItem(List<DietDay> days, DietPlanChange change) {
+  List<DietDay> _applyModifyFoodItem(
+    List<DietDay> days,
+    DietPlanChange change,
+  ) {
     if (change.dayIndex < 0 || change.dayIndex >= days.length) return days;
     if (change.mealIndex == null || change.foodItemIndex == null) return days;
 
     final day = days[change.dayIndex];
-    if (change.mealIndex! < 0 || change.mealIndex! >= day.meals.length) return days;
+    if (change.mealIndex! < 0 || change.mealIndex! >= day.meals.length)
+      return days;
 
     final meal = day.meals[change.mealIndex!];
-    if (change.foodItemIndex! < 0 || change.foodItemIndex! >= meal.items.length) return days;
+    if (change.foodItemIndex! < 0 || change.foodItemIndex! >= meal.items.length)
+      return days;
 
     final item = meal.items[change.foodItemIndex!];
 

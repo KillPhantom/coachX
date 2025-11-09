@@ -1,5 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:coach_x/core/utils/logger.dart';
+import 'package:coach_x/features/auth/data/providers/user_providers.dart';
+import 'package:coach_x/features/coach/plans/data/models/exercise_plan_model.dart';
+import 'package:coach_x/features/coach/plans/data/models/diet_plan_model.dart';
+import 'package:coach_x/features/coach/plans/data/models/supplement_plan_model.dart';
 import '../../data/models/student_plans_model.dart';
 import '../../data/models/daily_training_model.dart';
 import '../../data/repositories/student_home_repository.dart';
@@ -14,10 +18,10 @@ final studentHomeRepositoryProvider = Provider<StudentHomeRepository>((ref) {
 
 // ==================== Data Providers ====================
 
-/// 学生计划Provider
+/// 学生计划Provider（获取所有计划：教练分配的 + 自己创建的）
 final studentPlansProvider = FutureProvider<StudentPlansModel>((ref) async {
   final repository = ref.watch(studentHomeRepositoryProvider);
-  return await repository.getAssignedPlans();
+  return await repository.getAllPlans();
 });
 
 /// 最新训练记录Provider
@@ -43,7 +47,10 @@ final currentDayNumbersProvider = Provider<Map<String, int>>((ref) {
 
   // 如果有错误，返回空Map
   if (plansAsync.hasError || latestTrainingAsync.hasError) {
-    AppLogger.error('计算Day Number失败', plansAsync.error ?? latestTrainingAsync.error);
+    AppLogger.error(
+      '计算Day Number失败',
+      plansAsync.error ?? latestTrainingAsync.error,
+    );
     return {};
   }
 
@@ -80,6 +87,112 @@ final currentDayNumbersProvider = Provider<Map<String, int>>((ref) {
   AppLogger.info('计算Day Numbers: $dayNumbers');
 
   return dayNumbers;
+});
+
+// ==================== Active Plan ID Providers ====================
+
+/// Active Exercise Plan ID Provider
+///
+/// 从当前用户数据中获取选中的训练计划ID
+final activeExercisePlanIdProvider = Provider<String?>((ref) {
+  final userData = ref.watch(currentUserDataProvider);
+  return userData.when(
+    data: (user) => user?.activeExercisePlanId,
+    loading: () => null,
+    error: (_, __) => null,
+  );
+});
+
+/// Active Diet Plan ID Provider
+///
+/// 从当前用户数据中获取选中的饮食计划ID
+final activeDietPlanIdProvider = Provider<String?>((ref) {
+  final userData = ref.watch(currentUserDataProvider);
+  return userData.when(
+    data: (user) => user?.activeDietPlanId,
+    loading: () => null,
+    error: (_, __) => null,
+  );
+});
+
+/// Active Supplement Plan ID Provider
+///
+/// 从当前用户数据中获取选中的补剂计划ID
+final activeSupplementPlanIdProvider = Provider<String?>((ref) {
+  final userData = ref.watch(currentUserDataProvider);
+  return userData.when(
+    data: (user) => user?.activeSupplementPlanId,
+    loading: () => null,
+    error: (_, __) => null,
+  );
+});
+
+// ==================== Current Active Plans Provider ====================
+
+/// 当前选中的计划集合 Provider
+///
+/// 根据 active plan IDs 从计划列表中找到对应的计划对象
+/// 返回结构：
+/// {
+///   'exercisePlan': ExercisePlanModel?,
+///   'dietPlan': DietPlanModel?,
+///   'supplementPlan': SupplementPlanModel?
+/// }
+final currentActivePlansProvider = Provider<Map<String, dynamic>>((ref) {
+  final plansAsync = ref.watch(studentPlansProvider);
+  final activeExercisePlanId = ref.watch(activeExercisePlanIdProvider);
+  final activeDietPlanId = ref.watch(activeDietPlanIdProvider);
+  final activeSupplementPlanId = ref.watch(activeSupplementPlanIdProvider);
+
+  // 如果计划数据还在加载中，返回空Map
+  if (plansAsync.isLoading) {
+    return {};
+  }
+
+  // 如果有错误，返回空Map
+  if (plansAsync.hasError) {
+    AppLogger.error('获取当前选中计划失败', plansAsync.error);
+    return {};
+  }
+
+  final plans = plansAsync.value;
+  if (plans == null) {
+    return {};
+  }
+
+  final Map<String, dynamic> activePlans = {};
+
+  // 获取选中的训练计划
+  if (activeExercisePlanId != null) {
+    activePlans['exercisePlan'] =
+        plans.getActiveExercisePlan(activeExercisePlanId);
+  } else if (plans.exercisePlans.isNotEmpty) {
+    // 如果没有选中的计划但列表不为空，默认选择第一个
+    activePlans['exercisePlan'] = plans.exercisePlans.first;
+  }
+
+  // 获取选中的饮食计划
+  if (activeDietPlanId != null) {
+    activePlans['dietPlan'] = plans.getActiveDietPlan(activeDietPlanId);
+  } else if (plans.dietPlans.isNotEmpty) {
+    // 如果没有选中的计划但列表不为空，默认选择第一个
+    activePlans['dietPlan'] = plans.dietPlans.first;
+  }
+
+  // 获取选中的补剂计划
+  if (activeSupplementPlanId != null) {
+    activePlans['supplementPlan'] =
+        plans.getActiveSupplementPlan(activeSupplementPlanId);
+  } else if (plans.supplementPlans.isNotEmpty) {
+    // 如果没有选中的计划但列表不为空，默认选择第一个
+    activePlans['supplementPlan'] = plans.supplementPlans.first;
+  }
+
+  AppLogger.info('当前选中的计划: exercise=${activePlans['exercisePlan']?.id}, '
+      'diet=${activePlans['dietPlan']?.id}, '
+      'supplement=${activePlans['supplementPlan']?.id}');
+
+  return activePlans;
 });
 
 // ==================== Helper Functions ====================

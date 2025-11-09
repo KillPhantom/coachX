@@ -52,11 +52,7 @@ class PlanCard extends StatelessWidget {
                     color: _getPlanColor().withOpacity(0.1),
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(
-                    _getPlanIcon(),
-                    color: _getPlanColor(),
-                    size: 24,
-                  ),
+                  child: Icon(_getPlanIcon(), color: _getPlanColor(), size: 24),
                 ),
                 const SizedBox(width: AppDimensions.spacingM),
                 // 计划名称和描述
@@ -100,11 +96,10 @@ class PlanCard extends StatelessWidget {
             ),
             // 分割线
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: AppDimensions.spacingM),
-              child: Container(
-                height: 0.5,
-                color: AppColors.dividerLight,
+              padding: const EdgeInsets.symmetric(
+                vertical: AppDimensions.spacingM,
               ),
+              child: Container(height: 0.5, color: AppColors.dividerLight),
             ),
             // 底部：学生数量
             Text(
@@ -145,4 +140,3 @@ class PlanCard extends StatelessWidget {
     }
   }
 }
-

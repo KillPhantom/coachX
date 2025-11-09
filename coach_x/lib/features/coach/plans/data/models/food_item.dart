@@ -61,12 +61,7 @@ class FoodItem {
 
   /// 获取该食物的营养数据
   Macros get macros {
-    return Macros(
-      protein: protein,
-      carbs: carbs,
-      fat: fat,
-      calories: calories,
-    );
+    return Macros(protein: protein, carbs: carbs, fat: fat, calories: calories);
   }
 
   /// 复制并修改部分字段

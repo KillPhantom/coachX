@@ -57,10 +57,7 @@ class AIStreamEvent {
         );
 
       case 'day_start':
-        return AIStreamEvent(
-          type: type,
-          day: json['day'] as int,
-        );
+        return AIStreamEvent(type: type, day: json['day'] as int);
 
       case 'exercise_start':
         return AIStreamEvent(
@@ -91,10 +88,7 @@ class AIStreamEvent {
         );
 
       case 'complete':
-        return AIStreamEvent(
-          type: type,
-          content: json['message'] as String?,
-        );
+        return AIStreamEvent(type: type, content: json['message'] as String?);
 
       case 'error':
         return AIStreamEvent(
@@ -104,17 +98,13 @@ class AIStreamEvent {
         );
 
       default:
-        return AIStreamEvent(
-          type: type,
-        );
+        return AIStreamEvent(type: type);
     }
   }
 
   /// 转换为 JSON
   Map<String, dynamic> toJson() {
-    final json = <String, dynamic>{
-      'type': type,
-    };
+    final json = <String, dynamic>{'type': type};
 
     if (day != null) json['day'] = day;
     if (content != null) json['content'] = content;
@@ -154,4 +144,3 @@ class AIStreamEvent {
     return 'AIStreamEvent(type: $type, day: $day, exerciseIndex: $exerciseIndex, exerciseName: $exerciseName, content: $content, error: $error)';
   }
 }
-

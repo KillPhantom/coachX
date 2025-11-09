@@ -36,10 +36,7 @@ class StudentCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // 姓名
-                Text(
-                  student.name,
-                  style: AppTextStyles.bodyMedium,
-                ),
+                Text(student.name, style: AppTextStyles.bodyMedium),
 
                 const SizedBox(height: AppDimensions.spacingS),
 
@@ -73,8 +70,9 @@ class StudentCard extends StatelessWidget {
                   const SizedBox(height: AppDimensions.spacingXS),
                   Text(
                     '未分配计划',
-                    style: AppTextStyles.footnote
-                        .copyWith(color: AppColors.textTertiary),
+                    style: AppTextStyles.footnote.copyWith(
+                      color: AppColors.textTertiary,
+                    ),
                   ),
                 ],
               ],
@@ -113,8 +111,9 @@ class StudentCard extends StatelessWidget {
             child: Center(
               child: Text(
                 student.nameInitial,
-                style: AppTextStyles.bodyMedium
-                    .copyWith(color: AppColors.primaryText),
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: AppColors.primaryText,
+                ),
               ),
             ),
           ),
@@ -138,8 +137,9 @@ class StudentCard extends StatelessWidget {
       child: Center(
         child: Text(
           student.nameInitial,
-          style:
-              AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryText),
+          style: AppTextStyles.bodyMedium.copyWith(
+            color: AppColors.primaryText,
+          ),
         ),
       ),
     );
@@ -149,11 +149,7 @@ class StudentCard extends StatelessWidget {
   Widget _buildPlanInfo({required IconData icon, required String label}) {
     return Row(
       children: [
-        Icon(
-          icon,
-          size: AppDimensions.iconS,
-          color: AppColors.textSecondary,
-        ),
+        Icon(icon, size: AppDimensions.iconS, color: AppColors.textSecondary),
         const SizedBox(width: AppDimensions.spacingXS),
         Expanded(
           child: Text(
@@ -169,4 +165,3 @@ class StudentCard extends StatelessWidget {
     );
   }
 }
-

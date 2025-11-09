@@ -1,6 +1,7 @@
 /// 补剂计划流式生成事件
 class SupplementStreamEvent {
-  final String type;  // 'thinking' | 'analysis' | 'suggestion' | 'complete' | 'error'
+  final String
+  type; // 'thinking' | 'analysis' | 'suggestion' | 'complete' | 'error'
   final String? content;
   final Map<String, dynamic>? data;
   final String? error;

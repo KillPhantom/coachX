@@ -78,5 +78,3 @@ class AISuggestion {
     return 'AISuggestion(id: $id, type: $type, title: $title)';
   }
 }
-
-

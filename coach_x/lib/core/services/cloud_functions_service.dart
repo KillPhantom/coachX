@@ -14,11 +14,11 @@ class CloudFunctionsService {
     // 🔧 开发模式：使用本地模拟器
     // 将这里改为 true 即可使用本地测试
     const bool useLocalEmulator = true;
-    
+
     if (useLocalEmulator) {
       return 'http://127.0.0.1:5001/coachx-9d219/us-central1';
     }
-    
+
     // 生产环境
     const region = 'us-central1';
     const projectId = 'coachx-9d219';
@@ -94,6 +94,20 @@ class CloudFunctionsService {
     return await call('update_user_info', params);
   }
 
+  /// 更新用户的 Active Plan
+  ///
+  /// [planType] 计划类型：'exercise', 'diet', 'supplement'
+  /// [planId] 计划ID
+  static Future<Map<String, dynamic>> updateActivePlan({
+    required String planType,
+    required String planId,
+  }) async {
+    return await call('update_active_plan', {
+      'planType': planType,
+      'planId': planId,
+    });
+  }
+
   // ==================== 邀请码管理 ====================
 
   /// 验证邀请码
@@ -115,10 +129,7 @@ class CloudFunctionsService {
     int totalDays = 180,
     String? note,
   }) async {
-    final params = <String, dynamic>{
-      'count': count,
-      'total_days': totalDays,
-    };
+    final params = <String, dynamic>{'count': count, 'total_days': totalDays};
     if (note != null && note.isNotEmpty) {
       params['note'] = note;
     }
@@ -189,9 +200,7 @@ class CloudFunctionsService {
     String? studentId,
     Map<String, dynamic>? params,
   }) async {
-    final requestParams = <String, dynamic>{
-      'type': type,
-    };
+    final requestParams = <String, dynamic>{'type': type};
     if (prompt != null && prompt.isNotEmpty) {
       requestParams['prompt'] = prompt;
     }
@@ -213,9 +222,7 @@ class CloudFunctionsService {
   static Future<Map<String, dynamic>> importPlanFromImage({
     required String imageUrl,
   }) async {
-    final params = <String, dynamic>{
-      'image_url': imageUrl,
-    };
+    final params = <String, dynamic>{'image_url': imageUrl};
     return await call('import_plan_from_image', params);
   }
 
@@ -225,9 +232,7 @@ class CloudFunctionsService {
   static Future<Map<String, dynamic>> importSupplementPlanFromImage({
     required String imageUrl,
   }) async {
-    final params = <String, dynamic>{
-      'image_url': imageUrl,
-    };
+    final params = <String, dynamic>{'image_url': imageUrl};
     return await call('import_supplement_plan_from_image', params);
   }
 
@@ -266,10 +271,7 @@ class CloudFunctionsService {
   static Future<Map<String, dynamic>> getExercisePlanDetail({
     required String planId,
   }) async {
-    return await call('exercise_plan', {
-      'action': 'get',
-      'planId': planId,
-    });
+    return await call('exercise_plan', {'action': 'get', 'planId': planId});
   }
 
   /// 删除训练计划
@@ -278,10 +280,7 @@ class CloudFunctionsService {
   static Future<Map<String, dynamic>> deleteExercisePlan({
     required String planId,
   }) async {
-    return await call('exercise_plan', {
-      'action': 'delete',
-      'planId': planId,
-    });
+    return await call('exercise_plan', {'action': 'delete', 'planId': planId});
   }
 
   /// 复制训练计划
@@ -290,10 +289,7 @@ class CloudFunctionsService {
   static Future<Map<String, dynamic>> copyExercisePlan({
     required String planId,
   }) async {
-    return await call('exercise_plan', {
-      'action': 'copy',
-      'planId': planId,
-    });
+    return await call('exercise_plan', {'action': 'copy', 'planId': planId});
   }
 
   // ==================== 学生端API ====================
@@ -306,11 +302,42 @@ class CloudFunctionsService {
     return await call('get_student_assigned_plans');
   }
 
+  /// 获取学生所有计划
+  ///
+  /// 学生专用，返回学生的所有计划（包括教练分配的和自己创建的）
+  /// 返回格式：
+  /// {
+  ///   'exercisePlans': [...],
+  ///   'dietPlans': [...],
+  ///   'supplementPlans': [...]
+  /// }
+  static Future<Map<String, dynamic>> getStudentAllPlans() async {
+    return await call('get_student_all_plans');
+  }
+
   /// 获取学生最新训练记录
   ///
   /// 用于确定今天应该是计划的第几天
   static Future<Map<String, dynamic>> fetchLatestTraining() async {
     return await call('fetch_latest_training');
+  }
+
+  /// 获取今日训练记录
+  ///
+  /// [date] 日期 (格式: "yyyy-MM-dd")
+  /// 返回今日的完整训练记录（包含饮食、训练、补剂）
+  static Future<Map<String, dynamic>> fetchTodayTraining(String date) async {
+    return await call('fetch_today_training', {'date': date});
+  }
+
+  /// 保存/更新今日训练记录
+  ///
+  /// [trainingData] 训练记录数据
+  /// 返回保存结果
+  static Future<Map<String, dynamic>> upsertTodayTraining(
+    Map<String, dynamic> trainingData,
+  ) async {
+    return await call('upsert_today_training', trainingData);
   }
 
   // ==================== 异常处理 ====================

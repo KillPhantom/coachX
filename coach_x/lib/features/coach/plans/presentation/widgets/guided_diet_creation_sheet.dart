@@ -39,7 +39,8 @@ class _GuidedDietCreationSheetState
 
   // "其他"选项
   bool _hasOtherDietaryPreference = false;
-  final TextEditingController _otherDietaryPreferenceController = TextEditingController();
+  final TextEditingController _otherDietaryPreferenceController =
+      TextEditingController();
   bool _hasOtherAllergy = false;
   final TextEditingController _otherAllergyController = TextEditingController();
 
@@ -147,7 +148,8 @@ class _GuidedDietCreationSheetState
             ),
 
             // 错误提示
-            if (state.errorMessage != null) _buildErrorBanner(state.errorMessage!),
+            if (state.errorMessage != null)
+              _buildErrorBanner(state.errorMessage!),
 
             // 生成按钮
             _buildGenerateButton(),
@@ -486,7 +488,8 @@ class _GuidedDietCreationSheetState
           min: 1,
           max: 5,
           divisions: 4,
-          onChanged: (value) => setState(() => _planDurationDays = value.toInt()),
+          onChanged: (value) =>
+              setState(() => _planDurationDays = value.toInt()),
         ),
       ],
     );
@@ -570,9 +573,7 @@ class _GuidedDietCreationSheetState
                     color: hasOther
                         ? CupertinoColors.white
                         : AppColors.textPrimary,
-                    fontWeight: hasOther
-                        ? FontWeight.w600
-                        : FontWeight.normal,
+                    fontWeight: hasOther ? FontWeight.w600 : FontWeight.normal,
                   ),
                 ),
               ),

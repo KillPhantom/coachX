@@ -47,7 +47,9 @@ class SettingsRow extends StatelessWidget {
                 Text(
                   title,
                   style: AppTextStyles.body.copyWith(
-                    color: isDangerous ? AppColors.errorRed : AppColors.textPrimary,
+                    color: isDangerous
+                        ? AppColors.errorRed
+                        : AppColors.textPrimary,
                   ),
                 ),
                 trailing ??

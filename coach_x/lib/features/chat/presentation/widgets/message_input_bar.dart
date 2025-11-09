@@ -45,8 +45,8 @@ class _MessageInputBarState extends ConsumerState<MessageInputBar> {
 
   void _onTextChanged() {
     // 更新输入文本到 provider
-    ref.read(messageInputTextProvider.notifier).state =
-        _textController.text.trim();
+    ref.read(messageInputTextProvider.notifier).state = _textController.text
+        .trim();
   }
 
   /// 发送消息
@@ -145,17 +145,14 @@ class _MessageInputBarState extends ConsumerState<MessageInputBar> {
       decoration: BoxDecoration(
         color: AppColors.backgroundWhite,
         border: Border(
-          top: BorderSide(
-            color: AppColors.dividerLight,
-            width: 0.5,
-          ),
+          top: BorderSide(color: AppColors.dividerLight, width: 0.5),
         ),
       ),
       padding: EdgeInsets.only(
         left: 16,
         right: 16,
         top: 8,
-        bottom: MediaQuery.of(context).padding.bottom + 8,
+        bottom: MediaQuery.of(context).padding.bottom + 16,
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.end,

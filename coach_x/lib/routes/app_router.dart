@@ -12,6 +12,11 @@ import '../features/coach/plans/presentation/pages/create_diet_plan_page.dart';
 import '../features/coach/plans/presentation/pages/create_supplement_plan_page.dart';
 import '../features/chat/presentation/pages/chat_detail_page.dart';
 import '../features/shared/profile/presentation/pages/language_selection_page.dart';
+import '../features/student/diet/presentation/pages/diet_record_page.dart';
+import '../features/student/diet/presentation/pages/ai_food_scanner_page.dart';
+import '../features/student/body_stats/presentation/pages/body_stats_record_page.dart';
+import '../features/student/body_stats/presentation/pages/body_stats_history_page.dart';
+import '../features/student/training/presentation/pages/exercise_record_page.dart';
 
 /// 应用路由配置
 final GoRouter appRouter = GoRouter(
@@ -51,6 +56,42 @@ final GoRouter appRouter = GoRouter(
 
     // 学生端路由 - 使用Tab容器
     GoRoute(path: '/student', redirect: (context, state) => '/student/home'),
+
+    // 学生饮食记录页（必须在 /student/:tab 之前，否则会被 :tab 匹配）
+    GoRoute(
+      path: RouteNames.studentDietRecord,
+      pageBuilder: (context, state) =>
+          CupertinoPage(key: state.pageKey, child: const DietRecordPage()),
+    ),
+
+    // AI食物扫描页（必须在 /student/:tab 之前）
+    GoRoute(
+      path: RouteNames.studentAIFoodScanner,
+      pageBuilder: (context, state) =>
+          CupertinoPage(key: state.pageKey, child: const AIFoodScannerPage()),
+    ),
+
+    // 身体数据记录页（必须在 /student/:tab 之前）
+    GoRoute(
+      path: RouteNames.studentBodyStatsRecord,
+      pageBuilder: (context, state) =>
+          CupertinoPage(key: state.pageKey, child: const BodyStatsRecordPage()),
+    ),
+
+    // 身体数据历史页（必须在 /student/:tab 之前）
+    GoRoute(
+      path: RouteNames.studentBodyStatsHistory,
+      pageBuilder: (context, state) =>
+          CupertinoPage(key: state.pageKey, child: const BodyStatsHistoryPage()),
+    ),
+
+    // 训练记录页（必须在 /student/:tab 之前）
+    GoRoute(
+      path: RouteNames.studentExerciseRecord,
+      pageBuilder: (context, state) =>
+          CupertinoPage(key: state.pageKey, child: const ExerciseRecordPage()),
+    ),
+
     GoRoute(
       path: '/student/:tab',
       pageBuilder: (context, state) {
@@ -101,10 +142,7 @@ final GoRouter appRouter = GoRouter(
         // 当前显示占位页面
         return CupertinoPage(
           key: state.pageKey,
-          child: _PlanDetailPlaceholderPage(
-            planType: planType,
-            planId: planId,
-          ),
+          child: _PlanDetailPlaceholderPage(planType: planType, planId: planId),
         );
       },
     ),
@@ -299,10 +337,7 @@ class _PlanDetailPlaceholderPage extends StatelessWidget {
           children: [
             const Icon(CupertinoIcons.doc_text, size: 80),
             const SizedBox(height: 20),
-            const Text(
-              'Plan Detail Page',
-              style: AppTextStyles.title2,
-            ),
+            const Text('Plan Detail Page', style: AppTextStyles.title2),
             const SizedBox(height: 8),
             Text(
               'Type: $planType',
@@ -347,15 +382,9 @@ class ErrorPage extends StatelessWidget {
               color: CupertinoColors.systemRed,
             ),
             const SizedBox(height: 16),
-            const Text(
-              '页面不存在',
-              style: AppTextStyles.title3,
-            ),
+            const Text('页面不存在', style: AppTextStyles.title3),
             const SizedBox(height: 8),
-            const Text(
-              '抱歉，您访问的页面不存在',
-              style: AppTextStyles.footnote,
-            ),
+            const Text('抱歉，您访问的页面不存在', style: AppTextStyles.footnote),
             const SizedBox(height: 24),
             CupertinoButton.filled(
               onPressed: () {

@@ -14,11 +14,7 @@ class CoachInfoCard extends StatelessWidget {
   /// 合约有效期
   final DateTime? contractExpiresAt;
 
-  const CoachInfoCard({
-    super.key,
-    required this.coach,
-    this.contractExpiresAt,
-  });
+  const CoachInfoCard({super.key, required this.coach, this.contractExpiresAt});
 
   @override
   Widget build(BuildContext context) {
@@ -41,10 +37,7 @@ class CoachInfoCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // 教练姓名
-                Text(
-                  coach.name,
-                  style: AppTextStyles.title3,
-                ),
+                Text(coach.name, style: AppTextStyles.title3),
 
                 const SizedBox(height: AppDimensions.spacingS),
 
@@ -53,7 +46,9 @@ class CoachInfoCard extends StatelessWidget {
                   Wrap(
                     spacing: AppDimensions.spacingS,
                     runSpacing: AppDimensions.spacingS,
-                    children: coach.tags!.map((tag) => BadgeChip(tag: tag)).toList(),
+                    children: coach.tags!
+                        .map((tag) => BadgeChip(tag: tag))
+                        .toList(),
                   ),
 
                 const SizedBox(height: AppDimensions.spacingS),

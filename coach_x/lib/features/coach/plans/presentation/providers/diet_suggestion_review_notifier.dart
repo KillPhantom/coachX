@@ -8,11 +8,15 @@ import 'package:coach_x/features/coach/plans/data/models/meal.dart';
 import 'package:coach_x/features/coach/plans/data/models/food_item.dart';
 
 /// Diet Plan Suggestion Review Mode 状态管理
-class DietSuggestionReviewNotifier extends StateNotifier<DietSuggestionReviewState?> {
+class DietSuggestionReviewNotifier
+    extends StateNotifier<DietSuggestionReviewState?> {
   DietSuggestionReviewNotifier() : super(null);
 
   /// 开始 Review Mode
-  void startReview(DietPlanEditSuggestion suggestion, DietPlanModel originalPlan) {
+  void startReview(
+    DietPlanEditSuggestion suggestion,
+    DietPlanModel originalPlan,
+  ) {
     AppLogger.info('🔍 开始饮食计划 Review Mode - ${suggestion.changes.length} 处修改');
 
     state = DietSuggestionReviewState.initial(
@@ -128,11 +132,10 @@ class DietSuggestionReviewNotifier extends StateNotifier<DietSuggestionReviewSta
   }
 
   /// 应用单个修改到计划（核心逻辑）
-  DietPlanModel _applySingleChange(
-    DietPlanModel plan,
-    DietPlanChange change,
-  ) {
-    AppLogger.debug('📝 应用饮食计划修改: ${change.type.name} at day ${change.dayIndex}');
+  DietPlanModel _applySingleChange(DietPlanModel plan, DietPlanChange change) {
+    AppLogger.debug(
+      '📝 应用饮食计划修改: ${change.type.name} at day ${change.dayIndex}',
+    );
 
     switch (change.type) {
       case DietChangeType.addDay:
@@ -221,20 +224,12 @@ class DietSuggestionReviewNotifier extends StateNotifier<DietSuggestionReviewSta
         items: const [],
       );
     } else if (change.after is String) {
-      newMeal = Meal(
-        name: change.after as String,
-        items: const [],
-      );
+      newMeal = Meal(name: change.after as String, items: const []);
     } else {
-      newMeal = const Meal(
-        name: 'New Meal',
-        items: [],
-      );
+      newMeal = const Meal(name: 'New Meal', items: []);
     }
 
-    final updatedDay = day.copyWith(
-      meals: [...day.meals, newMeal],
-    );
+    final updatedDay = day.copyWith(meals: [...day.meals, newMeal]);
 
     days[change.dayIndex] = updatedDay;
     return plan.copyWith(days: days);
@@ -248,7 +243,8 @@ class DietSuggestionReviewNotifier extends StateNotifier<DietSuggestionReviewSta
     final days = List<DietDay>.from(plan.days);
     final day = days[change.dayIndex];
 
-    if (change.mealIndex! < 0 || change.mealIndex! >= day.meals.length) return plan;
+    if (change.mealIndex! < 0 || change.mealIndex! >= day.meals.length)
+      return plan;
 
     final updatedMeals = List<Meal>.from(day.meals);
     updatedMeals.removeAt(change.mealIndex!);
@@ -267,12 +263,11 @@ class DietSuggestionReviewNotifier extends StateNotifier<DietSuggestionReviewSta
     final days = List<DietDay>.from(plan.days);
     final day = days[change.dayIndex];
 
-    if (change.mealIndex! < 0 || change.mealIndex! >= day.meals.length) return plan;
+    if (change.mealIndex! < 0 || change.mealIndex! >= day.meals.length)
+      return plan;
 
     final meal = day.meals[change.mealIndex!];
-    final updatedMeal = meal.copyWith(
-      name: change.after as String,
-    );
+    final updatedMeal = meal.copyWith(name: change.after as String);
 
     final updatedMeals = List<Meal>.from(day.meals);
     updatedMeals[change.mealIndex!] = updatedMeal;
@@ -291,7 +286,8 @@ class DietSuggestionReviewNotifier extends StateNotifier<DietSuggestionReviewSta
     final days = List<DietDay>.from(plan.days);
     final day = days[change.dayIndex];
 
-    if (change.mealIndex! < 0 || change.mealIndex! >= day.meals.length) return plan;
+    if (change.mealIndex! < 0 || change.mealIndex! >= day.meals.length)
+      return plan;
 
     final meal = day.meals[change.mealIndex!];
 
@@ -311,9 +307,7 @@ class DietSuggestionReviewNotifier extends StateNotifier<DietSuggestionReviewSta
       newItem = FoodItem.empty();
     }
 
-    final updatedMeal = meal.copyWith(
-      items: [...meal.items, newItem],
-    );
+    final updatedMeal = meal.copyWith(items: [...meal.items, newItem]);
 
     final updatedMeals = List<Meal>.from(day.meals);
     updatedMeals[change.mealIndex!] = updatedMeal;
@@ -332,11 +326,13 @@ class DietSuggestionReviewNotifier extends StateNotifier<DietSuggestionReviewSta
     final days = List<DietDay>.from(plan.days);
     final day = days[change.dayIndex];
 
-    if (change.mealIndex! < 0 || change.mealIndex! >= day.meals.length) return plan;
+    if (change.mealIndex! < 0 || change.mealIndex! >= day.meals.length)
+      return plan;
 
     final meal = day.meals[change.mealIndex!];
 
-    if (change.foodItemIndex! < 0 || change.foodItemIndex! >= meal.items.length) return plan;
+    if (change.foodItemIndex! < 0 || change.foodItemIndex! >= meal.items.length)
+      return plan;
 
     final updatedItems = List<FoodItem>.from(meal.items);
     updatedItems.removeAt(change.foodItemIndex!);
@@ -360,11 +356,13 @@ class DietSuggestionReviewNotifier extends StateNotifier<DietSuggestionReviewSta
     final days = List<DietDay>.from(plan.days);
     final day = days[change.dayIndex];
 
-    if (change.mealIndex! < 0 || change.mealIndex! >= day.meals.length) return plan;
+    if (change.mealIndex! < 0 || change.mealIndex! >= day.meals.length)
+      return plan;
 
     final meal = day.meals[change.mealIndex!];
 
-    if (change.foodItemIndex! < 0 || change.foodItemIndex! >= meal.items.length) return plan;
+    if (change.foodItemIndex! < 0 || change.foodItemIndex! >= meal.items.length)
+      return plan;
 
     final item = meal.items[change.foodItemIndex!];
 

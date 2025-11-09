@@ -73,10 +73,7 @@ class _SupplementRowState extends State<SupplementRow> {
               placeholder: '补剂名称',
               onChanged: widget.onNameChanged,
               style: AppTextStyles.footnote,
-              padding: const EdgeInsets.symmetric(
-                horizontal: 8,
-                vertical: 6,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
               decoration: BoxDecoration(
                 color: CupertinoColors.systemGrey6.resolveFrom(context),
                 borderRadius: BorderRadius.circular(6),
@@ -94,10 +91,7 @@ class _SupplementRowState extends State<SupplementRow> {
               placeholder: '用量',
               onChanged: widget.onAmountChanged,
               style: AppTextStyles.footnote,
-              padding: const EdgeInsets.symmetric(
-                horizontal: 8,
-                vertical: 6,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
               decoration: BoxDecoration(
                 color: CupertinoColors.systemGrey6.resolveFrom(context),
                 borderRadius: BorderRadius.circular(6),

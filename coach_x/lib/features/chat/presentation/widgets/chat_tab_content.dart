@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:coach_x/core/theme/app_theme.dart';
+import 'package:coach_x/core/widgets/dismiss_keyboard_on_scroll.dart';
 import 'package:coach_x/app/providers.dart';
 import 'package:coach_x/features/chat/presentation/providers/chat_detail_providers.dart';
 import 'package:logger/web.dart';
@@ -11,10 +12,7 @@ import 'message_bubble.dart';
 class ChatTabContent extends ConsumerStatefulWidget {
   final String conversationId;
 
-  const ChatTabContent({
-    super.key,
-    required this.conversationId,
-  });
+  const ChatTabContent({super.key, required this.conversationId});
 
   @override
   ConsumerState<ChatTabContent> createState() => _ChatTabContentState();
@@ -78,15 +76,12 @@ class _ChatTabContentState extends ConsumerState<ChatTabContent> {
     );
 
     if (currentUser == null) {
-      return const Center(
-        child: Text('用户未登录'),
-      );
+      return const Center(child: Text('用户未登录'));
     }
 
     return messagesAsync.when(
-      loading: () => const Center(
-        child: CupertinoActivityIndicator(radius: 16),
-      ),
+      loading: () =>
+          const Center(child: CupertinoActivityIndicator(radius: 16)),
       error: (error, stack) => _buildErrorState(context, error),
       data: (messages) {
         // 自动滚动到底部（当有新消息时）
@@ -98,19 +93,21 @@ class _ChatTabContentState extends ConsumerState<ChatTabContent> {
           return _buildEmptyState();
         }
 
-        return ListView.builder(
-          controller: _scrollController,
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          // 反转列表，使最新消息在底部
-          reverse: false,
-          itemCount: messages.length,
-          itemBuilder: (context, index) {
-            final message = messages[index];
-            return MessageBubble(
-              message: message,
-              currentUserId: currentUser.id,
-            );
-          },
+        return DismissKeyboardOnScroll(
+          child: ListView.builder(
+            controller: _scrollController,
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            // 反转列表，使最新消息在底部
+            reverse: true,
+            itemCount: messages.length,
+            itemBuilder: (context, index) {
+              final message = messages[index];
+              return MessageBubble(
+                message: message,
+                currentUserId: currentUser.id,
+              );
+            },
+          ),
         );
       },
     );
@@ -161,10 +158,7 @@ class _ChatTabContentState extends ConsumerState<ChatTabContent> {
               color: CupertinoColors.systemRed,
             ),
             const SizedBox(height: 20),
-            const Text(
-              '加载消息失败',
-              style: AppTextStyles.title3,
-            ),
+            const Text('加载消息失败', style: AppTextStyles.title3),
             const SizedBox(height: 8),
             Text(
               error.toString(),

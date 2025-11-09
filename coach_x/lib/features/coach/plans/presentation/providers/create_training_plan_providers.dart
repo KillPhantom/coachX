@@ -9,13 +9,14 @@ import 'create_training_plan_notifier.dart';
 
 /// 创建训练计划 Notifier Provider
 final createTrainingPlanNotifierProvider =
-    StateNotifierProvider.autoDispose<CreateTrainingPlanNotifier, CreateTrainingPlanState>(
-  (ref) {
-    // 获取 Repository
-    final repository = ref.watch(trainingPlanRepositoryProvider);
-    return CreateTrainingPlanNotifier(repository);
-  },
-);
+    StateNotifierProvider.autoDispose<
+      CreateTrainingPlanNotifier,
+      CreateTrainingPlanState
+    >((ref) {
+      // 获取 Repository
+      final repository = ref.watch(trainingPlanRepositoryProvider);
+      return CreateTrainingPlanNotifier(repository);
+    });
 
 // ==================== 计算 Providers ====================
 
@@ -28,7 +29,7 @@ final currentDayProvider = Provider.autoDispose<ExerciseTrainingDay?>((ref) {
 /// 当前选中的动作 Provider
 final currentExerciseProvider = Provider.autoDispose<Exercise?>((ref) {
   final state = ref.watch(createTrainingPlanNotifierProvider);
-  
+
   if (state.selectedDayIndex == null ||
       state.selectedExerciseIndex == null ||
       state.selectedDayIndex! < 0 ||
@@ -37,7 +38,7 @@ final currentExerciseProvider = Provider.autoDispose<Exercise?>((ref) {
   }
 
   final day = state.days[state.selectedDayIndex!];
-  
+
   if (state.selectedExerciseIndex! < 0 ||
       state.selectedExerciseIndex! >= day.exercises.length) {
     return null;
@@ -106,4 +107,3 @@ final hasSuggestionsProvider = Provider.autoDispose<bool>((ref) {
 final trainingPlanRepositoryProvider = Provider<PlanRepositoryImpl>((ref) {
   return PlanRepositoryImpl();
 });
-

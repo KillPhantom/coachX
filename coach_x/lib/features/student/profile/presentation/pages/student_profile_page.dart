@@ -32,9 +32,7 @@ class _StudentProfilePageState extends ConsumerState<StudentProfilePage> {
 
     if (currentUser == null) {
       return const CupertinoPageScaffold(
-        child: Center(
-          child: CupertinoActivityIndicator(),
-        ),
+        child: Center(child: CupertinoActivityIndicator()),
       );
     }
 
@@ -48,10 +46,7 @@ class _StudentProfilePageState extends ConsumerState<StudentProfilePage> {
               child: Padding(
                 padding: const EdgeInsets.all(AppDimensions.paddingL),
                 child: Center(
-                  child: Text(
-                    l10n.profile,
-                    style: AppTextStyles.title2,
-                  ),
+                  child: Text(l10n.profile, style: AppTextStyles.title2),
                 ),
               ),
             ),
@@ -124,10 +119,7 @@ class _StudentProfilePageState extends ConsumerState<StudentProfilePage> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          l10n.coachInfo,
-                          style: AppTextStyles.title3,
-                        ),
+                        Text(l10n.coachInfo, style: AppTextStyles.title3),
                         const SizedBox(height: AppDimensions.spacingM),
                         coachAsync.when(
                           data: (coach) {
@@ -139,10 +131,10 @@ class _StudentProfilePageState extends ConsumerState<StudentProfilePage> {
                               contractExpiresAt: currentUser.contractExpiresAt,
                             );
                           },
-                          loading: () => const Center(
-                            child: CupertinoActivityIndicator(),
-                          ),
-                          error: (error, _) => _buildErrorCard(error.toString()),
+                          loading: () =>
+                              const Center(child: CupertinoActivityIndicator()),
+                          error: (error, _) =>
+                              _buildErrorCard(error.toString()),
                         ),
                         const SizedBox(height: AppDimensions.spacingL),
                       ],
@@ -154,7 +146,9 @@ class _StudentProfilePageState extends ConsumerState<StudentProfilePage> {
                     child: Column(
                       children: [
                         // Notifications Toggle
-                        _buildNotificationsRow(currentUser.notificationsEnabled),
+                        _buildNotificationsRow(
+                          currentUser.notificationsEnabled,
+                        ),
 
                         // Unit Preference
                         SettingsRow(
@@ -192,7 +186,8 @@ class _StudentProfilePageState extends ConsumerState<StudentProfilePage> {
                                 actions: [
                                   CupertinoDialogAction(
                                     child: Text(l10n.confirm),
-                                    onPressed: () => Navigator.of(context).pop(),
+                                    onPressed: () =>
+                                        Navigator.of(context).pop(),
                                   ),
                                 ],
                               ),
@@ -234,10 +229,7 @@ class _StudentProfilePageState extends ConsumerState<StudentProfilePage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            l10n.notifications,
-            style: AppTextStyles.body,
-          ),
+          Text(l10n.notifications, style: AppTextStyles.body),
           CupertinoSwitch(
             value: enabled,
             onChanged: (value) {
@@ -256,10 +248,9 @@ class _StudentProfilePageState extends ConsumerState<StudentProfilePage> {
 
     try {
       final userRepo = ref.read(userRepositoryProvider);
-      await userRepo.updateUser(
-        currentUser.id,
-        {'notificationsEnabled': enabled},
-      );
+      await userRepo.updateUser(currentUser.id, {
+        'notificationsEnabled': enabled,
+      });
     } catch (e) {
       if (mounted) {
         final l10n = AppLocalizations.of(context)!;
@@ -322,10 +313,7 @@ class _StudentProfilePageState extends ConsumerState<StudentProfilePage> {
 
     try {
       final userRepo = ref.read(userRepositoryProvider);
-      await userRepo.updateUser(
-        currentUser.id,
-        {'unitPreference': preference},
-      );
+      await userRepo.updateUser(currentUser.id, {'unitPreference': preference});
     } catch (e) {
       if (mounted) {
         final l10n = AppLocalizations.of(context)!;
@@ -388,9 +376,7 @@ class _StudentProfilePageState extends ConsumerState<StudentProfilePage> {
       ),
       child: Text(
         l10n.noCoachInfo,
-        style: AppTextStyles.body.copyWith(
-          color: AppColors.textSecondary,
-        ),
+        style: AppTextStyles.body.copyWith(color: AppColors.textSecondary),
         textAlign: TextAlign.center,
       ),
     );
@@ -408,9 +394,7 @@ class _StudentProfilePageState extends ConsumerState<StudentProfilePage> {
       ),
       child: Text(
         '${l10n.loadCoachInfoFailed}: $error',
-        style: AppTextStyles.body.copyWith(
-          color: AppColors.errorRed,
-        ),
+        style: AppTextStyles.body.copyWith(color: AppColors.errorRed),
         textAlign: TextAlign.center,
       ),
     );

@@ -19,10 +19,12 @@ class CreateSupplementPlanPage extends ConsumerStatefulWidget {
   const CreateSupplementPlanPage({super.key, this.planId});
 
   @override
-  ConsumerState<CreateSupplementPlanPage> createState() => _CreateSupplementPlanPageState();
+  ConsumerState<CreateSupplementPlanPage> createState() =>
+      _CreateSupplementPlanPageState();
 }
 
-class _CreateSupplementPlanPageState extends ConsumerState<CreateSupplementPlanPage> {
+class _CreateSupplementPlanPageState
+    extends ConsumerState<CreateSupplementPlanPage> {
   int? _selectedDayIndex;
 
   @override
@@ -67,7 +69,9 @@ class _CreateSupplementPlanPageState extends ConsumerState<CreateSupplementPlanP
     final notifier = ref.read(createSupplementPlanNotifierProvider.notifier);
 
     return CupertinoPageScaffold(
-      backgroundColor: CupertinoColors.systemGroupedBackground.resolveFrom(context),
+      backgroundColor: CupertinoColors.systemGroupedBackground.resolveFrom(
+        context,
+      ),
       navigationBar: CupertinoNavigationBar(
         backgroundColor: CupertinoColors.systemBackground.resolveFrom(context),
         middle: Text(
@@ -109,7 +113,9 @@ class _CreateSupplementPlanPageState extends ConsumerState<CreateSupplementPlanP
                   height: 52,
                   padding: const EdgeInsets.symmetric(vertical: 6),
                   decoration: BoxDecoration(
-                    color: CupertinoColors.systemBackground.resolveFrom(context),
+                    color: CupertinoColors.systemBackground.resolveFrom(
+                      context,
+                    ),
                     border: Border(
                       bottom: BorderSide(
                         color: CupertinoColors.separator.resolveFrom(context),
@@ -179,17 +185,26 @@ class _CreateSupplementPlanPageState extends ConsumerState<CreateSupplementPlanP
 
                 // Content Area
                 Expanded(
-                  child: _selectedDayIndex != null &&
+                  child:
+                      _selectedDayIndex != null &&
                           _selectedDayIndex! < state.days.length
                       ? SupplementDayEditor(
                           day: state.days[_selectedDayIndex!],
                           dayIndex: _selectedDayIndex!,
-                          onDeleteTiming: (timingIndex) =>
-                              notifier.removeTiming(_selectedDayIndex!, timingIndex),
+                          onDeleteTiming: (timingIndex) => notifier
+                              .removeTiming(_selectedDayIndex!, timingIndex),
                           onTimingNameChanged: (timingIndex, name) =>
-                              notifier.updateTimingName(_selectedDayIndex!, timingIndex, name),
+                              notifier.updateTimingName(
+                                _selectedDayIndex!,
+                                timingIndex,
+                                name,
+                              ),
                           onTimingNoteChanged: (timingIndex, note) =>
-                              notifier.updateTimingNote(_selectedDayIndex!, timingIndex, note),
+                              notifier.updateTimingNote(
+                                _selectedDayIndex!,
+                                timingIndex,
+                                note,
+                              ),
                           onAddSupplement: (timingIndex) {
                             notifier.addSupplement(
                               _selectedDayIndex!,
@@ -198,11 +213,27 @@ class _CreateSupplementPlanPageState extends ConsumerState<CreateSupplementPlanP
                             );
                           },
                           onDeleteSupplement: (timingIndex, supplementIndex) =>
-                              notifier.removeSupplement(_selectedDayIndex!, timingIndex, supplementIndex),
-                          onSupplementNameChanged: (timingIndex, supplementIndex, name) =>
-                              notifier.updateSupplementField(_selectedDayIndex!, timingIndex, supplementIndex, name: name),
-                          onSupplementAmountChanged: (timingIndex, supplementIndex, amount) =>
-                              notifier.updateSupplementField(_selectedDayIndex!, timingIndex, supplementIndex, amount: amount),
+                              notifier.removeSupplement(
+                                _selectedDayIndex!,
+                                timingIndex,
+                                supplementIndex,
+                              ),
+                          onSupplementNameChanged:
+                              (timingIndex, supplementIndex, name) =>
+                                  notifier.updateSupplementField(
+                                    _selectedDayIndex!,
+                                    timingIndex,
+                                    supplementIndex,
+                                    name: name,
+                                  ),
+                          onSupplementAmountChanged:
+                              (timingIndex, supplementIndex, amount) =>
+                                  notifier.updateSupplementField(
+                                    _selectedDayIndex!,
+                                    timingIndex,
+                                    supplementIndex,
+                                    amount: amount,
+                                  ),
                           onAddTiming: () {
                             notifier.addTiming(_selectedDayIndex!);
                           },
@@ -234,7 +265,9 @@ class _CreateSupplementPlanPageState extends ConsumerState<CreateSupplementPlanP
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: CupertinoColors.systemBackground.resolveFrom(context),
+                    color: CupertinoColors.systemBackground.resolveFrom(
+                      context,
+                    ),
                     border: Border(
                       top: BorderSide(
                         color: CupertinoColors.separator.resolveFrom(context),
@@ -382,7 +415,8 @@ class _CreateSupplementPlanPageState extends ConsumerState<CreateSupplementPlanP
                 setState(() {
                   _selectedDayIndex = null;
                 });
-              } else if (_selectedDayIndex != null && _selectedDayIndex! > index) {
+              } else if (_selectedDayIndex != null &&
+                  _selectedDayIndex! > index) {
                 setState(() {
                   _selectedDayIndex = _selectedDayIndex! - 1;
                 });

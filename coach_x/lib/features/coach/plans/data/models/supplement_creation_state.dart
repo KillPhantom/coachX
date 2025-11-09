@@ -3,8 +3,8 @@ import 'package:coach_x/features/coach/plans/data/models/supplement_day.dart';
 
 /// 选择步骤枚举
 enum SelectionStep {
-  training,  // 正在选择训练计划
-  diet,      // 正在选择饮食计划
+  training, // 正在选择训练计划
+  diet, // 正在选择饮食计划
 }
 
 /// 补剂计划创建状态
@@ -51,13 +51,17 @@ class SupplementCreationState {
     return SupplementCreationState(
       messages: messages ?? this.messages,
       isAIResponding: isAIResponding ?? this.isAIResponding,
-      pendingSuggestion: clearPendingSuggestion ? null : (pendingSuggestion ?? this.pendingSuggestion),
+      pendingSuggestion: clearPendingSuggestion
+          ? null
+          : (pendingSuggestion ?? this.pendingSuggestion),
       errorMessage: errorMessage ?? this.errorMessage,
       canSendMessage: canSendMessage ?? this.canSendMessage,
       currentSelectionStep: currentSelectionStep ?? this.currentSelectionStep,
-      selectedTrainingPlanId: selectedTrainingPlanId ?? this.selectedTrainingPlanId,
+      selectedTrainingPlanId:
+          selectedTrainingPlanId ?? this.selectedTrainingPlanId,
       selectedDietPlanId: selectedDietPlanId ?? this.selectedDietPlanId,
-      selectedTrainingPlanName: selectedTrainingPlanName ?? this.selectedTrainingPlanName,
+      selectedTrainingPlanName:
+          selectedTrainingPlanName ?? this.selectedTrainingPlanName,
       selectedDietPlanName: selectedDietPlanName ?? this.selectedDietPlanName,
     );
   }

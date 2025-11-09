@@ -129,5 +129,3 @@ AISuggestionType aiSuggestionTypeFromString(String value) {
       return AISuggestionType.fullPlan;
   }
 }
-
-

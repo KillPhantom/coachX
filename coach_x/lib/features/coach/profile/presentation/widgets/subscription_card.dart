@@ -23,10 +23,7 @@ class SubscriptionCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'Pro Plan',
-                  style: AppTextStyles.bodyMedium,
-                ),
+                Text('Pro Plan', style: AppTextStyles.bodyMedium),
                 const SizedBox(height: AppDimensions.spacingS),
                 Text(
                   'Renews on 2025-12-31',
