@@ -69,7 +69,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get student => '学生';
 
   @override
-  String get errorOccurred => '出错了';
+  String get errorOccurred => '发生错误';
 
   @override
   String get retry => '重试';
@@ -231,12 +231,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String unreadMessagesCount(int count) {
-    return '$count 条未读消息';
+    return '$count 未读消息';
   }
 
   @override
   String unreviewedTrainingsCount(int count) {
-    return '$count 条训练记录待审核';
+    return '$count 记录待评价';
   }
 
   @override
@@ -358,7 +358,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get deleteStudent => '删除学生';
 
   @override
-  String get confirmDelete => '确定要删除这条记录吗？';
+  String get confirmDelete => '确认删除';
 
   @override
   String get plansTitle => '计划';
@@ -401,7 +401,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get refreshFailed => '刷新失败';
 
   @override
-  String get noResults => '未找到结果';
+  String get noResults => '没有找到结果';
 
   @override
   String noPlansFoundForQuery(String query) {
@@ -478,6 +478,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get trainingRecordDesc => '记录组数、次数、重量和视频。';
+
+  @override
+  String get startRecording => '开始记录';
+
+  @override
+  String get viewRecords => '查看记录';
 
   @override
   String get dietRecord => '记录饮食';
@@ -571,6 +577,21 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get weightChange => '体重';
+
+  @override
+  String get caloriesIntake => '卡路里';
+
+  @override
+  String get volumePR => '训练量';
+
+  @override
+  String get noDataStartRecording => '暂无数据，快开始记录';
+
+  @override
+  String get lastWeekData => '上周数据';
+
+  @override
   String get todayRecord => '今日饮食计划';
 
   @override
@@ -662,6 +683,11 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get video => '视频';
+
+  @override
+  String videoWithNumber(int number) {
+    return '视频 $number';
+  }
 
   @override
   String get coachNotes => '教练备注：';
@@ -760,7 +786,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get editRecord => '编辑记录';
 
   @override
-  String get takePicture => '拍照';
+  String get takePicture => '拍摄照片';
 
   @override
   String get uploadImage => '上传图片';
@@ -833,7 +859,7 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get cameraPermissionDenied => '相机权限被拒绝，请在设置中启用相机访问权限。';
+  String get cameraPermissionDenied => '相机权限被拒绝';
 
   @override
   String get analysisFailed => '分析失败';
@@ -902,6 +928,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get skipPhoto => '跳过拍照';
 
   @override
+  String get usePhoto => '使用照片';
+
+  @override
   String get enterWeight => '输入体重';
 
   @override
@@ -935,6 +964,17 @@ class AppLocalizationsZh extends AppLocalizations {
   String get maxPhotosReached => '最多上传3张照片';
 
   @override
+  String get recordExistsTitle => '记录已存在';
+
+  @override
+  String recordExistsMessage(String date) {
+    return '您已有$date的记录，是否要替换？';
+  }
+
+  @override
+  String get replace => '替换';
+
+  @override
   String get history => '历史记录';
 
   @override
@@ -959,13 +999,28 @@ class AppLocalizationsZh extends AppLocalizations {
   String get completed => '已完成';
 
   @override
-  String get videoDurationExceeded => '视频时长不能超过1分钟';
+  String get videoDurationExceeded => '视频时长超过60秒';
 
   @override
   String get recordingVideo => '录制中...';
 
   @override
   String get selectFromGallery => '从相册选择';
+
+  @override
+  String get videoTooLong => '视频时长超限';
+
+  @override
+  String get videoTooLongMessage => '请选择60秒以内的视频';
+
+  @override
+  String get videoProcessingFailed => '视频处理失败';
+
+  @override
+  String get videoCompressionFailed => '视频压缩失败，将上传原文件';
+
+  @override
+  String get photoLibraryPermissionDenied => '相册权限被拒绝';
 
   @override
   String get startTimerConfirmTitle => '开始计时';
@@ -1016,4 +1071,749 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get coachPlan => '教练计划';
+
+  @override
+  String get feedbackSearchPlaceholder => '搜索反馈...';
+
+  @override
+  String get feedbackStartDate => '开始日期';
+
+  @override
+  String get feedbackEndDate => '结束日期';
+
+  @override
+  String get feedbackToday => '今天';
+
+  @override
+  String get feedbackYesterday => '昨天';
+
+  @override
+  String get feedbackNoFeedback => '暂无反馈';
+
+  @override
+  String get feedbackNoFeedbackDesc => '训练反馈将显示在这里';
+
+  @override
+  String get feedbackLoadError => '加载反馈失败';
+
+  @override
+  String get feedbackRetry => '重试';
+
+  @override
+  String get trainingReviews => '训练记录';
+
+  @override
+  String get searchStudentName => '按学生姓名搜索';
+
+  @override
+  String get filterAll => '全部';
+
+  @override
+  String get filterPending => '待审核';
+
+  @override
+  String get filterReviewed => '已审核';
+
+  @override
+  String get statusPending => '待审核';
+
+  @override
+  String get statusReviewed => '已审核';
+
+  @override
+  String get noTrainingReviews => '暂无训练记录';
+
+  @override
+  String get noTrainingReviewsDesc => '训练记录将显示在这里';
+
+  @override
+  String get todaySummary => '今日总结';
+
+  @override
+  String get nutritionDetails => '营养详情';
+
+  @override
+  String get exerciseRecordVideo => '训练记录视频';
+
+  @override
+  String get keyframes => '关键帧';
+
+  @override
+  String get keyframesProcessing => '关键帧提取中...';
+
+  @override
+  String get noKeyframes => '暂无关键帧';
+
+  @override
+  String get viewKeyframe => '查看关键帧';
+
+  @override
+  String get fats => '脂肪';
+
+  @override
+  String get addFeedback => '为该组添加反馈...';
+
+  @override
+  String get complete => '完成';
+
+  @override
+  String get viewAll => '查看全部';
+
+  @override
+  String get noNutritionData => '暂无营养数据';
+
+  @override
+  String get noExerciseRecords => '暂无训练记录';
+
+  @override
+  String get savingFeedback => '正在保存反馈...';
+
+  @override
+  String get feedbackSaved => '反馈保存成功';
+
+  @override
+  String get failedToSave => '保存反馈失败';
+
+  @override
+  String get noDataFound => '未找到数据';
+
+  @override
+  String get details => '详情';
+
+  @override
+  String get trainingDetails => '训练详情';
+
+  @override
+  String get videoUploading => '上传中...';
+
+  @override
+  String get videoUploadFailed => '上传失败';
+
+  @override
+  String get retryUpload => '重试';
+
+  @override
+  String get processing => '处理中...';
+
+  @override
+  String get videoPlayer => '视频播放';
+
+  @override
+  String get videoLoadFailed => '视频加载失败';
+
+  @override
+  String get exerciseLibrary => '动作库';
+
+  @override
+  String get searchExercises => '搜索动作';
+
+  @override
+  String get exercises => '个动作';
+
+  @override
+  String get newExercise => '新建动作';
+
+  @override
+  String get noExercisesYet => '还没有动作';
+
+  @override
+  String get createFirstExercise => '创建你的第一个动作模板';
+
+  @override
+  String get tags => '标签';
+
+  @override
+  String get deleteExercise => '删除动作';
+
+  @override
+  String get confirmDeleteExercise => '确定要删除这个动作吗?';
+
+  @override
+  String get addTag => '新增标签';
+
+  @override
+  String get tagNameHint => '输入标签名称';
+
+  @override
+  String get tagAlreadyExists => '标签已存在';
+
+  @override
+  String get extractKeyframes => 'AI提取关键帧';
+
+  @override
+  String get extractingKeyframes => '提取中...';
+
+  @override
+  String get createExercise => '新建动作';
+
+  @override
+  String get editExercise => '编辑动作';
+
+  @override
+  String get exerciseName => '动作名称';
+
+  @override
+  String get exerciseNameHint => '输入动作名称';
+
+  @override
+  String get selectTags => '选择标签';
+
+  @override
+  String get atLeastOneTag => '请至少选择一个标签';
+
+  @override
+  String get guidanceVideo => '指导视频';
+
+  @override
+  String get deleteVideo => '删除视频';
+
+  @override
+  String get textGuidance => '文字说明';
+
+  @override
+  String get textGuidanceHint => '输入详细说明';
+
+  @override
+  String get auxiliaryImages => '辅助图片';
+
+  @override
+  String get deleteImage => '删除图片';
+
+  @override
+  String get deleteImageMessage => '确定删除这张图片吗？';
+
+  @override
+  String get pleaseEnterName => '请输入动作名称';
+
+  @override
+  String get createSuccess => '动作创建成功';
+
+  @override
+  String get updateSuccess => '动作更新成功';
+
+  @override
+  String get waitingForUpload => '等待上传完成...';
+
+  @override
+  String get optional => '可选';
+
+  @override
+  String get noMoreData => '没有更多动作了';
+
+  @override
+  String get loadingMore => '加载更多中...';
+
+  @override
+  String get extractionFailed => '提取失败';
+
+  @override
+  String get retryExtraction => '重试';
+
+  @override
+  String get noKeyframesYet => '暂无关键帧';
+
+  @override
+  String get extractCurrentFrame => '提取关键帧';
+
+  @override
+  String get extractingFrame => '提取中...';
+
+  @override
+  String get frameExtracted => '关键帧已提取';
+
+  @override
+  String get studentDetailTitle => '学生详情';
+
+  @override
+  String get trainingRecords => '训练记录';
+
+  @override
+  String get message => '发消息';
+
+  @override
+  String get sessions => '次训练';
+
+  @override
+  String get adherence => '完成率';
+
+  @override
+  String get volume => '容量';
+
+  @override
+  String get aiProgressSummary => 'AI 进度总结';
+
+  @override
+  String get trainingVolume => '训练容量';
+
+  @override
+  String get weightLoss => '体重变化';
+
+  @override
+  String get avgStrength => '平均力量';
+
+  @override
+  String get starting => '起始';
+
+  @override
+  String get current => '当前';
+
+  @override
+  String get change => '变化';
+
+  @override
+  String get target => '目标';
+
+  @override
+  String get trainingHistory => '训练历史';
+
+  @override
+  String get pending => '待审核';
+
+  @override
+  String get reviewed => '已审核';
+
+  @override
+  String get videos => '个视频';
+
+  @override
+  String get years => '岁';
+
+  @override
+  String get feedbackInputPlaceholder => '添加反馈...';
+
+  @override
+  String get holdToRecord => '长按录音';
+
+  @override
+  String get releaseToSend => '松手发送';
+
+  @override
+  String get slideUpToCancel => '上滑取消';
+
+  @override
+  String get recordingVoice => '录音中...';
+
+  @override
+  String get voiceTooShort => '录音时长过短';
+
+  @override
+  String get sendImage => '发送图片';
+
+  @override
+  String get feedbackHistory => '反馈历史';
+
+  @override
+  String get noFeedbackYet => '暂无反馈';
+
+  @override
+  String get textFeedback => '文字';
+
+  @override
+  String get voiceFeedback => '语音';
+
+  @override
+  String get imageFeedback => '图片';
+
+  @override
+  String get permissionDenied => '权限被拒绝';
+
+  @override
+  String get microphonePermission => '需要麦克风权限';
+
+  @override
+  String get failedToStartRecording => '开始录音失败';
+
+  @override
+  String get failedToStopRecording => '停止录音失败';
+
+  @override
+  String get failedToSendFeedback => '发送反馈失败';
+
+  @override
+  String get failedToSendVoice => '发送语音失败';
+
+  @override
+  String get failedToPickImage => '选择图片失败';
+
+  @override
+  String get justNow => '刚刚';
+
+  @override
+  String get editImage => '编辑图片';
+
+  @override
+  String get saveEditedImage => '保存';
+
+  @override
+  String get cancelEdit => '取消';
+
+  @override
+  String get imageEditing => '图片编辑';
+
+  @override
+  String get uploadingEditedImage => '正在上传编辑后的图片...';
+
+  @override
+  String get editImageFailed => '编辑图片失败';
+
+  @override
+  String get currentExercisePlan => '当前运动计划';
+
+  @override
+  String get currentDietPlan => '当前饮食计划';
+
+  @override
+  String get currentSupplementPlan => '当前补剂计划';
+
+  @override
+  String get noPlan => '无计划';
+
+  @override
+  String get splashLoading => '加载中...';
+
+  @override
+  String get splashLoadError => '加载用户数据失败';
+
+  @override
+  String get upcomingScheduleTitle => '即将到来的日程';
+
+  @override
+  String get pendingReviewsTitle => '待审核训练';
+
+  @override
+  String get viewMore => '查看更多';
+
+  @override
+  String get recordTraining => '学生打卡';
+
+  @override
+  String get recordsToReview => '待评价记录';
+
+  @override
+  String get unreadMessagesLabel => '未读消息';
+
+  @override
+  String get noPendingReviews => '暂无待审核记录';
+
+  @override
+  String get noPendingReviewsDesc => '所有训练记录已审核完毕';
+
+  @override
+  String get generateAISummary => '生成 AI 总结';
+
+  @override
+  String get generatingAISummary => '生成中...';
+
+  @override
+  String get aiSummaryFailed => '生成失败';
+
+  @override
+  String get aiSummaryFailedMessage => '无法生成 AI 总结，请稍后重试。';
+
+  @override
+  String get provideFeedback => '评价动作';
+
+  @override
+  String get hideInput => '收起输入';
+
+  @override
+  String exerciseFeedbackHistory(String exerciseName) {
+    return '$exerciseName - 反馈历史';
+  }
+
+  @override
+  String get loadMore => '加载更多';
+
+  @override
+  String get previewPhoto => '预览照片';
+
+  @override
+  String get aiAnalysis => 'AI 分析';
+
+  @override
+  String get manualRecord => '手动记录';
+
+  @override
+  String get uploading => '上传中...';
+
+  @override
+  String get uploadingImage => '正在上传图片...';
+
+  @override
+  String get addFeedbackButton => '添加反馈';
+
+  @override
+  String get recentFeedbacks => '最近反馈';
+
+  @override
+  String get carbohydrates => '碳水化合物';
+
+  @override
+  String get savingImage => '正在保存图片...';
+
+  @override
+  String get deletingOldImage => '正在清理旧图片...';
+
+  @override
+  String get keyframeUpdated => '关键帧已更新';
+
+  @override
+  String get switchCamera => '切换摄像头';
+
+  @override
+  String get keyframeEditNote => '所有对关键帧的编辑学生端都看得到';
+
+  @override
+  String get keyframeEditNoteTitle => '提示';
+
+  @override
+  String get mealDetails => '餐次详情';
+
+  @override
+  String get saveChanges => '保存修改';
+
+  @override
+  String get addFood => '添加食物';
+
+  @override
+  String get editFood => '编辑食物';
+
+  @override
+  String get deleteFood => '删除食物';
+
+  @override
+  String get foodName => '食物名称';
+
+  @override
+  String get amount => '数量';
+
+  @override
+  String get yesterday => '昨天';
+
+  @override
+  String daysAgo(int days) {
+    return '$days天前';
+  }
+
+  @override
+  String get foodList => '食物列表';
+
+  @override
+  String get noPhotos => '暂无照片';
+
+  @override
+  String get noFood => '暂无食物';
+
+  @override
+  String get nutritionSummary => '总营养汇总';
+
+  @override
+  String get addNotePlaceholder => '添加备注...';
+
+  @override
+  String get cannotDeleteTemplate => '无法删除模板';
+
+  @override
+  String templateInUse(int count) {
+    return '该模板正被 $count 个训练计划使用。请先从这些计划中移除。';
+  }
+
+  @override
+  String get exerciseGuidance => '动作指导';
+
+  @override
+  String get viewGuidance => '查看指导';
+
+  @override
+  String get noGuidanceAvailable => '该动作暂无指导内容';
+
+  @override
+  String get referenceImages => '参考图片';
+
+  @override
+  String get exerciseNamePlaceholder => '动作名称';
+
+  @override
+  String get extractKeyframe => '截取\n关键帧';
+
+  @override
+  String get noTrainingRecords => '暂无训练记录';
+
+  @override
+  String get trainingInfo => '训练信息';
+
+  @override
+  String get trainingDate => '训练日期';
+
+  @override
+  String get totalExercises => '总动作数';
+
+  @override
+  String get exerciseDetails => '动作详情';
+
+  @override
+  String videoNumber(int number) {
+    return '视频 $number';
+  }
+
+  @override
+  String get videoDuration => '时长';
+
+  @override
+  String get reviewStatus => '批阅状态';
+
+  @override
+  String get notReviewed => '未批阅';
+
+  @override
+  String get completedSets => '完成组数';
+
+  @override
+  String get averageWeight => '平均重量';
+
+  @override
+  String get totalReps => '总次数';
+
+  @override
+  String get setDetails => '组次详情';
+
+  @override
+  String get dailyTrainingFeedback => '每日训练反馈';
+
+  @override
+  String get noDailyTrainingFeedbackYet => '本次训练暂无反馈';
+
+  @override
+  String get exerciseList => '动作列表';
+
+  @override
+  String get addExercise => '添加';
+
+  @override
+  String createNewExercise(String name) {
+    return '创建新动作 \"$name\"';
+  }
+
+  @override
+  String get addGuidance => '添加指导';
+
+  @override
+  String get trainingSets => '训练组';
+
+  @override
+  String get addSet => '添加组';
+
+  @override
+  String get noTemplateLinked => '未关联模板';
+
+  @override
+  String get unknownExercise => '未知动作';
+
+  @override
+  String get createPlanTitle => '创建训练计划';
+
+  @override
+  String get chooseCreationMethod => '选择创建方式：';
+
+  @override
+  String get aiGuidedCreate => 'AI 引导创建';
+
+  @override
+  String get aiGuidedDesc => '让 AI 帮你快速生成计划';
+
+  @override
+  String get scanOrPasteText => '扫描或粘贴文本';
+
+  @override
+  String get scanOrPasteDesc => '从现有计划导入';
+
+  @override
+  String get orManualCreate => '或者... 手动创建';
+
+  @override
+  String get textImportTitle => '从文本导入';
+
+  @override
+  String get textImportSubtitle => '扫描图片或粘贴文本导入训练计划';
+
+  @override
+  String get scanImage => '扫描图片';
+
+  @override
+  String get pasteText => '粘贴文本';
+
+  @override
+  String get selectImageToScan => '选择图片进行扫描';
+
+  @override
+  String get selectAnotherImage => '选择其他图片';
+
+  @override
+  String get extractedOrPastedText => '提取或粘贴的文本';
+
+  @override
+  String get pasteOrTypeHere => '粘贴或输入训练计划文本...';
+
+  @override
+  String get exampleFormat => '示例格式';
+
+  @override
+  String get exampleFormatContent =>
+      '第 1 天：胸部\n卧推 3x10\n上斜卧推 3x12\n\n第 2 天：背部\n引体向上 4x8\n划船 3x10';
+
+  @override
+  String get extractingText => '正在提取文字...';
+
+  @override
+  String get parsingPlan => '正在解析计划...';
+
+  @override
+  String get startParsing => '开始解析';
+
+  @override
+  String get extractionSuccess => '文字提取成功！请检查并根据需要编辑。';
+
+  @override
+  String get addDay => '添加天';
+
+  @override
+  String get selectDayOrAddNew => '选择一天或添加新的训练日';
+
+  @override
+  String get savePlan => '保存计划';
+
+  @override
+  String get aiGeneratingPlan => 'AI 正在生成训练计划...';
+
+  @override
+  String generatingDay(int day) {
+    return '正在生成第 $day 天';
+  }
+
+  @override
+  String addedExercises(int count) {
+    return '已添加 $count 个动作';
+  }
+
+  @override
+  String completedDays(int count) {
+    return '已完成 $count 天';
+  }
+
+  @override
+  String get noSetsYet => '暂无组次。点击\"添加组\"按钮。';
+
+  @override
+  String get editPlan => '编辑计划';
+
+  @override
+  String get importSuccess => '导入成功';
+
+  @override
+  String importWarnings(int count) {
+    return '发现 $count 个警告';
+  }
+
+  @override
+  String get pleaseReview => '请检查并根据需要调整计划。';
 }

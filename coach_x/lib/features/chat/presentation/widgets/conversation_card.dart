@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:coach_x/core/theme/app_theme.dart';
 import 'package:coach_x/routes/route_names.dart';
+import 'package:coach_x/app/providers.dart';
+import 'package:coach_x/core/enums/user_role.dart';
 import '../providers/chat_providers.dart';
 
 /// 对话卡片组件
@@ -28,7 +30,7 @@ class ConversationCard extends ConsumerWidget {
         child: Row(
           children: [
             // 头像
-            _buildAvatar(),
+            _buildAvatar(context, ref),
             const SizedBox(width: 12),
 
             // 中间内容区域
@@ -93,10 +95,12 @@ class ConversationCard extends ConsumerWidget {
   }
 
   /// 构建头像
-  Widget _buildAvatar() {
+  Widget _buildAvatar(BuildContext context, WidgetRef ref) {
+    Widget avatarWidget;
+
     if (item.avatarUrl != null && item.avatarUrl!.isNotEmpty) {
       // 显示网络头像
-      return Container(
+      avatarWidget = Container(
         width: 48,
         height: 48,
         decoration: BoxDecoration(
@@ -109,7 +113,7 @@ class ConversationCard extends ConsumerWidget {
       );
     } else {
       // 显示默认头像（姓名首字母）
-      return Container(
+      avatarWidget = Container(
         width: 48,
         height: 48,
         decoration: const BoxDecoration(
@@ -126,6 +130,23 @@ class ConversationCard extends ConsumerWidget {
         ),
       );
     }
+
+    // 包裹GestureDetector添加点击事件
+    return GestureDetector(
+      onTap: () => _handleAvatarTap(context, ref),
+      child: avatarWidget,
+    );
+  }
+
+  /// 处理头像点击
+  void _handleAvatarTap(BuildContext context, WidgetRef ref) {
+    final currentUser = ref.read(currentUserProvider).value;
+
+    // 只有教练点击学生头像时跳转到学生详情页
+    if (currentUser?.role == UserRole.coach) {
+      context.push('/student-detail/${item.userId}');
+    }
+    // 学生点击教练头像暂不处理
   }
 
   /// 获取姓名首字母

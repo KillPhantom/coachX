@@ -618,7 +618,7 @@ class _FoodItemRowState extends State<FoodItemRow>
                     padding: const EdgeInsets.only(right: 16),
                     child: CupertinoButton(
                       padding: EdgeInsets.zero,
-                      minSize: 0,
+                      minimumSize: Size.zero,
                       onPressed: _isLoadingMacros ? null : _onSparklePressed,
                       child: _isLoadingMacros
                           ? const CupertinoActivityIndicator(radius: 8)
@@ -739,8 +739,7 @@ class _FoodItemRowState extends State<FoodItemRow>
               ),
               child: CupertinoButton(
                 padding: EdgeInsets.zero,
-                minSize: 24,
-                onPressed: widget.onDelete,
+                onPressed: widget.onDelete, minimumSize: Size(24, 24),
                 child: Icon(
                   CupertinoIcons.xmark_circle_fill,
                   color: CupertinoColors.systemRed.resolveFrom(context),

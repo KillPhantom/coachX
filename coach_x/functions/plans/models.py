@@ -33,37 +33,30 @@ class TrainingSet:
 class Exercise:
     """运动动作"""
     name: str
-    note: str = ''
     type: str = 'strength'
     sets: List[TrainingSet] = field(default_factory=list)
-    completed: bool = False
-    detail_guide: Optional[str] = None
-    demo_videos: List[str] = field(default_factory=list)
+    exercise_template_id: Optional[str] = None
 
     def to_dict(self) -> Dict[str, Any]:
-        return {
+        result = {
             'name': self.name,
-            'note': self.note,
             'type': self.type,
             'sets': [s.to_dict() for s in self.sets],
-            'completed': self.completed,
-            'detailGuide': self.detail_guide,
-            'demoVideos': self.demo_videos,
         }
+        if self.exercise_template_id:
+            result['exerciseTemplateId'] = self.exercise_template_id
+        return result
 
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> 'Exercise':
         sets_data = data.get('sets', [])
         sets = [TrainingSet.from_dict(s) for s in sets_data]
-        
+
         return cls(
             name=data.get('name', ''),
-            note=data.get('note', ''),
             type=data.get('type', 'strength'),
             sets=sets,
-            completed=data.get('completed', False),
-            detail_guide=data.get('detailGuide'),
-            demo_videos=data.get('demoVideos', [])
+            exercise_template_id=data.get('exerciseTemplateId')
         )
 
 

@@ -151,7 +151,8 @@ class SupplementDayDetailSheet extends StatelessWidget {
                             color: AppColors.textSecondary,
                           ),
                         ),
-                        if (supplement.note != null && supplement.note!.isNotEmpty) ...[
+                        if (supplement.note != null &&
+                            supplement.note!.isNotEmpty) ...[
                           const SizedBox(height: 2),
                           Text(
                             supplement.note!,

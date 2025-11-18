@@ -29,10 +29,7 @@ class DismissKeyboard extends StatelessWidget {
   /// 子widget
   final Widget child;
 
-  const DismissKeyboard({
-    super.key,
-    required this.child,
-  });
+  const DismissKeyboard({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {

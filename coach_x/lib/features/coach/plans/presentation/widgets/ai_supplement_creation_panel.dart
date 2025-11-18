@@ -315,7 +315,7 @@ class _AISupplementCreationPanelState
                 ),
                 color: CupertinoColors.systemGrey6.resolveFrom(context),
                 borderRadius: BorderRadius.circular(20),
-                minSize: 0,
+                minimumSize: Size.zero,
                 onPressed: () =>
                     _handleQuickAction(action['id']!, action['label']!),
                 child: Text(

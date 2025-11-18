@@ -89,76 +89,78 @@ class _SupplementDayEditorState extends State<SupplementDayEditor> {
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(12),
         child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Timing Cards
-          ...widget.day.timings.asMap().entries.map((entry) {
-            final timingIndex = entry.key;
-            final timing = entry.value;
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Timing Cards
+            ...widget.day.timings.asMap().entries.map((entry) {
+              final timingIndex = entry.key;
+              final timing = entry.value;
 
-            return SupplementTimingCard(
-              timing: timing,
-              dayIndex: widget.dayIndex,
-              timingIndex: timingIndex,
-              isExpanded: true,
-              onDelete: () => widget.onDeleteTiming?.call(timingIndex),
-              onNameChanged: (name) =>
-                  widget.onTimingNameChanged?.call(timingIndex, name),
-              onNoteChanged: (note) =>
-                  widget.onTimingNoteChanged?.call(timingIndex, note),
-              onAddSupplement: () => widget.onAddSupplement?.call(timingIndex),
-              onDeleteSupplement: (supplementIndex) =>
-                  widget.onDeleteSupplement?.call(timingIndex, supplementIndex),
-              onSupplementNameChanged: (supplementIndex, name) => widget
-                  .onSupplementNameChanged
-                  ?.call(timingIndex, supplementIndex, name),
-              onSupplementAmountChanged: (supplementIndex, amount) => widget
-                  .onSupplementAmountChanged
-                  ?.call(timingIndex, supplementIndex, amount),
-            );
-          }),
+              return SupplementTimingCard(
+                timing: timing,
+                dayIndex: widget.dayIndex,
+                timingIndex: timingIndex,
+                isExpanded: true,
+                onDelete: () => widget.onDeleteTiming?.call(timingIndex),
+                onNameChanged: (name) =>
+                    widget.onTimingNameChanged?.call(timingIndex, name),
+                onNoteChanged: (note) =>
+                    widget.onTimingNoteChanged?.call(timingIndex, note),
+                onAddSupplement: () =>
+                    widget.onAddSupplement?.call(timingIndex),
+                onDeleteSupplement: (supplementIndex) => widget
+                    .onDeleteSupplement
+                    ?.call(timingIndex, supplementIndex),
+                onSupplementNameChanged: (supplementIndex, name) => widget
+                    .onSupplementNameChanged
+                    ?.call(timingIndex, supplementIndex, name),
+                onSupplementAmountChanged: (supplementIndex, amount) => widget
+                    .onSupplementAmountChanged
+                    ?.call(timingIndex, supplementIndex, amount),
+              );
+            }),
 
-          const SizedBox(height: 16),
+            const SizedBox(height: 16),
 
-          // Add Timing Button
-          if (widget.onAddTiming != null)
-            Center(
-              child: CupertinoButton(
-                onPressed: widget.onAddTiming,
-                padding: EdgeInsets.zero,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 12,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColors.primaryLight,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: AppColors.primary, width: 1),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        CupertinoIcons.add_circled_solid,
-                        color: AppColors.primaryText,
-                        size: 20,
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        '添加时间段',
-                        style: AppTextStyles.body.copyWith(
+            // Add Timing Button
+            if (widget.onAddTiming != null)
+              Center(
+                child: CupertinoButton(
+                  onPressed: widget.onAddTiming,
+                  padding: EdgeInsets.zero,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 12,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.primaryLight,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: AppColors.primary, width: 1),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          CupertinoIcons.add_circled_solid,
                           color: AppColors.primaryText,
-                          fontWeight: FontWeight.w600,
+                          size: 20,
                         ),
-                      ),
-                    ],
+                        const SizedBox(width: 8),
+                        Text(
+                          '添加时间段',
+                          style: AppTextStyles.body.copyWith(
+                            color: AppColors.primaryText,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-        ],
-      ),
+          ],
+        ),
       ),
     );
   }

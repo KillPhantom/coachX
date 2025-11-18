@@ -243,8 +243,9 @@ class DietSuggestionReviewNotifier
     final days = List<DietDay>.from(plan.days);
     final day = days[change.dayIndex];
 
-    if (change.mealIndex! < 0 || change.mealIndex! >= day.meals.length)
+    if (change.mealIndex! < 0 || change.mealIndex! >= day.meals.length) {
       return plan;
+    }
 
     final updatedMeals = List<Meal>.from(day.meals);
     updatedMeals.removeAt(change.mealIndex!);
@@ -263,8 +264,9 @@ class DietSuggestionReviewNotifier
     final days = List<DietDay>.from(plan.days);
     final day = days[change.dayIndex];
 
-    if (change.mealIndex! < 0 || change.mealIndex! >= day.meals.length)
+    if (change.mealIndex! < 0 || change.mealIndex! >= day.meals.length) {
       return plan;
+    }
 
     final meal = day.meals[change.mealIndex!];
     final updatedMeal = meal.copyWith(name: change.after as String);
@@ -286,8 +288,9 @@ class DietSuggestionReviewNotifier
     final days = List<DietDay>.from(plan.days);
     final day = days[change.dayIndex];
 
-    if (change.mealIndex! < 0 || change.mealIndex! >= day.meals.length)
+    if (change.mealIndex! < 0 || change.mealIndex! >= day.meals.length) {
       return plan;
+    }
 
     final meal = day.meals[change.mealIndex!];
 
@@ -326,13 +329,15 @@ class DietSuggestionReviewNotifier
     final days = List<DietDay>.from(plan.days);
     final day = days[change.dayIndex];
 
-    if (change.mealIndex! < 0 || change.mealIndex! >= day.meals.length)
+    if (change.mealIndex! < 0 || change.mealIndex! >= day.meals.length) {
       return plan;
+    }
 
     final meal = day.meals[change.mealIndex!];
 
-    if (change.foodItemIndex! < 0 || change.foodItemIndex! >= meal.items.length)
+    if (change.foodItemIndex! < 0 || change.foodItemIndex! >= meal.items.length) {
       return plan;
+    }
 
     final updatedItems = List<FoodItem>.from(meal.items);
     updatedItems.removeAt(change.foodItemIndex!);
@@ -356,13 +361,15 @@ class DietSuggestionReviewNotifier
     final days = List<DietDay>.from(plan.days);
     final day = days[change.dayIndex];
 
-    if (change.mealIndex! < 0 || change.mealIndex! >= day.meals.length)
+    if (change.mealIndex! < 0 || change.mealIndex! >= day.meals.length) {
       return plan;
+    }
 
     final meal = day.meals[change.mealIndex!];
 
-    if (change.foodItemIndex! < 0 || change.foodItemIndex! >= meal.items.length)
+    if (change.foodItemIndex! < 0 || change.foodItemIndex! >= meal.items.length) {
       return plan;
+    }
 
     final item = meal.items[change.foodItemIndex!];
 

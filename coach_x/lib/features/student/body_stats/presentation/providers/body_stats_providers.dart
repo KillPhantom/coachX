@@ -1,6 +1,4 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:coach_x/core/services/cloud_functions_service.dart';
-import 'package:coach_x/core/services/storage_service.dart';
 import 'package:coach_x/features/student/body_stats/data/repositories/body_stats_repository.dart';
 import 'package:coach_x/features/student/body_stats/data/repositories/body_stats_repository_impl.dart';
 import 'package:coach_x/features/student/body_stats/presentation/providers/body_stats_record_notifier.dart';
@@ -22,23 +20,25 @@ final bodyStatsRepositoryProvider = Provider<BodyStatsRepository>((ref) {
 /// 管理记录页面的状态
 final bodyStatsRecordProvider =
     StateNotifierProvider<BodyStatsRecordNotifier, BodyStatsState>((ref) {
-  final repository = ref.watch(bodyStatsRepositoryProvider);
-  final weightUnit = ref.watch(userWeightUnitProvider).value ?? 'kg';
+      final repository = ref.watch(bodyStatsRepositoryProvider);
+      final weightUnit = ref.watch(userWeightUnitProvider).value ?? 'kg';
 
-  return BodyStatsRecordNotifier(
-    repository: repository,
-    initialWeightUnit: weightUnit,
-  );
-});
+      return BodyStatsRecordNotifier(
+        repository: repository,
+        initialWeightUnit: weightUnit,
+      );
+    });
 
 /// Body Stats History Provider
 ///
 /// 管理历史页面的状态
-final bodyStatsHistoryProvider = StateNotifierProvider<
-    BodyStatsHistoryNotifier, BodyStatsHistoryState>((ref) {
-  final repository = ref.watch(bodyStatsRepositoryProvider);
-  return BodyStatsHistoryNotifier(repository: repository);
-});
+final bodyStatsHistoryProvider =
+    StateNotifierProvider<BodyStatsHistoryNotifier, BodyStatsHistoryState>((
+      ref,
+    ) {
+      final repository = ref.watch(bodyStatsRepositoryProvider);
+      return BodyStatsHistoryNotifier(repository: repository);
+    });
 
 /// User Weight Unit Provider
 ///
@@ -48,8 +48,10 @@ final userWeightUnitProvider = FutureProvider<String>((ref) async {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return 'kg';
 
-    final doc =
-        await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+    final doc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.uid)
+        .get();
 
     if (!doc.exists) return 'kg';
 

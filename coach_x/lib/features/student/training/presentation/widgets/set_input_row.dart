@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/services.dart';
 import 'package:coach_x/l10n/app_localizations.dart';
 import 'package:coach_x/core/theme/app_theme.dart';
 import 'package:coach_x/features/coach/plans/data/models/training_set.dart';
@@ -11,14 +10,14 @@ import 'package:coach_x/features/coach/plans/data/models/training_set.dart';
 class SetInputRow extends StatefulWidget {
   final TrainingSet set;
   final int setNumber;
-  final Function(TrainingSet) onChanged;
+  final Function(String reps, String weight) onComplete;
   final VoidCallback onToggleEdit;
 
   const SetInputRow({
     super.key,
     required this.set,
     required this.setNumber,
-    required this.onChanged,
+    required this.onComplete,
     required this.onToggleEdit,
   });
 
@@ -62,6 +61,11 @@ class _SetInputRowState extends State<SetInputRow> {
     _repsController.dispose();
     _weightController.dispose();
     super.dispose();
+  }
+
+  /// 处理完成按钮点击
+  void _handleComplete() {
+    widget.onComplete(_repsController.text, _weightController.text);
   }
 
   @override
@@ -114,11 +118,12 @@ class _SetInputRowState extends State<SetInputRow> {
                     )
                   : _buildInputField(
                       controller: _repsController,
-                      placeholder: widget.set.reps.isEmpty ? '10' : widget.set.reps,
+                      placeholder: widget.set.reps.isEmpty
+                          ? '10'
+                          : widget.set.reps,
                       suffix: l10n.reps,
                       onChanged: (value) {
-                        final updatedSet = widget.set.copyWith(reps: value);
-                        widget.onChanged(updatedSet);
+                        // 仅更新本地 controller，不触发父组件更新
                       },
                     ),
             ),
@@ -146,25 +151,31 @@ class _SetInputRowState extends State<SetInputRow> {
                     )
                   : _buildWeightInputField(
                       controller: _weightController,
-                      placeholder: widget.set.weight.isEmpty ? l10n.weightPlaceholder : widget.set.weight,
+                      placeholder: widget.set.weight.isEmpty
+                          ? l10n.weightPlaceholder
+                          : widget.set.weight,
                       onChanged: (value) {
-                        final updatedSet = widget.set.copyWith(weight: value);
-                        widget.onChanged(updatedSet);
+                        // 仅更新本地 controller，不触发父组件更新
                       },
                     ),
             ),
 
             const SizedBox(width: AppDimensions.spacingS),
 
-            // Checkmark（仅已完成时显示）
-            if (isCompleted)
-              const Icon(
-                CupertinoIcons.checkmark_circle_fill,
-                color: AppColors.successGreen,
+            // Checkmark Button（未完成显示灰色圆圈，已完成显示绿色 checkmark）
+            CupertinoButton(
+              padding: EdgeInsets.zero,
+              onPressed: isCompleted ? widget.onToggleEdit : _handleComplete, minimumSize: Size(24, 24),
+              child: Icon(
+                isCompleted
+                    ? CupertinoIcons.checkmark_circle_fill
+                    : CupertinoIcons.circle,
+                color: isCompleted
+                    ? AppColors.successGreen
+                    : AppColors.dividerMedium,
                 size: 24,
-              )
-            else
-              const SizedBox(width: 24), // 占位保持对齐
+              ),
+            ),
           ],
         ),
       ),

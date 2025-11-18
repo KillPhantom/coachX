@@ -99,7 +99,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
                   width: 48,
                   height: 48,
                   decoration: BoxDecoration(
-                    color: CupertinoColors.black.withOpacity(0.6),
+                    color: CupertinoColors.black.withValues(alpha: 0.6),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
@@ -133,7 +133,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
             width: 48,
             height: 48,
             decoration: BoxDecoration(
-              color: CupertinoColors.black.withOpacity(0.6),
+              color: CupertinoColors.black.withValues(alpha: 0.6),
               shape: BoxShape.circle,
             ),
             child: const Icon(

@@ -350,7 +350,7 @@ class _ImportPlanSheetState extends ConsumerState<ImportPlanSheet> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.error.withOpacity(0.1),
+        color: AppColors.error.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
@@ -374,7 +374,7 @@ class _ImportPlanSheetState extends ConsumerState<ImportPlanSheet> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.success.withOpacity(0.1),
+        color: AppColors.success.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -444,7 +444,7 @@ class _ImportPlanSheetState extends ConsumerState<ImportPlanSheet> {
         color: AppColors.background,
         boxShadow: [
           BoxShadow(
-            color: CupertinoColors.systemGrey.withOpacity(0.1),
+            color: CupertinoColors.systemGrey.withValues(alpha: 0.1),
             offset: const Offset(0, -2),
             blurRadius: 4,
           ),

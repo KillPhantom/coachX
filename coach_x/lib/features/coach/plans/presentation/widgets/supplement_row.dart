@@ -105,7 +105,7 @@ class _SupplementRowState extends State<SupplementRow> {
           if (widget.onDelete != null)
             CupertinoButton(
               padding: EdgeInsets.zero,
-              minSize: 0,
+              minimumSize: Size.zero,
               onPressed: widget.onDelete,
               child: Icon(
                 CupertinoIcons.xmark_circle_fill,

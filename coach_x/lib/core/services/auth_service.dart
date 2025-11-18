@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:coach_x/core/utils/logger.dart';
+import 'package:coach_x/core/services/user_cache_service.dart';
 
 /// Firebase Authentication服务
 ///
@@ -86,7 +87,13 @@ class AuthService {
   static Future<void> signOut() async {
     try {
       AppLogger.info('用户退出登录: ${currentUser?.uid}');
+
+      // 清除用户缓存
+      await UserCacheService.clearCache();
+
+      // 退出Firebase认证
       await _auth.signOut();
+
       AppLogger.info('退出登录成功');
     } catch (e, stackTrace) {
       AppLogger.error('退出登录失败', e, stackTrace);

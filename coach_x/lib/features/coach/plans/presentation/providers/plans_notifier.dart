@@ -3,6 +3,7 @@ import 'package:coach_x/core/enums/app_status.dart';
 import 'package:coach_x/core/utils/logger.dart';
 import '../../data/models/plans_page_state.dart';
 import '../../data/repositories/plan_repository.dart';
+import '../../data/cache/plans_cache_service.dart';
 
 /// 计划管理状态管理
 class PlansNotifier extends StateNotifier<PlansPageState> {
@@ -43,6 +44,10 @@ class PlansNotifier extends StateNotifier<PlansPageState> {
   /// 刷新计划列表
   Future<void> refreshPlans() async {
     try {
+      // 手动刷新时强制清除所有缓存
+      await PlansCacheService.invalidateAllPlansCache();
+      AppLogger.info('🔄 手动刷新，已清除所有计划缓存');
+
       final plansData = await _repository.fetchAllPlans();
 
       state = state.copyWith(

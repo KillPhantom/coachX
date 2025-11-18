@@ -781,7 +781,6 @@ master/main          # 生产环境
 
 ### 20.2 API文档
 - 后端API与数据库Schema: `/docs/backend_apis_and_document_db_schemas.md`
-- Google Docs: https://docs.google.com/document/d/1yKQgZWjdeALkwrl2SHf6RjUnsCmeLxtoWFrv0Epr7SQ
 
 ### 20.3 技术文档
 - Flutter官方文档: https://flutter.dev

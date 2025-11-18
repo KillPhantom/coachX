@@ -1,5 +1,3 @@
-import 'package:coach_x/features/coach/plans/data/models/exercise_plan_model.dart';
-
 /// 修改类型
 enum ChangeType {
   modifyExercise, // 修改动作名称

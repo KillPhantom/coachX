@@ -33,17 +33,22 @@ from invitations.handlers import (
 from students.handlers import (
     fetch_students,
     delete_student,
-    fetch_latest_training
+    fetch_latest_training,
+    fetch_student_detail,
+    generate_student_ai_summary
 )
 from students.training_handlers import (
     fetch_today_training,
-    upsert_today_training
+    upsert_today_training,
+    fetch_weekly_home_stats,
+    update_meal_record
 )
 
 # ==================== 导入 AI 生成模块 ====================
 from ai.handlers import (
     generate_ai_training_plan,
     import_plan_from_image,
+    import_plan_from_text,
     import_supplement_plan_from_image,
     stream_training_plan,
     edit_plan_conversation,
@@ -77,12 +82,22 @@ from chat.handlers import (
     get_or_create_conversation
 )
 
+# ==================== 导入训练反馈模块 ====================
+from feedback.handlers import (
+    fetch_student_feedback
+)
+
 # ==================== 导入身体测量模块 ====================
 from body_stats.handlers import (
     save_body_measurement,
     fetch_body_measurements,
     update_body_measurement,
     delete_body_measurement
+)
+
+# ==================== 导入动作库模块 ====================
+from exercise_library.handlers import (
+    delete_exercise_template
 )
 
 # ==================== 导出所有函数 ====================
@@ -103,12 +118,17 @@ __all__ = [
     'fetch_students',
     'delete_student',
     'fetch_latest_training',
+    'fetch_student_detail',
+    'generate_student_ai_summary',
     'fetch_today_training',
     'upsert_today_training',
+    'fetch_weekly_home_stats',
+    'update_meal_record',
 
     # AI 生成
     'generate_ai_training_plan',
     'import_plan_from_image',
+    'import_plan_from_text',
     'import_supplement_plan_from_image',
     'stream_training_plan',
     'edit_plan_conversation',
@@ -133,9 +153,15 @@ __all__ = [
     'mark_messages_as_read',
     'get_or_create_conversation',
 
+    # 训练反馈
+    'fetch_student_feedback',
+
     # 身体测量
     'save_body_measurement',
     'fetch_body_measurements',
     'update_body_measurement',
     'delete_body_measurement',
+
+    # 动作库
+    'delete_exercise_template',
 ]

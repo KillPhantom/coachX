@@ -4,11 +4,7 @@ class Supplement {
   final String amount;
   final String? note;
 
-  const Supplement({
-    required this.name,
-    required this.amount,
-    this.note,
-  });
+  const Supplement({required this.name, required this.amount, this.note});
 
   /// 创建空的补剂
   factory Supplement.empty() {

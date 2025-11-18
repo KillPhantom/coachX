@@ -20,9 +20,9 @@ from utils.logger import logger
 def stream_generate_training_plan(params: Dict[str, Any]) -> Generator[Dict[str, Any], None, None]:
     """
     流式生成训练计划
-    
+
     逐天生成训练计划，每生成一天就立即 yield 返回
-    
+
     Args:
         params: 训练计划参数，包含:
             - goal: 训练目标
@@ -38,6 +38,7 @@ def stream_generate_training_plan(params: Dict[str, Any]) -> Generator[Dict[str,
             - training_styles: 训练风格列表
             - equipment: 可用设备列表
             - notes: 补充说明（可选）
+            - exercise_templates: 动作库模板列表（可选）
     
     Yields:
         dict: 流式事件
@@ -83,7 +84,8 @@ def stream_generate_training_plan(params: Dict[str, Any]) -> Generator[Dict[str,
                 user_prompt = build_single_day_prompt(
                     day=day_num,
                     params=params,
-                    previous_days=previous_days
+                    previous_days=previous_days,
+                    exercise_templates=params.get('exercise_templates')
                 )
                 
                 logger.info(f'📝 [Stream Day {day_num}] System Prompt 长度: {len(system_prompt)} 字符')
@@ -280,6 +282,16 @@ def stream_edit_plan_conversation(
         # 1. 获取用户 memory
         logger.info('📖 加载用户 Memory')
         user_memory_context = MemoryManager.build_memory_context(user_id)
+
+        # 2. 加载教练的动作库
+        try:
+            coach_id = _get_coach_id_from_plan(plan_id)
+            exercise_templates = _fetch_coach_exercise_templates(coach_id)
+            logger.info(f'📚 加载动作库: {len(exercise_templates)} 个模板')
+        except Exception as e:
+            logger.warning(f'⚠️ 加载动作库失败: {e}')
+            exercise_templates = []
+            coach_id = None
         profile = MemoryManager.get_user_memory(user_id)
         conversation_history = profile.get_recent_conversations(limit=3)
         language = profile.language_preference
@@ -300,6 +312,7 @@ def stream_edit_plan_conversation(
             current_plan=current_plan,
             user_memory=user_memory_context,
             conversation_history=conversation_history,
+            exercise_templates=exercise_templates,
             language=language
         )
         
@@ -444,6 +457,26 @@ def stream_edit_plan_conversation(
                     if 'after' not in change_with_id or not change_with_id['after']:
                         logger.warning(f'⚠️ Change #{idx} 缺少 after 字段，前端可能无法应用此修改')
                         validation_errors.append(f'Change #{idx} 缺少 after 字段')
+
+                    # 注入 exerciseTemplateId（如果是add_exercise或modify_exercise类型）
+                    if coach_id and exercise_templates:
+                        change_type = change_with_id.get('type', '')
+
+                        if change_type in ['add_exercise', 'modify_exercise']:
+                            exercise_name = _extract_exercise_name_from_change(change_with_id)
+
+                            if exercise_name:
+                                try:
+                                    template_id = _match_or_create_template(
+                                        coach_id,
+                                        exercise_name,
+                                        exercise_templates
+                                    )
+                                    _inject_exercise_template_id(change_with_id, template_id)
+
+                                    logger.info(f'✅ 注入模板ID: {exercise_name} -> {template_id}')
+                                except Exception as e:
+                                    logger.error(f'❌ 注入模板ID失败: {exercise_name}', exc_info=True)
 
                     changes_with_id.append(change_with_id)
 
@@ -937,5 +970,110 @@ def stream_generate_supplement_plan_conversation(
         yield {
             'type': 'error',
             'error': f'处理失败: {str(e)}'
+        }
+
+
+# ==================== ExerciseTemplate 集成辅助函数 ====================
+
+def _get_coach_id_from_plan(plan_id: str) -> str:
+    """从plan_id获取教练ID"""
+    from firebase_admin import firestore
+    db = firestore.client()
+
+    # 查询 exercisePlans 集合
+    plan_ref = db.collection('exercisePlans').document(plan_id)
+    plan_doc = plan_ref.get()
+
+    if not plan_doc.exists:
+        raise ValueError(f'Plan not found: {plan_id}')
+
+    coach_id = plan_doc.to_dict().get('coachId')
+    if not coach_id:
+        raise ValueError(f'Plan {plan_id} missing coachId')
+
+    return coach_id
+
+
+def _fetch_coach_exercise_templates(coach_id: str) -> list:
+    """获取教练的动作库"""
+    from firebase_admin import firestore
+    db = firestore.client()
+
+    templates_ref = db.collection('exerciseTemplates').where('coachId', '==', coach_id)
+    templates_docs = templates_ref.stream()
+
+    templates = []
+    for doc in templates_docs:
+        data = doc.to_dict()
+        templates.append({
+            'id': doc.id,
+            'name': data.get('name', ''),
+            'tags': data.get('tags', [])
+        })
+
+    return templates
+
+
+def _match_or_create_template(coach_id: str, exercise_name: str, existing_templates: list) -> str:
+    """匹配动作库或快捷创建新模板"""
+    from firebase_admin import firestore
+
+    # 1. 精确匹配
+    for template in existing_templates:
+        if template['name'] == exercise_name:
+            logger.info(f'✅ 匹配到动作模板: {exercise_name} -> {template["id"]}')
+            return template['id']
+
+    # 2. 模糊匹配（忽略大小写、前后空格）
+    normalized_name = exercise_name.strip().lower()
+    for template in existing_templates:
+        if template['name'].strip().lower() == normalized_name:
+            logger.info(f'✅ 模糊匹配到动作模板: {exercise_name} -> {template["id"]}')
+            return template['id']
+
+    # 3. 快捷创建新模板
+    logger.info(f'⚠️ 动作「{exercise_name}」不在库中，创建新模板')
+
+    db = firestore.client()
+    new_template_ref = db.collection('exerciseTemplates').document()
+
+    new_template_ref.set({
+        'name': exercise_name,
+        'tags': [],  # 默认空标签
+        'coachId': coach_id,
+        'createdAt': firestore.SERVER_TIMESTAMP,
+        'updatedAt': firestore.SERVER_TIMESTAMP,
+    })
+
+    logger.info(f'✅ 创建新模板: {exercise_name} -> {new_template_ref.id}')
+    return new_template_ref.id
+
+
+def _extract_exercise_name_from_change(change: dict) -> str:
+    """从change对象提取动作名称"""
+    after = change.get('after')
+
+    # 如果after是对象
+    if isinstance(after, dict):
+        return after.get('name', '')
+
+    # 如果after是字符串（不应该，但防御性处理）
+    if isinstance(after, str):
+        return after
+
+    return ''
+
+
+def _inject_exercise_template_id(change: dict, template_id: str):
+    """注入exerciseTemplateId到change的after字段"""
+    after = change.get('after')
+
+    if isinstance(after, dict):
+        after['exerciseTemplateId'] = template_id
+    else:
+        # 如果after不是dict，包装成dict
+        change['after'] = {
+            'name': str(after),
+            'exerciseTemplateId': template_id
         }
 

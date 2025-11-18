@@ -41,11 +41,7 @@ class PlanValidator {
         continue;
       }
 
-      // 验证动作数量
-      if (day.exercises.isEmpty) {
-        errors.add('训练日「${day.name}」至少需要一个动作');
-        continue;
-      }
+      // 允许训练日有空的exercises列表
 
       // 验证每个动作
       for (int j = 0; j < day.exercises.length; j++) {
@@ -54,6 +50,13 @@ class PlanValidator {
         // 验证动作名称
         if (exercise.name.trim().isEmpty) {
           errors.add('训练日「${day.name}」的第${j + 1}个动作需要名称');
+          continue;
+        }
+
+        // 验证动作模板 ID
+        if (exercise.exerciseTemplateId == null ||
+            exercise.exerciseTemplateId!.trim().isEmpty) {
+          errors.add('动作「${exercise.name}」必须关联动作模板');
           continue;
         }
 

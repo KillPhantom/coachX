@@ -23,7 +23,7 @@ class EventReminderSection extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(l10n.eventReminderTitle, style: AppTextStyles.title3),
+          Text(l10n.upcomingScheduleTitle, style: AppTextStyles.bodyMedium),
           const SizedBox(height: AppDimensions.spacingL),
           remindersAsync.when(
             data: (reminders) {

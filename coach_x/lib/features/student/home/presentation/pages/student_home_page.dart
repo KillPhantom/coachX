@@ -24,6 +24,8 @@ class StudentHomePage extends ConsumerWidget {
     Future<void> handleRefresh() async {
       ref.invalidate(studentPlansProvider);
       ref.invalidate(latestTrainingProvider);
+      ref.invalidate(todayTrainingStreamProvider);
+      ref.invalidate(weeklyStatsProvider);
       await Future.delayed(const Duration(milliseconds: 500));
     }
 
@@ -36,6 +38,7 @@ class StudentHomePage extends ConsumerWidget {
             onRetry: () {
               ref.invalidate(studentPlansProvider);
               ref.invalidate(latestTrainingProvider);
+              ref.invalidate(weeklyStatsProvider);
             },
           ),
           data: (plans) {

@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:coach_x/l10n/app_localizations.dart';
 import 'package:coach_x/core/theme/app_theme.dart';
 import 'package:coach_x/core/widgets/loading_indicator.dart';
@@ -149,31 +150,33 @@ class _StudentsPageState extends ConsumerState<StudentsPage>
                   controller: _scrollController,
                   physics: const AlwaysScrollableScrollPhysics(),
                   slivers: [
-                  // 下拉刷新
-                  CupertinoSliverRefreshControl(
-                    onRefresh: () async {
-                      await ref.read(studentsStateProvider.notifier).refresh();
-                    },
-                  ),
-
-                  // 内容区域
-                  _buildContent(context, state),
-
-                  // 加载更多指示器
-                  if (state.isLoadingMore)
-                    const SliverToBoxAdapter(
-                      child: Padding(
-                        padding: EdgeInsets.all(AppDimensions.spacingL),
-                        child: Center(child: CupertinoActivityIndicator()),
-                      ),
+                    // 下拉刷新
+                    CupertinoSliverRefreshControl(
+                      onRefresh: () async {
+                        await ref
+                            .read(studentsStateProvider.notifier)
+                            .refresh();
+                      },
                     ),
 
-                  // 底部间距（避免被TabBar遮挡）
-                  const SliverToBoxAdapter(
-                    child: SizedBox(height: AppDimensions.spacingXXXL),
-                  ),
-                ],
-              ),
+                    // 内容区域
+                    _buildContent(context, state),
+
+                    // 加载更多指示器
+                    if (state.isLoadingMore)
+                      const SliverToBoxAdapter(
+                        child: Padding(
+                          padding: EdgeInsets.all(AppDimensions.spacingL),
+                          child: Center(child: CupertinoActivityIndicator()),
+                        ),
+                      ),
+
+                    // 底部间距（避免被TabBar遮挡）
+                    const SliverToBoxAdapter(
+                      child: SizedBox(height: AppDimensions.spacingXXXL),
+                    ),
+                  ],
+                ),
               ),
             ),
           ],
@@ -238,20 +241,7 @@ class _StudentsPageState extends ConsumerState<StudentsPage>
 
   /// 点击学生卡片
   void _onStudentTap(String studentId) {
-    // TODO: 跳转到学生详情页
-    showCupertinoDialog(
-      context: context,
-      builder: (context) => CupertinoAlertDialog(
-        title: const Text('学生详情'),
-        content: Text('跳转到学生详情页: $studentId\n\n该功能将在后续版本中实现'),
-        actions: [
-          CupertinoDialogAction(
-            child: const Text('确定'),
-            onPressed: () => Navigator.pop(context),
-          ),
-        ],
-      ),
-    );
+    context.push('/student-detail/$studentId');
   }
 
   /// 显示操作菜单

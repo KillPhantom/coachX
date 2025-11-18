@@ -136,10 +136,10 @@ class EditConversationNotifier extends StateNotifier<EditConversationState> {
           // 诊断日志
           AppLogger.debug('📊 Complete 事件数据检查:');
           AppLogger.debug(
-            '  - changes: ${changes != null ? '✅ ${changes!.length} 项' : '❌ null'}',
+            '  - changes: ${changes != null ? '✅ ${changes.length} 项' : '❌ null'}',
           );
           AppLogger.debug(
-            '  - summary: ${summary != null && summary!.isNotEmpty ? '✅ 有' : '⚠️ 空/null'}',
+            '  - summary: ${summary != null && summary.isNotEmpty ? '✅ 有' : '⚠️ 空/null'}',
           );
           AppLogger.debug(
             '  - analysisContent: ${analysisContent.isNotEmpty ? '✅ ${analysisContent.length} 字符' : '❌ 空'}',

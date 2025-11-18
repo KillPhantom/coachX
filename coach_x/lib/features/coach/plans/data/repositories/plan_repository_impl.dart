@@ -5,6 +5,7 @@ import 'package:coach_x/features/coach/students/data/models/student_list_item_mo
 import '../models/exercise_plan_model.dart';
 import '../models/diet_plan_model.dart';
 import '../models/supplement_plan_model.dart';
+import '../cache/plans_cache_service.dart';
 import 'plan_repository.dart';
 
 /// 计划仓库实现
@@ -54,6 +55,28 @@ class PlanRepositoryImpl implements PlanRepository {
     try {
       AppLogger.debug('📥 获取所有计划列表');
 
+      // 1. 尝试从缓存读取三类计划列表
+      final cachedExercisePlans =
+          await PlansCacheService.getCachedExercisePlans();
+      final cachedDietPlans = await PlansCacheService.getCachedDietPlans();
+      final cachedSupplementPlans =
+          await PlansCacheService.getCachedSupplementPlans();
+
+      // 如果所有列表缓存都有效，返回缓存数据
+      if (cachedExercisePlans != null &&
+          cachedDietPlans != null &&
+          cachedSupplementPlans != null) {
+        AppLogger.debug(
+          '✅ 所有计划列表缓存命中: 训练${cachedExercisePlans.length}, 饮食${cachedDietPlans.length}, 补剂${cachedSupplementPlans.length}',
+        );
+        return PlansData(
+          exercisePlans: cachedExercisePlans,
+          dietPlans: cachedDietPlans,
+          supplementPlans: cachedSupplementPlans,
+        );
+      }
+
+      // 2. 缓存无效，调用 Cloud Function
       final result = await CloudFunctionsService.call(
         'fetch_available_plans',
         {},
@@ -115,6 +138,11 @@ class PlanRepositoryImpl implements PlanRepository {
         '✅ 获取计划成功: 训练${exercisePlans.length}, 饮食${dietPlans.length}, 补剂${supplementPlans.length}',
       );
 
+      // 3. 写入缓存
+      await PlansCacheService.cacheExercisePlans(exercisePlans);
+      await PlansCacheService.cacheDietPlans(dietPlans);
+      await PlansCacheService.cacheSupplementPlans(supplementPlans);
+
       return PlansData(
         exercisePlans: exercisePlans,
         dietPlans: dietPlans,
@@ -145,6 +173,9 @@ class PlanRepositoryImpl implements PlanRepository {
       final planId = result['data']['planId'] as String;
       AppLogger.debug('✅ 创建训练计划成功: $planId');
 
+      // 创建成功后清除对应类型的列表缓存
+      await PlansCacheService.invalidateListCache('exercise');
+
       return planId;
     } on FirebaseFunctionsException catch (e) {
       AppLogger.error('❌ 创建计划失败: ${e.code} - ${e.message}');
@@ -170,6 +201,9 @@ class PlanRepositoryImpl implements PlanRepository {
       }
 
       AppLogger.debug('✅ 更新训练计划成功');
+
+      // 更新成功后清除列表缓存
+      await PlansCacheService.invalidateListCache('exercise');
     } on FirebaseFunctionsException catch (e) {
       AppLogger.error('❌ 更新计划失败: ${e.code} - ${e.message}');
       throw _handleFirebaseError(e);
@@ -236,6 +270,9 @@ class PlanRepositoryImpl implements PlanRepository {
       }
 
       AppLogger.debug('✅ 删除计划成功');
+
+      // 删除成功后清除列表缓存
+      await PlansCacheService.invalidateListCache(planType);
     } on FirebaseFunctionsException catch (e) {
       AppLogger.error('❌ 删除计划失败: ${e.code} - ${e.message}');
       throw _handleFirebaseError(e);
@@ -262,6 +299,9 @@ class PlanRepositoryImpl implements PlanRepository {
 
       final newPlanId = result['data']['planId'] as String;
       AppLogger.debug('✅ 复制计划成功: $newPlanId');
+
+      // 复制成功后清除列表缓存
+      await PlansCacheService.invalidateListCache(planType);
 
       return newPlanId;
     } on FirebaseFunctionsException catch (e) {
@@ -300,6 +340,9 @@ class PlanRepositoryImpl implements PlanRepository {
       }
 
       AppLogger.debug('✅ ${action == 'assign' ? '分配' : '取消分配'}计划成功');
+
+      // 分配/取消分配成功后清除列表缓存（studentIds改变）
+      await PlansCacheService.invalidateListCache(planType);
     } on FirebaseFunctionsException catch (e) {
       AppLogger.error('❌ 分配计划失败: ${e.code} - ${e.message}');
       throw _handleFirebaseError(e);

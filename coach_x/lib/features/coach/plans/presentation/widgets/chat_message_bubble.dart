@@ -3,6 +3,7 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:coach_x/core/theme/app_colors.dart';
 import 'package:coach_x/core/theme/app_text_styles.dart';
 import 'package:coach_x/features/coach/plans/data/models/llm_chat_message.dart';
+import 'package:flutter/material.dart' show Icons;
 
 /// 聊天消息气泡组件
 class ChatMessageBubble extends StatelessWidget {
@@ -237,7 +238,7 @@ class ChatMessageBubble extends StatelessWidget {
 
     // 根据类型选择图标
     if (option.type == 'training_plan') {
-      icon = CupertinoIcons.sportscourt;
+      icon = Icons.fitness_center;
     } else if (option.type == 'diet_plan') {
       icon = CupertinoIcons.chart_bar_alt_fill;
     } else {

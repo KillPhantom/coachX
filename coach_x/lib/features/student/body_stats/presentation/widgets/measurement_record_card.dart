@@ -30,8 +30,7 @@ class MeasurementRecordCard extends ConsumerStatefulWidget {
       _MeasurementRecordCardState();
 }
 
-class _MeasurementRecordCardState
-    extends ConsumerState<MeasurementRecordCard> {
+class _MeasurementRecordCardState extends ConsumerState<MeasurementRecordCard> {
   bool _isExpanded = false;
 
   @override
@@ -73,7 +72,9 @@ class _MeasurementRecordCardState
                     padding: const EdgeInsets.all(AppDimensions.spacingM),
                     decoration: BoxDecoration(
                       color: AppColors.primaryColor.withOpacity(0.15),
-                      borderRadius: BorderRadius.circular(AppDimensions.radiusM),
+                      borderRadius: BorderRadius.circular(
+                        AppDimensions.radiusM,
+                      ),
                     ),
                     child: const Icon(
                       CupertinoIcons.calendar,
@@ -120,10 +121,7 @@ class _MeasurementRecordCardState
 
           // 展开内容
           if (_isExpanded) ...[
-            Container(
-              height: 1,
-              color: AppColors.dividerLight,
-            ),
+            Container(height: 1, color: AppColors.dividerLight),
             Padding(
               padding: const EdgeInsets.all(AppDimensions.spacingM),
               child: Column(
@@ -173,7 +171,8 @@ class _MeasurementRecordCardState
                             onTap: () => _showPhotoGallery(context, index),
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(
-                                  AppDimensions.radiusM),
+                                AppDimensions.radiusM,
+                              ),
                               child: CachedNetworkImage(
                                 imageUrl: photoUrl,
                                 width: 80,
@@ -208,10 +207,12 @@ class _MeasurementRecordCardState
                       Expanded(
                         child: CupertinoButton(
                           padding: const EdgeInsets.symmetric(
-                              vertical: AppDimensions.spacingS),
+                            vertical: AppDimensions.spacingS,
+                          ),
                           color: AppColors.dividerLight,
-                          borderRadius:
-                              BorderRadius.circular(AppDimensions.radiusM),
+                          borderRadius: BorderRadius.circular(
+                            AppDimensions.radiusM,
+                          ),
                           onPressed: () => _confirmDelete(context),
                           child: Text(
                             l10n.deleteRecord,
@@ -304,10 +305,7 @@ class _PhotoGalleryPage extends StatelessWidget {
   final List<String> photos;
   final int initialIndex;
 
-  const _PhotoGalleryPage({
-    required this.photos,
-    required this.initialIndex,
-  });
+  const _PhotoGalleryPage({required this.photos, required this.initialIndex});
 
   @override
   Widget build(BuildContext context) {
@@ -328,9 +326,7 @@ class _PhotoGalleryPage extends StatelessWidget {
             },
             itemCount: photos.length,
             loadingBuilder: (context, event) => const Center(
-              child: CupertinoActivityIndicator(
-                color: CupertinoColors.white,
-              ),
+              child: CupertinoActivityIndicator(color: CupertinoColors.white),
             ),
             pageController: PageController(initialPage: initialIndex),
           ),

@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:coach_x/core/enums/app_status.dart';
 import 'package:coach_x/core/enums/ai_status.dart';
+import 'package:coach_x/core/enums/exercise_type.dart';
 import 'package:coach_x/core/services/ai_service.dart';
 import 'package:coach_x/core/utils/logger.dart';
 import 'package:coach_x/core/utils/plan_validator.dart';
@@ -13,13 +14,15 @@ import 'package:coach_x/features/coach/plans/data/models/ai/ai_suggestion.dart';
 import 'package:coach_x/features/coach/plans/data/models/import_result.dart';
 import 'package:coach_x/features/coach/plans/data/models/plan_generation_params.dart';
 import 'package:coach_x/features/coach/plans/data/repositories/plan_repository.dart';
+import 'package:coach_x/features/coach/exercise_library/presentation/providers/exercise_library_providers.dart';
 
 /// 创建训练计划状态管理
 class CreateTrainingPlanNotifier
     extends StateNotifier<CreateTrainingPlanState> {
   final PlanRepository _planRepository;
+  final Ref _ref;
 
-  CreateTrainingPlanNotifier(this._planRepository)
+  CreateTrainingPlanNotifier(this._planRepository, this._ref)
     : super(const CreateTrainingPlanState());
 
   // ==================== 基础字段更新 ====================
@@ -113,6 +116,33 @@ class CreateTrainingPlanNotifier
     AppLogger.debug('➕ 添加动作 - Day ${dayIndex + 1}');
   }
 
+  /// 从模板添加动作
+  ///
+  /// 用于从搜索栏快速添加动作
+  void addExerciseFromTemplate(
+    int dayIndex,
+    String templateId,
+    String templateName,
+  ) {
+    if (dayIndex < 0 || dayIndex >= state.days.length) return;
+
+    final newExercise = Exercise(
+      name: templateName,
+      type: ExerciseType.strength,
+      sets: [TrainingSet.empty()], // 添加一个默认空 Set
+      exerciseTemplateId: templateId,
+    );
+
+    final day = state.days[dayIndex];
+    final updatedDay = day.addExercise(newExercise);
+
+    updateDay(dayIndex, updatedDay);
+
+    AppLogger.debug(
+      '➕ 从模板添加动作 - Day ${dayIndex + 1}, Template: $templateName ($templateId)',
+    );
+  }
+
   /// 删除动作
   void removeExercise(int dayIndex, int exerciseIndex) {
     if (dayIndex < 0 || dayIndex >= state.days.length) return;
@@ -149,15 +179,25 @@ class CreateTrainingPlanNotifier
     updateExercise(dayIndex, exerciseIndex, updatedExercise);
   }
 
-  /// 更新动作备注
-  void updateExerciseNote(int dayIndex, int exerciseIndex, String note) {
+  /// 设置动作模板
+  ///
+  /// 从动作库选择模板时调用，同时更新名称和模板 ID
+  void setExerciseTemplate(
+    int dayIndex,
+    int exerciseIndex,
+    String name,
+    String? templateId,
+  ) {
     if (dayIndex < 0 || dayIndex >= state.days.length) return;
 
     final day = state.days[dayIndex];
     if (exerciseIndex < 0 || exerciseIndex >= day.exercises.length) return;
 
     final exercise = day.exercises[exerciseIndex];
-    final updatedExercise = exercise.copyWith(note: note);
+    final updatedExercise = exercise.copyWith(
+      name: name,
+      exerciseTemplateId: templateId,
+    );
     updateExercise(dayIndex, exerciseIndex, updatedExercise);
   }
 
@@ -586,6 +626,19 @@ class CreateTrainingPlanNotifier
   Future<void> generateFromParamsStreaming(PlanGenerationParams params) async {
     try {
       AppLogger.info('🔄 开始流式生成训练计划');
+
+      // 获取教练的动作库列表
+      final exerciseTemplates = _ref.read(exerciseTemplatesProvider);
+
+      // 如果有动作库，添加到参数中
+      if (exerciseTemplates.isNotEmpty) {
+        params = params.copyWith(exerciseTemplates: exerciseTemplates);
+        AppLogger.info(
+          '📚 已添加 ${exerciseTemplates.length} 个动作模板到生成参数',
+        );
+      } else {
+        AppLogger.info('⚠️ 未找到动作库，AI 将自由选择动作名称');
+      }
 
       // 清空现有数据
       state = state.copyWith(

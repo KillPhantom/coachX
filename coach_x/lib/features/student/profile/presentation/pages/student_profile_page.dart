@@ -5,6 +5,7 @@ import 'package:coach_x/l10n/app_localizations.dart';
 import 'package:coach_x/core/theme/app_theme.dart';
 import 'package:coach_x/core/utils/unit_converter.dart';
 import 'package:coach_x/core/services/auth_service.dart';
+import 'package:coach_x/core/providers/locale_providers.dart';
 import 'package:coach_x/routes/route_names.dart';
 import 'package:coach_x/features/shared/profile/presentation/widgets/profile_header.dart';
 import 'package:coach_x/features/shared/profile/presentation/widgets/info_card.dart';
@@ -29,6 +30,7 @@ class _StudentProfilePageState extends ConsumerState<StudentProfilePage> {
     final currentUser = ref.watch(currentStudentProvider);
     final coachAsync = ref.watch(coachInfoProvider);
     final isMetric = ref.watch(isMetricProvider);
+    final languageDisplayName = ref.watch(languageDisplayNameProvider);
 
     if (currentUser == null) {
       return const CupertinoPageScaffold(
@@ -159,6 +161,30 @@ class _StudentProfilePageState extends ConsumerState<StudentProfilePage> {
                             children: [
                               Text(
                                 isMetric ? l10n.metric : l10n.imperial,
+                                style: AppTextStyles.body.copyWith(
+                                  color: AppColors.textSecondary,
+                                ),
+                              ),
+                              const SizedBox(width: AppDimensions.spacingS),
+                              const Icon(
+                                CupertinoIcons.forward,
+                                size: 20,
+                                color: AppColors.textTertiary,
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        // Language
+                        SettingsRow(
+                          title: l10n.language,
+                          onTap: () =>
+                              context.push(RouteNames.languageSelection),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                languageDisplayName,
                                 style: AppTextStyles.body.copyWith(
                                   color: AppColors.textSecondary,
                                 ),

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:go_router/go_router.dart';
 import 'package:coach_x/core/theme/app_theme.dart';
 import 'package:coach_x/l10n/app_localizations.dart';
 
@@ -32,12 +32,7 @@ class _CongratsBannerState extends State<CongratsBanner>
     _scaleAnimation = Tween<double>(
       begin: 1.0,
       end: 1.2,
-    ).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: Curves.easeInOut,
-      ),
-    );
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
   }
 
   @override
@@ -50,40 +45,46 @@ class _CongratsBannerState extends State<CongratsBanner>
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.primaryColor,
-        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          // 庆祝图标（带缩放动画）
-          ScaleTransition(
-            scale: _scaleAnimation,
-            child: Icon(
-              Icons.celebration,
-              size: 24.0,
-              color: AppColors.primaryAction,
-            ),
-          ),
-
-          const SizedBox(width: 8.0),
-
-          // 合并文字（单行）
-          Flexible(
-            child: Text(
-              l10n.congratsMessageCompact,
-              style: AppTextStyles.footnote.copyWith(
-                color: AppColors.textPrimary,
+    return GestureDetector(
+      onTap: () {
+        // 返回到 home page
+        context.pop();
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: AppColors.primaryColor,
+          borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // 庆祝图标（带缩放动画）
+            ScaleTransition(
+              scale: _scaleAnimation,
+              child: Icon(
+                Icons.celebration,
+                size: 24.0,
+                color: AppColors.primaryAction,
               ),
-              textAlign: TextAlign.center,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
             ),
-          ),
-        ],
+
+            const SizedBox(width: 8.0),
+
+            // 合并文字（单行）
+            Flexible(
+              child: Text(
+                l10n.congratsMessageCompact,
+                style: AppTextStyles.footnote.copyWith(
+                  color: AppColors.textPrimary,
+                ),
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

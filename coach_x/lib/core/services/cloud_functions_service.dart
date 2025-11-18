@@ -13,16 +13,15 @@ class CloudFunctionsService {
   static String get baseUrl {
     // 🔧 开发模式：使用本地模拟器
     // 将这里改为 true 即可使用本地测试
-    const bool useLocalEmulator = true;
+    final bool useLocalEmulator = true;
 
     if (useLocalEmulator) {
       return 'http://127.0.0.1:5001/coachx-9d219/us-central1';
     }
 
     // 生产环境
-    const region = 'us-central1';
-    const projectId = 'coachx-9d219';
-    return 'https://$region-$projectId.cloudfunctions.net';
+    // ignore: dead_code
+    return 'https://us-central1-coachx-9d219.cloudfunctions.net';
   }
 
   /// 调用Cloud Function
@@ -236,6 +235,16 @@ class CloudFunctionsService {
     return await call('import_supplement_plan_from_image', params);
   }
 
+  /// 从文本导入训练计划
+  ///
+  /// [textContent] 训练计划文本内容
+  static Future<Map<String, dynamic>> importPlanFromText({
+    required String textContent,
+  }) async {
+    final params = <String, dynamic>{'text_content': textContent};
+    return await call('import_plan_from_text', params);
+  }
+
   // ==================== 计划管理API ====================
 
   /// 创建训练计划
@@ -338,6 +347,26 @@ class CloudFunctionsService {
     Map<String, dynamic> trainingData,
   ) async {
     return await call('upsert_today_training', trainingData);
+  }
+
+  /// 获取本周首页统计数据
+  ///
+  /// 传递客户端当前日期以确保时区同步
+  ///
+  /// 返回:
+  /// - 本周训练打卡状态（7天）
+  /// - 体重变化统计（本周平均 vs 上周平均）
+  /// - 卡路里摄入统计（本周总量 vs 上周总量）
+  /// - Volume PR 统计（选一个动作示例）
+  static Future<Map<String, dynamic>> fetchWeeklyHomeStats() async {
+    // 获取客户端当前日期（用户本地时区）
+    final now = DateTime.now();
+    final currentDate =
+        '${now.year.toString().padLeft(4, '0')}-'
+        '${now.month.toString().padLeft(2, '0')}-'
+        '${now.day.toString().padLeft(2, '0')}';
+
+    return await call('fetch_weekly_home_stats', {'current_date': currentDate});
   }
 
   // ==================== 异常处理 ====================

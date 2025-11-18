@@ -5,31 +5,23 @@ import 'training_set.dart';
 /// 单个运动动作数据模型
 class Exercise {
   final String name;
-  final String note;
   final ExerciseType type;
   final List<TrainingSet> sets;
-  final bool completed;
-  final String? detailGuide; // 预留：详细指导文字
-  final List<String> demoVideos; // 预留：演示视频URL列表
+  final String? exerciseTemplateId; // 关联的动作模板 ID
 
   const Exercise({
     required this.name,
-    this.note = '',
     this.type = ExerciseType.strength,
     required this.sets,
-    this.completed = false,
-    this.detailGuide,
-    this.demoVideos = const [],
+    this.exerciseTemplateId,
   });
 
   /// 创建空的 Exercise
   factory Exercise.empty() {
     return Exercise(
       name: '',
-      note: '',
       type: ExerciseType.strength,
       sets: [TrainingSet.empty()],
-      completed: false,
     );
   }
 
@@ -42,16 +34,9 @@ class Exercise {
 
     return Exercise(
       name: json['name'] as String? ?? '',
-      note: json['note'] as String? ?? '',
       type: exerciseTypeFromString(json['type'] as String? ?? 'strength'),
       sets: sets.isNotEmpty ? sets : [TrainingSet.empty()],
-      completed: json['completed'] as bool? ?? false,
-      detailGuide: json['detailGuide'] as String?,
-      demoVideos:
-          (json['demoVideos'] as List<dynamic>?)
-              ?.map((e) => e as String)
-              .toList() ??
-          [],
+      exerciseTemplateId: json['exerciseTemplateId'] as String?,
     );
   }
 
@@ -59,33 +44,24 @@ class Exercise {
   Map<String, dynamic> toJson() {
     return {
       'name': name,
-      'note': note,
       'type': type.toJsonString(),
       'sets': sets.map((set) => set.toJson()).toList(),
-      'completed': completed,
-      if (detailGuide != null) 'detailGuide': detailGuide,
-      'demoVideos': demoVideos,
+      if (exerciseTemplateId != null) 'exerciseTemplateId': exerciseTemplateId,
     };
   }
 
   /// 复制并修改部分字段
   Exercise copyWith({
     String? name,
-    String? note,
     ExerciseType? type,
     List<TrainingSet>? sets,
-    bool? completed,
-    String? detailGuide,
-    List<String>? demoVideos,
+    String? exerciseTemplateId,
   }) {
     return Exercise(
       name: name ?? this.name,
-      note: note ?? this.note,
       type: type ?? this.type,
       sets: sets ?? this.sets,
-      completed: completed ?? this.completed,
-      detailGuide: detailGuide ?? this.detailGuide,
-      demoVideos: demoVideos ?? this.demoVideos,
+      exerciseTemplateId: exerciseTemplateId ?? this.exerciseTemplateId,
     );
   }
 
@@ -111,19 +87,11 @@ class Exercise {
     return copyWith(sets: newSets);
   }
 
-  /// 切换完成状态
-  Exercise toggleComplete() {
-    return copyWith(completed: !completed);
-  }
-
   /// 获取 Sets 总数
   int get totalSets => sets.length;
 
   /// 是否有效（name 不为空）
   bool get isValid => name.trim().isNotEmpty;
-
-  /// 获取已完成的 Sets 数量
-  int get completedSetsCount => sets.where((set) => set.completed).length;
 
   @override
   bool operator ==(Object other) =>
@@ -131,16 +99,13 @@ class Exercise {
       other is Exercise &&
           runtimeType == other.runtimeType &&
           name == other.name &&
-          note == other.note &&
-          type == other.type &&
-          completed == other.completed;
+          type == other.type;
 
   @override
-  int get hashCode =>
-      name.hashCode ^ note.hashCode ^ type.hashCode ^ completed.hashCode;
+  int get hashCode => name.hashCode ^ type.hashCode;
 
   @override
   String toString() {
-    return 'Exercise(name: $name, type: $type, sets: ${sets.length}, completed: $completed)';
+    return 'Exercise(name: $name, type: $type, sets: ${sets.length})';
   }
 }

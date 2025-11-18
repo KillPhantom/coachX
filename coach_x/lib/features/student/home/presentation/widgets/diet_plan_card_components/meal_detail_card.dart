@@ -8,19 +8,32 @@ import 'package:coach_x/features/coach/plans/data/models/meal.dart';
 /// 显示餐名、备注、食物列表和营养数据
 class MealDetailCard extends StatelessWidget {
   final Meal meal;
+  final Meal? recordedMeal;
+  final VoidCallback? onViewDetails;
 
-  const MealDetailCard({super.key, required this.meal});
+  const MealDetailCard({
+    super.key,
+    required this.meal,
+    this.recordedMeal,
+    this.onViewDetails,
+  });
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final macros = meal.macros;
+    final hasRecord = recordedMeal != null;
+    final displayMeal = recordedMeal ?? meal;
+    final macros = displayMeal.macros;
 
     return Container(
       height: 160,
       padding: const EdgeInsets.all(AppDimensions.spacingM),
       decoration: BoxDecoration(
         color: AppColors.backgroundWhite,
+        // 绿色边框 (有记录时)
+        border: hasRecord
+            ? Border.all(color: AppColors.successGreen, width: 2)
+            : null,
         borderRadius: BorderRadius.circular(AppDimensions.radiusL),
         boxShadow: [
           BoxShadow(
@@ -33,22 +46,42 @@ class MealDetailCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 餐名
-          Text(
-            meal.name,
-            style: AppTextStyles.bodyMedium.copyWith(
-              color: AppColors.primaryText,
-              fontWeight: FontWeight.w600,
-            ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
+          // 餐名 + 查看详情按钮
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Text(
+                  displayMeal.name,
+                  style: AppTextStyles.bodyMedium.copyWith(
+                    color: AppColors.primaryText,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              // 查看详情按钮 (仅有记录时显示)
+              if (hasRecord && onViewDetails != null)
+                CupertinoButton(
+                  padding: EdgeInsets.zero,
+                  onPressed: onViewDetails, minimumSize: Size(0, 0),
+                  child: Text(
+                    l10n.viewDetails,
+                    style: AppTextStyles.caption1.copyWith(
+                      color: AppColors.successGreen,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+            ],
           ),
 
           // 备注（如果有）
-          if (meal.note.isNotEmpty) ...[
+          if (displayMeal.note.isNotEmpty) ...[
             const SizedBox(height: 4),
             Text(
-              meal.note,
+              displayMeal.note,
               style: AppTextStyles.caption1.copyWith(
                 color: AppColors.textSecondary,
               ),
@@ -63,9 +96,9 @@ class MealDetailCard extends StatelessWidget {
           Expanded(
             child: ListView.builder(
               padding: EdgeInsets.zero,
-              itemCount: meal.items.length,
+              itemCount: displayMeal.items.length,
               itemBuilder: (context, index) {
-                final item = meal.items[index];
+                final item = displayMeal.items[index];
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 4),
                   child: Text(

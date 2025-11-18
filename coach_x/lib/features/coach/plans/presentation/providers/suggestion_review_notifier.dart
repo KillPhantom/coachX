@@ -198,7 +198,6 @@ class SuggestionReviewNotifier extends StateNotifier<SuggestionReviewState?> {
 
     exercises[change.exerciseIndex!] = currentExercise.copyWith(
       name: modifications['name'] as String?,
-      note: modifications['note'] as String?,
       type: modifications['type'] as ExerciseType?,
       sets: newSets,
     );
@@ -690,14 +689,24 @@ class SuggestionReviewNotifier extends StateNotifier<SuggestionReviewState?> {
           sets = [TrainingSet.empty()];
         }
 
-        return Exercise(
+        final exercise = Exercise(
           name: data['name'] as String? ?? '新动作',
-          note: data['note'] as String? ?? '',
           type: data.containsKey('type')
               ? exerciseTypeFromString(data['type'] as String)
               : ExerciseType.strength,
           sets: sets,
+          exerciseTemplateId: data['exerciseTemplateId'] as String?,
         );
+
+        // 开发阶段验证（不阻塞）
+        if (exercise.exerciseTemplateId == null ||
+            exercise.exerciseTemplateId!.isEmpty) {
+          AppLogger.warning(
+            '⚠️ AI编辑: 动作「${exercise.name}」缺少exerciseTemplateId（后端应已处理）',
+          );
+        }
+
+        return exercise;
       }
 
       // 如果是 String，按原有逻辑处理
@@ -734,14 +743,24 @@ class SuggestionReviewNotifier extends StateNotifier<SuggestionReviewState?> {
             sets = [TrainingSet.empty()];
           }
 
-          return Exercise(
+          final exercise = Exercise(
             name: json['name'] as String? ?? '新动作',
-            note: json['note'] as String? ?? '',
             type: json.containsKey('type')
                 ? exerciseTypeFromString(json['type'] as String)
                 : ExerciseType.strength,
             sets: sets,
+            exerciseTemplateId: json['exerciseTemplateId'] as String?,
           );
+
+          // 开发阶段验证（不阻塞）
+          if (exercise.exerciseTemplateId == null ||
+              exercise.exerciseTemplateId!.isEmpty) {
+            AppLogger.warning(
+              '⚠️ AI编辑: 动作「${exercise.name}」缺少exerciseTemplateId（后端应已处理）',
+            );
+          }
+
+          return exercise;
         }
 
         // 简单文本格式：假设是动作名称
@@ -803,11 +822,11 @@ class SuggestionReviewNotifier extends StateNotifier<SuggestionReviewState?> {
 
                 return Exercise(
                   name: exerciseJson['name'] as String? ?? '新动作',
-                  note: exerciseJson['note'] as String? ?? '',
                   type: exerciseJson.containsKey('type')
                       ? exerciseTypeFromString(exerciseJson['type'] as String)
                       : ExerciseType.strength,
                   sets: sets,
+                  exerciseTemplateId: exerciseJson['exerciseTemplateId'] as String?,
                 );
               }
               return Exercise.empty();
@@ -861,11 +880,11 @@ class SuggestionReviewNotifier extends StateNotifier<SuggestionReviewState?> {
 
               return Exercise(
                 name: exerciseJson['name'] as String? ?? '新动作',
-                note: exerciseJson['note'] as String? ?? '',
                 type: exerciseJson.containsKey('type')
                     ? exerciseTypeFromString(exerciseJson['type'] as String)
                     : ExerciseType.strength,
                 sets: sets,
+                exerciseTemplateId: exerciseJson['exerciseTemplateId'] as String?,
               );
             }
             return Exercise.empty();

@@ -122,7 +122,7 @@ class _ImageFullScreenPage extends StatelessWidget {
     return CupertinoPageScaffold(
       backgroundColor: CupertinoColors.black,
       navigationBar: CupertinoNavigationBar(
-        backgroundColor: CupertinoColors.black.withOpacity(0.8),
+        backgroundColor: CupertinoColors.black.withValues(alpha: 0.8),
         leading: CupertinoButton(
           padding: EdgeInsets.zero,
           onPressed: () => Navigator.of(context).pop(),

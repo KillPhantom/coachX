@@ -30,6 +30,11 @@ from .image_import.supplement_handlers import (
     import_supplement_plan_from_image,
 )
 
+# 文本导入模块
+from .text_import.handlers import (
+    import_plan_from_text,
+)
+
 # 食物营养模块
 from .food_macros.handlers import (
     get_food_macros,
@@ -49,6 +54,9 @@ __all__ = [
     # Image Import
     'import_plan_from_image',
     'import_supplement_plan_from_image',
+
+    # Text Import
+    'import_plan_from_text',
 
     # Food Macros
     'get_food_macros',

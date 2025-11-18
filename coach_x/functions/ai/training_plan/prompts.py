@@ -288,12 +288,15 @@ SINGLE_DAY_PROMPT_TEMPLATE = """你是一位专业的私人健身教练，现在
 **已完成的训练日：**
 {previous_days_summary}
 
+{exercise_library_section}
+
 **请按照以下要求设计今天的训练计划：**
 
 1. **训练主题**：为今天选择一个合适的训练主题（如"胸+肱三头肌", "腿部力量", "核心稳定"等）
 
 2. **动作选择**：
    - 选择 {exercises_min}-{exercises_max} 个动作
+   {exercise_selection_rule}
    - 确保动作多样性，避免与之前重复
    - 考虑训练目标和可用设备
    - 兼顾主动肌群和协同肌群
@@ -446,7 +449,8 @@ def build_structured_plan_prompt(params: dict) -> tuple:
 def build_single_day_prompt(
     day: int,
     params: dict,
-    previous_days: list = None
+    previous_days: list = None,
+    exercise_templates: list = None
 ) -> str:
     """
     构建单天训练计划的 Prompt
@@ -455,6 +459,7 @@ def build_single_day_prompt(
         day: 当前是第几天
         params: 训练参数字典
         previous_days: 已完成的训练日列表（可选）
+        exercise_templates: 动作库模板列表（可选）
 
     Returns:
         完整的单天生成 Prompt
@@ -479,6 +484,9 @@ def build_single_day_prompt(
     # 已完成训练日总结
     previous_days_summary = _summarize_previous_days(previous_days) if previous_days else "无（这是第一天）"
 
+    # 动作库列表（如果提供）
+    exercise_library_section, exercise_selection_rule = _format_exercise_library(exercise_templates)
+
     return SINGLE_DAY_PROMPT_TEMPLATE.format(
         day=day,
         goal=params.get('goal', ''),
@@ -496,6 +504,8 @@ def build_single_day_prompt(
         notes_section=notes_section,
         day_focus=day_focus,
         previous_days_summary=previous_days_summary,
+        exercise_library_section=exercise_library_section,
+        exercise_selection_rule=exercise_selection_rule,
     )
 
 
@@ -578,6 +588,64 @@ def _summarize_previous_days(previous_days: list) -> str:
     return '\n'.join(summary_lines)
 
 
+def _format_exercise_library(exercise_templates: list) -> tuple:
+    """
+    格式化动作库列表
+
+    Args:
+        exercise_templates: 动作模板列表，每个模板包含 name 和 tags
+
+    Returns:
+        (exercise_library_section, exercise_selection_rule) 元组
+    """
+    if not exercise_templates or len(exercise_templates) == 0:
+        return ("", "- 可以自由选择适合的动作")
+
+    # 格式化动作库列表
+    exercise_lines = []
+    for template in exercise_templates:
+        name = template.get('name', '未知动作')
+        tags = template.get('tags', [])
+        tags_text = f"（{', '.join(tags)}）" if tags else ""
+        exercise_lines.append(f"   - {name}{tags_text}")
+
+    exercise_list_text = '\n'.join(exercise_lines)
+
+    library_section = f"""
+**可用动作库（共 {len(exercise_templates)} 个动作）：**
+{exercise_list_text}
+"""
+
+    selection_rule = "- **重要：必须从上述动作库中选择动作（使用完全相同的名称）**"
+
+    return (library_section, selection_rule)
+
+
+def _format_exercise_library_for_edit(exercise_templates: list) -> str:
+    """
+    格式化动作库列表用于编辑对话
+
+    Args:
+        exercise_templates: 动作模板列表，包含 id, name, tags
+
+    Returns:
+        格式化的动作库文本
+    """
+    if not exercise_templates:
+        return ""
+
+    lines = ["**教练的动作库（可选择）**："]
+    for template in exercise_templates:
+        name = template.get('name', '')
+        tags = template.get('tags', [])
+        tags_text = f"（{', '.join(tags)}）" if tags else ""
+        lines.append(f"   - {name}{tags_text}")
+
+    lines.append("\n**说明**：修改/新增动作时，优先从上述库中选择。如需使用新动作，直接提供名称，系统会自动创建模板。")
+
+    return '\n'.join(lines)
+
+
 # ==================== 编辑对话 Prompts ====================
 
 def build_edit_conversation_prompt(
@@ -585,6 +653,7 @@ def build_edit_conversation_prompt(
     current_plan: dict,
     user_memory: str,
     conversation_history: list,
+    exercise_templates: list = None,
     language: str = '中文'
 ) -> tuple[str, str]:
     """
@@ -595,6 +664,7 @@ def build_edit_conversation_prompt(
         current_plan: 当前完整计划数据
         user_memory: 用户的 memory context
         conversation_history: 最近的对话历史
+        exercise_templates: 动作库模板列表（可选）
         language: 输出语言
 
     Returns:
@@ -731,10 +801,17 @@ def build_edit_conversation_prompt(
 
         plan_summary += f"第{day_num}天：{day_name}\n  动作：{exercise_list}\n\n"
 
-    # 3. 统一的 User Prompt
+    # 3. 动作库列表（如果提供）
+    exercise_library_text = ""
+    if exercise_templates:
+        exercise_library_text = f"\n\n{_format_exercise_library_for_edit(exercise_templates)}\n"
+
+    # 4. 统一的 User Prompt
     user_prompt = f"""{history_text}
 
 {plan_summary}
+
+{exercise_library_text}
 
 **用户的消息：**
 {user_message}
@@ -763,24 +840,22 @@ def build_edit_conversation_prompt(
      * add_day/add_exercise 类型：after使用完整JSON对象
      * 其他类型：使用字符串描述
 
-   **示例 - 修改动作（名称、备注、训练组）**：
+   **示例 - 修改动作（名称、训练组）**：
    ```json
    {{
      "type": "modify_exercise",
      "day_index": 0,
      "exercise_index": 4,
-     "description": "将feed替换为双杠臂屈伸，并调整训练参数",
+     "description": "将绳索下压替换为双杠臂屈伸，并调整训练参数",
      "before": {{
-       "name": "feed",
-       "note": "肘部固定，手臂完全伸直，感受肱三头肌收缩",
+       "name": "绳索下压",
        "sets": [{{"reps": "12", "weight": "60kg"}}, {{"reps": "12", "weight": "65kg"}}, {{"reps": "10", "weight": "70kg"}}]
      }},
      "after": {{
        "name": "双杠臂屈伸",
-       "note": "身体略微前倾，注意肩部稳定，控制下降速度",
        "sets": [{{"reps": "10", "weight": "体重"}}, {{"reps": "10", "weight": "体重"}}, {{"reps": "8", "weight": "体重+5kg"}}]
      }},
-     "reason": "feed不是有效的训练动作名称，替换为双杠臂屈伸来训练肱三头肌，同时优化了训练参数和技术要点"
+     "reason": "双杠臂屈伸能够更全面地激活肱三头肌三个头，且允许更大的动作幅度"
    }}
    ```
 

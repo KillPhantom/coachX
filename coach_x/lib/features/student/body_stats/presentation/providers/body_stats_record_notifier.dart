@@ -12,8 +12,8 @@ class BodyStatsRecordNotifier extends StateNotifier<BodyStatsState> {
   BodyStatsRecordNotifier({
     required BodyStatsRepository repository,
     required String initialWeightUnit,
-  })  : _repository = repository,
-        super(BodyStatsState.initial(weightUnit: initialWeightUnit));
+  }) : _repository = repository,
+       super(BodyStatsState.initial(weightUnit: initialWeightUnit));
 
   /// 添加照片
   ///
@@ -21,17 +21,12 @@ class BodyStatsRecordNotifier extends StateNotifier<BodyStatsState> {
   void addPhoto(String localPath) {
     if (state.isPhotosLimitReached) {
       AppLogger.warning('⚠️ 照片数量已达上限（3张）');
-      state = state.copyWith(
-        errorMessage: 'Maximum 3 photos allowed',
-      );
+      state = state.copyWith(errorMessage: 'Maximum 3 photos allowed');
       return;
     }
 
     final updatedPhotos = List<String>.from(state.photos)..add(localPath);
-    state = state.copyWith(
-      photos: updatedPhotos,
-      clearError: true,
-    );
+    state = state.copyWith(photos: updatedPhotos, clearError: true);
 
     AppLogger.info('📸 添加照片: $localPath, 当前数量: ${updatedPhotos.length}');
   }
@@ -46,10 +41,7 @@ class BodyStatsRecordNotifier extends StateNotifier<BodyStatsState> {
     }
 
     final updatedPhotos = List<String>.from(state.photos)..removeAt(index);
-    state = state.copyWith(
-      photos: updatedPhotos,
-      clearError: true,
-    );
+    state = state.copyWith(photos: updatedPhotos, clearError: true);
 
     AppLogger.info('🗑️ 移除照片: 索引 $index, 剩余数量: ${updatedPhotos.length}');
   }
@@ -58,10 +50,7 @@ class BodyStatsRecordNotifier extends StateNotifier<BodyStatsState> {
   ///
   /// [weight] 体重值
   void setWeight(double weight) {
-    state = state.copyWith(
-      weight: weight,
-      clearError: true,
-    );
+    state = state.copyWith(weight: weight, clearError: true);
 
     AppLogger.info('⚖️ 设置体重: $weight${state.weightUnit}');
   }
@@ -75,10 +64,7 @@ class BodyStatsRecordNotifier extends StateNotifier<BodyStatsState> {
       return;
     }
 
-    state = state.copyWith(
-      weightUnit: unit,
-      clearError: true,
-    );
+    state = state.copyWith(weightUnit: unit, clearError: true);
 
     AppLogger.info('📏 设置体重单位: $unit');
   }
@@ -87,10 +73,7 @@ class BodyStatsRecordNotifier extends StateNotifier<BodyStatsState> {
   ///
   /// [bodyFat] 体脂率（可为 null）
   void setBodyFat(double? bodyFat) {
-    state = state.copyWith(
-      bodyFat: bodyFat,
-      clearError: true,
-    );
+    state = state.copyWith(bodyFat: bodyFat, clearError: true);
 
     AppLogger.info('💪 设置体脂率: $bodyFat%');
   }
@@ -102,9 +85,7 @@ class BodyStatsRecordNotifier extends StateNotifier<BodyStatsState> {
     // 验证数据
     if (!state.isValid) {
       AppLogger.warning('⚠️ 数据验证失败');
-      state = state.copyWith(
-        errorMessage: 'Please enter valid weight',
-      );
+      state = state.copyWith(errorMessage: 'Please enter valid weight');
       return false;
     }
 
@@ -161,5 +142,87 @@ class BodyStatsRecordNotifier extends StateNotifier<BodyStatsState> {
   /// 清除错误消息
   void clearError() {
     state = state.copyWith(clearError: true);
+  }
+
+  /// 检查指定日期是否已有记录
+  ///
+  /// [recordDate] 记录日期（格式：'2025-11-05'）
+  /// 返回已存在记录的ID，如果不存在则返回null
+  Future<String?> checkExistingRecord(String recordDate) async {
+    try {
+      AppLogger.info('🔍 检查日期是否已有记录: $recordDate');
+
+      // 获取所有记录
+      final measurements = await _repository.fetchMeasurements();
+
+      // 查找匹配日期的记录
+      for (final measurement in measurements) {
+        if (measurement.recordDate == recordDate) {
+          AppLogger.info('✅ 找到已存在的记录: ${measurement.id}');
+          return measurement.id;
+        }
+      }
+
+      AppLogger.info('✅ 该日期没有记录');
+      return null;
+    } catch (e, stack) {
+      AppLogger.error('❌ 检查记录失败', e, stack);
+      return null;
+    }
+  }
+
+  /// 更新已存在的记录
+  ///
+  /// [measurementId] 要更新的记录ID
+  /// 返回是否更新成功
+  Future<bool> updateRecord(String measurementId) async {
+    // 验证数据
+    if (!state.isValid) {
+      AppLogger.warning('⚠️ 数据验证失败');
+      state = state.copyWith(errorMessage: 'Please enter valid weight');
+      return false;
+    }
+
+    state = state.copyWith(isLoading: true, clearError: true);
+
+    try {
+      AppLogger.info('🔄 开始更新身体数据记录: $measurementId');
+
+      // 1. 上传照片
+      final List<String> photoUrls = [];
+      for (final localPath in state.photos) {
+        try {
+          final url = await _repository.uploadPhoto(localPath);
+          photoUrls.add(url);
+          AppLogger.info('✅ 照片上传成功: $url');
+        } catch (e) {
+          AppLogger.error('❌ 照片上传失败: $localPath', e);
+          // 继续上传其他照片
+        }
+      }
+
+      // 2. 更新记录
+      final measurement = await _repository.updateMeasurement(
+        measurementId: measurementId,
+        weight: state.weight!,
+        weightUnit: state.weightUnit,
+        bodyFat: state.bodyFat,
+        photos: photoUrls,
+      );
+
+      AppLogger.info('✅ 身体数据记录更新成功: ${measurement.id}');
+
+      // 3. 重置状态
+      state = BodyStatsState.initial(weightUnit: state.weightUnit);
+
+      return true;
+    } catch (e, stack) {
+      AppLogger.error('❌ 更新身体数据记录失败', e, stack);
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: 'Failed to update record: ${e.toString()}',
+      );
+      return false;
+    }
   }
 }

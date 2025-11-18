@@ -17,8 +17,9 @@ class SupplementDayContent extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // 所有时间段列表
-        ...supplementDay.timings
-            .map((timing) => _buildTimingSection(context, timing)),
+        ...supplementDay.timings.map(
+          (timing) => _buildTimingSection(context, timing),
+        ),
       ],
     );
   }
@@ -75,7 +76,8 @@ class SupplementDayContent extends StatelessWidget {
           const SizedBox(height: AppDimensions.spacingM),
 
           // 补剂列表
-          ...timing.supplements.map((supplement) => Container(
+          ...timing.supplements.map(
+            (supplement) => Container(
               margin: const EdgeInsets.only(bottom: AppDimensions.spacingS),
               padding: const EdgeInsets.all(AppDimensions.spacingS),
               decoration: BoxDecoration(
@@ -115,7 +117,8 @@ class SupplementDayContent extends StatelessWidget {
                         ),
 
                         // 补剂备注
-                        if (supplement.note != null && supplement.note!.isNotEmpty) ...[
+                        if (supplement.note != null &&
+                            supplement.note!.isNotEmpty) ...[
                           const SizedBox(height: 4),
                           Text(
                             supplement.note!,

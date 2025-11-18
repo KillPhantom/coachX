@@ -1,9 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:coach_x/core/theme/app_theme.dart';
+import 'package:coach_x/features/coach/training_reviews/presentation/providers/training_review_providers.dart';
 import '../widgets/summary_section.dart';
 import '../widgets/event_reminder_section.dart';
-import '../widgets/recent_activity_section.dart';
+import '../widgets/pending_reviews_section.dart';
 import '../providers/coach_home_providers.dart';
 
 /// 教练首页
@@ -27,7 +28,7 @@ class CoachHomePage extends ConsumerWidget {
                 // 刷新所有数据
                 ref.invalidate(coachSummaryProvider);
                 ref.invalidate(eventRemindersProvider);
-                ref.invalidate(recentActivitiesProvider);
+                ref.invalidate(trainingReviewsStreamProvider);
                 await Future.delayed(const Duration(milliseconds: 500));
               },
             ),
@@ -44,12 +45,12 @@ class CoachHomePage extends ConsumerWidget {
                   const SummarySection(),
                   const SizedBox(height: AppDimensions.spacingL),
 
-                  // Event Reminder区域
+                  // Upcoming Schedule区域
                   const EventReminderSection(),
                   const SizedBox(height: AppDimensions.spacingL),
 
-                  // Recent Activity区域
-                  const RecentActivitySection(),
+                  // Pending Reviews区域
+                  const PendingReviewsSection(),
                 ]),
               ),
             ),

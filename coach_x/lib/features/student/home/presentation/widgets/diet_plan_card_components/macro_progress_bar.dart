@@ -6,20 +6,32 @@ import 'package:coach_x/core/theme/app_theme.dart';
 /// 显示宏营养素的进度条
 class MacroProgressBar extends StatelessWidget {
   final String label;
-  final int value;
+  final double actualValue;
+  final int targetValue;
   final double progress;
   final Color color;
 
   const MacroProgressBar({
     super.key,
     required this.label,
-    required this.value,
+    required this.actualValue,
+    required this.targetValue,
     required this.progress,
     required this.color,
   });
 
   @override
   Widget build(BuildContext context) {
+    // 计算颜色 (3色逻辑)
+    Color progressColor;
+    if (progress >= 0.95 && progress <= 1.05) {
+      progressColor = AppColors.successGreen;
+    } else if (progress > 1.05) {
+      progressColor = AppColors.errorRed;
+    } else {
+      progressColor = color;
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -34,7 +46,7 @@ class MacroProgressBar extends StatelessWidget {
               ),
             ),
             Text(
-              '${value}g',
+              '${actualValue.toInt()}/${targetValue}g',
               style: AppTextStyles.caption1.copyWith(
                 color: AppColors.primaryText,
                 fontWeight: FontWeight.w600,
@@ -62,7 +74,7 @@ class MacroProgressBar extends StatelessWidget {
                 widthFactor: progress.clamp(0.0, 1.0),
                 child: Container(
                   decoration: BoxDecoration(
-                    color: color,
+                    color: progressColor,
                     borderRadius: BorderRadius.circular(3),
                   ),
                 ),

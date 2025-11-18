@@ -3,10 +3,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart' show Icons;
 import 'package:coach_x/l10n/app_localizations.dart';
 import 'package:coach_x/core/theme/app_theme.dart';
-import 'package:coach_x/features/coach/plans/data/models/training_set.dart';
 import 'package:coach_x/features/student/training/data/models/student_exercise_model.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:coach_x/core/enums/video_source.dart';
+import 'package:coach_x/core/widgets/video_upload_section.dart';
 import 'set_input_row.dart';
-import 'my_recordings_section.dart';
 import 'exercise_time_header.dart';
 
 /// 动作记录卡片（增强版）
@@ -15,22 +16,27 @@ import 'exercise_time_header.dart';
 class ExerciseRecordCard extends StatelessWidget {
   final StudentExerciseModel exercise;
   final int exerciseIndex;
-  final Function(int setIndex, TrainingSet set) onSetChanged;
+  final Function(int setIndex, String reps, String weight) onSetComplete;
   final Function(int setIndex) onToggleSetEdit;
   final VoidCallback onQuickComplete;
   final Function(File) onVideoUploaded;
   final Function(int) onVideoDeleted;
+  final Function(int)? onVideoRetry;
+  final Function(int videoIndex, String downloadUrl, String? thumbnailUrl)?
+  onVideoUploadCompleted;
   final bool isSaving;
 
   const ExerciseRecordCard({
     super.key,
     required this.exercise,
     required this.exerciseIndex,
-    required this.onSetChanged,
+    required this.onSetComplete,
     required this.onToggleSetEdit,
     required this.onQuickComplete,
     required this.onVideoUploaded,
     required this.onVideoDeleted,
+    this.onVideoRetry,
+    this.onVideoUploadCompleted,
     this.isSaving = false,
   });
 
@@ -149,7 +155,8 @@ class ExerciseRecordCard extends StatelessWidget {
               child: SetInputRow(
                 set: exercise.sets[index],
                 setNumber: index + 1,
-                onChanged: (updatedSet) => onSetChanged(index, updatedSet),
+                onComplete: (reps, weight) =>
+                    onSetComplete(index, reps, weight),
                 onToggleEdit: () => onToggleSetEdit(index),
               ),
             );
@@ -157,11 +164,25 @@ class ExerciseRecordCard extends StatelessWidget {
 
           // My Recordings
           const SizedBox(height: AppDimensions.spacingM),
-          MyRecordingsSection(
-            videos: exercise.videos,
-            onVideoRecorded: onVideoUploaded,
-            onDeleteVideo: onVideoDeleted,
+          VideoUploadSection(
+            storagePathPrefix:
+                'students/trainings/${FirebaseAuth.instance.currentUser!.uid}/',
             maxVideos: 3,
+            maxSeconds: 60,
+            videoSource: VideoSource.both,
+            initialVideos: exercise.videos,
+            onVideoSelected: (index, file) {
+              // 添加 pending 状态视频到 notifier（不启动上传）
+              // 上传由 VideoUploadSection 负责
+              onVideoUploaded(file);
+            },
+            onUploadCompleted: (index, videoUrl, thumbnailUrl) {
+              // 视频上传完成，同步状态到 notifier 并保存
+              onVideoUploadCompleted?.call(index, videoUrl, thumbnailUrl);
+            },
+            onVideoDeleted: (index) {
+              onVideoDeleted(index);
+            },
           ),
         ],
       ),

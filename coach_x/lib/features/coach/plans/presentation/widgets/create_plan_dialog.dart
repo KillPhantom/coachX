@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:coach_x/l10n/app_localizations.dart';
 import 'package:coach_x/core/theme/app_colors.dart';
 import 'package:coach_x/core/theme/app_text_styles.dart';
+import 'package:flutter/material.dart' show Icons;
 
 /// 创建计划弹窗
 class CreatePlanDialog extends StatelessWidget {
@@ -65,7 +66,7 @@ class CreatePlanDialog extends StatelessWidget {
               child: Column(
                 children: [
                   _PlanOptionCard(
-                    icon: CupertinoIcons.sportscourt_fill,
+                    icon: Icons.fitness_center,
                     iconColor: const Color(0xFFEC1313),
                     iconBackground: const Color(0xFFEC1313).withOpacity(0.1),
                     title: l10n.exercisePlanTitle,

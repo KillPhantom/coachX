@@ -61,8 +61,9 @@ class StudentPlansModel {
       } else if (json['diet_plans'] != null) {
         // 旧格式：数组
         final plansData = safeMapListCast(json['diet_plans'], 'diet_plans');
-        dietPlans =
-            plansData.map((data) => DietPlanModel.fromJson(data)).toList();
+        dietPlans = plansData
+            .map((data) => DietPlanModel.fromJson(data))
+            .toList();
       }
     } catch (e) {
       AppLogger.error('Error parsing diet plans', e);
@@ -102,8 +103,7 @@ class StudentPlansModel {
     return {
       'exercise_plans': exercisePlans.map((plan) => plan.toJson()).toList(),
       'diet_plans': dietPlans.map((plan) => plan.toJson()).toList(),
-      'supplement_plans':
-          supplementPlans.map((plan) => plan.toJson()).toList(),
+      'supplement_plans': supplementPlans.map((plan) => plan.toJson()).toList(),
     };
   }
 

@@ -144,7 +144,7 @@ class EditDietConversationNotifier
               summary = suggestion.summary;
               macrosChange = suggestion.macrosChange;
 
-              AppLogger.info('✅ 解析成功 - ${changes?.length ?? 0} 个修改');
+              AppLogger.info('✅ 解析成功 - ${changes.length} 个修改');
 
               // 更新最后一条消息，附加建议
               final aiMessage = LLMChatMessage.ai(
@@ -185,9 +185,7 @@ class EditDietConversationNotifier
               summary = suggestion.summary;
               macrosChange = suggestion.macrosChange;
 
-              AppLogger.info(
-                '✅ 从 complete 事件解析成功 - ${changes?.length ?? 0} 个修改',
-              );
+              AppLogger.info('✅ 从 complete 事件解析成功 - ${changes.length} 个修改');
 
               // 更新最后一条消息，附加建议
               final aiMessage = LLMChatMessage.ai(
@@ -238,7 +236,7 @@ class EditDietConversationNotifier
               summary = suggestion.summary;
               macrosChange = suggestion.macrosChange;
 
-              AppLogger.info('✅ 解析成功 - ${changes?.length ?? 0} 个修改');
+              AppLogger.info('✅ 解析成功 - ${changes.length} 个修改');
 
               // 更新最后一条消息，附加建议
               final aiMessage = LLMChatMessage.ai(
@@ -433,8 +431,9 @@ class EditDietConversationNotifier
     if (change.mealIndex == null) return days;
 
     final day = days[change.dayIndex];
-    if (change.mealIndex! < 0 || change.mealIndex! >= day.meals.length)
+    if (change.mealIndex! < 0 || change.mealIndex! >= day.meals.length) {
       return days;
+    }
 
     final updatedMeals = List<Meal>.from(day.meals);
     updatedMeals.removeAt(change.mealIndex!);
@@ -452,8 +451,9 @@ class EditDietConversationNotifier
     if (change.mealIndex == null) return days;
 
     final day = days[change.dayIndex];
-    if (change.mealIndex! < 0 || change.mealIndex! >= day.meals.length)
+    if (change.mealIndex! < 0 || change.mealIndex! >= day.meals.length) {
       return days;
+    }
 
     final meal = day.meals[change.mealIndex!];
     final updatedMeal = meal.copyWith(name: change.after as String);
@@ -474,8 +474,9 @@ class EditDietConversationNotifier
     if (change.mealIndex == null) return days;
 
     final day = days[change.dayIndex];
-    if (change.mealIndex! < 0 || change.mealIndex! >= day.meals.length)
+    if (change.mealIndex! < 0 || change.mealIndex! >= day.meals.length) {
       return days;
+    }
 
     final meal = day.meals[change.mealIndex!];
 
@@ -516,12 +517,14 @@ class EditDietConversationNotifier
     if (change.mealIndex == null || change.foodItemIndex == null) return days;
 
     final day = days[change.dayIndex];
-    if (change.mealIndex! < 0 || change.mealIndex! >= day.meals.length)
+    if (change.mealIndex! < 0 || change.mealIndex! >= day.meals.length) {
       return days;
+    }
 
     final meal = day.meals[change.mealIndex!];
-    if (change.foodItemIndex! < 0 || change.foodItemIndex! >= meal.items.length)
+    if (change.foodItemIndex! < 0 || change.foodItemIndex! >= meal.items.length) {
       return days;
+    }
 
     final updatedItems = List<FoodItem>.from(meal.items);
     updatedItems.removeAt(change.foodItemIndex!);
@@ -547,12 +550,14 @@ class EditDietConversationNotifier
     if (change.mealIndex == null || change.foodItemIndex == null) return days;
 
     final day = days[change.dayIndex];
-    if (change.mealIndex! < 0 || change.mealIndex! >= day.meals.length)
+    if (change.mealIndex! < 0 || change.mealIndex! >= day.meals.length) {
       return days;
+    }
 
     final meal = day.meals[change.mealIndex!];
-    if (change.foodItemIndex! < 0 || change.foodItemIndex! >= meal.items.length)
+    if (change.foodItemIndex! < 0 || change.foodItemIndex! >= meal.items.length) {
       return days;
+    }
 
     final item = meal.items[change.foodItemIndex!];
 

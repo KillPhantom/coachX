@@ -15,7 +15,7 @@ final createTrainingPlanNotifierProvider =
     >((ref) {
       // 获取 Repository
       final repository = ref.watch(trainingPlanRepositoryProvider);
-      return CreateTrainingPlanNotifier(repository);
+      return CreateTrainingPlanNotifier(repository, ref);
     });
 
 // ==================== 计算 Providers ====================

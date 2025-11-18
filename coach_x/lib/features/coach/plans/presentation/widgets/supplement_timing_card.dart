@@ -153,7 +153,7 @@ class _SupplementTimingCardState extends State<SupplementTimingCard> {
                         if (widget.onAddSupplement != null)
                           CupertinoButton(
                             padding: EdgeInsets.zero,
-                            minSize: 0,
+                            minimumSize: Size.zero,
                             onPressed: widget.onAddSupplement,
                             child: Row(
                               children: [
@@ -255,7 +255,7 @@ class _SupplementTimingCardState extends State<SupplementTimingCard> {
               right: -6,
               child: CupertinoButton(
                 padding: EdgeInsets.zero,
-                minSize: 0,
+                minimumSize: Size.zero,
                 onPressed: widget.onDelete,
                 child: Container(
                   width: 18,

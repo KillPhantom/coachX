@@ -1,3 +1,5 @@
+import 'package:coach_x/core/utils/logger.dart';
+
 /// JSON 解析工具函数
 ///
 /// 提供安全的类型转换，避免从 Firebase Cloud Functions 返回的数据类型不匹配问题
@@ -38,7 +40,9 @@ Map<String, dynamic>? safeMapCast(dynamic data, [String? fieldName]) {
 
   // 不是 Map 类型，记录警告并返回 null
   final field = fieldName != null ? ' for field "$fieldName"' : '';
-  print('⚠️ Warning: Expected Map but got ${data.runtimeType}$field');
+  AppLogger.warning(
+    '⚠️ Warning: Expected Map but got ${data.runtimeType}$field',
+  );
   return null;
 }
 
@@ -62,7 +66,9 @@ List<Map<String, dynamic>> safeMapListCast(dynamic data, [String? fieldName]) {
 
   if (data is! List) {
     final field = fieldName != null ? ' for field "$fieldName"' : '';
-    print('⚠️ Warning: Expected List but got ${data.runtimeType}$field');
+    AppLogger.warning(
+      '⚠️ Warning: Expected List but got ${data.runtimeType}$field',
+    );
     return [];
   }
 
@@ -86,7 +92,9 @@ List<String> safeStringListCast(dynamic data, [String? fieldName]) {
 
   if (data is! List) {
     final field = fieldName != null ? ' for field "$fieldName"' : '';
-    print('⚠️ Warning: Expected List but got ${data.runtimeType}$field');
+    AppLogger.warning(
+      '⚠️ Warning: Expected List but got ${data.runtimeType}$field',
+    );
     return [];
   }
 
@@ -137,13 +145,15 @@ int? safeIntCast(dynamic data, [int? defaultValue, String? fieldName]) {
     }
 
     final field = fieldName != null ? ' for field "$fieldName"' : '';
-    print('⚠️ Warning: Cannot parse "$data" as int$field');
+    AppLogger.warning('⚠️ Warning: Cannot parse "$data" as int$field');
     return defaultValue;
   }
 
   // 其他类型
   final field = fieldName != null ? ' for field "$fieldName"' : '';
-  print('⚠️ Warning: Expected int but got ${data.runtimeType}$field');
+  AppLogger.warning(
+    '⚠️ Warning: Expected int but got ${data.runtimeType}$field',
+  );
   return defaultValue;
 }
 
@@ -178,12 +188,14 @@ double? safeDoubleCast(
     if (parsed != null) return parsed;
 
     final field = fieldName != null ? ' for field "$fieldName"' : '';
-    print('⚠️ Warning: Cannot parse "$data" as double$field');
+    AppLogger.warning('⚠️ Warning: Cannot parse "$data" as double$field');
     return defaultValue;
   }
 
   // 其他类型
   final field = fieldName != null ? ' for field "$fieldName"' : '';
-  print('⚠️ Warning: Expected double but got ${data.runtimeType}$field');
+  AppLogger.warning(
+    '⚠️ Warning: Expected double but got ${data.runtimeType}$field',
+  );
   return defaultValue;
 }

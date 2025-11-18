@@ -35,10 +35,7 @@ class DaySelectorPills extends StatelessWidget {
             onTap: () => onDaySelected(day),
             child: Container(
               margin: const EdgeInsets.only(right: 8),
-              padding: const EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 8,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               constraints: const BoxConstraints(minWidth: 60),
               decoration: BoxDecoration(
                 color: isSelected
@@ -53,8 +50,7 @@ class DaySelectorPills extends StatelessWidget {
                     color: isSelected
                         ? AppColors.primaryText
                         : AppColors.textSecondary,
-                    fontWeight:
-                        isSelected ? FontWeight.w600 : FontWeight.w400,
+                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
                   ),
                 ),
               ),

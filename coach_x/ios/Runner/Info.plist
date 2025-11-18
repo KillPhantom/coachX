@@ -27,9 +27,11 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>需要使用相机拍摄食物以进行营养分析</string>
+	<string>需要使用相机拍摄食物以进行营养分析和录制训练视频</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>需要使用麦克风录制训练视频音频</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>需要访问相册以选择食物图片</string>
+	<string>需要访问相册以选择食物图片和训练视频</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>

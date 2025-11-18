@@ -307,6 +307,7 @@ enum TimeRange {
 | `bodyFat` | Body Fat % | 体脂率 |
 | `bodyFatOptional` | Body Fat % (Optional) | 体脂率（可选） |
 | `skipPhoto` | Skip Photo | 跳过拍照 |
+| `usePhoto` | Use Photo | 使用照片 |
 | `takePhoto` | Take Photo | 拍照 |
 | `uploadPhoto` | Upload Photo | 上传照片 |
 | `enterWeight` | Enter Weight | 输入体重 |
@@ -349,79 +350,81 @@ dependencies:
 - `permission_handler: ^11.3.1`
 - `firebase_storage: ^13.0.3`
 
-## Implementation Checklist
+## Camera Implementation Details
 
-### Phase 1: Backend (Cloud Functions)
-- [ ] 创建 `functions/body_stats/` 目录
-- [ ] 实现 `save_body_measurement` 函数
-- [ ] 实现 `fetch_body_measurements` 函数
-- [ ] 实现 `update_body_measurement` 函数
-- [ ] 实现 `delete_body_measurement` 函数
-- [ ] 在 `functions/main.py` 导出函数
-- [ ] 部署到 Firebase
+### 相机预览正确实现
 
-### Phase 2: Frontend - Dependencies & i18n
-- [ ] 添加 `fl_chart` 依赖到 `pubspec.yaml`
-- [ ] 运行 `flutter pub get`
-- [ ] 添加国际化文本到 `app_en.arb`
-- [ ] 添加国际化文本到 `app_zh.arb`
-- [ ] 运行 `flutter gen-l10n`
-- [ ] 添加路由到 `route_names.dart`
-- [ ] 注册路由到 `app_router.dart`
+为避免相机预览在不同设备上拉伸变形，必须使用 `AspectRatio` 包装：
 
-### Phase 3: Frontend - Data Layer
-- [ ] 创建 `body_measurement_model.dart`
-- [ ] 创建 `body_stats_state.dart`
-- [ ] 创建 `body_stats_history_state.dart`
-- [ ] 创建 `time_range_enum.dart`
-- [ ] 创建 `body_stats_repository.dart` 接口
-- [ ] 实现 `body_stats_repository_impl.dart`
+```dart
+if (_isCameraInitialized && _cameraController != null && !_isPreviewMode)
+  Positioned.fill(
+    child: Container(
+      color: CupertinoColors.black,
+      child: Center(
+        child: AspectRatio(
+          aspectRatio: _cameraController!.value.aspectRatio,
+          child: CameraPreview(_cameraController!),
+        ),
+      ),
+    ),
+  ),
+```
 
-### Phase 4: Frontend - Providers
-- [ ] 创建 `body_stats_providers.dart`
-- [ ] 实现 `body_stats_record_notifier.dart`
-- [ ] 实现 `body_stats_history_notifier.dart`
+**关键点**:
+- 使用相机实际宽高比 `_cameraController!.value.aspectRatio`
+- 黑色背景填充剩余空间
+- 相机预览居中显示
 
-### Phase 5: Frontend - Record Page UI
-- [ ] 创建 `body_stats_record_page.dart`
-- [ ] 创建 `body_stats_input_sheet.dart`
-- [ ] 创建 `photo_thumbnail.dart`
-- [ ] 实现相机和照片选择逻辑
-- [ ] 实现照片上传到 Firebase Storage
+### 拍照预览流程
 
-### Phase 6: Frontend - History Page UI
-- [ ] 创建 `body_stats_history_page.dart`
-- [ ] 创建 `weight_trend_chart.dart`
-- [ ] 创建 `measurement_record_card.dart`
-- [ ] 创建 `edit_measurement_sheet.dart`
-- [ ] 实现时间范围切换
-- [ ] 实现照片全屏查看
+拍照后进入预览模式，用户可以查看照片并决定是否使用：
 
-### Phase 7: Integration
-- [ ] 更新 `record_activity_bottom_sheet.dart`
-- [ ] 测试完整流程
-- [ ] Code review 和优化
+**状态管理**:
+```dart
+String? _capturedImagePath;  // 保存拍摄的照片路径
+bool _isPreviewMode = false;  // 控制预览模式
+```
 
-## Testing Strategy
+**流程方法**:
+```dart
+// 显示预览
+void _showPreview(String imagePath) {
+  setState(() {
+    _capturedImagePath = imagePath;
+    _isPreviewMode = true;
+  });
+}
 
-### Unit Tests
-- [ ] 测试 `BodyMeasurementModel` 序列化/反序列化
-- [ ] 测试单位转换方法 `getWeightInUnit()`
-- [ ] 测试 Repository 方法（使用 mock）
+// 关闭预览，返回实时相机
+void _closePreview() {
+  setState(() {
+    _capturedImagePath = null;
+    _isPreviewMode = false;
+  });
+}
 
-### Integration Tests
-- [ ] 测试完整记录流程（拍照→输入→保存）
-- [ ] 测试历史加载和显示
-- [ ] 测试编辑功能
-- [ ] 测试删除功能
-- [ ] 测试时间范围筛选
+// 使用照片，进入输入表单
+void _usePhoto() {
+  if (_capturedImagePath == null) return;
+  ref.read(bodyStatsRecordProvider.notifier).addPhoto(_capturedImagePath!);
+  _showInputSheet();
+}
+```
 
-### Edge Cases
-- [ ] 无照片记录（Skip Photo）
-- [ ] 最大3张照片限制
-- [ ] 网络错误处理
-- [ ] 相机权限被拒绝
-- [ ] 单位转换精度
+**用户流程**:
+```
+实时相机 → 拍照 → 静态预览
+                      ↓
+               关闭 | 使用照片
+                      ↓
+                   输入表单
+```
+
+**预览UI**:
+- **图片显示**: 使用 `Image.file()` + `AspectRatio` 保持宽高比
+- **关闭按钮**: 顶部右上角 X 图标
+- **使用照片按钮**: 底部中心大按钮
 
 ## Performance Considerations
 
@@ -470,7 +473,6 @@ match /bodyMeasure/{measurementId} {
 ## References
 
 - UI Design: `/Users/ivan/coachX/studentUI/bodyStatsPage/code.html`
-- Backend Schema: `/Users/ivan/coachX/docs/backend_apis_and_document_db_schemas.md`
 - Similar Feature: AI Food Scanner (`lib/features/student/diet/`)
 - Chart Library: [fl_chart Documentation](https://pub.dev/packages/fl_chart)
 
@@ -553,7 +555,6 @@ match /bodyMeasure/{measurementId} {
 
 ---
 
-**Created**: 2025-11-06
-**Completed**: 2025-11-06
+**Last Updated**: 2025-11-16
 **Status**: ✅ Complete
 **Owner**: Implementation Team

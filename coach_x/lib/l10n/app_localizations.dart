@@ -200,7 +200,7 @@ abstract class AppLocalizations {
   /// **'Height'**
   String get height;
 
-  /// Weight label
+  /// Weight stat label
   ///
   /// In en, this message translates to:
   /// **'Weight'**
@@ -218,7 +218,7 @@ abstract class AppLocalizations {
   /// **'Student'**
   String get student;
 
-  /// Generic error message title
+  /// Generic error message
   ///
   /// In en, this message translates to:
   /// **'An error occurred'**
@@ -230,7 +230,7 @@ abstract class AppLocalizations {
   /// **'Retry'**
   String get retry;
 
-  /// Cancel button text
+  /// Cancel button
   ///
   /// In en, this message translates to:
   /// **'Cancel'**
@@ -290,13 +290,13 @@ abstract class AppLocalizations {
   /// **'Success'**
   String get success;
 
-  /// Error message
+  /// Error dialog title
   ///
   /// In en, this message translates to:
   /// **'Error'**
   String get error;
 
-  /// Delete action
+  /// Delete button
   ///
   /// In en, this message translates to:
   /// **'Delete'**
@@ -308,7 +308,7 @@ abstract class AppLocalizations {
   /// **'Copy'**
   String get copy;
 
-  /// Close action
+  /// Close button text
   ///
   /// In en, this message translates to:
   /// **'Close'**
@@ -545,7 +545,7 @@ abstract class AppLocalizations {
   /// Unreviewed trainings count
   ///
   /// In en, this message translates to:
-  /// **'{count} training records need to be reviewed'**
+  /// **'{count} to be reviewed'**
   String unreviewedTrainingsCount(int count);
 
   /// Event reminder section title
@@ -710,7 +710,7 @@ abstract class AppLocalizations {
   /// **'No invitation codes'**
   String get noInvitationCodes;
 
-  /// Load failed error title
+  /// Error message when loading fails
   ///
   /// In en, this message translates to:
   /// **'Load Failed'**
@@ -758,10 +758,10 @@ abstract class AppLocalizations {
   /// **'Select action'**
   String get selectAction;
 
-  /// View details action
+  /// Button text to view meal details
   ///
   /// In en, this message translates to:
-  /// **'View details'**
+  /// **'View Details'**
   String get viewDetails;
 
   /// Assign plan action
@@ -776,10 +776,10 @@ abstract class AppLocalizations {
   /// **'Delete student'**
   String get deleteStudent;
 
-  /// Confirm delete dialog message
+  /// Confirm delete dialog title
   ///
   /// In en, this message translates to:
-  /// **'Are you sure you want to delete this record?'**
+  /// **'Confirm Delete'**
   String get confirmDelete;
 
   /// Plans page title
@@ -854,10 +854,10 @@ abstract class AppLocalizations {
   /// **'Refresh failed'**
   String get refreshFailed;
 
-  /// No results message
+  /// No search results message
   ///
   /// In en, this message translates to:
-  /// **'No results'**
+  /// **'No results found'**
   String get noResults;
 
   /// No plans found for query message
@@ -1003,6 +1003,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Log sets, reps, weight, and videos.'**
   String get trainingRecordDesc;
+
+  /// Start recording button label
+  ///
+  /// In en, this message translates to:
+  /// **'Start Recording'**
+  String get startRecording;
+
+  /// View records button label
+  ///
+  /// In en, this message translates to:
+  /// **'View Records'**
+  String get viewRecords;
 
   /// Diet record type
   ///
@@ -1178,19 +1190,49 @@ abstract class AppLocalizations {
   /// **'{count} of 7 days recorded'**
   String daysRecorded(int count);
 
+  /// Weight change stat card title
+  ///
+  /// In en, this message translates to:
+  /// **'Weight'**
+  String get weightChange;
+
+  /// Calories intake stat card title
+  ///
+  /// In en, this message translates to:
+  /// **'Calories'**
+  String get caloriesIntake;
+
+  /// Volume PR stat card title
+  ///
+  /// In en, this message translates to:
+  /// **'Volume'**
+  String get volumePR;
+
+  /// Empty state message for stat cards
+  ///
+  /// In en, this message translates to:
+  /// **'No data yet, start recording now'**
+  String get noDataStartRecording;
+
+  /// Label shown when only previous week data is available
+  ///
+  /// In en, this message translates to:
+  /// **'Last week\'s data'**
+  String get lastWeekData;
+
   /// Today's meal plan section title
   ///
   /// In en, this message translates to:
   /// **'Today\'s Meal Plan'**
   String get todayRecord;
 
-  /// Protein macro label
+  /// Protein nutrition label
   ///
   /// In en, this message translates to:
   /// **'Protein'**
   String get protein;
 
-  /// Carbs macro label
+  /// Carbohydrates nutrition label
   ///
   /// In en, this message translates to:
   /// **'Carbs'**
@@ -1214,7 +1256,7 @@ abstract class AppLocalizations {
   /// **'kcal'**
   String get kcal;
 
-  /// Calories label
+  /// Calories nutrition label
   ///
   /// In en, this message translates to:
   /// **'Calories'**
@@ -1292,7 +1334,7 @@ abstract class AppLocalizations {
   /// **'No Exercises'**
   String get noExercises;
 
-  /// Sets unit
+  /// Sets label (plural)
   ///
   /// In en, this message translates to:
   /// **'sets'**
@@ -1328,6 +1370,12 @@ abstract class AppLocalizations {
   /// **'Video'**
   String get video;
 
+  /// Video label with number (e.g., Video 1, Video 2)
+  ///
+  /// In en, this message translates to:
+  /// **'Video {number}'**
+  String videoWithNumber(int number);
+
   /// Coach notes label
   ///
   /// In en, this message translates to:
@@ -1346,7 +1394,7 @@ abstract class AppLocalizations {
   /// **'Coming Soon'**
   String get comingSoon;
 
-  /// OK button label
+  /// OK button text
   ///
   /// In en, this message translates to:
   /// **'OK'**
@@ -1424,7 +1472,7 @@ abstract class AppLocalizations {
   /// **'Done'**
   String get done;
 
-  /// Save button label
+  /// Save button
   ///
   /// In en, this message translates to:
   /// **'Save'**
@@ -1520,13 +1568,13 @@ abstract class AppLocalizations {
   /// **'Edit Record'**
   String get editRecord;
 
-  /// Take picture button label
+  /// Take picture button
   ///
   /// In en, this message translates to:
   /// **'Take Picture'**
   String get takePicture;
 
-  /// Upload image button label
+  /// Upload image button
   ///
   /// In en, this message translates to:
   /// **'Upload Image'**
@@ -1658,10 +1706,10 @@ abstract class AppLocalizations {
   /// **'{count} foods recognized'**
   String recognizedFoods(int count);
 
-  /// Camera permission denied message
+  /// Camera permission denied error
   ///
   /// In en, this message translates to:
-  /// **'Camera permission denied. Please enable camera access in Settings.'**
+  /// **'Camera permission denied'**
   String get cameraPermissionDenied;
 
   /// Analysis failed title
@@ -1796,6 +1844,12 @@ abstract class AppLocalizations {
   /// **'Skip Photo'**
   String get skipPhoto;
 
+  /// Use photo button
+  ///
+  /// In en, this message translates to:
+  /// **'Use Photo'**
+  String get usePhoto;
+
   /// Enter weight placeholder
   ///
   /// In en, this message translates to:
@@ -1862,6 +1916,24 @@ abstract class AppLocalizations {
   /// **'Maximum 3 photos allowed'**
   String get maxPhotosReached;
 
+  /// Record exists dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Record Already Exists'**
+  String get recordExistsTitle;
+
+  /// Record exists dialog message
+  ///
+  /// In en, this message translates to:
+  /// **'You already have a record for {date}. Do you want to replace it?'**
+  String recordExistsMessage(String date);
+
+  /// Replace button text
+  ///
+  /// In en, this message translates to:
+  /// **'Replace'**
+  String get replace;
+
   /// History section label
   ///
   /// In en, this message translates to:
@@ -1886,7 +1958,7 @@ abstract class AppLocalizations {
   /// **'My Recordings'**
   String get myRecordings;
 
-  /// Record video button label
+  /// Record video button
   ///
   /// In en, this message translates to:
   /// **'Record Video'**
@@ -1910,10 +1982,10 @@ abstract class AppLocalizations {
   /// **'Completed'**
   String get completed;
 
-  /// Video duration exceeded error message
+  /// Video duration validation error
   ///
   /// In en, this message translates to:
-  /// **'Video must be ≤ 1 minute'**
+  /// **'Video duration exceeds 60 seconds'**
   String get videoDurationExceeded;
 
   /// Recording video status
@@ -1922,11 +1994,41 @@ abstract class AppLocalizations {
   /// **'Recording...'**
   String get recordingVideo;
 
-  /// Select from gallery action
+  /// Select video from gallery button
   ///
   /// In en, this message translates to:
-  /// **'Select from gallery'**
+  /// **'Select from Gallery'**
   String get selectFromGallery;
+
+  /// Video duration exceeds limit error title
+  ///
+  /// In en, this message translates to:
+  /// **'Video too long'**
+  String get videoTooLong;
+
+  /// Video duration exceeds limit error message
+  ///
+  /// In en, this message translates to:
+  /// **'Please select a video under 60 seconds'**
+  String get videoTooLongMessage;
+
+  /// Video processing failed error
+  ///
+  /// In en, this message translates to:
+  /// **'Video processing failed'**
+  String get videoProcessingFailed;
+
+  /// Video compression failed warning
+  ///
+  /// In en, this message translates to:
+  /// **'Video compression failed, uploading original file'**
+  String get videoCompressionFailed;
+
+  /// Photo library permission denied error
+  ///
+  /// In en, this message translates to:
+  /// **'Photo library permission denied'**
+  String get photoLibraryPermissionDenied;
 
   /// Start timer dialog title
   ///
@@ -2023,6 +2125,1458 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Coach\'s Plan'**
   String get coachPlan;
+
+  /// Placeholder text for feedback search bar
+  ///
+  /// In en, this message translates to:
+  /// **'Search feedback...'**
+  String get feedbackSearchPlaceholder;
+
+  /// Label for start date filter
+  ///
+  /// In en, this message translates to:
+  /// **'Start Date'**
+  String get feedbackStartDate;
+
+  /// Label for end date filter
+  ///
+  /// In en, this message translates to:
+  /// **'End Date'**
+  String get feedbackEndDate;
+
+  /// Label for today's feedback group
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get feedbackToday;
+
+  /// Label for yesterday's feedback group
+  ///
+  /// In en, this message translates to:
+  /// **'Yesterday'**
+  String get feedbackYesterday;
+
+  /// Message shown when there is no feedback
+  ///
+  /// In en, this message translates to:
+  /// **'No feedback yet'**
+  String get feedbackNoFeedback;
+
+  /// Description shown when there is no feedback
+  ///
+  /// In en, this message translates to:
+  /// **'Training feedback will appear here'**
+  String get feedbackNoFeedbackDesc;
+
+  /// Error message when feedback fails to load
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load feedback'**
+  String get feedbackLoadError;
+
+  /// Button text to retry loading feedback
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get feedbackRetry;
+
+  /// Training reviews page title
+  ///
+  /// In en, this message translates to:
+  /// **'Training Reviews'**
+  String get trainingReviews;
+
+  /// Search placeholder for student name
+  ///
+  /// In en, this message translates to:
+  /// **'Search by student name'**
+  String get searchStudentName;
+
+  /// Filter button for all records
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get filterAll;
+
+  /// Filter button for pending records
+  ///
+  /// In en, this message translates to:
+  /// **'Pending'**
+  String get filterPending;
+
+  /// Filter button for reviewed records
+  ///
+  /// In en, this message translates to:
+  /// **'Reviewed'**
+  String get filterReviewed;
+
+  /// Pending status badge label
+  ///
+  /// In en, this message translates to:
+  /// **'Pending'**
+  String get statusPending;
+
+  /// Reviewed status badge label
+  ///
+  /// In en, this message translates to:
+  /// **'Reviewed'**
+  String get statusReviewed;
+
+  /// Empty state title for training reviews
+  ///
+  /// In en, this message translates to:
+  /// **'No training reviews'**
+  String get noTrainingReviews;
+
+  /// Empty state description for training reviews
+  ///
+  /// In en, this message translates to:
+  /// **'Training records will appear here'**
+  String get noTrainingReviewsDesc;
+
+  /// Today's summary section title
+  ///
+  /// In en, this message translates to:
+  /// **'Today\'s Summary'**
+  String get todaySummary;
+
+  /// Nutrition details modal title
+  ///
+  /// In en, this message translates to:
+  /// **'Nutrition Details'**
+  String get nutritionDetails;
+
+  /// Exercise video section title
+  ///
+  /// In en, this message translates to:
+  /// **'Exercise Record Video'**
+  String get exerciseRecordVideo;
+
+  /// Keyframes section title
+  ///
+  /// In en, this message translates to:
+  /// **'Keyframes'**
+  String get keyframes;
+
+  /// Message shown while keyframes are being extracted
+  ///
+  /// In en, this message translates to:
+  /// **'Keyframes extracting...'**
+  String get keyframesProcessing;
+
+  /// Message when no keyframes exist
+  ///
+  /// In en, this message translates to:
+  /// **'No keyframes available'**
+  String get noKeyframes;
+
+  /// Action to view a keyframe in fullscreen
+  ///
+  /// In en, this message translates to:
+  /// **'View Keyframe'**
+  String get viewKeyframe;
+
+  /// Fats nutrition label
+  ///
+  /// In en, this message translates to:
+  /// **'Fats'**
+  String get fats;
+
+  /// Feedback input placeholder
+  ///
+  /// In en, this message translates to:
+  /// **'Add feedback for this set...'**
+  String get addFeedback;
+
+  /// Complete button label
+  ///
+  /// In en, this message translates to:
+  /// **'Complete'**
+  String get complete;
+
+  /// View all button text
+  ///
+  /// In en, this message translates to:
+  /// **'View All'**
+  String get viewAll;
+
+  /// Empty nutrition data message
+  ///
+  /// In en, this message translates to:
+  /// **'No nutrition data'**
+  String get noNutritionData;
+
+  /// Empty exercise records message
+  ///
+  /// In en, this message translates to:
+  /// **'No exercise records'**
+  String get noExerciseRecords;
+
+  /// Saving feedback loading message
+  ///
+  /// In en, this message translates to:
+  /// **'Saving feedback...'**
+  String get savingFeedback;
+
+  /// Feedback saved success message
+  ///
+  /// In en, this message translates to:
+  /// **'Feedback saved successfully'**
+  String get feedbackSaved;
+
+  /// Failed to save feedback error message
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to save feedback'**
+  String get failedToSave;
+
+  /// No data found error message
+  ///
+  /// In en, this message translates to:
+  /// **'No data found'**
+  String get noDataFound;
+
+  /// Details button text
+  ///
+  /// In en, this message translates to:
+  /// **'Details'**
+  String get details;
+
+  /// Training details dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Training Details'**
+  String get trainingDetails;
+
+  /// Video upload progress text
+  ///
+  /// In en, this message translates to:
+  /// **'Uploading...'**
+  String get videoUploading;
+
+  /// Video upload error message
+  ///
+  /// In en, this message translates to:
+  /// **'Upload failed'**
+  String get videoUploadFailed;
+
+  /// Retry upload button
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get retryUpload;
+
+  /// Processing indicator text
+  ///
+  /// In en, this message translates to:
+  /// **'Processing...'**
+  String get processing;
+
+  /// Video player page title
+  ///
+  /// In en, this message translates to:
+  /// **'Video Player'**
+  String get videoPlayer;
+
+  /// Video load failed error message
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load video'**
+  String get videoLoadFailed;
+
+  /// Exercise library section title
+  ///
+  /// In en, this message translates to:
+  /// **'Exercise Library'**
+  String get exerciseLibrary;
+
+  /// Placeholder for exercise search input
+  ///
+  /// In en, this message translates to:
+  /// **'Search Exercises'**
+  String get searchExercises;
+
+  /// Exercises count label
+  ///
+  /// In en, this message translates to:
+  /// **'exercises'**
+  String get exercises;
+
+  /// New exercise button
+  ///
+  /// In en, this message translates to:
+  /// **'New Exercise'**
+  String get newExercise;
+
+  /// Empty state message
+  ///
+  /// In en, this message translates to:
+  /// **'No exercises yet'**
+  String get noExercisesYet;
+
+  /// Empty state call to action
+  ///
+  /// In en, this message translates to:
+  /// **'Create your first exercise template'**
+  String get createFirstExercise;
+
+  /// Tags label
+  ///
+  /// In en, this message translates to:
+  /// **'Tags'**
+  String get tags;
+
+  /// Delete exercise dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Exercise'**
+  String get deleteExercise;
+
+  /// Delete exercise confirmation message
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete this exercise?'**
+  String get confirmDeleteExercise;
+
+  /// Add tag dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Add Tag'**
+  String get addTag;
+
+  /// Tag name input hint
+  ///
+  /// In en, this message translates to:
+  /// **'Enter tag name'**
+  String get tagNameHint;
+
+  /// Duplicate tag error message
+  ///
+  /// In en, this message translates to:
+  /// **'Tag already exists'**
+  String get tagAlreadyExists;
+
+  /// Button text to extract video keyframes
+  ///
+  /// In en, this message translates to:
+  /// **'Extract Keyframes'**
+  String get extractKeyframes;
+
+  /// Loading text during keyframe extraction
+  ///
+  /// In en, this message translates to:
+  /// **'Extracting keyframes...'**
+  String get extractingKeyframes;
+
+  /// Create exercise sheet title
+  ///
+  /// In en, this message translates to:
+  /// **'Create Exercise'**
+  String get createExercise;
+
+  /// Edit exercise sheet title
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Exercise'**
+  String get editExercise;
+
+  /// Exercise name label
+  ///
+  /// In en, this message translates to:
+  /// **'Exercise Name'**
+  String get exerciseName;
+
+  /// Exercise name input hint
+  ///
+  /// In en, this message translates to:
+  /// **'Enter exercise name'**
+  String get exerciseNameHint;
+
+  /// Select tags label
+  ///
+  /// In en, this message translates to:
+  /// **'Select Tags'**
+  String get selectTags;
+
+  /// Tag validation error
+  ///
+  /// In en, this message translates to:
+  /// **'Please select at least one tag'**
+  String get atLeastOneTag;
+
+  /// Label for guidance video section
+  ///
+  /// In en, this message translates to:
+  /// **'Guidance Video'**
+  String get guidanceVideo;
+
+  /// Delete video button
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Video'**
+  String get deleteVideo;
+
+  /// Label for text guidance section
+  ///
+  /// In en, this message translates to:
+  /// **'Text Guidance'**
+  String get textGuidance;
+
+  /// Text guidance input hint
+  ///
+  /// In en, this message translates to:
+  /// **'Enter detailed guidance'**
+  String get textGuidanceHint;
+
+  /// Auxiliary images section title
+  ///
+  /// In en, this message translates to:
+  /// **'Auxiliary Images'**
+  String get auxiliaryImages;
+
+  /// Delete image button
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Image'**
+  String get deleteImage;
+
+  /// Delete image confirmation message
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete this image?'**
+  String get deleteImageMessage;
+
+  /// Name validation error
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter exercise name'**
+  String get pleaseEnterName;
+
+  /// Create success message
+  ///
+  /// In en, this message translates to:
+  /// **'Exercise created successfully'**
+  String get createSuccess;
+
+  /// Update success message
+  ///
+  /// In en, this message translates to:
+  /// **'Exercise updated successfully'**
+  String get updateSuccess;
+
+  /// Waiting for upload message
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting for upload to complete...'**
+  String get waitingForUpload;
+
+  /// Optional field indicator
+  ///
+  /// In en, this message translates to:
+  /// **'Optional'**
+  String get optional;
+
+  /// End of list message
+  ///
+  /// In en, this message translates to:
+  /// **'No more exercises'**
+  String get noMoreData;
+
+  /// Loading more indicator
+  ///
+  /// In en, this message translates to:
+  /// **'Loading more...'**
+  String get loadingMore;
+
+  /// Error message when keyframe extraction fails
+  ///
+  /// In en, this message translates to:
+  /// **'Extraction failed'**
+  String get extractionFailed;
+
+  /// Button text to retry keyframe extraction
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get retryExtraction;
+
+  /// Placeholder text when no keyframes available
+  ///
+  /// In en, this message translates to:
+  /// **'No keyframes yet'**
+  String get noKeyframesYet;
+
+  /// Button text to extract current video frame manually
+  ///
+  /// In en, this message translates to:
+  /// **'Extract Frame'**
+  String get extractCurrentFrame;
+
+  /// Loading text while extracting frame
+  ///
+  /// In en, this message translates to:
+  /// **'Extracting...'**
+  String get extractingFrame;
+
+  /// Success message after frame extraction
+  ///
+  /// In en, this message translates to:
+  /// **'Frame extracted successfully'**
+  String get frameExtracted;
+
+  /// Student detail page title
+  ///
+  /// In en, this message translates to:
+  /// **'Student Details'**
+  String get studentDetailTitle;
+
+  /// Training records button text
+  ///
+  /// In en, this message translates to:
+  /// **'Training Records'**
+  String get trainingRecords;
+
+  /// Message button text
+  ///
+  /// In en, this message translates to:
+  /// **'Message'**
+  String get message;
+
+  /// Training sessions stat label
+  ///
+  /// In en, this message translates to:
+  /// **'Sessions'**
+  String get sessions;
+
+  /// Adherence stat label
+  ///
+  /// In en, this message translates to:
+  /// **'Adherence'**
+  String get adherence;
+
+  /// Training volume stat label
+  ///
+  /// In en, this message translates to:
+  /// **'Volume'**
+  String get volume;
+
+  /// AI progress summary dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'AI Progress Summary'**
+  String get aiProgressSummary;
+
+  /// Training volume highlight label
+  ///
+  /// In en, this message translates to:
+  /// **'Training Volume'**
+  String get trainingVolume;
+
+  /// Weight change highlight label
+  ///
+  /// In en, this message translates to:
+  /// **'Weight Change'**
+  String get weightLoss;
+
+  /// Average strength highlight label
+  ///
+  /// In en, this message translates to:
+  /// **'Avg Strength'**
+  String get avgStrength;
+
+  /// Starting weight stat
+  ///
+  /// In en, this message translates to:
+  /// **'Starting'**
+  String get starting;
+
+  /// Current weight stat
+  ///
+  /// In en, this message translates to:
+  /// **'Current'**
+  String get current;
+
+  /// Weight change stat
+  ///
+  /// In en, this message translates to:
+  /// **'Change'**
+  String get change;
+
+  /// Target weight stat
+  ///
+  /// In en, this message translates to:
+  /// **'Target'**
+  String get target;
+
+  /// Training history section title
+  ///
+  /// In en, this message translates to:
+  /// **'Training History'**
+  String get trainingHistory;
+
+  /// Pending review status
+  ///
+  /// In en, this message translates to:
+  /// **'Pending'**
+  String get pending;
+
+  /// Reviewed status
+  ///
+  /// In en, this message translates to:
+  /// **'Reviewed'**
+  String get reviewed;
+
+  /// Videos count label
+  ///
+  /// In en, this message translates to:
+  /// **'videos'**
+  String get videos;
+
+  /// Years age label
+  ///
+  /// In en, this message translates to:
+  /// **'years'**
+  String get years;
+
+  /// Feedback input placeholder
+  ///
+  /// In en, this message translates to:
+  /// **'Add feedback...'**
+  String get feedbackInputPlaceholder;
+
+  /// Voice record button hint
+  ///
+  /// In en, this message translates to:
+  /// **'Hold to Record'**
+  String get holdToRecord;
+
+  /// Release to send voice message
+  ///
+  /// In en, this message translates to:
+  /// **'Release to Send'**
+  String get releaseToSend;
+
+  /// Slide up to cancel voice recording
+  ///
+  /// In en, this message translates to:
+  /// **'Slide up to cancel'**
+  String get slideUpToCancel;
+
+  /// Recording voice indicator
+  ///
+  /// In en, this message translates to:
+  /// **'Recording...'**
+  String get recordingVoice;
+
+  /// Voice recording too short error
+  ///
+  /// In en, this message translates to:
+  /// **'Recording too short'**
+  String get voiceTooShort;
+
+  /// Send image button
+  ///
+  /// In en, this message translates to:
+  /// **'Send Image'**
+  String get sendImage;
+
+  /// Feedback history section title
+  ///
+  /// In en, this message translates to:
+  /// **'Feedback History'**
+  String get feedbackHistory;
+
+  /// Empty state text for no feedback
+  ///
+  /// In en, this message translates to:
+  /// **'No feedback yet'**
+  String get noFeedbackYet;
+
+  /// Text feedback type
+  ///
+  /// In en, this message translates to:
+  /// **'Text'**
+  String get textFeedback;
+
+  /// Voice feedback type
+  ///
+  /// In en, this message translates to:
+  /// **'Voice'**
+  String get voiceFeedback;
+
+  /// Image feedback type
+  ///
+  /// In en, this message translates to:
+  /// **'Image'**
+  String get imageFeedback;
+
+  /// Permission denied error
+  ///
+  /// In en, this message translates to:
+  /// **'Permission denied'**
+  String get permissionDenied;
+
+  /// Microphone permission required message
+  ///
+  /// In en, this message translates to:
+  /// **'Microphone permission required'**
+  String get microphonePermission;
+
+  /// Failed to start recording error
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to start recording'**
+  String get failedToStartRecording;
+
+  /// Failed to stop recording error
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to stop recording'**
+  String get failedToStopRecording;
+
+  /// Failed to send feedback error
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to send feedback'**
+  String get failedToSendFeedback;
+
+  /// Failed to send voice error
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to send voice'**
+  String get failedToSendVoice;
+
+  /// Failed to pick image error
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to pick image'**
+  String get failedToPickImage;
+
+  /// Time format: just now
+  ///
+  /// In en, this message translates to:
+  /// **'Just now'**
+  String get justNow;
+
+  /// Edit image button
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Image'**
+  String get editImage;
+
+  /// Save edited image button
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get saveEditedImage;
+
+  /// Cancel editing button
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancelEdit;
+
+  /// Image editing page title
+  ///
+  /// In en, this message translates to:
+  /// **'Image Editing'**
+  String get imageEditing;
+
+  /// Uploading edited image message
+  ///
+  /// In en, this message translates to:
+  /// **'Uploading edited image...'**
+  String get uploadingEditedImage;
+
+  /// Failed to edit image error
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to edit image'**
+  String get editImageFailed;
+
+  /// Current exercise plan label
+  ///
+  /// In en, this message translates to:
+  /// **'Current Exercise Plan'**
+  String get currentExercisePlan;
+
+  /// Current diet plan label
+  ///
+  /// In en, this message translates to:
+  /// **'Current Diet Plan'**
+  String get currentDietPlan;
+
+  /// Current supplement plan label
+  ///
+  /// In en, this message translates to:
+  /// **'Current Supplement Plan'**
+  String get currentSupplementPlan;
+
+  /// No plan assigned label
+  ///
+  /// In en, this message translates to:
+  /// **'No Plan'**
+  String get noPlan;
+
+  /// Loading message on splash screen
+  ///
+  /// In en, this message translates to:
+  /// **'Loading...'**
+  String get splashLoading;
+
+  /// Error message when loading user data fails on splash screen
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load user data'**
+  String get splashLoadError;
+
+  /// Upcoming schedule section title on coach home page
+  ///
+  /// In en, this message translates to:
+  /// **'Upcoming Schedule'**
+  String get upcomingScheduleTitle;
+
+  /// Pending reviews section title on coach home page
+  ///
+  /// In en, this message translates to:
+  /// **'Pending Reviews'**
+  String get pendingReviewsTitle;
+
+  /// View more button text
+  ///
+  /// In en, this message translates to:
+  /// **'View More'**
+  String get viewMore;
+
+  /// Record training text for summary stats
+  ///
+  /// In en, this message translates to:
+  /// **'record training'**
+  String get recordTraining;
+
+  /// Records to review label for summary stats
+  ///
+  /// In en, this message translates to:
+  /// **'Records to Review'**
+  String get recordsToReview;
+
+  /// Unread messages label for summary stats
+  ///
+  /// In en, this message translates to:
+  /// **'Unread Messages'**
+  String get unreadMessagesLabel;
+
+  /// No pending reviews message
+  ///
+  /// In en, this message translates to:
+  /// **'No pending reviews'**
+  String get noPendingReviews;
+
+  /// No pending reviews description
+  ///
+  /// In en, this message translates to:
+  /// **'All training records have been reviewed'**
+  String get noPendingReviewsDesc;
+
+  /// Generate AI summary button text
+  ///
+  /// In en, this message translates to:
+  /// **'Generate AI Summary'**
+  String get generateAISummary;
+
+  /// Generating AI summary loading text
+  ///
+  /// In en, this message translates to:
+  /// **'Generating...'**
+  String get generatingAISummary;
+
+  /// AI summary generation failed title
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to Generate'**
+  String get aiSummaryFailed;
+
+  /// AI summary generation failed message
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to generate AI summary. Please try again later.'**
+  String get aiSummaryFailedMessage;
+
+  /// Provide feedback button text
+  ///
+  /// In en, this message translates to:
+  /// **'Provide Feedback'**
+  String get provideFeedback;
+
+  /// Hide input bar button text
+  ///
+  /// In en, this message translates to:
+  /// **'Hide Input'**
+  String get hideInput;
+
+  /// Exercise feedback history section title
+  ///
+  /// In en, this message translates to:
+  /// **'{exerciseName} - Feedback History'**
+  String exerciseFeedbackHistory(String exerciseName);
+
+  /// Load more button text
+  ///
+  /// In en, this message translates to:
+  /// **'Load More'**
+  String get loadMore;
+
+  /// Image preview page title
+  ///
+  /// In en, this message translates to:
+  /// **'Preview Photo'**
+  String get previewPhoto;
+
+  /// AI analysis button text
+  ///
+  /// In en, this message translates to:
+  /// **'AI Analysis'**
+  String get aiAnalysis;
+
+  /// Manual record button text
+  ///
+  /// In en, this message translates to:
+  /// **'Manual Record'**
+  String get manualRecord;
+
+  /// Uploading state text
+  ///
+  /// In en, this message translates to:
+  /// **'Uploading...'**
+  String get uploading;
+
+  /// Image uploading progress text
+  ///
+  /// In en, this message translates to:
+  /// **'Uploading image...'**
+  String get uploadingImage;
+
+  /// Add feedback button text in read-only section
+  ///
+  /// In en, this message translates to:
+  /// **'Add Feedback'**
+  String get addFeedbackButton;
+
+  /// Recent feedbacks section title
+  ///
+  /// In en, this message translates to:
+  /// **'Recent Feedbacks'**
+  String get recentFeedbacks;
+
+  /// Carbohydrates nutrition label
+  ///
+  /// In en, this message translates to:
+  /// **'Carbohydrates'**
+  String get carbohydrates;
+
+  /// Saving image progress text
+  ///
+  /// In en, this message translates to:
+  /// **'Saving image...'**
+  String get savingImage;
+
+  /// Deleting old image progress text
+  ///
+  /// In en, this message translates to:
+  /// **'Cleaning up old image...'**
+  String get deletingOldImage;
+
+  /// Keyframe update success message
+  ///
+  /// In en, this message translates to:
+  /// **'Keyframe updated successfully'**
+  String get keyframeUpdated;
+
+  /// Switch between front and back camera
+  ///
+  /// In en, this message translates to:
+  /// **'Switch Camera'**
+  String get switchCamera;
+
+  /// Note about keyframe edits being visible to students
+  ///
+  /// In en, this message translates to:
+  /// **'Students can see all edits to keyframes'**
+  String get keyframeEditNote;
+
+  /// Title for keyframe edit note dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Note'**
+  String get keyframeEditNoteTitle;
+
+  /// Title for meal details bottom sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Meal Details'**
+  String get mealDetails;
+
+  /// Button text to save changes
+  ///
+  /// In en, this message translates to:
+  /// **'Save Changes'**
+  String get saveChanges;
+
+  /// Button text to add food item
+  ///
+  /// In en, this message translates to:
+  /// **'Add Food'**
+  String get addFood;
+
+  /// Button text to edit food item
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Food'**
+  String get editFood;
+
+  /// Button text to delete food item
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Food'**
+  String get deleteFood;
+
+  /// Label for food name input
+  ///
+  /// In en, this message translates to:
+  /// **'Food Name'**
+  String get foodName;
+
+  /// Label for amount input
+  ///
+  /// In en, this message translates to:
+  /// **'Amount'**
+  String get amount;
+
+  /// Label for yesterday
+  ///
+  /// In en, this message translates to:
+  /// **'yesterday'**
+  String get yesterday;
+
+  /// Label for days ago
+  ///
+  /// In en, this message translates to:
+  /// **'{days} days ago'**
+  String daysAgo(int days);
+
+  /// Food list section title
+  ///
+  /// In en, this message translates to:
+  /// **'Food List'**
+  String get foodList;
+
+  /// Empty state for photos
+  ///
+  /// In en, this message translates to:
+  /// **'No photos'**
+  String get noPhotos;
+
+  /// Empty state for food list
+  ///
+  /// In en, this message translates to:
+  /// **'No food items'**
+  String get noFood;
+
+  /// Nutrition summary label for custom food item
+  ///
+  /// In en, this message translates to:
+  /// **'Nutrition Summary'**
+  String get nutritionSummary;
+
+  /// Placeholder for note input field
+  ///
+  /// In en, this message translates to:
+  /// **'Add note...'**
+  String get addNotePlaceholder;
+
+  /// Error dialog title when trying to delete a template in use
+  ///
+  /// In en, this message translates to:
+  /// **'Cannot Delete Template'**
+  String get cannotDeleteTemplate;
+
+  /// Error message when trying to delete a template in use
+  ///
+  /// In en, this message translates to:
+  /// **'This template is being used by {count} training plan(s). Please remove it from those plans first.'**
+  String templateInUse(int count);
+
+  /// Title for exercise guidance sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Exercise Guidance'**
+  String get exerciseGuidance;
+
+  /// Button text to view exercise guidance
+  ///
+  /// In en, this message translates to:
+  /// **'View Guidance'**
+  String get viewGuidance;
+
+  /// Message when no guidance content is available
+  ///
+  /// In en, this message translates to:
+  /// **'No guidance available for this exercise'**
+  String get noGuidanceAvailable;
+
+  /// Label for reference images section
+  ///
+  /// In en, this message translates to:
+  /// **'Reference Images'**
+  String get referenceImages;
+
+  /// Placeholder for exercise name input
+  ///
+  /// In en, this message translates to:
+  /// **'Exercise Name'**
+  String get exerciseNamePlaceholder;
+
+  /// Button text to extract keyframe from video
+  ///
+  /// In en, this message translates to:
+  /// **'Extract\nKeyframe'**
+  String get extractKeyframe;
+
+  /// Empty state title when there are no training records
+  ///
+  /// In en, this message translates to:
+  /// **'No Training Records'**
+  String get noTrainingRecords;
+
+  /// Training information section title
+  ///
+  /// In en, this message translates to:
+  /// **'Training Info'**
+  String get trainingInfo;
+
+  /// Training date label
+  ///
+  /// In en, this message translates to:
+  /// **'Training Date'**
+  String get trainingDate;
+
+  /// Total exercises count label
+  ///
+  /// In en, this message translates to:
+  /// **'Total Exercises'**
+  String get totalExercises;
+
+  /// Exercise details section title
+  ///
+  /// In en, this message translates to:
+  /// **'Exercise Details'**
+  String get exerciseDetails;
+
+  /// Video number label
+  ///
+  /// In en, this message translates to:
+  /// **'Video {number}'**
+  String videoNumber(int number);
+
+  /// Video duration label
+  ///
+  /// In en, this message translates to:
+  /// **'Duration'**
+  String get videoDuration;
+
+  /// Review status label
+  ///
+  /// In en, this message translates to:
+  /// **'Review Status'**
+  String get reviewStatus;
+
+  /// Not reviewed status label
+  ///
+  /// In en, this message translates to:
+  /// **'Not Reviewed'**
+  String get notReviewed;
+
+  /// Completed sets label
+  ///
+  /// In en, this message translates to:
+  /// **'Completed Sets'**
+  String get completedSets;
+
+  /// Average weight label
+  ///
+  /// In en, this message translates to:
+  /// **'Average Weight'**
+  String get averageWeight;
+
+  /// Total reps label
+  ///
+  /// In en, this message translates to:
+  /// **'Total Reps'**
+  String get totalReps;
+
+  /// Set details label
+  ///
+  /// In en, this message translates to:
+  /// **'Set Details'**
+  String get setDetails;
+
+  /// Daily training feedback section title
+  ///
+  /// In en, this message translates to:
+  /// **'Daily Training Feedback'**
+  String get dailyTrainingFeedback;
+
+  /// Empty state message for daily training feedback
+  ///
+  /// In en, this message translates to:
+  /// **'No feedback for this training yet'**
+  String get noDailyTrainingFeedbackYet;
+
+  /// Title for exercise list section
+  ///
+  /// In en, this message translates to:
+  /// **'Exercise List'**
+  String get exerciseList;
+
+  /// Button text to add an exercise
+  ///
+  /// In en, this message translates to:
+  /// **'Add'**
+  String get addExercise;
+
+  /// Option to create a new exercise template
+  ///
+  /// In en, this message translates to:
+  /// **'Create new \"{name}\"'**
+  String createNewExercise(String name);
+
+  /// Button to add guidance to exercise
+  ///
+  /// In en, this message translates to:
+  /// **'Add Guidance'**
+  String get addGuidance;
+
+  /// Training sets section title
+  ///
+  /// In en, this message translates to:
+  /// **'Sets'**
+  String get trainingSets;
+
+  /// Button to add a training set
+  ///
+  /// In en, this message translates to:
+  /// **'Add Set'**
+  String get addSet;
+
+  /// Message when exercise has no template
+  ///
+  /// In en, this message translates to:
+  /// **'No Template Linked'**
+  String get noTemplateLinked;
+
+  /// Fallback exercise name when template not found
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown Exercise'**
+  String get unknownExercise;
+
+  /// Title for create plan page
+  ///
+  /// In en, this message translates to:
+  /// **'Create Training Plan'**
+  String get createPlanTitle;
+
+  /// Subtitle for creation method selection
+  ///
+  /// In en, this message translates to:
+  /// **'Choose how to start:'**
+  String get chooseCreationMethod;
+
+  /// AI guided creation button title
+  ///
+  /// In en, this message translates to:
+  /// **'AI Guided Creation'**
+  String get aiGuidedCreate;
+
+  /// AI guided creation button description
+  ///
+  /// In en, this message translates to:
+  /// **'Let AI help you quickly generate a plan'**
+  String get aiGuidedDesc;
+
+  /// Text import button title
+  ///
+  /// In en, this message translates to:
+  /// **'Scan or Paste Text'**
+  String get scanOrPasteText;
+
+  /// Text import button description
+  ///
+  /// In en, this message translates to:
+  /// **'Import from existing plan'**
+  String get scanOrPasteDesc;
+
+  /// Manual create link text
+  ///
+  /// In en, this message translates to:
+  /// **'or... Manual Create'**
+  String get orManualCreate;
+
+  /// Text import view title
+  ///
+  /// In en, this message translates to:
+  /// **'Import from Text'**
+  String get textImportTitle;
+
+  /// Text import view subtitle
+  ///
+  /// In en, this message translates to:
+  /// **'Scan an image or paste text to import a training plan'**
+  String get textImportSubtitle;
+
+  /// Scan image tab label
+  ///
+  /// In en, this message translates to:
+  /// **'Scan Image'**
+  String get scanImage;
+
+  /// Paste text tab label
+  ///
+  /// In en, this message translates to:
+  /// **'Paste Text'**
+  String get pasteText;
+
+  /// Button to select image for OCR
+  ///
+  /// In en, this message translates to:
+  /// **'Select Image to Scan'**
+  String get selectImageToScan;
+
+  /// Button to select another image
+  ///
+  /// In en, this message translates to:
+  /// **'Select Another Image'**
+  String get selectAnotherImage;
+
+  /// Label for text input area
+  ///
+  /// In en, this message translates to:
+  /// **'Extracted or Pasted Text'**
+  String get extractedOrPastedText;
+
+  /// Placeholder for text input
+  ///
+  /// In en, this message translates to:
+  /// **'Paste or type training plan text here...'**
+  String get pasteOrTypeHere;
+
+  /// Example format section title
+  ///
+  /// In en, this message translates to:
+  /// **'Example Format'**
+  String get exampleFormat;
+
+  /// Example format content
+  ///
+  /// In en, this message translates to:
+  /// **'Day 1: Chest\nBench Press 3x10\nIncline Press 3x12\n\nDay 2: Back\nPull-ups 4x8\nRows 3x10'**
+  String get exampleFormatContent;
+
+  /// OCR extraction loading message
+  ///
+  /// In en, this message translates to:
+  /// **'Extracting text...'**
+  String get extractingText;
+
+  /// AI parsing loading message
+  ///
+  /// In en, this message translates to:
+  /// **'Parsing plan...'**
+  String get parsingPlan;
+
+  /// Button to start parsing text
+  ///
+  /// In en, this message translates to:
+  /// **'Start Parsing'**
+  String get startParsing;
+
+  /// OCR extraction success message
+  ///
+  /// In en, this message translates to:
+  /// **'Text extracted successfully! Please review and edit if needed.'**
+  String get extractionSuccess;
+
+  /// Add day button label
+  ///
+  /// In en, this message translates to:
+  /// **'Add Day'**
+  String get addDay;
+
+  /// Empty state message when no day selected
+  ///
+  /// In en, this message translates to:
+  /// **'Select a day or add a new one'**
+  String get selectDayOrAddNew;
+
+  /// Save plan button label
+  ///
+  /// In en, this message translates to:
+  /// **'Save Plan'**
+  String get savePlan;
+
+  /// AI generation loading message
+  ///
+  /// In en, this message translates to:
+  /// **'AI is generating training plan...'**
+  String get aiGeneratingPlan;
+
+  /// Current day being generated
+  ///
+  /// In en, this message translates to:
+  /// **'Generating Day {day}'**
+  String generatingDay(int day);
+
+  /// Number of exercises added
+  ///
+  /// In en, this message translates to:
+  /// **'{count} exercises added'**
+  String addedExercises(int count);
+
+  /// Number of days completed
+  ///
+  /// In en, this message translates to:
+  /// **'{count} days completed'**
+  String completedDays(int count);
+
+  /// Empty state message for sets
+  ///
+  /// In en, this message translates to:
+  /// **'No sets yet. Click \"Add Set\" button.'**
+  String get noSetsYet;
+
+  /// Edit plan page title
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Plan'**
+  String get editPlan;
+
+  /// Import success dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Import Successful'**
+  String get importSuccess;
+
+  /// Number of import warnings
+  ///
+  /// In en, this message translates to:
+  /// **'{count} warnings found'**
+  String importWarnings(int count);
+
+  /// Import success message
+  ///
+  /// In en, this message translates to:
+  /// **'Please review and adjust the plan as needed.'**
+  String get pleaseReview;
 }
 
 class _AppLocalizationsDelegate

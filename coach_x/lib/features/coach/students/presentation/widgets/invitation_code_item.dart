@@ -19,7 +19,7 @@ class InvitationCodeItem extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppDimensions.radiusL),
         border: Border.all(
           color: code.isExpired
-              ? AppColors.errorRed.withOpacity(0.3)
+              ? AppColors.errorRed.withValues(alpha: 0.3)
               : AppColors.dividerLight,
         ),
       ),

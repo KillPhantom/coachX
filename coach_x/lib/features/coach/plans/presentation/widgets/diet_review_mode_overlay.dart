@@ -146,7 +146,7 @@ class DietReviewModeOverlay extends ConsumerWidget {
               // 查看全部按钮
               CupertinoButton(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                minSize: 0,
+                minimumSize: Size.zero,
                 onPressed: () => ref
                     .read(dietSuggestionReviewNotifierProvider.notifier)
                     .toggleShowAllChanges(),
@@ -162,7 +162,7 @@ class DietReviewModeOverlay extends ConsumerWidget {
               // 退出按钮
               CupertinoButton(
                 padding: EdgeInsets.zero,
-                minSize: 0,
+                minimumSize: Size.zero,
                 onPressed: () => _cancelReview(context, ref),
                 child: Container(
                   width: 28,
@@ -349,7 +349,7 @@ class DietReviewModeOverlay extends ConsumerWidget {
               const Spacer(),
               CupertinoButton(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                minSize: 0,
+                minimumSize: Size.zero,
                 onPressed: () => ref
                     .read(dietSuggestionReviewNotifierProvider.notifier)
                     .toggleShowAllChanges(),
@@ -363,7 +363,7 @@ class DietReviewModeOverlay extends ConsumerWidget {
               ),
               CupertinoButton(
                 padding: EdgeInsets.zero,
-                minSize: 0,
+                minimumSize: Size.zero,
                 onPressed: () => _cancelReview(context, ref),
                 child: Container(
                   width: 28,

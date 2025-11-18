@@ -13,10 +13,7 @@ import '../providers/ai_food_scanner_providers.dart';
 class MealProgressInputCard extends ConsumerWidget {
   final Meal planMeal; // 计划中的meal（包含目标值）
 
-  const MealProgressInputCard({
-    super.key,
-    required this.planMeal,
-  });
+  const MealProgressInputCard({super.key, required this.planMeal});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -66,7 +63,7 @@ class MealProgressInputCard extends ConsumerWidget {
           _buildNutritionRow(
             context,
             ref,
-            icon: '🔥',
+            icon: l10n.calories,
             label: l10n.caloriesInput,
             planValue: planMeal.macros.calories,
             currentValue: state.currentCalories,
@@ -83,7 +80,7 @@ class MealProgressInputCard extends ConsumerWidget {
           _buildNutritionRow(
             context,
             ref,
-            icon: '💪',
+            icon: l10n.protein,
             label: l10n.proteinInput,
             planValue: planMeal.macros.protein,
             currentValue: state.currentProtein,
@@ -100,7 +97,7 @@ class MealProgressInputCard extends ConsumerWidget {
           _buildNutritionRow(
             context,
             ref,
-            icon: '🍚',
+            icon: l10n.carbohydrates,
             label: l10n.carbsInput,
             planValue: planMeal.macros.carbs,
             currentValue: state.currentCarbs,
@@ -117,7 +114,7 @@ class MealProgressInputCard extends ConsumerWidget {
           _buildNutritionRow(
             context,
             ref,
-            icon: '🥑',
+            icon: l10n.fat,
             label: l10n.fatInput,
             planValue: planMeal.macros.fat,
             currentValue: state.currentFat,
@@ -133,7 +130,8 @@ class MealProgressInputCard extends ConsumerWidget {
           ),
 
           // AI检测食物备注（如果有）
-          if (state.aiDetectedFoods != null && state.aiDetectedFoods!.isNotEmpty)
+          if (state.aiDetectedFoods != null &&
+              state.aiDetectedFoods!.isNotEmpty)
             _buildAIFoodNotes(context, l10n, state.aiDetectedFoods!),
         ],
       ),
@@ -167,7 +165,12 @@ class MealProgressInputCard extends ConsumerWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(icon, style: AppTextStyles.body),
+                    Text(
+                      icon,
+                      style: AppTextStyles.caption1.copyWith(
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
                     const SizedBox(width: 8),
                     Text(
                       '${planValue.toStringAsFixed(0)} ${_getUnit(label)}',

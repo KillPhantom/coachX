@@ -1,3 +1,4 @@
+import 'package:coach_x/core/utils/logger.dart';
 import 'dart:io';
 import 'package:video_thumbnail/video_thumbnail.dart';
 import 'package:video_player/video_player.dart';
@@ -15,19 +16,27 @@ class VideoUtils {
   /// 返回缩略图文件，如果失败返回 null
   static Future<File?> generateThumbnail(String videoPath) async {
     try {
+      AppLogger.debug('🖼️ [VideoUtils] 开始生成缩略图: $videoPath');
+      final tempDir = await getTemporaryDirectory();
+      AppLogger.debug('🖼️ [VideoUtils] 临时目录: ${tempDir.path}');
+
       final thumbnailPath = await VideoThumbnail.thumbnailFile(
         video: videoPath,
-        thumbnailPath: (await getTemporaryDirectory()).path,
+        thumbnailPath: tempDir.path,
         imageFormat: ImageFormat.JPEG,
         maxWidth: 300,
         quality: 75,
       );
 
       if (thumbnailPath != null) {
+        AppLogger.debug('✅ [VideoUtils] 缩略图生成成功: $thumbnailPath');
         return File(thumbnailPath);
+      } else {
+        AppLogger.debug('⚠️ [VideoUtils] 缩略图生成返回null');
       }
-    } catch (e) {
-      print('生成视频缩略图失败: $e');
+    } catch (e, stackTrace) {
+      AppLogger.debug('❌ [VideoUtils] 生成视频缩略图失败: $e');
+      AppLogger.debug('Stack trace: $stackTrace');
     }
     return null;
   }
@@ -39,18 +48,24 @@ class VideoUtils {
   static Future<Duration> getVideoDuration(String videoPath) async {
     VideoPlayerController? controller;
     try {
+      AppLogger.debug('⏱️ [VideoUtils] 开始获取视频时长: $videoPath');
       // 根据路径类型创建不同的 controller
       if (videoPath.startsWith('http://') || videoPath.startsWith('https://')) {
+        AppLogger.debug('⏱️ [VideoUtils] 使用网络视频控制器');
         controller = VideoPlayerController.networkUrl(Uri.parse(videoPath));
       } else {
+        AppLogger.debug('⏱️ [VideoUtils] 使用本地文件控制器');
         controller = VideoPlayerController.file(File(videoPath));
       }
 
+      AppLogger.debug('⏱️ [VideoUtils] 初始化视频控制器...');
       await controller.initialize();
       final duration = controller.value.duration;
+      AppLogger.debug('✅ [VideoUtils] 视频时长: ${duration.inSeconds}秒');
       return duration;
-    } catch (e) {
-      print('获取视频时长失败: $e');
+    } catch (e, stackTrace) {
+      AppLogger.debug('❌ [VideoUtils] 获取视频时长失败: $e');
+      AppLogger.debug('Stack trace: $stackTrace');
       return Duration.zero;
     } finally {
       controller?.dispose();
@@ -80,9 +95,20 @@ class VideoUtils {
   /// [videoFile] 视频文件
   /// [maxSeconds] 最大允许秒数（默认60秒）
   /// 返回是否有效
-  static Future<bool> validateVideoFile(File videoFile, {int maxSeconds = 60}) async {
+  static Future<bool> validateVideoFile(
+    File videoFile, {
+    int maxSeconds = 60,
+  }) async {
+    AppLogger.debug('🔍 [VideoUtils] 验证视频文件: ${videoFile.path}');
+    AppLogger.debug('🔍 [VideoUtils] 最大允许时长: $maxSeconds秒');
+
     final duration = await getVideoDuration(videoFile.path);
-    return isVideoDurationValid(duration, maxSeconds);
+    final isValid = isVideoDurationValid(duration, maxSeconds);
+
+    AppLogger.debug(
+      '🔍 [VideoUtils] 验证结果: ${isValid ? "✅ 通过" : "❌ 超时"} (实际时长: ${duration.inSeconds}秒)',
+    );
+    return isValid;
   }
 
   /// 获取视频文件大小（MB）
@@ -94,7 +120,7 @@ class VideoUtils {
         return bytes / (1024 * 1024); // 转换为 MB
       }
     } catch (e) {
-      print('获取视频大小失败: $e');
+      AppLogger.debug('获取视频大小失败: $e');
     }
     return 0.0;
   }

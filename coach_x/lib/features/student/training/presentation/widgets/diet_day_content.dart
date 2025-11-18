@@ -30,7 +30,11 @@ class DietDayContent extends StatelessWidget {
   }
 
   /// 构建单餐卡片
-  Widget _buildMealCard(BuildContext context, Meal meal, AppLocalizations l10n) {
+  Widget _buildMealCard(
+    BuildContext context,
+    Meal meal,
+    AppLocalizations l10n,
+  ) {
     final macros = meal.macros;
 
     return Container(
@@ -73,7 +77,8 @@ class DietDayContent extends StatelessWidget {
           const SizedBox(height: AppDimensions.spacingS),
 
           // 食物列表
-          ...meal.items.map((item) => Padding(
+          ...meal.items.map(
+            (item) => Padding(
               padding: const EdgeInsets.only(bottom: 6),
               child: Row(
                 children: [
@@ -97,10 +102,7 @@ class DietDayContent extends StatelessWidget {
           ),
 
           const SizedBox(height: AppDimensions.spacingS),
-          Container(
-            height: 1,
-            color: AppColors.dividerLight,
-          ),
+          Container(height: 1, color: AppColors.dividerLight),
           const SizedBox(height: AppDimensions.spacingS),
 
           // 营养数据行
@@ -197,17 +199,12 @@ class DietDayContent extends StatelessWidget {
         Container(
           width: 8,
           height: 8,
-          decoration: BoxDecoration(
-            color: color,
-            shape: BoxShape.circle,
-          ),
+          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
         ),
         const SizedBox(height: 4),
         Text(
           label,
-          style: AppTextStyles.caption1.copyWith(
-            color: AppColors.primaryText,
-          ),
+          style: AppTextStyles.caption1.copyWith(color: AppColors.primaryText),
         ),
         const SizedBox(height: 2),
         Text(

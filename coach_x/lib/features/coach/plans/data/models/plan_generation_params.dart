@@ -4,6 +4,7 @@ import 'package:coach_x/core/enums/training_style.dart';
 import 'package:coach_x/core/enums/equipment.dart';
 import 'package:coach_x/core/enums/training_level.dart';
 import 'package:coach_x/core/enums/workload_level.dart';
+import 'package:coach_x/features/coach/exercise_library/data/models/exercise_template_model.dart';
 
 /// 训练计划生成参数
 ///
@@ -51,6 +52,11 @@ class PlanGenerationParams {
   /// 语言设置
   final String language;
 
+  /// 教练的动作库列表（可选）
+  ///
+  /// 如果提供，AI 将从这些动作中选择，而不是自由创建动作名称
+  final List<ExerciseTemplateModel>? exerciseTemplates;
+
   const PlanGenerationParams({
     required this.goal,
     required this.muscleGroups,
@@ -66,6 +72,7 @@ class PlanGenerationParams {
     required this.equipment,
     this.notes,
     this.language = '中文',
+    this.exerciseTemplates,
   });
 
   /// 创建默认参数
@@ -104,6 +111,7 @@ class PlanGenerationParams {
     List<Equipment>? equipment,
     String? notes,
     String? language,
+    List<ExerciseTemplateModel>? exerciseTemplates,
   }) {
     return PlanGenerationParams(
       goal: goal ?? this.goal,
@@ -120,6 +128,7 @@ class PlanGenerationParams {
       equipment: equipment ?? this.equipment,
       notes: notes ?? this.notes,
       language: language ?? this.language,
+      exerciseTemplates: exerciseTemplates ?? this.exerciseTemplates,
     );
   }
 
@@ -140,6 +149,12 @@ class PlanGenerationParams {
       'equipment': equipment.map((e) => e.toJsonString()).toList(),
       if (notes != null) 'notes': notes,
       'language': language,
+      // 动作库列表（仅传递 name 和 tags）
+      if (exerciseTemplates != null && exerciseTemplates!.isNotEmpty)
+        'exercise_templates': exerciseTemplates!.map((template) => {
+          'name': template.name,
+          'tags': template.tags,
+        }).toList(),
     };
   }
 

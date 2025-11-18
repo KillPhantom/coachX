@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:coach_x/core/utils/json_utils.dart';
 import 'plan_base_model.dart';
 import 'exercise_training_day.dart';
@@ -41,6 +42,13 @@ class ExercisePlanModel extends PlanBaseModel {
       updatedAt: safeIntCast(json['updatedAt'], 0, 'updatedAt') ?? 0,
       days: days,
     );
+  }
+
+  /// 从 Firestore 文档创建
+  factory ExercisePlanModel.fromFirestore(DocumentSnapshot doc) {
+    final data = doc.data() as Map<String, dynamic>;
+    data['id'] = doc.id;
+    return ExercisePlanModel.fromJson(data);
   }
 
   @override

@@ -10,11 +10,13 @@ import 'dart:math' as math;
 /// 显示环形进度条（总卡路里）和3个宏营养素进度条
 class TotalNutritionCard extends StatelessWidget {
   final Macros macros;
+  final Macros? actualMacros;
   final Map<String, double> progress;
 
   const TotalNutritionCard({
     super.key,
     required this.macros,
+    this.actualMacros,
     required this.progress,
   });
 
@@ -61,7 +63,8 @@ class TotalNutritionCard extends StatelessWidget {
                 // Protein
                 MacroProgressBar(
                   label: l10n.protein,
-                  value: macros.protein.toInt(),
+                  actualValue: actualMacros?.protein ?? 0.0,
+                  targetValue: macros.protein.toInt(),
                   progress: progress['protein'] ?? 0.0,
                   color: const Color(0xFFFF6B6B),
                 ),
@@ -70,7 +73,8 @@ class TotalNutritionCard extends StatelessWidget {
                 // Carbs
                 MacroProgressBar(
                   label: l10n.carbs,
-                  value: macros.carbs.toInt(),
+                  actualValue: actualMacros?.carbs ?? 0.0,
+                  targetValue: macros.carbs.toInt(),
                   progress: progress['carbs'] ?? 0.0,
                   color: const Color(0xFFF59E0B),
                 ),
@@ -79,7 +83,8 @@ class TotalNutritionCard extends StatelessWidget {
                 // Fat
                 MacroProgressBar(
                   label: l10n.fat,
-                  value: macros.fat.toInt(),
+                  actualValue: actualMacros?.fat ?? 0.0,
+                  targetValue: macros.fat.toInt(),
                   progress: progress['fat'] ?? 0.0,
                   color: const Color(0xFFEF4444),
                 ),
@@ -94,6 +99,16 @@ class TotalNutritionCard extends StatelessWidget {
   Widget _buildCircularProgress(AppLocalizations l10n) {
     final calorieProgress = progress['calories'] ?? 0.0;
 
+    // 计算颜色 (3色逻辑)
+    Color progressColor;
+    if (calorieProgress >= 0.95 && calorieProgress <= 1.05) {
+      progressColor = AppColors.successGreen;
+    } else if (calorieProgress > 1.05) {
+      progressColor = AppColors.errorRed;
+    } else {
+      progressColor = AppColors.primaryColor;
+    }
+
     return SizedBox(
       width: 100,
       height: 100,
@@ -104,7 +119,7 @@ class TotalNutritionCard extends StatelessWidget {
             size: const Size(100, 100),
             painter: _CircularProgressPainter(
               progress: calorieProgress,
-              progressColor: AppColors.primaryColor,
+              progressColor: progressColor,
               backgroundColor: AppColors.dividerLight,
             ),
           ),
@@ -114,19 +129,36 @@ class TotalNutritionCard extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  '${macros.calories.toInt()}',
-                  style: AppTextStyles.title3.copyWith(
-                    color: AppColors.primaryText,
-                    fontWeight: FontWeight.w700,
+                // 实际值（上方）
+                if (actualMacros != null)
+                  Text(
+                    '${actualMacros!.calories.toInt()}',
+                    style: AppTextStyles.title3.copyWith(
+                      color: AppColors.primaryText,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
-                ),
+                // 目标值 + 单位（下方）
                 Text(
-                  l10n.kcal,
-                  style: AppTextStyles.caption1.copyWith(
-                    color: AppColors.textSecondary,
-                  ),
+                  actualMacros != null
+                      ? '${macros.calories.toInt()} ${l10n.kcal}'
+                      : '${macros.calories.toInt()}',
+                  style: actualMacros != null
+                      ? AppTextStyles.caption1.copyWith(
+                          color: AppColors.textSecondary,
+                        )
+                      : AppTextStyles.title3.copyWith(
+                          color: AppColors.primaryText,
+                          fontWeight: FontWeight.w700,
+                        ),
                 ),
+                if (actualMacros == null)
+                  Text(
+                    l10n.kcal,
+                    style: AppTextStyles.caption1.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
               ],
             ),
           ),

@@ -372,7 +372,6 @@ Claude API (Extended Thinking + Skill)
 
 - 原始饮食计划实现: `docs/create_diet_plan_implementation.md`
 - Skill使用说明: `functions/ai/claude_skills/diet_plan_calculation/使用说明_v2.0.md`
-- 训练计划AI生成: `docs/ai_create_plan_streaming_summary.md`
 
 ---
 

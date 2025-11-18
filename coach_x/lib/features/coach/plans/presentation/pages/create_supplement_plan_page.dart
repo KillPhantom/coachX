@@ -331,7 +331,7 @@ class _CreateSupplementPlanPageState
 
           if (state.isLoading)
             Container(
-              color: CupertinoColors.black.withOpacity(0.3),
+              color: CupertinoColors.black.withValues(alpha: 0.3),
               child: const Center(
                 child: CupertinoActivityIndicator(radius: 16),
               ),

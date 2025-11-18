@@ -90,9 +90,7 @@ class _PlanDropdownState<T extends PlanBaseModel>
                 });
               },
               behavior: HitTestBehavior.opaque,
-              child: Container(
-                color: Colors.transparent,
-              ),
+              child: Container(color: Colors.transparent),
             ),
           ),
 
@@ -149,10 +147,14 @@ class _PlanDropdownState<T extends PlanBaseModel>
                               // 分隔线
                               if (widget.plans.isNotEmpty)
                                 Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                  ),
                                   child: Divider(
                                     height: 1,
-                                    color: AppColors.textSecondary.withValues(alpha: 0.1),
+                                    color: AppColors.textSecondary.withValues(
+                                      alpha: 0.1,
+                                    ),
                                   ),
                                 ),
 
@@ -175,7 +177,8 @@ class _PlanDropdownState<T extends PlanBaseModel>
 
   /// 获取 Header 的实际宽度
   double _getHeaderWidth() {
-    final renderBox = _widgetKey.currentContext?.findRenderObject() as RenderBox?;
+    final renderBox =
+        _widgetKey.currentContext?.findRenderObject() as RenderBox?;
     return renderBox?.size.width ?? 0;
   }
 
@@ -211,10 +214,7 @@ class _PlanDropdownState<T extends PlanBaseModel>
                 : BorderRadius.circular(12),
             border: _isExpanded
                 ? null
-                : Border.all(
-                    color: AppColors.cardBackground,
-                    width: 1.5,
-                  ),
+                : Border.all(color: AppColors.cardBackground, width: 1.5),
             boxShadow: _isExpanded
                 ? [
                     BoxShadow(
@@ -288,7 +288,9 @@ class _PlanDropdownState<T extends PlanBaseModel>
                   Text(
                     plan.name,
                     style: AppTextStyles.bodyMedium.copyWith(
-                      color: isActive ? AppColors.primaryText : AppColors.primaryDark,
+                      color: isActive
+                          ? AppColors.primaryText
+                          : AppColors.primaryDark,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
