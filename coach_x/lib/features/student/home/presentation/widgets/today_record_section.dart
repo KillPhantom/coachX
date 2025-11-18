@@ -2,7 +2,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:coach_x/l10n/app_localizations.dart';
 import 'package:coach_x/core/theme/app_theme.dart';
+import 'package:coach_x/features/coach/plans/data/models/macros.dart';
 import '../../data/models/student_plans_model.dart';
+import '../../data/models/daily_training_model.dart';
+import '../../../diet/data/models/student_diet_record_model.dart';
 import '../providers/student_home_providers.dart';
 import 'diet_plan_card.dart';
 
@@ -17,6 +20,9 @@ class TodayRecordSection extends ConsumerWidget {
     final l10n = AppLocalizations.of(context)!;
     final plansAsync = ref.watch(studentPlansProvider);
     final dayNumbersAsync = ref.watch(currentDayNumbersProvider);
+    final progress = ref.watch(dietProgressProvider);
+    final actualMacros = ref.watch(actualDietMacrosProvider);
+    final todayTrainingAsync = ref.watch(optimizedTodayTrainingProvider);
 
     return plansAsync.when(
       loading: () => const SizedBox.shrink(),
@@ -48,7 +54,14 @@ class TodayRecordSection extends ConsumerWidget {
               ),
 
               // 内容区域（包含指示器）
-              _buildRecordCards(context, plans, dayNumbersAsync),
+              _buildRecordCards(
+                context,
+                plans,
+                dayNumbersAsync,
+                progress,
+                actualMacros,
+                todayTrainingAsync.value,
+              ),
             ],
           ),
         );
@@ -60,13 +73,22 @@ class TodayRecordSection extends ConsumerWidget {
     BuildContext context,
     StudentPlansModel plans,
     Map<String, int> dayNumbers,
+    Map<String, double>? progress,
+    Macros? actualMacros,
+    DailyTrainingModel? todayTraining,
   ) {
     // 只显示饮食计划
     if (plans.dietPlan == null) {
       return const SizedBox.shrink();
     }
 
-    return _DietPlanWithIndicator(plans: plans, dayNumbers: dayNumbers);
+    return _DietPlanWithIndicator(
+      plans: plans,
+      dayNumbers: dayNumbers,
+      progress: progress,
+      actualMacros: actualMacros,
+      todayDietRecord: todayTraining?.diet,
+    );
   }
 }
 
@@ -74,8 +96,17 @@ class TodayRecordSection extends ConsumerWidget {
 class _DietPlanWithIndicator extends StatefulWidget {
   final StudentPlansModel plans;
   final Map<String, int> dayNumbers;
+  final Map<String, double>? progress;
+  final Macros? actualMacros;
+  final StudentDietRecordModel? todayDietRecord;
 
-  const _DietPlanWithIndicator({required this.plans, required this.dayNumbers});
+  const _DietPlanWithIndicator({
+    required this.plans,
+    required this.dayNumbers,
+    this.progress,
+    this.actualMacros,
+    this.todayDietRecord,
+  });
 
   @override
   State<_DietPlanWithIndicator> createState() => _DietPlanWithIndicatorState();
@@ -100,8 +131,9 @@ class _DietPlanWithIndicatorState extends State<_DietPlanWithIndicator> {
         // 饮食计划卡片
         DietPlanCard(
           dietDay: dietDay,
-          // TBD: 未来从 todayRecord 计算进度
-          progress: null,
+          actualMacros: widget.actualMacros,
+          todayDietRecord: widget.todayDietRecord,
+          progress: widget.progress,
           onPageChanged: (index) {
             setState(() {
               _currentPage = index;

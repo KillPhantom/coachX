@@ -24,7 +24,7 @@ class SupplementSuggestionCard extends StatelessWidget {
         color: CupertinoColors.systemBackground.resolveFrom(context),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: AppColors.primary.withOpacity(0.3),
+          color: AppColors.primary.withValues(alpha: 0.3),
           width: 1.5,
         ),
       ),
@@ -37,60 +37,6 @@ class SupplementSuggestionCard extends StatelessWidget {
 
           // 按钮区域
           _buildActions(context),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildHeader(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      child: Row(
-        children: [
-          // 图标
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  AppColors.primary,
-                  AppColors.primary.withValues(alpha: 0.7),
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: const Icon(
-              CupertinoIcons.capsule_fill,
-              color: AppColors.primaryText,
-              size: 20,
-            ),
-          ),
-          const SizedBox(width: 12),
-          // 标题
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'AI Supplement Recommendation',
-                  style: AppTextStyles.footnote.copyWith(
-                    color: CupertinoColors.secondaryLabel.resolveFrom(context),
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  supplementDay.name,
-                  style: AppTextStyles.callout.copyWith(
-                    color: CupertinoColors.label.resolveFrom(context),
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            ),
-          ),
         ],
       ),
     );
@@ -116,7 +62,7 @@ class SupplementSuggestionCard extends StatelessWidget {
                 if (!isLast) const SizedBox(height: 12),
               ],
             );
-          }).toList(),
+          }),
         ],
       ),
     );
@@ -266,7 +212,7 @@ class SupplementSuggestionCard extends StatelessWidget {
                   gradient: LinearGradient(
                     colors: [
                       AppColors.primary,
-                      AppColors.primary.withOpacity(0.8),
+                      AppColors.primary.withValues(alpha: 0.8),
                     ],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,

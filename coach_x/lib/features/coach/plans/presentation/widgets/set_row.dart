@@ -120,7 +120,7 @@ class _SetRowState extends State<SetRow> {
           if (widget.onDelete != null)
             CupertinoButton(
               padding: EdgeInsets.zero,
-              minSize: 0,
+              minimumSize: Size.zero,
               onPressed: widget.onDelete,
               child: Icon(
                 CupertinoIcons.minus_circle_fill,
@@ -142,7 +142,7 @@ class _SetRowState extends State<SetRow> {
         color: CupertinoColors.systemBackground.resolveFrom(context),
         borderRadius: BorderRadius.circular(4),
         border: Border.all(
-          color: AppColors.primary.withOpacity(0.5),
+          color: AppColors.primary.withValues(alpha: 0.5),
           width: 1.5,
         ),
       ),
@@ -176,7 +176,7 @@ class _SetRowState extends State<SetRow> {
       margin: const EdgeInsets.only(bottom: 2),
       padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 4),
       decoration: BoxDecoration(
-        color: AppColors.success.withOpacity(0.05),
+        color: AppColors.success.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(4),
         border: Border.all(color: AppColors.success, width: 2),
       ),
@@ -258,7 +258,7 @@ class _SetRowState extends State<SetRow> {
       margin: const EdgeInsets.only(bottom: 2),
       padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 4),
       decoration: BoxDecoration(
-        color: CupertinoColors.systemRed.withOpacity(0.1),
+        color: CupertinoColors.systemRed.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(4),
         border: Border.all(
           color: CupertinoColors.systemRed.resolveFrom(context),
@@ -345,7 +345,7 @@ class _SetRowState extends State<SetRow> {
       width: 14,
       height: 14,
       decoration: BoxDecoration(
-        color: (color ?? AppColors.primary).withOpacity(0.1),
+        color: (color ?? AppColors.primary).withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(2),
       ),
       alignment: Alignment.center,

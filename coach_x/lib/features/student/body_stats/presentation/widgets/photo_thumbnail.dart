@@ -29,10 +29,7 @@ class PhotoThumbnail extends StatelessWidget {
       height: size,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(AppDimensions.radiusM),
-        border: Border.all(
-          color: AppColors.dividerLight,
-          width: 1.0,
-        ),
+        border: Border.all(color: AppColors.dividerLight, width: 1.0),
       ),
       child: Stack(
         children: [

@@ -1,22 +1,31 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
-import 'package:coach_x/routes/app_router.dart';
 import 'package:coach_x/core/services/auth_service.dart';
 import 'package:coach_x/features/auth/data/repositories/user_repository.dart';
 import 'package:coach_x/features/auth/data/repositories/user_repository_impl.dart';
 import 'package:coach_x/features/auth/data/models/user_model.dart';
+import 'package:coach_x/features/chat/data/repositories/feedback_repository.dart';
+import 'package:coach_x/features/chat/data/repositories/feedback_repository_impl.dart';
+import 'package:coach_x/features/chat/data/repositories/daily_training_repository.dart';
+import 'package:coach_x/features/chat/data/repositories/daily_training_repository_impl.dart';
 
 /// 全局Providers配置
 /// 用于管理应用级的状态和依赖
 
-/// 路由Provider
-final routerProvider = Provider<GoRouter>((ref) {
-  return appRouter;
-});
-
 /// 用户仓库Provider
 final userRepositoryProvider = Provider<UserRepository>((ref) {
   return UserRepositoryImpl();
+});
+
+/// 训练反馈仓库Provider
+final feedbackRepositoryProvider = Provider<FeedbackRepository>((ref) {
+  return FeedbackRepositoryImpl();
+});
+
+/// 每日训练记录仓库Provider
+final dailyTrainingRepositoryProvider = Provider<DailyTrainingRepository>((
+  ref,
+) {
+  return DailyTrainingRepositoryImpl();
 });
 
 /// 当前用户Provider (监听Firestore)

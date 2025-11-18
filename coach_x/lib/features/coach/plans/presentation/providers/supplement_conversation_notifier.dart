@@ -6,14 +6,12 @@ import 'package:coach_x/features/coach/plans/data/models/llm_chat_message.dart';
 import 'package:coach_x/features/coach/plans/data/models/supplement_day.dart';
 import 'package:coach_x/features/coach/plans/data/models/exercise_plan_model.dart';
 import 'package:coach_x/features/coach/plans/data/models/diet_plan_model.dart';
-import 'package:coach_x/features/coach/plans/data/repositories/supplement_plan_repository.dart';
 import 'package:coach_x/features/coach/plans/data/repositories/plan_repository.dart';
 import 'package:coach_x/features/coach/plans/presentation/providers/create_supplement_plan_notifier.dart';
 
 /// 补剂对话状态管理
 class SupplementConversationNotifier
     extends StateNotifier<SupplementCreationState> {
-  final SupplementPlanRepository _supplementPlanRepository;
   final PlanRepository _planRepository;
   final CreateSupplementPlanNotifier _createNotifier;
 
@@ -21,11 +19,8 @@ class SupplementConversationNotifier
   List<ExercisePlanModel> _exercisePlans = [];
   List<DietPlanModel> _dietPlans = [];
 
-  SupplementConversationNotifier(
-    this._supplementPlanRepository,
-    this._planRepository,
-    this._createNotifier,
-  ) : super(const SupplementCreationState());
+  SupplementConversationNotifier(this._planRepository, this._createNotifier)
+    : super(const SupplementCreationState());
 
   /// 初始化对话
   Future<void> initConversation() async {
@@ -123,7 +118,7 @@ class SupplementConversationNotifier
   }
 
   /// 显示计划选择消息
-  void _showPlanSelectionMessage(String planType, {bool isFinal = false}) {
+  void _showPlanSelectionMessage(String planType) {
     final newMessages = List<LLMChatMessage>.from(state.messages);
 
     if (planType == 'training') {
@@ -340,7 +335,7 @@ class SupplementConversationNotifier
 
     // 添加成功消息
     final newMessages = List<LLMChatMessage>.from(state.messages);
-    newMessages.add(LLMChatMessage.system(content: '✅ 已应用补剂方案到${dayCount}天计划'));
+    newMessages.add(LLMChatMessage.system(content: '✅ 已应用补剂方案到$dayCount天计划'));
 
     // 清空建议并更新消息
     state = state.copyWith(

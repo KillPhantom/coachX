@@ -46,7 +46,7 @@ class CupertinoCard extends StatelessWidget {
         boxShadow: showShadow
             ? [
                 BoxShadow(
-                  color: CupertinoColors.systemGrey.withOpacity(0.1),
+                  color: CupertinoColors.systemGrey.withValues(alpha: 0.1),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),

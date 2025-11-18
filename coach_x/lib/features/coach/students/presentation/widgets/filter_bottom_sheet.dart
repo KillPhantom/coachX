@@ -55,7 +55,7 @@ class FilterBottomSheet {
                     },
                     child: Text(plan['name'] ?? ''),
                   );
-                }).toList(),
+                }),
               ],
               cancelButton: CupertinoActionSheetAction(
                 isDefaultAction: true,

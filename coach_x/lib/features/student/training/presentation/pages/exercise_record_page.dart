@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:coach_x/core/theme/app_colors.dart';
 import 'package:coach_x/core/theme/app_text_styles.dart';
+import 'package:coach_x/core/utils/logger.dart';
 import 'package:coach_x/core/widgets/loading_indicator.dart';
 import 'package:coach_x/l10n/app_localizations.dart';
 import 'package:coach_x/features/student/home/presentation/providers/student_home_providers.dart';
@@ -87,7 +88,7 @@ class _ExerciseRecordPageState extends ConsumerState<ExerciseRecordPage> {
             exercisePlanDay: currentDay.exercises,
           );
     } catch (e) {
-      print('❌ 加载训练数据失败: $e');
+      AppLogger.error('❌ 加载训练数据失败: $e');
     }
   }
 
@@ -122,7 +123,9 @@ class _ExerciseRecordPageState extends ConsumerState<ExerciseRecordPage> {
   void _startTimerMode() {
     ref.read(exerciseRecordNotifierProvider.notifier).startTimer();
     // 同时启动第一个 Exercise 的计时器
-    ref.read(exerciseRecordNotifierProvider.notifier).startExerciseTimer(_currentPage);
+    ref
+        .read(exerciseRecordNotifierProvider.notifier)
+        .startExerciseTimer(_currentPage);
   }
 
   @override
@@ -132,23 +135,11 @@ class _ExerciseRecordPageState extends ConsumerState<ExerciseRecordPage> {
 
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
-        middle: Text(l10n.trainingRecord, style: AppTextStyles.navTitle),
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Timer Icon
-            CupertinoButton(
-              padding: EdgeInsets.zero,
-              onPressed: state.isTimerRunning ? null : _showStartTimerDialog,
-              child: Icon(CupertinoIcons.timer, color: AppColors.primaryAction),
-            ),
-            // Add Custom Exercise Icon
-            CupertinoButton(
-              padding: EdgeInsets.zero,
-              onPressed: state.isSaving ? null : _showAddCustomExerciseAlert,
-              child: const Icon(CupertinoIcons.add, color: AppColors.primaryAction),
-            ),
-          ],
+        middle: Text(l10n.trainingRecord),
+        trailing: CupertinoButton(
+          padding: EdgeInsets.zero,
+          onPressed: state.isTimerRunning ? null : _showStartTimerDialog,
+          child: Icon(CupertinoIcons.timer, color: AppColors.primaryAction),
         ),
       ),
       child: SafeArea(
@@ -177,7 +168,9 @@ class _ExerciseRecordPageState extends ConsumerState<ExerciseRecordPage> {
               CustomPageIndicator(
                 currentPage: _currentPage,
                 totalPages: state.exercises.length,
-                completedCount: state.exercises.where((e) => e.completed).length,
+                completedCount: state.exercises
+                    .where((e) => e.completed)
+                    .length,
                 onPreviousPage: () {
                   if (_currentPage > 0) {
                     _pageController.previousPage(
@@ -284,10 +277,10 @@ class _ExerciseRecordPageState extends ConsumerState<ExerciseRecordPage> {
             exercise: exercise,
             exerciseIndex: index,
             isSaving: state.isSaving,
-            onSetChanged: (setIndex, updatedSet) {
+            onSetComplete: (setIndex, reps, weight) {
               ref
                   .read(exerciseRecordNotifierProvider.notifier)
-                  .updateSetRealtime(index, setIndex, updatedSet);
+                  .completeSet(index, setIndex, reps, weight);
             },
             onToggleSetEdit: (setIndex) {
               ref
@@ -300,34 +293,35 @@ class _ExerciseRecordPageState extends ConsumerState<ExerciseRecordPage> {
                   .quickComplete(index);
             },
             onVideoUploaded: (videoFile) {
+              // 添加 pending 视频到状态（缩略图路径为 null）
               ref
                   .read(exerciseRecordNotifierProvider.notifier)
-                  .uploadVideo(index, videoFile);
+                  .addPendingVideo(index, videoFile.path, null);
+            },
+            onVideoUploadCompleted: (videoIndex, downloadUrl, thumbnailUrl) {
+              // 上传完成，更新状态并保存到 Firestore
+              ref
+                  .read(exerciseRecordNotifierProvider.notifier)
+                  .completeVideoUpload(
+                    index,
+                    videoIndex,
+                    downloadUrl,
+                    thumbnailUrl: thumbnailUrl,
+                  );
             },
             onVideoDeleted: (videoIndex) {
               ref
                   .read(exerciseRecordNotifierProvider.notifier)
                   .deleteVideo(index, videoIndex);
             },
+            onVideoRetry: (videoIndex) {
+              ref
+                  .read(exerciseRecordNotifierProvider.notifier)
+                  .retryVideoUpload(index, videoIndex);
+            },
           ),
         );
       },
-    );
-  }
-
-  void _showAddCustomExerciseAlert() {
-    showCupertinoDialog(
-      context: context,
-      builder: (context) => CupertinoAlertDialog(
-        title: const Text('TODO'),
-        content: const Text('添加自定义动作功能开发中...'),
-        actions: [
-          CupertinoDialogAction(
-            child: const Text('确定'),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-        ],
-      ),
     );
   }
 }

@@ -281,8 +281,3 @@ flutter run -d android
 └── utils/              # 通用辅助工具
     └── db_helper.py    # 数据库连接、常用查询等
 ```
-
-## 后端API
-
-后端API基于Firebase Cloud Functions (Python)实现，详细的API接口和数据库Schema请参考：
-- [后端API与数据库Schema文档](../docs/backend_apis_and_document_db_schemas.md)

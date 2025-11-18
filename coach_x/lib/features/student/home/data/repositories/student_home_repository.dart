@@ -1,5 +1,6 @@
 import '../models/student_plans_model.dart';
 import '../models/daily_training_model.dart';
+import '../models/weekly_stats_model.dart';
 
 /// 学生首页Repository接口
 abstract class StudentHomeRepository {
@@ -17,4 +18,7 @@ abstract class StudentHomeRepository {
 
   /// 获取学生最新训练记录
   Future<DailyTrainingModel?> getLatestTraining();
+
+  /// 获取本周首页统计数据
+  Future<WeeklyStatsModel> getWeeklyHomeStats();
 }

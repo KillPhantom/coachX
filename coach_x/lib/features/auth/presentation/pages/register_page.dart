@@ -84,177 +84,178 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
             child: Form(
               key: _formKey,
               child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // 返回按钮
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: CupertinoButton(
-                    padding: EdgeInsets.zero,
-                    onPressed: registerState.status == RegisterStatus.loading
-                        ? null
-                        : () => context.pop(),
-                    child: const Icon(
-                      CupertinoIcons.back,
-                      color: AppColors.primaryColor,
-                      size: 28,
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 20),
-
-                // 标题
-                Text(
-                  l10n.createAccount,
-                  style: AppTextStyles.title1,
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: AppDimensions.spacingS),
-                Text(
-                  l10n.startYourJourney,
-                  style: AppTextStyles.subhead.copyWith(
-                    color: AppColors.textSecondary,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-
-                const SizedBox(height: 40),
-
-                // 姓名输入
-                CustomTextField(
-                  controller: _nameController,
-                  placeholder: l10n.namePlaceholder,
-                  prefix: const Padding(
-                    padding: EdgeInsets.only(left: 12, right: 8),
-                    child: Icon(
-                      CupertinoIcons.person,
-                      color: AppColors.textTertiary,
-                      size: 20,
-                    ),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return l10n.nameRequired;
-                    }
-                    return null;
-                  },
-                  enabled: registerState.status != RegisterStatus.loading,
-                ),
-
-                const SizedBox(height: AppDimensions.spacingL),
-
-                // 邮箱输入
-                CustomTextField(
-                  controller: _emailController,
-                  placeholder: l10n.emailPlaceholder,
-                  keyboardType: TextInputType.emailAddress,
-                  prefix: const Padding(
-                    padding: EdgeInsets.only(left: 12, right: 8),
-                    child: Icon(
-                      CupertinoIcons.mail,
-                      color: AppColors.textTertiary,
-                      size: 20,
-                    ),
-                  ),
-                  validator: ValidationUtils.validateEmail,
-                  enabled: registerState.status != RegisterStatus.loading,
-                ),
-
-                const SizedBox(height: AppDimensions.spacingL),
-
-                // 密码输入
-                CustomTextField(
-                  controller: _passwordController,
-                  placeholder: l10n.passwordMinLength,
-                  isPassword: true,
-                  prefix: const Padding(
-                    padding: EdgeInsets.only(left: 12, right: 8),
-                    child: Icon(
-                      CupertinoIcons.lock,
-                      color: AppColors.textTertiary,
-                      size: 20,
-                    ),
-                  ),
-                  validator: ValidationUtils.validatePassword,
-                  enabled: registerState.status != RegisterStatus.loading,
-                ),
-
-                const SizedBox(height: AppDimensions.spacingL),
-
-                // 确认密码输入
-                CustomTextField(
-                  controller: _confirmPasswordController,
-                  placeholder: l10n.confirmPasswordPlaceholder,
-                  isPassword: true,
-                  prefix: const Padding(
-                    padding: EdgeInsets.only(left: 12, right: 8),
-                    child: Icon(
-                      CupertinoIcons.lock,
-                      color: AppColors.textTertiary,
-                      size: 20,
-                    ),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return l10n.confirmPasswordRequired;
-                    }
-                    if (value != _passwordController.text) {
-                      return l10n.passwordMismatch;
-                    }
-                    return null;
-                  },
-                  enabled: registerState.status != RegisterStatus.loading,
-                  onEditingComplete: _handleRegister,
-                ),
-
-                const SizedBox(height: AppDimensions.spacingXL),
-
-                // 用户协议提示
-                Text(
-                  l10n.termsAgreement,
-                  style: AppTextStyles.caption1.copyWith(
-                    color: AppColors.textTertiary,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-
-                const SizedBox(height: AppDimensions.spacingL),
-
-                // 注册按钮
-                CustomButton(
-                  text: l10n.register,
-                  onPressed: _handleRegister,
-                  isLoading: registerState.status == RegisterStatus.loading,
-                  fullWidth: true,
-                ),
-
-                const SizedBox(height: AppDimensions.spacingL),
-
-                // 登录提示
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(l10n.hasAccount, style: AppTextStyles.body),
-                    CupertinoButton(
-                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // 返回按钮
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: CupertinoButton(
+                      padding: EdgeInsets.zero,
                       onPressed: registerState.status == RegisterStatus.loading
                           ? null
                           : () => context.pop(),
-                      child: Text(
-                        l10n.loginNow,
-                        style: AppTextStyles.body.copyWith(
-                          color: AppColors.primaryText,
-                          fontWeight: FontWeight.w700,
-                        ),
+                      child: const Icon(
+                        CupertinoIcons.back,
+                        color: AppColors.primaryColor,
+                        size: 28,
                       ),
                     ),
-                  ],
-                ),
-              ],
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  // 标题
+                  Text(
+                    l10n.createAccount,
+                    style: AppTextStyles.title1,
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: AppDimensions.spacingS),
+                  Text(
+                    l10n.startYourJourney,
+                    style: AppTextStyles.subhead.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+
+                  const SizedBox(height: 40),
+
+                  // 姓名输入
+                  CustomTextField(
+                    controller: _nameController,
+                    placeholder: l10n.namePlaceholder,
+                    prefix: const Padding(
+                      padding: EdgeInsets.only(left: 12, right: 8),
+                      child: Icon(
+                        CupertinoIcons.person,
+                        color: AppColors.textTertiary,
+                        size: 20,
+                      ),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.trim().isEmpty) {
+                        return l10n.nameRequired;
+                      }
+                      return null;
+                    },
+                    enabled: registerState.status != RegisterStatus.loading,
+                  ),
+
+                  const SizedBox(height: AppDimensions.spacingL),
+
+                  // 邮箱输入
+                  CustomTextField(
+                    controller: _emailController,
+                    placeholder: l10n.emailPlaceholder,
+                    keyboardType: TextInputType.emailAddress,
+                    prefix: const Padding(
+                      padding: EdgeInsets.only(left: 12, right: 8),
+                      child: Icon(
+                        CupertinoIcons.mail,
+                        color: AppColors.textTertiary,
+                        size: 20,
+                      ),
+                    ),
+                    validator: ValidationUtils.validateEmail,
+                    enabled: registerState.status != RegisterStatus.loading,
+                  ),
+
+                  const SizedBox(height: AppDimensions.spacingL),
+
+                  // 密码输入
+                  CustomTextField(
+                    controller: _passwordController,
+                    placeholder: l10n.passwordMinLength,
+                    isPassword: true,
+                    prefix: const Padding(
+                      padding: EdgeInsets.only(left: 12, right: 8),
+                      child: Icon(
+                        CupertinoIcons.lock,
+                        color: AppColors.textTertiary,
+                        size: 20,
+                      ),
+                    ),
+                    validator: ValidationUtils.validatePassword,
+                    enabled: registerState.status != RegisterStatus.loading,
+                  ),
+
+                  const SizedBox(height: AppDimensions.spacingL),
+
+                  // 确认密码输入
+                  CustomTextField(
+                    controller: _confirmPasswordController,
+                    placeholder: l10n.confirmPasswordPlaceholder,
+                    isPassword: true,
+                    prefix: const Padding(
+                      padding: EdgeInsets.only(left: 12, right: 8),
+                      child: Icon(
+                        CupertinoIcons.lock,
+                        color: AppColors.textTertiary,
+                        size: 20,
+                      ),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return l10n.confirmPasswordRequired;
+                      }
+                      if (value != _passwordController.text) {
+                        return l10n.passwordMismatch;
+                      }
+                      return null;
+                    },
+                    enabled: registerState.status != RegisterStatus.loading,
+                    onEditingComplete: _handleRegister,
+                  ),
+
+                  const SizedBox(height: AppDimensions.spacingXL),
+
+                  // 用户协议提示
+                  Text(
+                    l10n.termsAgreement,
+                    style: AppTextStyles.caption1.copyWith(
+                      color: AppColors.textTertiary,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+
+                  const SizedBox(height: AppDimensions.spacingL),
+
+                  // 注册按钮
+                  CustomButton(
+                    text: l10n.register,
+                    onPressed: _handleRegister,
+                    isLoading: registerState.status == RegisterStatus.loading,
+                    fullWidth: true,
+                  ),
+
+                  const SizedBox(height: AppDimensions.spacingL),
+
+                  // 登录提示
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(l10n.hasAccount, style: AppTextStyles.body),
+                      CupertinoButton(
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        onPressed:
+                            registerState.status == RegisterStatus.loading
+                            ? null
+                            : () => context.pop(),
+                        child: Text(
+                          l10n.loginNow,
+                          style: AppTextStyles.body.copyWith(
+                            color: AppColors.primaryText,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
-        ),
         ),
       ),
     );

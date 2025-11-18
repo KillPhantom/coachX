@@ -233,7 +233,7 @@ class _ChatAIPanelState extends ConsumerState<ChatAIPanel> {
               width: 32,
               height: 32,
               decoration: BoxDecoration(
-                color: CupertinoColors.activeBlue.withOpacity(0.1),
+                color: CupertinoColors.activeBlue.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: const Icon(

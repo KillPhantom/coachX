@@ -3,6 +3,7 @@ import 'package:coach_x/core/utils/logger.dart';
 import 'package:coach_x/core/utils/json_utils.dart';
 import '../models/student_plans_model.dart';
 import '../models/daily_training_model.dart';
+import '../models/weekly_stats_model.dart';
 import 'student_home_repository.dart';
 
 /// 学生首页Repository实现
@@ -25,9 +26,13 @@ class StudentHomeRepositoryImpl implements StudentHomeRepository {
 
       // 调试：打印返回的数据结构
       AppLogger.info('📦 后端返回的data字段: ${data.keys.toList()}');
-      AppLogger.info('📦 exercise_plans字段类型: ${data['exercise_plans']?.runtimeType}');
+      AppLogger.info(
+        '📦 exercise_plans字段类型: ${data['exercise_plans']?.runtimeType}',
+      );
       AppLogger.info('📦 diet_plans字段类型: ${data['diet_plans']?.runtimeType}');
-      AppLogger.info('📦 supplement_plans字段类型: ${data['supplement_plans']?.runtimeType}');
+      AppLogger.info(
+        '📦 supplement_plans字段类型: ${data['supplement_plans']?.runtimeType}',
+      );
 
       final plansModel = StudentPlansModel.fromJson(data);
 
@@ -58,7 +63,9 @@ class StudentHomeRepositoryImpl implements StudentHomeRepository {
 
       final plansModel = StudentPlansModel.fromJson(data);
 
-      AppLogger.info('获取所有计划成功: 训练计划${plansModel.exercisePlans.length}个, 饮食计划${plansModel.dietPlans.length}个, 补剂计划${plansModel.supplementPlans.length}个');
+      AppLogger.info(
+        '获取所有计划成功: 训练计划${plansModel.exercisePlans.length}个, 饮食计划${plansModel.dietPlans.length}个, 补剂计划${plansModel.supplementPlans.length}个',
+      );
 
       return plansModel;
     } catch (e, stackTrace) {
@@ -118,6 +125,33 @@ class StudentHomeRepositoryImpl implements StudentHomeRepository {
       return trainingModel;
     } catch (e, stackTrace) {
       AppLogger.error('获取最新训练记录失败', e, stackTrace);
+      rethrow;
+    }
+  }
+
+  @override
+  Future<WeeklyStatsModel> getWeeklyHomeStats() async {
+    try {
+      AppLogger.info('获取本周首页统计数据');
+
+      final response = await CloudFunctionsService.fetchWeeklyHomeStats();
+
+      if (response['status'] != 'success') {
+        throw Exception('获取本周统计数据失败: ${response['message'] ?? '未知错误'}');
+      }
+
+      final data = safeMapCast(response['data'], 'data');
+      if (data == null) {
+        throw Exception('获取本周统计数据失败: 数据格式错误');
+      }
+
+      final statsModel = WeeklyStatsModel.fromJson(data);
+
+      AppLogger.info('获取本周统计数据成功: ${statsModel.toString()}');
+
+      return statsModel;
+    } catch (e, stackTrace) {
+      AppLogger.error('获取本周统计数据失败', e, stackTrace);
       rethrow;
     }
   }

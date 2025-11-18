@@ -1,7 +1,8 @@
 import 'package:coach_x/core/enums/exercise_type.dart';
 import 'package:coach_x/core/utils/json_utils.dart';
 import 'package:coach_x/features/coach/plans/data/models/training_set.dart';
-import 'voice_feedback_model.dart';
+import 'package:coach_x/core/models/video_upload_state.dart';
+import 'keyframe_model.dart';
 
 /// 学生训练动作模型
 ///
@@ -12,9 +13,10 @@ class StudentExerciseModel {
   final ExerciseType type;
   final List<TrainingSet> sets;
   final bool completed;
-  final List<String> videos; // 学生上传的视频 URL
-  final List<VoiceFeedbackModel> voiceFeedbacks; // 语音反馈
+  final List<VideoUploadState> videos; // 学生上传的视频状态
+  final List<KeyframeModel> keyframes; // 视频关键帧（带时间戳）
   final int? timeSpent; // 动作耗时（秒数），nullable
+  final String? exerciseTemplateId; // 关联的动作模板 ID
 
   const StudentExerciseModel({
     required this.name,
@@ -23,8 +25,9 @@ class StudentExerciseModel {
     required this.sets,
     this.completed = false,
     this.videos = const [],
-    this.voiceFeedbacks = const [],
+    this.keyframes = const [],
     this.timeSpent,
+    this.exerciseTemplateId,
   });
 
   /// 创建空的 StudentExercise
@@ -36,7 +39,7 @@ class StudentExerciseModel {
       sets: [TrainingSet.empty()],
       completed: false,
       videos: const [],
-      voiceFeedbacks: const [],
+      keyframes: const [],
       timeSpent: null,
     );
   }
@@ -44,11 +47,8 @@ class StudentExerciseModel {
   /// 从 JSON 创建
   factory StudentExerciseModel.fromJson(Map<String, dynamic> json) {
     final setsData = safeMapListCast(json['sets'], 'sets');
-    final sets = setsData.map((setJson) => TrainingSet.fromJson(setJson)).toList();
-
-    final voiceFeedbacksData = safeMapListCast(json['voiceFeedbacks'], 'voiceFeedbacks');
-    final voiceFeedbacks = voiceFeedbacksData
-        .map((feedbackJson) => VoiceFeedbackModel.fromJson(feedbackJson))
+    final sets = setsData
+        .map((setJson) => TrainingSet.fromJson(setJson))
         .toList();
 
     return StudentExerciseModel(
@@ -57,9 +57,31 @@ class StudentExerciseModel {
       type: exerciseTypeFromString(json['type'] as String? ?? 'strength'),
       sets: sets.isNotEmpty ? sets : [TrainingSet.empty()],
       completed: json['completed'] as bool? ?? false,
-      videos: (json['videos'] as List<dynamic>?)?.map((e) => e as String).toList() ?? [],
-      voiceFeedbacks: voiceFeedbacks,
+      videos:
+          (json['videos'] as List<dynamic>?)?.map((data) {
+            final videoData = safeMapCast(data, 'video');
+            return videoData != null
+                ? VideoUploadState.fromJson(videoData)
+                : VideoUploadState.completed(''); // 降级处理
+          }).toList() ??
+          [],
+      keyframes:
+          (json['keyframes'] as List<dynamic>?)?.map((e) {
+            if (e is String) {
+              // 兼容旧格式：纯URL字符串
+              return KeyframeModel(url: e, timestamp: 0.0);
+            } else if (e is Map) {
+              // 新格式：带时间戳的对象
+              final keyframeData = safeMapCast(e, 'keyframe');
+              return keyframeData != null
+                  ? KeyframeModel.fromJson(keyframeData)
+                  : KeyframeModel(url: '', timestamp: 0.0);
+            }
+            return KeyframeModel(url: '', timestamp: 0.0);
+          }).toList() ??
+          [],
       timeSpent: json['timeSpent'] as int?,
+      exerciseTemplateId: json['exerciseTemplateId'] as String?,
     );
   }
 
@@ -71,9 +93,13 @@ class StudentExerciseModel {
       'type': type.toJsonString(),
       'sets': sets.map((set) => set.toJson()).toList(),
       'completed': completed,
-      'videos': videos,
-      'voiceFeedbacks': voiceFeedbacks.map((feedback) => feedback.toJson()).toList(),
+      'videos': videos
+          .map((v) => v.toJson())
+          .where((url) => url != null) // 只保存已完成的
+          .toList(),
+      'keyframes': keyframes.map((kf) => kf.toJson()).toList(),
       'timeSpent': timeSpent,
+      if (exerciseTemplateId != null) 'exerciseTemplateId': exerciseTemplateId,
     };
   }
 
@@ -84,9 +110,10 @@ class StudentExerciseModel {
     ExerciseType? type,
     List<TrainingSet>? sets,
     bool? completed,
-    List<String>? videos,
-    List<VoiceFeedbackModel>? voiceFeedbacks,
+    List<VideoUploadState>? videos,
+    List<KeyframeModel>? keyframes,
     int? timeSpent,
+    String? exerciseTemplateId,
   }) {
     return StudentExerciseModel(
       name: name ?? this.name,
@@ -95,27 +122,86 @@ class StudentExerciseModel {
       sets: sets ?? this.sets,
       completed: completed ?? this.completed,
       videos: videos ?? this.videos,
-      voiceFeedbacks: voiceFeedbacks ?? this.voiceFeedbacks,
+      keyframes: keyframes ?? this.keyframes,
       timeSpent: timeSpent ?? this.timeSpent,
+      exerciseTemplateId: exerciseTemplateId ?? this.exerciseTemplateId,
     );
   }
 
-  /// 添加视频
-  StudentExerciseModel addVideo(String videoUrl) {
-    return copyWith(videos: [...videos, videoUrl]);
+  /// 添加待上传视频
+  StudentExerciseModel addPendingVideo(
+    String localPath,
+    String? thumbnailPath,
+  ) {
+    final newVideo = VideoUploadState.pending(localPath, thumbnailPath);
+    return copyWith(videos: [...videos, newVideo]);
+  }
+
+  /// 更新视频上传进度
+  StudentExerciseModel updateVideoProgress(int index, double progress) {
+    if (index < 0 || index >= videos.length) return this;
+
+    final updatedVideos = List<VideoUploadState>.from(videos);
+    updatedVideos[index] = videos[index].copyWith(
+      status: VideoUploadStatus.uploading,
+      progress: progress,
+    );
+    return copyWith(videos: updatedVideos);
+  }
+
+  /// 完成视频上传
+  StudentExerciseModel completeVideoUpload(
+    int index,
+    String downloadUrl, {
+    String? thumbnailUrl,
+  }) {
+    if (index < 0 || index >= videos.length) return this;
+
+    final updatedVideos = List<VideoUploadState>.from(videos);
+    updatedVideos[index] = videos[index].copyWith(
+      status: VideoUploadStatus.completed,
+      downloadUrl: downloadUrl,
+      thumbnailUrl: thumbnailUrl,
+      progress: 1.0,
+    );
+    return copyWith(videos: updatedVideos);
+  }
+
+  /// 标记视频上传失败
+  StudentExerciseModel failVideoUpload(int index, String error) {
+    if (index < 0 || index >= videos.length) return this;
+
+    final updatedVideos = List<VideoUploadState>.from(videos);
+    updatedVideos[index] = videos[index].copyWith(
+      status: VideoUploadStatus.error,
+      error: error,
+    );
+    return copyWith(videos: updatedVideos);
   }
 
   /// 删除视频
   StudentExerciseModel removeVideo(int index) {
     if (index < 0 || index >= videos.length) return this;
-    final newVideos = List<String>.from(videos);
-    newVideos.removeAt(index);
-    return copyWith(videos: newVideos);
+
+    final updatedVideos = List<VideoUploadState>.from(videos);
+    updatedVideos.removeAt(index);
+    return copyWith(videos: updatedVideos);
   }
 
-  /// 添加语音反馈
-  StudentExerciseModel addVoiceFeedback(VoiceFeedbackModel feedback) {
-    return copyWith(voiceFeedbacks: [...voiceFeedbacks, feedback]);
+  /// 重试失败的上传
+  StudentExerciseModel retryVideoUpload(int index) {
+    if (index < 0 || index >= videos.length) return this;
+
+    final video = videos[index];
+    if (video.status != VideoUploadStatus.error) return this;
+
+    final updatedVideos = List<VideoUploadState>.from(videos);
+    updatedVideos[index] = video.copyWith(
+      status: VideoUploadStatus.pending,
+      progress: 0.0,
+      error: null,
+    );
+    return copyWith(videos: updatedVideos);
   }
 
   /// 切换完成状态
@@ -170,6 +256,6 @@ class StudentExerciseModel {
 
   @override
   String toString() {
-    return 'StudentExerciseModel(name: $name, type: $type, sets: ${sets.length}, completed: $completed, videos: ${videos.length}, timeSpent: $timeSpent)';
+    return 'StudentExerciseModel(name: $name, type: $type, sets: ${sets.length}, completed: $completed, videos: ${videos.length}, keyframes: ${keyframes.length}, timeSpent: $timeSpent)';
   }
 }

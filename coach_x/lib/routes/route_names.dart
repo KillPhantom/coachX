@@ -5,8 +5,8 @@ class RouteNames {
 
   // ==================== 根路由 ====================
 
-  /// 启动页
-  static const String splash = '/';
+  /// 启动页/Splash页
+  static const String splash = '/splash';
 
   /// 登录页
   static const String login = '/login';
@@ -30,9 +30,6 @@ class RouteNames {
 
   /// 学生资料页
   static const String studentProfile = '/student/profile';
-
-  /// 学生饮食记录页
-  static const String studentDietRecord = '/student/diet-record';
 
   /// AI食物扫描页
   static const String studentAIFoodScanner = '/student/ai-food-scanner';
@@ -63,10 +60,19 @@ class RouteNames {
   /// 教练资料页
   static const String coachProfile = '/coach/profile';
 
+  /// 训练审核列表页
+  static const String coachTrainingReviews = '/coach/training-reviews';
+
+  /// 训练批阅 Feed 页
+  static const String trainingFeed = '/coach/training-feed/:dailyTrainingId';
+
   /// 创建补剂计划页
   static const String createSupplementPlan = 'create-supplement-plan';
 
   // ==================== 共享路由 ====================
+
+  /// 语言选择页
+  static const String languageSelection = '/language-selection';
 
   /// 计划详情页（带参数）
   static const String planDetail = '/plan/:id';
@@ -92,5 +98,14 @@ class RouteNames {
   /// 获取对话详情路由（替换参数）
   static String getChatDetailRoute(String conversationId) {
     return '/chat/$conversationId';
+  }
+
+  /// 获取训练批阅 Feed 路由（替换参数）
+  static String getTrainingFeedRoute(
+    String dailyTrainingId, {
+    required String studentId,
+    required String studentName,
+  }) {
+    return '/coach/training-feed/$dailyTrainingId?studentId=$studentId&studentName=$studentName';
   }
 }

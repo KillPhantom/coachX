@@ -8,9 +8,7 @@ import 'package:coach_x/l10n/app_localizations.dart';
 import 'package:coach_x/core/theme/app_theme.dart';
 import 'package:coach_x/core/utils/logger.dart';
 import '../widgets/camera_focus_overlay.dart';
-import '../widgets/food_analysis_bottom_sheet.dart';
-import '../../data/models/food_record_mode.dart';
-import '../providers/ai_food_scanner_providers.dart';
+import 'food_image_preview_page.dart';
 
 /// AI食物扫描相机页面
 class AIFoodScannerPage extends ConsumerStatefulWidget {
@@ -26,7 +24,6 @@ class _AIFoodScannerPageState extends ConsumerState<AIFoodScannerPage>
   bool _isCameraInitialized = false;
   bool _isPermissionDenied = false;
   final ImagePicker _imagePicker = ImagePicker();
-  FoodRecordMode _currentMode = FoodRecordMode.aiScanner;
 
   @override
   void initState() {
@@ -147,20 +144,12 @@ class _AIFoodScannerPageState extends ConsumerState<AIFoodScannerPage>
     }
   }
 
-  /// 显示分析Bottom Sheet
+  /// 导航到图片预览页面
   void _showAnalysisSheet(String imagePath) {
-    showCupertinoModalPopup(
-      context: context,
-      builder: (context) => FoodAnalysisBottomSheet(
-        imagePath: imagePath,
-        recordMode: _currentMode,
-        onComplete: () {
-          // 分析完成并保存后，返回上一页
-          Navigator.pop(context);
-          if (mounted) {
-            context.pop();
-          }
-        },
+    Navigator.push(
+      context,
+      CupertinoPageRoute(
+        builder: (context) => FoodImagePreviewPage(imagePath: imagePath),
       ),
     );
   }
@@ -379,65 +368,6 @@ class _AIFoodScannerPageState extends ConsumerState<AIFoodScannerPage>
                             ),
                           ),
                         ],
-                      ),
-                    ),
-
-                    // 模式切换控件
-                    Container(
-                      margin: const EdgeInsets.only(
-                        bottom: AppDimensions.spacingL,
-                      ),
-                      padding: const EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                        color: CupertinoColors.black.withOpacity(0.6),
-                        borderRadius: BorderRadius.circular(
-                          AppDimensions.radiusL,
-                        ),
-                      ),
-                      child: CupertinoSegmentedControl<FoodRecordMode>(
-                        groupValue: _currentMode,
-                        onValueChanged: (FoodRecordMode value) {
-                          setState(() {
-                            _currentMode = value;
-                          });
-                          ref
-                              .read(aiFoodScannerProvider.notifier)
-                              .setRecordMode(value);
-                        },
-                        children: {
-                          FoodRecordMode.aiScanner: Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: AppDimensions.spacingM,
-                              vertical: AppDimensions.spacingS,
-                            ),
-                            child: Text(
-                              l10n.aiScannerMode,
-                              style: AppTextStyles.callout.copyWith(
-                                color: _currentMode == FoodRecordMode.aiScanner
-                                    ? AppColors.primaryText
-                                    : CupertinoColors.white,
-                              ),
-                            ),
-                          ),
-                          FoodRecordMode.simpleRecord: Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: AppDimensions.spacingM,
-                              vertical: AppDimensions.spacingS,
-                            ),
-                            child: Text(
-                              l10n.simpleRecordMode,
-                              style: AppTextStyles.callout.copyWith(
-                                color:
-                                    _currentMode == FoodRecordMode.simpleRecord
-                                        ? AppColors.primaryText
-                                        : CupertinoColors.white,
-                              ),
-                            ),
-                          ),
-                        },
-                        selectedColor: AppColors.primaryColor,
-                        unselectedColor: CupertinoColors.black.withOpacity(0.0),
-                        borderColor: CupertinoColors.black.withOpacity(0.0),
                       ),
                     ),
                   ],

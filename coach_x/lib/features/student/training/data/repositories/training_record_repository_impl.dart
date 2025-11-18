@@ -4,6 +4,7 @@ import 'package:coach_x/core/services/storage_service.dart';
 import 'package:coach_x/core/utils/logger.dart';
 import 'package:coach_x/core/utils/json_utils.dart';
 import 'package:coach_x/features/student/home/data/models/daily_training_model.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'training_record_repository.dart';
 
 /// 训练记录仓库实现
@@ -44,8 +45,9 @@ class TrainingRecordRepositoryImpl implements TrainingRecordRepository {
 
       final trainingData = training.toJson();
 
-      final response =
-          await CloudFunctionsService.upsertTodayTraining(trainingData);
+      final response = await CloudFunctionsService.upsertTodayTraining(
+        trainingData,
+      );
 
       if (response['status'] != 'success') {
         throw Exception('保存训练记录失败: ${response['message'] ?? '未知错误'}');
@@ -79,6 +81,49 @@ class TrainingRecordRepositoryImpl implements TrainingRecordRepository {
       return downloadUrl;
     } catch (e, stackTrace) {
       AppLogger.error('上传训练视频失败', e, stackTrace);
+      rethrow;
+    }
+  }
+
+  @override
+  Stream<double> uploadVideoWithProgress(File videoFile, String path) {
+    final storage = FirebaseStorage.instance;
+    final ref = storage.ref(path);
+    final uploadTask = ref.putFile(videoFile);
+
+    return uploadTask.snapshotEvents.map((snapshot) {
+      if (snapshot.state == TaskState.running) {
+        // 安全检查：避免除以0导致 NaN 或 Infinity
+        if (snapshot.totalBytes == 0) {
+          return 0.0;
+        }
+        final progress = snapshot.bytesTransferred / snapshot.totalBytes;
+        // 确保进度在 0.0 到 1.0 之间
+        return progress.clamp(0.0, 1.0);
+      }
+      return 0.0;
+    });
+  }
+
+  @override
+  Future<String> getDownloadUrl(String path) async {
+    final storage = FirebaseStorage.instance;
+    final ref = storage.ref(path);
+    return await ref.getDownloadURL();
+  }
+
+  @override
+  Future<String> uploadThumbnail(File thumbnailFile, String path) async {
+    try {
+      AppLogger.info('上传视频缩略图: $path');
+
+      final downloadUrl = await StorageService.uploadFile(thumbnailFile, path);
+
+      AppLogger.info('上传视频缩略图成功: $downloadUrl');
+
+      return downloadUrl;
+    } catch (e, stackTrace) {
+      AppLogger.error('上传视频缩略图失败', e, stackTrace);
       rethrow;
     }
   }

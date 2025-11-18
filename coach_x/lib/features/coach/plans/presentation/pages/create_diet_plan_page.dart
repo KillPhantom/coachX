@@ -277,17 +277,18 @@ class _CreateDietPlanPageState extends ConsumerState<CreateDietPlanPage> {
                           child: SingleChildScrollView(
                             controller: _mealsScrollController,
                             child: DietDayEditor(
-                            onAddMeal: () =>
-                                _onAddMeal(notifier, _selectedDayIndex!),
-                            totalMacros: state.days[_selectedDayIndex!].macros,
-                            mealsWidget: _buildMealsList(
-                              context,
-                              notifier,
-                              _selectedDayIndex!,
-                              state.days[_selectedDayIndex!].meals,
-                              reviewState,
+                              onAddMeal: () =>
+                                  _onAddMeal(notifier, _selectedDayIndex!),
+                              totalMacros:
+                                  state.days[_selectedDayIndex!].macros,
+                              mealsWidget: _buildMealsList(
+                                context,
+                                notifier,
+                                _selectedDayIndex!,
+                                state.days[_selectedDayIndex!].meals,
+                                reviewState,
+                              ),
                             ),
-                          ),
                           ),
                         )
                       : Center(
@@ -387,7 +388,7 @@ class _CreateDietPlanPageState extends ConsumerState<CreateDietPlanPage> {
           // Loading Overlay
           if (state.isLoading)
             Container(
-              color: CupertinoColors.black.withOpacity(0.3),
+              color: CupertinoColors.black.withValues(alpha: 0.3),
               child: const Center(
                 child: CupertinoActivityIndicator(radius: 16),
               ),
@@ -941,20 +942,6 @@ class _CreateDietPlanPageState extends ConsumerState<CreateDietPlanPage> {
       updatedAt: 0,
       days: state.days,
     );
-  }
-
-  /// 应用 AI 修改到当前计划
-  void _applyModifiedPlan(DietPlanModel modifiedPlan) {
-    final notifier = ref.read(createDietPlanNotifierProvider.notifier);
-    final currentState = notifier.state;
-
-    notifier.state = currentState.copyWith(
-      planName: modifiedPlan.name,
-      description: modifiedPlan.description,
-      days: modifiedPlan.days,
-    );
-
-    AppLogger.info('✅ AI 修改已应用 - ${modifiedPlan.days.length} 个饮食日');
   }
 }
 

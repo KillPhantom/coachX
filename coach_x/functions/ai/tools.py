@@ -48,11 +48,7 @@ def get_single_day_tool() -> Dict[str, Any]:
                         "properties": {
                             "name": {
                                 "type": "string",
-                                "description": "动作名称，使用指定语言命名。中文示例：'深蹲'、'卧推'、'硬拉'；英文示例：'Squats'、'Bench Press'、'Deadlift'"
-                            },
-                            "note": {
-                                "type": "string",
-                                "description": "动作备注和技术要点，如 '保持肩胛骨稳定'"
+                                "description": "动作名称。**重要：如果用户提供了动作库列表，必须严格从列表中选择动作名称（完全匹配）；如果未提供动作库，可以自由命名。** 使用指定语言命名。中文示例：'深蹲'、'卧推'、'硬拉'；英文示例：'Squats'、'Bench Press'、'Deadlift'"
                             },
                             "sets": {
                                 "type": "array",
@@ -238,10 +234,6 @@ def get_plan_edit_tool() -> Dict[str, Any]:
                                                 "type": "string",
                                                 "description": "动作名称"
                                             },
-                                            "note": {
-                                                "type": "string",
-                                                "description": "动作备注"
-                                            },
                                             "sets": {
                                                 "type": "array",
                                                 "description": "训练组列表",
@@ -292,7 +284,7 @@ def get_plan_edit_tool() -> Dict[str, Any]:
                                     },
                                     {
                                         "type": "object",
-                                        "description": "完整的结构化数据（用于 add_day, add_exercise 和 modify_exercise 类型）。add_day 需包含 name, type, note, exercises；add_exercise 和 modify_exercise 需包含 name, note, sets"
+                                        "description": "完整的结构化数据（用于 add_day, add_exercise 和 modify_exercise 类型）。add_day 需包含 name, type, exercises；add_exercise 和 modify_exercise 需包含 name, sets"
                                     }
                                 ]
                             },

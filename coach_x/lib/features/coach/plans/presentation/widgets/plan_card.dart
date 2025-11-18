@@ -3,6 +3,7 @@ import 'package:coach_x/core/theme/app_colors.dart';
 import 'package:coach_x/core/theme/app_text_styles.dart';
 import 'package:coach_x/core/theme/app_dimensions.dart';
 import '../../data/models/plan_base_model.dart';
+import 'package:flutter/material.dart' show Icons;
 
 /// 计划卡片组件
 class PlanCard extends StatelessWidget {
@@ -32,7 +33,7 @@ class PlanCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(AppDimensions.radiusL),
           boxShadow: [
             BoxShadow(
-              color: CupertinoColors.systemGrey.withOpacity(0.1),
+              color: CupertinoColors.systemGrey.withValues(alpha: 0.1),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -49,7 +50,7 @@ class PlanCard extends StatelessWidget {
                   width: 48,
                   height: 48,
                   decoration: BoxDecoration(
-                    color: _getPlanColor().withOpacity(0.1),
+                    color: _getPlanColor().withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(_getPlanIcon(), color: _getPlanColor(), size: 24),
@@ -84,8 +85,7 @@ class PlanCard extends StatelessWidget {
                 // 更多按钮
                 CupertinoButton(
                   padding: EdgeInsets.zero,
-                  minSize: 32,
-                  onPressed: onMoreTap,
+                  onPressed: onMoreTap, minimumSize: Size(32, 32),
                   child: const Icon(
                     CupertinoIcons.ellipsis,
                     color: AppColors.textSecondary,
@@ -116,7 +116,7 @@ class PlanCard extends StatelessWidget {
   IconData _getPlanIcon() {
     switch (plan.planType) {
       case 'exercise':
-        return CupertinoIcons.sportscourt_fill;
+        return Icons.fitness_center;
       case 'diet':
         return CupertinoIcons.square_favorites_alt_fill;
       case 'supplement':

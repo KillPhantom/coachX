@@ -383,7 +383,7 @@
     }
   },
 
-  "unreviewedTrainingsCount": "{count} training records need to be reviewed",
+  "unreviewedTrainingsCount": "{count} to be reviewed",
   "@unreviewedTrainingsCount": {
     "description": "Unreviewed trainings count",
     "placeholders": {
@@ -810,6 +810,16 @@
     "description": "Training record description"
   },
 
+  "startRecording": "Start Recording",
+  "@startRecording": {
+    "description": "Start recording button label"
+  },
+
+  "viewRecords": "View Records",
+  "@viewRecords": {
+    "description": "View records button label"
+  },
+
   "dietRecord": "Record Meal",
   "@dietRecord": {
     "description": "Diet record type"
@@ -959,6 +969,31 @@
     "placeholders": {
       "count": {"type": "int"}
     }
+  },
+
+  "weightChange": "Weight",
+  "@weightChange": {
+    "description": "Weight change stat card title"
+  },
+
+  "caloriesIntake": "Calories",
+  "@caloriesIntake": {
+    "description": "Calories intake stat card title"
+  },
+
+  "volumePR": "Volume",
+  "@volumePR": {
+    "description": "Volume PR stat card title"
+  },
+
+  "noDataStartRecording": "No data yet, start recording now",
+  "@noDataStartRecording": {
+    "description": "Empty state message for stat cards"
+  },
+
+  "lastWeekData": "Last week's data",
+  "@lastWeekData": {
+    "description": "Label shown when only previous week data is available"
   },
 
   "todayRecord": "Today's Meal Plan",
@@ -1114,6 +1149,16 @@
   "video": "Video",
   "@video": {
     "description": "Video label"
+  },
+
+  "videoWithNumber": "Video {number}",
+  "@videoWithNumber": {
+    "description": "Video label with number (e.g., Video 1, Video 2)",
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
   },
 
   "coachNotes": "Coach Notes:",
@@ -1539,6 +1584,11 @@
     "description": "Skip photo button"
   },
 
+  "usePhoto": "Use Photo",
+  "@usePhoto": {
+    "description": "Use photo button"
+  },
+
   "enterWeight": "Enter Weight",
   "@enterWeight": {
     "description": "Enter weight placeholder"
@@ -1604,6 +1654,26 @@
     "description": "Maximum photos limit message"
   },
 
+  "recordExistsTitle": "Record Already Exists",
+  "@recordExistsTitle": {
+    "description": "Record exists dialog title"
+  },
+
+  "recordExistsMessage": "You already have a record for {date}. Do you want to replace it?",
+  "@recordExistsMessage": {
+    "description": "Record exists dialog message",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+
+  "replace": "Replace",
+  "@replace": {
+    "description": "Replace button text"
+  },
+
   "history": "History",
   "@history": {
     "description": "History section label"
@@ -1657,6 +1727,36 @@
   "selectFromGallery": "Select from gallery",
   "@selectFromGallery": {
     "description": "Select from gallery action"
+  },
+
+  "videoTooLong": "Video too long",
+  "@videoTooLong": {
+    "description": "Video duration exceeds limit error title"
+  },
+
+  "videoTooLongMessage": "Please select a video under 60 seconds",
+  "@videoTooLongMessage": {
+    "description": "Video duration exceeds limit error message"
+  },
+
+  "videoProcessingFailed": "Video processing failed",
+  "@videoProcessingFailed": {
+    "description": "Video processing failed error"
+  },
+
+  "videoCompressionFailed": "Video compression failed, uploading original file",
+  "@videoCompressionFailed": {
+    "description": "Video compression failed warning"
+  },
+
+  "cameraPermissionDenied": "Camera permission denied",
+  "@cameraPermissionDenied": {
+    "description": "Camera permission denied error"
+  },
+
+  "photoLibraryPermissionDenied": "Photo library permission denied",
+  "@photoLibraryPermissionDenied": {
+    "description": "Photo library permission denied error"
   },
 
   "startTimerConfirmTitle": "Start Timer",
@@ -1762,5 +1862,1436 @@
   "coachPlan": "Coach's Plan",
   "@coachPlan": {
     "description": "Label for coach-assigned plans"
+  },
+
+  "feedbackSearchPlaceholder": "Search feedback...",
+  "@feedbackSearchPlaceholder": {
+    "description": "Placeholder text for feedback search bar"
+  },
+
+  "feedbackStartDate": "Start Date",
+  "@feedbackStartDate": {
+    "description": "Label for start date filter"
+  },
+
+  "feedbackEndDate": "End Date",
+  "@feedbackEndDate": {
+    "description": "Label for end date filter"
+  },
+
+  "feedbackToday": "Today",
+  "@feedbackToday": {
+    "description": "Label for today's feedback group"
+  },
+
+  "feedbackYesterday": "Yesterday",
+  "@feedbackYesterday": {
+    "description": "Label for yesterday's feedback group"
+  },
+
+  "feedbackNoFeedback": "No feedback yet",
+  "@feedbackNoFeedback": {
+    "description": "Message shown when there is no feedback"
+  },
+
+  "feedbackNoFeedbackDesc": "Training feedback will appear here",
+  "@feedbackNoFeedbackDesc": {
+    "description": "Description shown when there is no feedback"
+  },
+
+  "feedbackLoadError": "Failed to load feedback",
+  "@feedbackLoadError": {
+    "description": "Error message when feedback fails to load"
+  },
+
+  "feedbackRetry": "Retry",
+  "@feedbackRetry": {
+    "description": "Button text to retry loading feedback"
+  },
+
+  "trainingReviews": "Training Reviews",
+  "@trainingReviews": {
+    "description": "Training reviews page title"
+  },
+
+  "searchStudentName": "Search by student name",
+  "@searchStudentName": {
+    "description": "Search placeholder for student name"
+  },
+
+  "filterAll": "All",
+  "@filterAll": {
+    "description": "Filter button for all records"
+  },
+
+  "filterPending": "Pending",
+  "@filterPending": {
+    "description": "Filter button for pending records"
+  },
+
+  "filterReviewed": "Reviewed",
+  "@filterReviewed": {
+    "description": "Filter button for reviewed records"
+  },
+
+  "statusPending": "Pending",
+  "@statusPending": {
+    "description": "Pending status badge label"
+  },
+
+  "statusReviewed": "Reviewed",
+  "@statusReviewed": {
+    "description": "Reviewed status badge label"
+  },
+
+  "noTrainingReviews": "No training reviews",
+  "@noTrainingReviews": {
+    "description": "Empty state title for training reviews"
+  },
+
+  "noTrainingReviewsDesc": "Training records will appear here",
+  "@noTrainingReviewsDesc": {
+    "description": "Empty state description for training reviews"
+  },
+
+  "todaySummary": "Today's Summary",
+  "@todaySummary": {
+    "description": "Today's summary section title"
+  },
+
+  "nutritionDetails": "Nutrition Details",
+  "@nutritionDetails": {
+    "description": "Nutrition details modal title"
+  },
+
+  "exerciseRecordVideo": "Exercise Record Video",
+  "@exerciseRecordVideo": {
+    "description": "Exercise video section title"
+  },
+
+  "keyframes": "Keyframes",
+  "@keyframes": {
+    "description": "Keyframes section title"
+  },
+
+  "keyframesProcessing": "Keyframes extracting...",
+  "@keyframesProcessing": {
+    "description": "Message shown while keyframes are being extracted"
+  },
+
+  "noKeyframes": "No keyframes available",
+  "@noKeyframes": {
+    "description": "Message when no keyframes exist"
+  },
+
+  "viewKeyframe": "View Keyframe",
+  "@viewKeyframe": {
+    "description": "Action to view a keyframe in fullscreen"
+  },
+
+  "calories": "Calories",
+  "@calories": {
+    "description": "Calories nutrition label"
+  },
+
+  "protein": "Protein",
+  "@protein": {
+    "description": "Protein nutrition label"
+  },
+
+  "carbs": "Carbs",
+  "@carbs": {
+    "description": "Carbohydrates nutrition label"
+  },
+
+  "fats": "Fats",
+  "@fats": {
+    "description": "Fats nutrition label"
+  },
+
+  "addFeedback": "Add feedback for this set...",
+  "@addFeedback": {
+    "description": "Feedback input placeholder"
+  },
+
+  "complete": "Complete",
+  "@complete": {
+    "description": "Complete button label"
+  },
+
+  "viewAll": "View All",
+  "@viewAll": {
+    "description": "View all button label"
+  },
+
+  "sets": "sets",
+  "@sets": {
+    "description": "Sets label (plural)"
+  },
+
+  "noNutritionData": "No nutrition data",
+  "@noNutritionData": {
+    "description": "Empty nutrition data message"
+  },
+
+  "noExerciseRecords": "No exercise records",
+  "@noExerciseRecords": {
+    "description": "Empty exercise records message"
+  },
+
+  "savingFeedback": "Saving feedback...",
+  "@savingFeedback": {
+    "description": "Saving feedback loading message"
+  },
+
+  "feedbackSaved": "Feedback saved successfully",
+  "@feedbackSaved": {
+    "description": "Feedback saved success message"
+  },
+
+  "failedToSave": "Failed to save feedback",
+  "@failedToSave": {
+    "description": "Failed to save feedback error message"
+  },
+
+  "noDataFound": "No data found",
+  "@noDataFound": {
+    "description": "No data found error message"
+  },
+
+  "details": "Details",
+  "@details": {
+    "description": "Details button text"
+  },
+
+  "trainingDetails": "Training Details",
+  "@trainingDetails": {
+    "description": "Training details dialog title"
+  },
+
+  "videoUploading": "Uploading...",
+  "@videoUploading": {
+    "description": "Video uploading status text"
+  },
+
+  "videoUploadFailed": "Upload failed",
+  "@videoUploadFailed": {
+    "description": "Video upload failed status text"
+  },
+
+  "retryUpload": "Retry",
+  "@retryUpload": {
+    "description": "Retry upload button text"
+  },
+
+  "processing": "Processing...",
+  "@processing": {
+    "description": "Processing indicator text"
+  },
+
+  "videoPlayer": "Video Player",
+  "@videoPlayer": {
+    "description": "Video player page title"
+  },
+
+  "videoLoadFailed": "Failed to load video",
+  "@videoLoadFailed": {
+    "description": "Video load failed error message"
+  },
+
+  "exerciseLibrary": "Exercise Library",
+  "@exerciseLibrary": {
+    "description": "Exercise library section title"
+  },
+
+  "searchExercises": "Search exercises",
+  "@searchExercises": {
+    "description": "Search exercises placeholder"
+  },
+
+  "exercises": "exercises",
+  "@exercises": {
+    "description": "Exercises count label"
+  },
+
+  "newExercise": "New Exercise",
+  "@newExercise": {
+    "description": "New exercise button"
+  },
+
+  "noExercisesYet": "No exercises yet",
+  "@noExercisesYet": {
+    "description": "Empty state message"
+  },
+
+  "createFirstExercise": "Create your first exercise template",
+  "@createFirstExercise": {
+    "description": "Empty state call to action"
+  },
+
+  "noResults": "No results found",
+  "@noResults": {
+    "description": "No search results message"
+  },
+
+  "tags": "Tags",
+  "@tags": {
+    "description": "Tags label"
+  },
+
+  "retry": "Retry",
+  "@retry": {
+    "description": "Retry button"
+  },
+
+  "errorOccurred": "An error occurred",
+  "@errorOccurred": {
+    "description": "Generic error message"
+  },
+
+  "deleteExercise": "Delete Exercise",
+  "@deleteExercise": {
+    "description": "Delete exercise dialog title"
+  },
+
+  "confirmDeleteExercise": "Are you sure you want to delete this exercise?",
+  "@confirmDeleteExercise": {
+    "description": "Delete exercise confirmation message"
+  },
+
+  "delete": "Delete",
+  "@delete": {
+    "description": "Delete button"
+  },
+
+  "cancel": "Cancel",
+  "@cancel": {
+    "description": "Cancel button"
+  },
+
+  "save": "Save",
+  "@save": {
+    "description": "Save button"
+  },
+
+  "addTag": "Add Tag",
+  "@addTag": {
+    "description": "Add tag dialog title"
+  },
+
+  "tagNameHint": "Enter tag name",
+  "@tagNameHint": {
+    "description": "Tag name input hint"
+  },
+
+  "tagAlreadyExists": "Tag already exists",
+  "@tagAlreadyExists": {
+    "description": "Duplicate tag error message"
+  },
+
+  "extractKeyframes": "Extract Keyframes",
+  "@extractKeyframes": {
+    "description": "Button text to extract video keyframes"
+  },
+
+  "extractingKeyframes": "Extracting keyframes...",
+  "@extractingKeyframes": {
+    "description": "Loading text during keyframe extraction"
+  },
+
+  "createExercise": "Create Exercise",
+  "@createExercise": {
+    "description": "Create exercise sheet title"
+  },
+
+  "editExercise": "Edit Exercise",
+  "@editExercise": {
+    "description": "Edit exercise sheet title"
+  },
+
+  "exerciseName": "Exercise Name",
+  "@exerciseName": {
+    "description": "Exercise name label"
+  },
+
+  "exerciseNameHint": "Enter exercise name",
+  "@exerciseNameHint": {
+    "description": "Exercise name input hint"
+  },
+
+  "selectTags": "Select Tags",
+  "@selectTags": {
+    "description": "Select tags label"
+  },
+
+  "atLeastOneTag": "Please select at least one tag",
+  "@atLeastOneTag": {
+    "description": "Tag validation error"
+  },
+
+  "guidanceVideo": "Guidance Video",
+  "@guidanceVideo": {
+    "description": "Guidance video section title"
+  },
+
+  "recordVideo": "Record Video",
+  "@recordVideo": {
+    "description": "Record video button"
+  },
+
+  "selectFromGallery": "Select from Gallery",
+  "@selectFromGallery": {
+    "description": "Select video from gallery button"
+  },
+
+  "videoUploading": "Uploading...",
+  "@videoUploading": {
+    "description": "Video upload progress text"
+  },
+
+  "videoUploadFailed": "Upload failed",
+  "@videoUploadFailed": {
+    "description": "Video upload error message"
+  },
+
+  "retryUpload": "Retry",
+  "@retryUpload": {
+    "description": "Retry upload button"
+  },
+
+  "deleteVideo": "Delete Video",
+  "@deleteVideo": {
+    "description": "Delete video button"
+  },
+
+  "textGuidance": "Text Guidance",
+  "@textGuidance": {
+    "description": "Text guidance section title"
+  },
+
+  "textGuidanceHint": "Enter detailed guidance",
+  "@textGuidanceHint": {
+    "description": "Text guidance input hint"
+  },
+
+  "auxiliaryImages": "Auxiliary Images",
+  "@auxiliaryImages": {
+    "description": "Auxiliary images section title"
+  },
+
+  "uploadImage": "Upload Image",
+  "@uploadImage": {
+    "description": "Upload image button"
+  },
+
+  "deleteImage": "Delete Image",
+  "@deleteImage": {
+    "description": "Delete image button"
+  },
+
+  "confirmDelete": "Confirm Delete",
+  "@confirmDelete": {
+    "description": "Confirm delete dialog title"
+  },
+
+  "deleteImageMessage": "Are you sure you want to delete this image?",
+  "@deleteImageMessage": {
+    "description": "Delete image confirmation message"
+  },
+
+  "videoDurationExceeded": "Video duration exceeds 60 seconds",
+  "@videoDurationExceeded": {
+    "description": "Video duration validation error"
+  },
+
+  "pleaseEnterName": "Please enter exercise name",
+  "@pleaseEnterName": {
+    "description": "Name validation error"
+  },
+
+  "createSuccess": "Exercise created successfully",
+  "@createSuccess": {
+    "description": "Create success message"
+  },
+
+  "updateSuccess": "Exercise updated successfully",
+  "@updateSuccess": {
+    "description": "Update success message"
+  },
+
+  "waitingForUpload": "Waiting for upload to complete...",
+  "@waitingForUpload": {
+    "description": "Waiting for upload message"
+  },
+
+  "optional": "Optional",
+  "@optional": {
+    "description": "Optional field indicator"
+  },
+
+  "noMoreData": "No more exercises",
+  "@noMoreData": {
+    "description": "End of list message"
+  },
+
+  "loadingMore": "Loading more...",
+  "@loadingMore": {
+    "description": "Loading more indicator"
+  },
+
+  "takePicture": "Take Picture",
+  "@takePicture": {
+    "description": "Take picture button"
+  },
+
+  "extractionFailed": "Extraction failed",
+  "@extractionFailed": {
+    "description": "Error message when keyframe extraction fails"
+  },
+
+  "retryExtraction": "Retry",
+  "@retryExtraction": {
+    "description": "Button text to retry keyframe extraction"
+  },
+
+  "noKeyframesYet": "No keyframes yet",
+  "@noKeyframesYet": {
+    "description": "Placeholder text when no keyframes available"
+  },
+
+  "extractCurrentFrame": "Extract Frame",
+  "@extractCurrentFrame": {
+    "description": "Button text to extract current video frame manually"
+  },
+
+  "extractingFrame": "Extracting...",
+  "@extractingFrame": {
+    "description": "Loading text while extracting frame"
+  },
+
+  "frameExtracted": "Frame extracted successfully",
+  "@frameExtracted": {
+    "description": "Success message after frame extraction"
+  },
+
+  "studentDetailTitle": "Student Details",
+  "@studentDetailTitle": {
+    "description": "Student detail page title"
+  },
+
+  "trainingRecords": "Training Records",
+  "@trainingRecords": {
+    "description": "Training records button text"
+  },
+
+  "message": "Message",
+  "@message": {
+    "description": "Message button text"
+  },
+
+  "sessions": "Sessions",
+  "@sessions": {
+    "description": "Training sessions stat label"
+  },
+
+  "weight": "Weight",
+  "@weight": {
+    "description": "Weight stat label"
+  },
+
+  "adherence": "Adherence",
+  "@adherence": {
+    "description": "Adherence stat label"
+  },
+
+  "volume": "Volume",
+  "@volume": {
+    "description": "Training volume stat label"
+  },
+
+  "aiProgressSummary": "AI Progress Summary",
+  "@aiProgressSummary": {
+    "description": "AI progress summary badge"
+  },
+
+  "trainingVolume": "Training Volume",
+  "@trainingVolume": {
+    "description": "Training volume highlight label"
+  },
+
+  "weightLoss": "Weight Change",
+  "@weightLoss": {
+    "description": "Weight change highlight label"
+  },
+
+  "avgStrength": "Avg Strength",
+  "@avgStrength": {
+    "description": "Average strength highlight label"
+  },
+
+  "weightTrend": "Weight Trend",
+  "@weightTrend": {
+    "description": "Weight trend chart title"
+  },
+
+  "starting": "Starting",
+  "@starting": {
+    "description": "Starting weight stat"
+  },
+
+  "current": "Current",
+  "@current": {
+    "description": "Current weight stat"
+  },
+
+  "change": "Change",
+  "@change": {
+    "description": "Weight change stat"
+  },
+
+  "target": "Target",
+  "@target": {
+    "description": "Target weight stat"
+  },
+
+  "trainingHistory": "Training History",
+  "@trainingHistory": {
+    "description": "Training history section title"
+  },
+
+  "viewAll": "View All",
+  "@viewAll": {
+    "description": "View all button text"
+  },
+
+  "pending": "Pending",
+  "@pending": {
+    "description": "Pending review status"
+  },
+
+  "reviewed": "Reviewed",
+  "@reviewed": {
+    "description": "Reviewed status"
+  },
+
+  "exercises": "exercises",
+  "@exercises": {
+    "description": "Exercises count label"
+  },
+
+  "videos": "videos",
+  "@videos": {
+    "description": "Videos count label"
+  },
+
+  "years": "years",
+  "@years": {
+    "description": "Years age label"
+  },
+
+  "error": "Error",
+  "@error": {
+    "description": "Error dialog title"
+  },
+
+  "ok": "OK",
+  "@ok": {
+    "description": "OK button text"
+  },
+
+  "feedbackInputPlaceholder": "Add feedback...",
+  "@feedbackInputPlaceholder": {
+    "description": "Feedback input placeholder"
+  },
+
+  "holdToRecord": "Hold to Record",
+  "@holdToRecord": {
+    "description": "Voice record button hint"
+  },
+
+  "releaseToSend": "Release to Send",
+  "@releaseToSend": {
+    "description": "Release to send voice message"
+  },
+
+  "slideUpToCancel": "Slide up to cancel",
+  "@slideUpToCancel": {
+    "description": "Slide up to cancel voice recording"
+  },
+
+  "recordingVoice": "Recording...",
+  "@recordingVoice": {
+    "description": "Recording voice indicator"
+  },
+
+  "voiceTooShort": "Recording too short",
+  "@voiceTooShort": {
+    "description": "Voice recording too short error"
+  },
+
+  "sendImage": "Send Image",
+  "@sendImage": {
+    "description": "Send image button"
+  },
+
+  "feedbackHistory": "Feedback History",
+  "@feedbackHistory": {
+    "description": "Feedback history section title"
+  },
+
+  "noFeedbackYet": "No feedback yet",
+  "@noFeedbackYet": {
+    "description": "No feedback message"
+  },
+
+  "textFeedback": "Text",
+  "@textFeedback": {
+    "description": "Text feedback type"
+  },
+
+  "voiceFeedback": "Voice",
+  "@voiceFeedback": {
+    "description": "Voice feedback type"
+  },
+
+  "imageFeedback": "Image",
+  "@imageFeedback": {
+    "description": "Image feedback type"
+  },
+
+  "permissionDenied": "Permission denied",
+  "@permissionDenied": {
+    "description": "Permission denied error"
+  },
+
+  "microphonePermission": "Microphone permission required",
+  "@microphonePermission": {
+    "description": "Microphone permission required message"
+  },
+
+  "failedToStartRecording": "Failed to start recording",
+  "@failedToStartRecording": {
+    "description": "Failed to start recording error"
+  },
+
+  "failedToStopRecording": "Failed to stop recording",
+  "@failedToStopRecording": {
+    "description": "Failed to stop recording error"
+  },
+
+  "failedToSendFeedback": "Failed to send feedback",
+  "@failedToSendFeedback": {
+    "description": "Failed to send feedback error"
+  },
+
+  "failedToSendVoice": "Failed to send voice",
+  "@failedToSendVoice": {
+    "description": "Failed to send voice error"
+  },
+
+  "failedToPickImage": "Failed to pick image",
+  "@failedToPickImage": {
+    "description": "Failed to pick image error"
+  },
+
+  "close": "Close",
+  "@close": {
+    "description": "Close button text"
+  },
+
+  "justNow": "Just now",
+  "@justNow": {
+    "description": "Time format: just now"
+  },
+
+  "editImage": "Edit Image",
+  "@editImage": {
+    "description": "Edit image button"
+  },
+
+  "saveEditedImage": "Save",
+  "@saveEditedImage": {
+    "description": "Save edited image button"
+  },
+
+  "cancelEdit": "Cancel",
+  "@cancelEdit": {
+    "description": "Cancel editing button"
+  },
+
+  "imageEditing": "Image Editing",
+  "@imageEditing": {
+    "description": "Image editing page title"
+  },
+
+  "uploadingEditedImage": "Uploading edited image...",
+  "@uploadingEditedImage": {
+    "description": "Uploading edited image message"
+  },
+
+  "editImageFailed": "Failed to edit image",
+  "@editImageFailed": {
+    "description": "Failed to edit image error"
+  },
+
+  "currentExercisePlan": "Current Exercise Plan",
+  "@currentExercisePlan": {
+    "description": "Current exercise plan label"
+  },
+
+  "currentDietPlan": "Current Diet Plan",
+  "@currentDietPlan": {
+    "description": "Current diet plan label"
+  },
+
+  "currentSupplementPlan": "Current Supplement Plan",
+  "@currentSupplementPlan": {
+    "description": "Current supplement plan label"
+  },
+
+  "noPlan": "No Plan",
+  "@noPlan": {
+    "description": "No plan assigned label"
+  },
+
+  "splashLoading": "Loading...",
+  "@splashLoading": {
+    "description": "Loading message on splash screen"
+  },
+
+  "splashLoadError": "Failed to load user data",
+  "@splashLoadError": {
+    "description": "Error message when loading user data fails on splash screen"
+  },
+
+  "upcomingScheduleTitle": "Upcoming Schedule",
+  "@upcomingScheduleTitle": {
+    "description": "Upcoming schedule section title on coach home page"
+  },
+
+  "pendingReviewsTitle": "Pending Reviews",
+  "@pendingReviewsTitle": {
+    "description": "Pending reviews section title on coach home page"
+  },
+
+  "viewMore": "View More",
+  "@viewMore": {
+    "description": "View more button text"
+  },
+
+  "viewAll": "View All",
+  "@viewAll": {
+    "description": "View all button text"
+  },
+
+  "recordTraining": "record training",
+  "@recordTraining": {
+    "description": "Record training text for summary stats"
+  },
+
+  "recordsToReview": "Records to Review",
+  "@recordsToReview": {
+    "description": "Records to review label for summary stats"
+  },
+
+  "unreadMessagesLabel": "Unread Messages",
+  "@unreadMessagesLabel": {
+    "description": "Unread messages label for summary stats"
+  },
+
+  "noPendingReviews": "No pending reviews",
+  "@noPendingReviews": {
+    "description": "No pending reviews message"
+  },
+
+  "noPendingReviewsDesc": "All training records have been reviewed",
+  "@noPendingReviewsDesc": {
+    "description": "No pending reviews description"
+  },
+
+  "aiProgressSummary": "AI Progress Summary",
+  "@aiProgressSummary": {
+    "description": "AI progress summary dialog title"
+  },
+
+  "generateAISummary": "Generate AI Summary",
+  "@generateAISummary": {
+    "description": "Generate AI summary button text"
+  },
+
+  "generatingAISummary": "Generating...",
+  "@generatingAISummary": {
+    "description": "Generating AI summary loading text"
+  },
+
+  "aiSummaryFailed": "Failed to Generate",
+  "@aiSummaryFailed": {
+    "description": "AI summary generation failed title"
+  },
+
+  "aiSummaryFailedMessage": "Unable to generate AI summary. Please try again later.",
+  "@aiSummaryFailedMessage": {
+    "description": "AI summary generation failed message"
+  },
+
+  "provideFeedback": "Provide Feedback",
+  "@provideFeedback": {
+    "description": "Provide feedback button text"
+  },
+
+  "hideInput": "Hide Input",
+  "@hideInput": {
+    "description": "Hide input bar button text"
+  },
+
+  "exerciseFeedbackHistory": "{exerciseName} - Feedback History",
+  "@exerciseFeedbackHistory": {
+    "description": "Exercise feedback history section title",
+    "placeholders": {
+      "exerciseName": {
+        "type": "String"
+      }
+    }
+  },
+
+  "noFeedbackYet": "No feedback yet",
+  "@noFeedbackYet": {
+    "description": "Empty state text for no feedback"
+  },
+
+  "loadMore": "Load More",
+  "@loadMore": {
+    "description": "Load more button text"
+  },
+
+  "previewPhoto": "Preview Photo",
+  "@previewPhoto": {
+    "description": "Image preview page title"
+  },
+
+  "aiAnalysis": "AI Analysis",
+  "@aiAnalysis": {
+    "description": "AI analysis button text"
+  },
+
+  "manualRecord": "Manual Record",
+  "@manualRecord": {
+    "description": "Manual record button text"
+  },
+
+  "uploading": "Uploading...",
+  "@uploading": {
+    "description": "Uploading state text"
+  },
+
+  "uploadingImage": "Uploading image...",
+  "@uploadingImage": {
+    "description": "Image uploading progress text"
+  },
+
+  "addFeedbackButton": "Add Feedback",
+  "@addFeedbackButton": {
+    "description": "Add feedback button text in read-only section"
+  },
+
+  "recentFeedbacks": "Recent Feedbacks",
+  "@recentFeedbacks": {
+    "description": "Recent feedbacks section title"
+  },
+
+  "carbohydrates": "Carbohydrates",
+  "@carbohydrates": {
+    "description": "Carbohydrates nutrition label"
+  },
+
+  "savingImage": "Saving image...",
+  "@savingImage": {
+    "description": "Saving image progress text"
+  },
+
+  "deletingOldImage": "Cleaning up old image...",
+  "@deletingOldImage": {
+    "description": "Deleting old image progress text"
+  },
+
+  "keyframeUpdated": "Keyframe updated successfully",
+  "@keyframeUpdated": {
+    "description": "Keyframe update success message"
+  },
+
+  "switchCamera": "Switch Camera",
+  "@switchCamera": {
+    "description": "Switch between front and back camera"
+  },
+
+  "keyframeEditNote": "Students can see all edits to keyframes",
+  "@keyframeEditNote": {
+    "description": "Note about keyframe edits being visible to students"
+  },
+
+  "keyframeEditNoteTitle": "Note",
+  "@keyframeEditNoteTitle": {
+    "description": "Title for keyframe edit note dialog"
+  },
+
+  "viewDetails": "View Details",
+  "@viewDetails": {
+    "description": "Button text to view meal details"
+  },
+
+  "mealDetails": "Meal Details",
+  "@mealDetails": {
+    "description": "Title for meal details bottom sheet"
+  },
+
+  "saveChanges": "Save Changes",
+  "@saveChanges": {
+    "description": "Button text to save changes"
+  },
+
+  "addFood": "Add Food",
+  "@addFood": {
+    "description": "Button text to add food item"
+  },
+
+  "editFood": "Edit Food",
+  "@editFood": {
+    "description": "Button text to edit food item"
+  },
+
+  "deleteFood": "Delete Food",
+  "@deleteFood": {
+    "description": "Button text to delete food item"
+  },
+
+  "foodName": "Food Name",
+  "@foodName": {
+    "description": "Label for food name input"
+  },
+
+  "amount": "Amount",
+  "@amount": {
+    "description": "Label for amount input"
+  },
+
+  "yesterday": "yesterday",
+  "@yesterday": {
+    "description": "Label for yesterday"
+  },
+
+  "daysAgo": "{days} days ago",
+  "@daysAgo": {
+    "description": "Label for days ago",
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+
+  "foodList": "Food List",
+  "@foodList": {
+    "description": "Food list section title"
+  },
+
+  "noPhotos": "No photos",
+  "@noPhotos": {
+    "description": "Empty state for photos"
+  },
+
+  "noFood": "No food items",
+  "@noFood": {
+    "description": "Empty state for food list"
+  },
+
+  "nutritionSummary": "Nutrition Summary",
+  "@nutritionSummary": {
+    "description": "Nutrition summary label for custom food item"
+  },
+
+  "addNotePlaceholder": "Add note...",
+  "@addNotePlaceholder": {
+    "description": "Placeholder for note input field"
+  },
+
+  "cannotDeleteTemplate": "Cannot Delete Template",
+  "@cannotDeleteTemplate": {
+    "description": "Error dialog title when trying to delete a template in use"
+  },
+
+  "templateInUse": "This template is being used by {count} training plan(s). Please remove it from those plans first.",
+  "@templateInUse": {
+    "description": "Error message when trying to delete a template in use",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+
+  "exerciseGuidance": "Exercise Guidance",
+  "@exerciseGuidance": {
+    "description": "Title for exercise guidance sheet"
+  },
+
+  "viewGuidance": "View Guidance",
+  "@viewGuidance": {
+    "description": "Button text to view exercise guidance"
+  },
+
+  "noGuidanceAvailable": "No guidance available for this exercise",
+  "@noGuidanceAvailable": {
+    "description": "Message when no guidance content is available"
+  },
+
+  "guidanceVideo": "Guidance Video",
+  "@guidanceVideo": {
+    "description": "Label for guidance video section"
+  },
+
+  "textGuidance": "Text Guidance",
+  "@textGuidance": {
+    "description": "Label for text guidance section"
+  },
+
+  "referenceImages": "Reference Images",
+  "@referenceImages": {
+    "description": "Label for reference images section"
+  },
+
+  "exerciseNamePlaceholder": "e.g., Squat, Bench Press",
+  "@exerciseNamePlaceholder": {
+    "description": "Placeholder text for exercise name input field"
+  },
+
+  "extractKeyframe": "Extract\nKeyframe",
+  "@extractKeyframe": {
+    "description": "Button text to extract keyframe from video"
+  },
+
+  "noTrainingRecords": "No Training Records",
+  "@noTrainingRecords": {
+    "description": "Empty state title when there are no training records"
+  },
+
+  "trainingInfo": "Training Info",
+  "@trainingInfo": {
+    "description": "Training information section title"
+  },
+
+  "trainingDate": "Training Date",
+  "@trainingDate": {
+    "description": "Training date label"
+  },
+
+  "totalExercises": "Total Exercises",
+  "@totalExercises": {
+    "description": "Total exercises count label"
+  },
+
+  "exerciseDetails": "Exercise Details",
+  "@exerciseDetails": {
+    "description": "Exercise details section title"
+  },
+
+  "videoNumber": "Video {number}",
+  "@videoNumber": {
+    "description": "Video number label",
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+
+  "videoDuration": "Duration",
+  "@videoDuration": {
+    "description": "Video duration label"
+  },
+
+  "reviewStatus": "Review Status",
+  "@reviewStatus": {
+    "description": "Review status label"
+  },
+
+  "notReviewed": "Not Reviewed",
+  "@notReviewed": {
+    "description": "Not reviewed status label"
+  },
+
+  "completedSets": "Completed Sets",
+  "@completedSets": {
+    "description": "Completed sets label"
+  },
+
+  "averageWeight": "Average Weight",
+  "@averageWeight": {
+    "description": "Average weight label"
+  },
+
+  "totalReps": "Total Reps",
+  "@totalReps": {
+    "description": "Total reps label"
+  },
+
+  "setDetails": "Set Details",
+  "@setDetails": {
+    "description": "Set details label"
+  },
+
+  "dailyTrainingFeedback": "Daily Training Feedback",
+  "@dailyTrainingFeedback": {
+    "description": "Daily training feedback section title"
+  },
+
+  "noDailyTrainingFeedbackYet": "No feedback for this training yet",
+  "@noDailyTrainingFeedbackYet": {
+    "description": "Empty state message for daily training feedback"
+  },
+
+  "exerciseList": "Exercise List",
+  "@exerciseList": {
+    "description": "Title for exercise list section"
+  },
+
+  "addExercise": "Add",
+  "@addExercise": {
+    "description": "Button text to add an exercise"
+  },
+
+  "searchExercises": "Search Exercises",
+  "@searchExercises": {
+    "description": "Placeholder for exercise search input"
+  },
+
+  "createNewExercise": "Create new \"{name}\"",
+  "@createNewExercise": {
+    "description": "Option to create a new exercise template",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "description": "Name of the new exercise"
+      }
+    }
+  },
+
+  "addGuidance": "Add Guidance",
+  "@addGuidance": {
+    "description": "Button to add guidance to exercise"
+  },
+
+  "exerciseNamePlaceholder": "Exercise Name",
+  "@exerciseNamePlaceholder": {
+    "description": "Placeholder for exercise name input"
+  },
+
+  "trainingSets": "Sets",
+  "@trainingSets": {
+    "description": "Training sets section title"
+  },
+
+  "addSet": "Add Set",
+  "@addSet": {
+    "description": "Button to add a training set"
+  },
+
+  "noTemplateLinked": "No Template Linked",
+  "@noTemplateLinked": {
+    "description": "Message when exercise has no template"
+  },
+
+  "unknownExercise": "Unknown Exercise",
+  "@unknownExercise": {
+    "description": "Fallback exercise name when template not found"
+  },
+
+  "loadFailed": "Load Failed",
+  "@loadFailed": {
+    "description": "Error message when loading fails"
+  },
+
+  "createPlanTitle": "Create Training Plan",
+  "@createPlanTitle": {
+    "description": "Title for create plan page"
+  },
+
+  "chooseCreationMethod": "Choose how to start:",
+  "@chooseCreationMethod": {
+    "description": "Subtitle for creation method selection"
+  },
+
+  "aiGuidedCreate": "AI Guided Creation",
+  "@aiGuidedCreate": {
+    "description": "AI guided creation button title"
+  },
+
+  "aiGuidedDesc": "Let AI help you quickly generate a plan",
+  "@aiGuidedDesc": {
+    "description": "AI guided creation button description"
+  },
+
+  "scanOrPasteText": "Scan or Paste Text",
+  "@scanOrPasteText": {
+    "description": "Text import button title"
+  },
+
+  "scanOrPasteDesc": "Import from existing plan",
+  "@scanOrPasteDesc": {
+    "description": "Text import button description"
+  },
+
+  "orManualCreate": "or... Manual Create",
+  "@orManualCreate": {
+    "description": "Manual create link text"
+  },
+
+  "textImportTitle": "Import from Text",
+  "@textImportTitle": {
+    "description": "Text import view title"
+  },
+
+  "textImportSubtitle": "Scan an image or paste text to import a training plan",
+  "@textImportSubtitle": {
+    "description": "Text import view subtitle"
+  },
+
+  "scanImage": "Scan Image",
+  "@scanImage": {
+    "description": "Scan image tab label"
+  },
+
+  "pasteText": "Paste Text",
+  "@pasteText": {
+    "description": "Paste text tab label"
+  },
+
+  "selectImageToScan": "Select Image to Scan",
+  "@selectImageToScan": {
+    "description": "Button to select image for OCR"
+  },
+
+  "selectAnotherImage": "Select Another Image",
+  "@selectAnotherImage": {
+    "description": "Button to select another image"
+  },
+
+  "extractedOrPastedText": "Extracted or Pasted Text",
+  "@extractedOrPastedText": {
+    "description": "Label for text input area"
+  },
+
+  "pasteOrTypeHere": "Paste or type training plan text here...",
+  "@pasteOrTypeHere": {
+    "description": "Placeholder for text input"
+  },
+
+  "exampleFormat": "Example Format",
+  "@exampleFormat": {
+    "description": "Example format section title"
+  },
+
+  "exampleFormatContent": "Day 1: Chest\nBench Press 3x10\nIncline Press 3x12\n\nDay 2: Back\nPull-ups 4x8\nRows 3x10",
+  "@exampleFormatContent": {
+    "description": "Example format content"
+  },
+
+  "extractingText": "Extracting text...",
+  "@extractingText": {
+    "description": "OCR extraction loading message"
+  },
+
+  "parsingPlan": "Parsing plan...",
+  "@parsingPlan": {
+    "description": "AI parsing loading message"
+  },
+
+  "startParsing": "Start Parsing",
+  "@startParsing": {
+    "description": "Button to start parsing text"
+  },
+
+  "extractionSuccess": "Text extracted successfully! Please review and edit if needed.",
+  "@extractionSuccess": {
+    "description": "OCR extraction success message"
+  },
+
+  "addDay": "Add Day",
+  "@addDay": {
+    "description": "Add day button label"
+  },
+
+  "selectDayOrAddNew": "Select a day or add a new one",
+  "@selectDayOrAddNew": {
+    "description": "Empty state message when no day selected"
+  },
+
+  "savePlan": "Save Plan",
+  "@savePlan": {
+    "description": "Save plan button label"
+  },
+
+  "aiGeneratingPlan": "AI is generating training plan...",
+  "@aiGeneratingPlan": {
+    "description": "AI generation loading message"
+  },
+
+  "generatingDay": "Generating Day {day}",
+  "@generatingDay": {
+    "description": "Current day being generated",
+    "placeholders": {
+      "day": {
+        "type": "int"
+      }
+    }
+  },
+
+  "addedExercises": "{count} exercises added",
+  "@addedExercises": {
+    "description": "Number of exercises added",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+
+  "completedDays": "{count} days completed",
+  "@completedDays": {
+    "description": "Number of days completed",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+
+  "noSetsYet": "No sets yet. Click \"Add Set\" button.",
+  "@noSetsYet": {
+    "description": "Empty state message for sets"
+  },
+
+  "editPlan": "Edit Plan",
+  "@editPlan": {
+    "description": "Edit plan page title"
+  },
+
+  "importSuccess": "Import Successful",
+  "@importSuccess": {
+    "description": "Import success dialog title"
+  },
+
+  "importWarnings": "{count} warnings found",
+  "@importWarnings": {
+    "description": "Number of import warnings",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+
+  "pleaseReview": "Please review and adjust the plan as needed.",
+  "@pleaseReview": {
+    "description": "Import success message"
   }
 }

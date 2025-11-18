@@ -340,6 +340,42 @@ class AIService {
     }
   }
 
+  /// 从文本导入训练计划
+  ///
+  /// [textContent] 训练计划文本内容
+  /// 返回导入结果（包含计划和置信度）
+  static Future<ImportResult> importPlanFromText({
+    required String textContent,
+  }) async {
+    try {
+      AppLogger.info('📝 从文本导入训练计划');
+      AppLogger.info('文本长度: ${textContent.length} 字符');
+
+      final result = await CloudFunctionsService.importPlanFromText(
+        textContent: textContent,
+      );
+
+      // 解析结果
+      final importResult = ImportResult.fromJson(result);
+
+      if (importResult.isSuccess) {
+        AppLogger.info(
+          '✅ 文本导入成功 - 置信度: ${(importResult.confidence * 100).toStringAsFixed(0)}%',
+        );
+        if (importResult.hasWarnings) {
+          AppLogger.warning('⚠️ 警告: ${importResult.warnings.join(", ")}');
+        }
+      } else {
+        AppLogger.warning('⚠️ 文本导入失败: ${importResult.errorMessage}');
+      }
+
+      return importResult;
+    } catch (e) {
+      AppLogger.error('❌ 文本导入异常', e);
+      return ImportResult.failure(errorMessage: '文本导入失败: $e');
+    }
+  }
+
   /// 基于结构化参数生成训练计划
   ///
   /// [params] 结构化参数对象
@@ -931,10 +967,7 @@ class AIService {
 
       final result = await CloudFunctionsService.call(
         'analyze_food_nutrition',
-        {
-          'image_url': imageUrl,
-          'language': language,
-        },
+        {'image_url': imageUrl, 'language': language},
       );
 
       if (result['status'] == 'success') {
@@ -942,7 +975,7 @@ class AIService {
 
         // 安全地转换为 Map<String, dynamic>
         final analysisData = data is Map
-            ? Map<String, dynamic>.from(data as Map)
+            ? Map<String, dynamic>.from(data)
             : <String, dynamic>{};
 
         final foodsList = analysisData['foods'] as List<dynamic>? ?? [];

@@ -20,6 +20,11 @@ service firebase.storage {
              && request.resource.contentType.matches('image/.*');
     }
 
+    // Helper function to validate video file
+    function isValidVideo() {
+      return request.resource.contentType.matches('video/.*');
+    }
+
     // ==================== 训练计划图片 ====================
     // Path: training_plan_images/{userId}/{fileName}
     match /training_plan_images/{userId}/{fileName} {
@@ -76,6 +81,51 @@ service firebase.storage {
     // Path: avatars/{userId}
     match /avatars/{userId} {
       allow write: if isOwner(userId) && isValidImage();
+      allow read: if isAuthenticated();
+    }
+
+    // ==================== 训练关键帧图片 ====================
+    // Path: training_keyframes/{trainingId}/{fileName}
+    match /training_keyframes/{trainingId}/{fileName} {
+      // 允许所有认证用户读取关键帧（教练和学生）
+      allow read: if isAuthenticated();
+      // 允许认证用户上传关键帧图片（教练本地提取后上传）
+      allow write: if isAuthenticated() && isValidImage();
+    }
+
+    // ==================== 学生训练视频和缩略图 ====================
+    // Path: students/trainings/{userId}/{fileName}
+    match /students/trainings/{userId}/{fileName} {
+      // 允许学生本人上传训练视频和缩略图
+      allow write: if isOwner(userId) && (isValidVideo() || isValidImage());
+      // 允许任何已认证用户读取（学生和教练都可以查看）
+      allow read: if isAuthenticated();
+    }
+
+    // ==================== 教练动作库视频 ====================
+    // Path: exercise_videos/{userId}/{fileName}
+    match /exercise_videos/{userId}/{fileName} {
+      // 允许教练本人上传动作库视频
+      allow write: if isOwner(userId) && isValidVideo();
+      // 允许任何已认证用户读取（教练和学生都可以查看）
+      allow read: if isAuthenticated();
+    }
+
+    // ==================== 教练动作库视频缩略图 ====================
+    // Path: exercise_thumbnails/{userId}/{fileName}
+    match /exercise_thumbnails/{userId}/{fileName} {
+      // 允许教练本人上传动作库视频缩略图
+      allow write: if isOwner(userId) && isValidImage();
+      // 允许任何已认证用户读取
+      allow read: if isAuthenticated();
+    }
+
+    // ==================== 教练动作库图片 ====================
+    // Path: exercise_images/{userId}/{fileName}
+    match /exercise_images/{userId}/{fileName} {
+      // 允许教练本人上传动作库辅助图片
+      allow write: if isOwner(userId) && isValidImage();
+      // 允许任何已认证用户读取
       allow read: if isAuthenticated();
     }
 

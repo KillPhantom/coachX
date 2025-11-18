@@ -87,7 +87,7 @@ class DietDayEditor extends StatelessWidget {
                       ),
                       _buildMacroChip(
                         context,
-                        '${totalMacros!.calories.toStringAsFixed(0)}',
+                        totalMacros!.calories.toStringAsFixed(0),
                         '卡路里',
                         CupertinoIcons.flame_fill,
                         AppColors.secondaryPurple,
@@ -113,7 +113,7 @@ class DietDayEditor extends StatelessWidget {
               if (onAddMeal != null)
                 CupertinoButton(
                   padding: EdgeInsets.zero,
-                  minSize: 0,
+                  minimumSize: Size.zero,
                   onPressed: onAddMeal,
                   child: Row(
                     children: [

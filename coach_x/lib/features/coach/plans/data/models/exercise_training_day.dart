@@ -39,7 +39,7 @@ class ExerciseTrainingDay {
       day: json['day'] as int? ?? 1,
       name: json['name'] as String? ?? 'Day ${json['day'] ?? 1}',
       note: json['note'] as String? ?? '',
-      exercises: exercises.isNotEmpty ? exercises : [Exercise.empty()],
+      exercises: exercises,
       completed: json['completed'] as bool? ?? false,
     );
   }
@@ -82,10 +82,7 @@ class ExerciseTrainingDay {
     if (index < 0 || index >= exercises.length) return this;
     final newExercises = List<Exercise>.from(exercises);
     newExercises.removeAt(index);
-    // 至少保留一个 Exercise
-    return copyWith(
-      exercises: newExercises.isEmpty ? [Exercise.empty()] : newExercises,
-    );
+    return copyWith(exercises: newExercises);
   }
 
   /// 更新 Exercise
@@ -103,10 +100,6 @@ class ExerciseTrainingDay {
 
   /// 获取 Exercises 总数
   int get totalExercises => exercises.length;
-
-  /// 获取已完成的 Exercises 数量
-  int get completedExercisesCount =>
-      exercises.where((exercise) => exercise.completed).length;
 
   /// 是否有效（至少有一个有效的 Exercise）
   bool get isValid =>

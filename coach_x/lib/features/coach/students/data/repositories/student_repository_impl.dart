@@ -2,6 +2,7 @@ import 'package:coach_x/core/services/cloud_functions_service.dart';
 import 'package:coach_x/core/utils/logger.dart';
 import '../models/student_list_item_model.dart';
 import '../models/plan_summary.dart';
+import '../cache/students_cache_service.dart';
 import 'student_repository.dart';
 
 /// 学生Repository实现
@@ -15,6 +16,27 @@ class StudentRepositoryImpl implements StudentRepository {
     bool includePlans = true,
   }) async {
     try {
+      // 1. 尝试从缓存读取
+      final cachedStudents = await StudentsCacheService.getCachedStudents(
+        pageNumber,
+        searchName,
+        filterPlanId,
+      );
+
+      if (cachedStudents != null) {
+        // 缓存命中，返回缓存数据
+        // 注意：从缓存返回时，无法获取 totalCount/hasMore 等分页信息
+        // 这些信息需要从服务器获取，所以使用默认值
+        return StudentsPageResult(
+          students: cachedStudents,
+          totalCount: cachedStudents.length,
+          hasMore: false,
+          currentPage: pageNumber,
+          totalPages: 1,
+        );
+      }
+
+      // 2. 缓存无效，调用 Cloud Function
       final params = <String, dynamic>{
         'page_size': pageSize,
         'page_number': pageNumber,
@@ -57,6 +79,14 @@ class StudentRepositoryImpl implements StudentRepository {
 
       AppLogger.info('fetch_students成功: ${students.length}个学生');
 
+      // 3. 写入缓存
+      await StudentsCacheService.cacheStudents(
+        students,
+        pageNumber,
+        searchName,
+        filterPlanId,
+      );
+
       return result;
     } catch (e, stackTrace) {
       AppLogger.error('获取学生列表失败', e, stackTrace);
@@ -74,6 +104,9 @@ class StudentRepositoryImpl implements StudentRepository {
       });
 
       AppLogger.info('delete_student成功');
+
+      // 删除成功后清除缓存
+      await StudentsCacheService.invalidateCache();
     } catch (e, stackTrace) {
       AppLogger.error('删除学生失败', e, stackTrace);
       rethrow;

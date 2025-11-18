@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/foundation.dart';
 import 'package:coach_x/firebase_options.dart';
+import 'package:coach_x/core/constants/app_constants.dart';
 import 'package:coach_x/core/utils/logger.dart';
 
 /// Firebase初始化服务
@@ -30,12 +31,21 @@ class FirebaseInitService {
       // Release 模式：连接到生产 Firebase Cloud APIs
       if (kDebugMode) {
         AppLogger.info('🔧 Debug 模式 - 使用本地 Firebase Emulators');
+        AppLogger.info(
+          '📡 Emulator 地址: ${AppConstants.firebaseEmulatorHost}:${AppConstants.firebaseFunctionsEmulatorPort}',
+        );
 
         // Functions Emulator
-        FirebaseFunctions.instance.useFunctionsEmulator('127.0.0.1', 5001);
+        FirebaseFunctions.instance.useFunctionsEmulator(
+          AppConstants.firebaseEmulatorHost,
+          AppConstants.firebaseFunctionsEmulatorPort,
+        );
 
         // Firestore Emulator (如果需要)
-        // FirebaseFirestore.instance.useFirestoreEmulator('127.0.0.1', 8080);
+        // FirebaseFirestore.instance.useFirestoreEmulator(
+        //   AppConstants.firebaseEmulatorHost,
+        //   AppConstants.firebaseFirestoreEmulatorPort,
+        // );
       } else {
         AppLogger.info('🚀 Release 模式 - 使用生产 Firebase Cloud APIs');
       }

@@ -239,7 +239,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String unreviewedTrainingsCount(int count) {
-    return '$count training records need to be reviewed';
+    return '$count to be reviewed';
   }
 
   @override
@@ -355,7 +355,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get selectAction => 'Select action';
 
   @override
-  String get viewDetails => 'View details';
+  String get viewDetails => 'View Details';
 
   @override
   String get assignPlan => 'Assign plan';
@@ -364,7 +364,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get deleteStudent => 'Delete student';
 
   @override
-  String get confirmDelete => 'Are you sure you want to delete this record?';
+  String get confirmDelete => 'Confirm Delete';
 
   @override
   String get plansTitle => 'Plans';
@@ -407,7 +407,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get refreshFailed => 'Refresh failed';
 
   @override
-  String get noResults => 'No results';
+  String get noResults => 'No results found';
 
   @override
   String noPlansFoundForQuery(String query) {
@@ -485,6 +485,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get trainingRecordDesc => 'Log sets, reps, weight, and videos.';
+
+  @override
+  String get startRecording => 'Start Recording';
+
+  @override
+  String get viewRecords => 'View Records';
 
   @override
   String get dietRecord => 'Record Meal';
@@ -579,6 +585,21 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get weightChange => 'Weight';
+
+  @override
+  String get caloriesIntake => 'Calories';
+
+  @override
+  String get volumePR => 'Volume';
+
+  @override
+  String get noDataStartRecording => 'No data yet, start recording now';
+
+  @override
+  String get lastWeekData => 'Last week\'s data';
+
+  @override
   String get todayRecord => 'Today\'s Meal Plan';
 
   @override
@@ -670,6 +691,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get video => 'Video';
+
+  @override
+  String videoWithNumber(int number) {
+    return 'Video $number';
+  }
 
   @override
   String get coachNotes => 'Coach Notes:';
@@ -841,8 +867,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get cameraPermissionDenied =>
-      'Camera permission denied. Please enable camera access in Settings.';
+  String get cameraPermissionDenied => 'Camera permission denied';
 
   @override
   String get analysisFailed => 'Analysis Failed';
@@ -911,6 +936,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get skipPhoto => 'Skip Photo';
 
   @override
+  String get usePhoto => 'Use Photo';
+
+  @override
   String get enterWeight => 'Enter Weight';
 
   @override
@@ -944,6 +972,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get maxPhotosReached => 'Maximum 3 photos allowed';
 
   @override
+  String get recordExistsTitle => 'Record Already Exists';
+
+  @override
+  String recordExistsMessage(String date) {
+    return 'You already have a record for $date. Do you want to replace it?';
+  }
+
+  @override
+  String get replace => 'Replace';
+
+  @override
   String get history => 'History';
 
   @override
@@ -968,13 +1007,29 @@ class AppLocalizationsEn extends AppLocalizations {
   String get completed => 'Completed';
 
   @override
-  String get videoDurationExceeded => 'Video must be ≤ 1 minute';
+  String get videoDurationExceeded => 'Video duration exceeds 60 seconds';
 
   @override
   String get recordingVideo => 'Recording...';
 
   @override
-  String get selectFromGallery => 'Select from gallery';
+  String get selectFromGallery => 'Select from Gallery';
+
+  @override
+  String get videoTooLong => 'Video too long';
+
+  @override
+  String get videoTooLongMessage => 'Please select a video under 60 seconds';
+
+  @override
+  String get videoProcessingFailed => 'Video processing failed';
+
+  @override
+  String get videoCompressionFailed =>
+      'Video compression failed, uploading original file';
+
+  @override
+  String get photoLibraryPermissionDenied => 'Photo library permission denied';
 
   @override
   String get startTimerConfirmTitle => 'Start Timer';
@@ -1025,4 +1080,754 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get coachPlan => 'Coach\'s Plan';
+
+  @override
+  String get feedbackSearchPlaceholder => 'Search feedback...';
+
+  @override
+  String get feedbackStartDate => 'Start Date';
+
+  @override
+  String get feedbackEndDate => 'End Date';
+
+  @override
+  String get feedbackToday => 'Today';
+
+  @override
+  String get feedbackYesterday => 'Yesterday';
+
+  @override
+  String get feedbackNoFeedback => 'No feedback yet';
+
+  @override
+  String get feedbackNoFeedbackDesc => 'Training feedback will appear here';
+
+  @override
+  String get feedbackLoadError => 'Failed to load feedback';
+
+  @override
+  String get feedbackRetry => 'Retry';
+
+  @override
+  String get trainingReviews => 'Training Reviews';
+
+  @override
+  String get searchStudentName => 'Search by student name';
+
+  @override
+  String get filterAll => 'All';
+
+  @override
+  String get filterPending => 'Pending';
+
+  @override
+  String get filterReviewed => 'Reviewed';
+
+  @override
+  String get statusPending => 'Pending';
+
+  @override
+  String get statusReviewed => 'Reviewed';
+
+  @override
+  String get noTrainingReviews => 'No training reviews';
+
+  @override
+  String get noTrainingReviewsDesc => 'Training records will appear here';
+
+  @override
+  String get todaySummary => 'Today\'s Summary';
+
+  @override
+  String get nutritionDetails => 'Nutrition Details';
+
+  @override
+  String get exerciseRecordVideo => 'Exercise Record Video';
+
+  @override
+  String get keyframes => 'Keyframes';
+
+  @override
+  String get keyframesProcessing => 'Keyframes extracting...';
+
+  @override
+  String get noKeyframes => 'No keyframes available';
+
+  @override
+  String get viewKeyframe => 'View Keyframe';
+
+  @override
+  String get fats => 'Fats';
+
+  @override
+  String get addFeedback => 'Add feedback for this set...';
+
+  @override
+  String get complete => 'Complete';
+
+  @override
+  String get viewAll => 'View All';
+
+  @override
+  String get noNutritionData => 'No nutrition data';
+
+  @override
+  String get noExerciseRecords => 'No exercise records';
+
+  @override
+  String get savingFeedback => 'Saving feedback...';
+
+  @override
+  String get feedbackSaved => 'Feedback saved successfully';
+
+  @override
+  String get failedToSave => 'Failed to save feedback';
+
+  @override
+  String get noDataFound => 'No data found';
+
+  @override
+  String get details => 'Details';
+
+  @override
+  String get trainingDetails => 'Training Details';
+
+  @override
+  String get videoUploading => 'Uploading...';
+
+  @override
+  String get videoUploadFailed => 'Upload failed';
+
+  @override
+  String get retryUpload => 'Retry';
+
+  @override
+  String get processing => 'Processing...';
+
+  @override
+  String get videoPlayer => 'Video Player';
+
+  @override
+  String get videoLoadFailed => 'Failed to load video';
+
+  @override
+  String get exerciseLibrary => 'Exercise Library';
+
+  @override
+  String get searchExercises => 'Search Exercises';
+
+  @override
+  String get exercises => 'exercises';
+
+  @override
+  String get newExercise => 'New Exercise';
+
+  @override
+  String get noExercisesYet => 'No exercises yet';
+
+  @override
+  String get createFirstExercise => 'Create your first exercise template';
+
+  @override
+  String get tags => 'Tags';
+
+  @override
+  String get deleteExercise => 'Delete Exercise';
+
+  @override
+  String get confirmDeleteExercise =>
+      'Are you sure you want to delete this exercise?';
+
+  @override
+  String get addTag => 'Add Tag';
+
+  @override
+  String get tagNameHint => 'Enter tag name';
+
+  @override
+  String get tagAlreadyExists => 'Tag already exists';
+
+  @override
+  String get extractKeyframes => 'Extract Keyframes';
+
+  @override
+  String get extractingKeyframes => 'Extracting keyframes...';
+
+  @override
+  String get createExercise => 'Create Exercise';
+
+  @override
+  String get editExercise => 'Edit Exercise';
+
+  @override
+  String get exerciseName => 'Exercise Name';
+
+  @override
+  String get exerciseNameHint => 'Enter exercise name';
+
+  @override
+  String get selectTags => 'Select Tags';
+
+  @override
+  String get atLeastOneTag => 'Please select at least one tag';
+
+  @override
+  String get guidanceVideo => 'Guidance Video';
+
+  @override
+  String get deleteVideo => 'Delete Video';
+
+  @override
+  String get textGuidance => 'Text Guidance';
+
+  @override
+  String get textGuidanceHint => 'Enter detailed guidance';
+
+  @override
+  String get auxiliaryImages => 'Auxiliary Images';
+
+  @override
+  String get deleteImage => 'Delete Image';
+
+  @override
+  String get deleteImageMessage =>
+      'Are you sure you want to delete this image?';
+
+  @override
+  String get pleaseEnterName => 'Please enter exercise name';
+
+  @override
+  String get createSuccess => 'Exercise created successfully';
+
+  @override
+  String get updateSuccess => 'Exercise updated successfully';
+
+  @override
+  String get waitingForUpload => 'Waiting for upload to complete...';
+
+  @override
+  String get optional => 'Optional';
+
+  @override
+  String get noMoreData => 'No more exercises';
+
+  @override
+  String get loadingMore => 'Loading more...';
+
+  @override
+  String get extractionFailed => 'Extraction failed';
+
+  @override
+  String get retryExtraction => 'Retry';
+
+  @override
+  String get noKeyframesYet => 'No keyframes yet';
+
+  @override
+  String get extractCurrentFrame => 'Extract Frame';
+
+  @override
+  String get extractingFrame => 'Extracting...';
+
+  @override
+  String get frameExtracted => 'Frame extracted successfully';
+
+  @override
+  String get studentDetailTitle => 'Student Details';
+
+  @override
+  String get trainingRecords => 'Training Records';
+
+  @override
+  String get message => 'Message';
+
+  @override
+  String get sessions => 'Sessions';
+
+  @override
+  String get adherence => 'Adherence';
+
+  @override
+  String get volume => 'Volume';
+
+  @override
+  String get aiProgressSummary => 'AI Progress Summary';
+
+  @override
+  String get trainingVolume => 'Training Volume';
+
+  @override
+  String get weightLoss => 'Weight Change';
+
+  @override
+  String get avgStrength => 'Avg Strength';
+
+  @override
+  String get starting => 'Starting';
+
+  @override
+  String get current => 'Current';
+
+  @override
+  String get change => 'Change';
+
+  @override
+  String get target => 'Target';
+
+  @override
+  String get trainingHistory => 'Training History';
+
+  @override
+  String get pending => 'Pending';
+
+  @override
+  String get reviewed => 'Reviewed';
+
+  @override
+  String get videos => 'videos';
+
+  @override
+  String get years => 'years';
+
+  @override
+  String get feedbackInputPlaceholder => 'Add feedback...';
+
+  @override
+  String get holdToRecord => 'Hold to Record';
+
+  @override
+  String get releaseToSend => 'Release to Send';
+
+  @override
+  String get slideUpToCancel => 'Slide up to cancel';
+
+  @override
+  String get recordingVoice => 'Recording...';
+
+  @override
+  String get voiceTooShort => 'Recording too short';
+
+  @override
+  String get sendImage => 'Send Image';
+
+  @override
+  String get feedbackHistory => 'Feedback History';
+
+  @override
+  String get noFeedbackYet => 'No feedback yet';
+
+  @override
+  String get textFeedback => 'Text';
+
+  @override
+  String get voiceFeedback => 'Voice';
+
+  @override
+  String get imageFeedback => 'Image';
+
+  @override
+  String get permissionDenied => 'Permission denied';
+
+  @override
+  String get microphonePermission => 'Microphone permission required';
+
+  @override
+  String get failedToStartRecording => 'Failed to start recording';
+
+  @override
+  String get failedToStopRecording => 'Failed to stop recording';
+
+  @override
+  String get failedToSendFeedback => 'Failed to send feedback';
+
+  @override
+  String get failedToSendVoice => 'Failed to send voice';
+
+  @override
+  String get failedToPickImage => 'Failed to pick image';
+
+  @override
+  String get justNow => 'Just now';
+
+  @override
+  String get editImage => 'Edit Image';
+
+  @override
+  String get saveEditedImage => 'Save';
+
+  @override
+  String get cancelEdit => 'Cancel';
+
+  @override
+  String get imageEditing => 'Image Editing';
+
+  @override
+  String get uploadingEditedImage => 'Uploading edited image...';
+
+  @override
+  String get editImageFailed => 'Failed to edit image';
+
+  @override
+  String get currentExercisePlan => 'Current Exercise Plan';
+
+  @override
+  String get currentDietPlan => 'Current Diet Plan';
+
+  @override
+  String get currentSupplementPlan => 'Current Supplement Plan';
+
+  @override
+  String get noPlan => 'No Plan';
+
+  @override
+  String get splashLoading => 'Loading...';
+
+  @override
+  String get splashLoadError => 'Failed to load user data';
+
+  @override
+  String get upcomingScheduleTitle => 'Upcoming Schedule';
+
+  @override
+  String get pendingReviewsTitle => 'Pending Reviews';
+
+  @override
+  String get viewMore => 'View More';
+
+  @override
+  String get recordTraining => 'record training';
+
+  @override
+  String get recordsToReview => 'Records to Review';
+
+  @override
+  String get unreadMessagesLabel => 'Unread Messages';
+
+  @override
+  String get noPendingReviews => 'No pending reviews';
+
+  @override
+  String get noPendingReviewsDesc => 'All training records have been reviewed';
+
+  @override
+  String get generateAISummary => 'Generate AI Summary';
+
+  @override
+  String get generatingAISummary => 'Generating...';
+
+  @override
+  String get aiSummaryFailed => 'Failed to Generate';
+
+  @override
+  String get aiSummaryFailedMessage =>
+      'Unable to generate AI summary. Please try again later.';
+
+  @override
+  String get provideFeedback => 'Provide Feedback';
+
+  @override
+  String get hideInput => 'Hide Input';
+
+  @override
+  String exerciseFeedbackHistory(String exerciseName) {
+    return '$exerciseName - Feedback History';
+  }
+
+  @override
+  String get loadMore => 'Load More';
+
+  @override
+  String get previewPhoto => 'Preview Photo';
+
+  @override
+  String get aiAnalysis => 'AI Analysis';
+
+  @override
+  String get manualRecord => 'Manual Record';
+
+  @override
+  String get uploading => 'Uploading...';
+
+  @override
+  String get uploadingImage => 'Uploading image...';
+
+  @override
+  String get addFeedbackButton => 'Add Feedback';
+
+  @override
+  String get recentFeedbacks => 'Recent Feedbacks';
+
+  @override
+  String get carbohydrates => 'Carbohydrates';
+
+  @override
+  String get savingImage => 'Saving image...';
+
+  @override
+  String get deletingOldImage => 'Cleaning up old image...';
+
+  @override
+  String get keyframeUpdated => 'Keyframe updated successfully';
+
+  @override
+  String get switchCamera => 'Switch Camera';
+
+  @override
+  String get keyframeEditNote => 'Students can see all edits to keyframes';
+
+  @override
+  String get keyframeEditNoteTitle => 'Note';
+
+  @override
+  String get mealDetails => 'Meal Details';
+
+  @override
+  String get saveChanges => 'Save Changes';
+
+  @override
+  String get addFood => 'Add Food';
+
+  @override
+  String get editFood => 'Edit Food';
+
+  @override
+  String get deleteFood => 'Delete Food';
+
+  @override
+  String get foodName => 'Food Name';
+
+  @override
+  String get amount => 'Amount';
+
+  @override
+  String get yesterday => 'yesterday';
+
+  @override
+  String daysAgo(int days) {
+    return '$days days ago';
+  }
+
+  @override
+  String get foodList => 'Food List';
+
+  @override
+  String get noPhotos => 'No photos';
+
+  @override
+  String get noFood => 'No food items';
+
+  @override
+  String get nutritionSummary => 'Nutrition Summary';
+
+  @override
+  String get addNotePlaceholder => 'Add note...';
+
+  @override
+  String get cannotDeleteTemplate => 'Cannot Delete Template';
+
+  @override
+  String templateInUse(int count) {
+    return 'This template is being used by $count training plan(s). Please remove it from those plans first.';
+  }
+
+  @override
+  String get exerciseGuidance => 'Exercise Guidance';
+
+  @override
+  String get viewGuidance => 'View Guidance';
+
+  @override
+  String get noGuidanceAvailable => 'No guidance available for this exercise';
+
+  @override
+  String get referenceImages => 'Reference Images';
+
+  @override
+  String get exerciseNamePlaceholder => 'Exercise Name';
+
+  @override
+  String get extractKeyframe => 'Extract\nKeyframe';
+
+  @override
+  String get noTrainingRecords => 'No Training Records';
+
+  @override
+  String get trainingInfo => 'Training Info';
+
+  @override
+  String get trainingDate => 'Training Date';
+
+  @override
+  String get totalExercises => 'Total Exercises';
+
+  @override
+  String get exerciseDetails => 'Exercise Details';
+
+  @override
+  String videoNumber(int number) {
+    return 'Video $number';
+  }
+
+  @override
+  String get videoDuration => 'Duration';
+
+  @override
+  String get reviewStatus => 'Review Status';
+
+  @override
+  String get notReviewed => 'Not Reviewed';
+
+  @override
+  String get completedSets => 'Completed Sets';
+
+  @override
+  String get averageWeight => 'Average Weight';
+
+  @override
+  String get totalReps => 'Total Reps';
+
+  @override
+  String get setDetails => 'Set Details';
+
+  @override
+  String get dailyTrainingFeedback => 'Daily Training Feedback';
+
+  @override
+  String get noDailyTrainingFeedbackYet => 'No feedback for this training yet';
+
+  @override
+  String get exerciseList => 'Exercise List';
+
+  @override
+  String get addExercise => 'Add';
+
+  @override
+  String createNewExercise(String name) {
+    return 'Create new \"$name\"';
+  }
+
+  @override
+  String get addGuidance => 'Add Guidance';
+
+  @override
+  String get trainingSets => 'Sets';
+
+  @override
+  String get addSet => 'Add Set';
+
+  @override
+  String get noTemplateLinked => 'No Template Linked';
+
+  @override
+  String get unknownExercise => 'Unknown Exercise';
+
+  @override
+  String get createPlanTitle => 'Create Training Plan';
+
+  @override
+  String get chooseCreationMethod => 'Choose how to start:';
+
+  @override
+  String get aiGuidedCreate => 'AI Guided Creation';
+
+  @override
+  String get aiGuidedDesc => 'Let AI help you quickly generate a plan';
+
+  @override
+  String get scanOrPasteText => 'Scan or Paste Text';
+
+  @override
+  String get scanOrPasteDesc => 'Import from existing plan';
+
+  @override
+  String get orManualCreate => 'or... Manual Create';
+
+  @override
+  String get textImportTitle => 'Import from Text';
+
+  @override
+  String get textImportSubtitle =>
+      'Scan an image or paste text to import a training plan';
+
+  @override
+  String get scanImage => 'Scan Image';
+
+  @override
+  String get pasteText => 'Paste Text';
+
+  @override
+  String get selectImageToScan => 'Select Image to Scan';
+
+  @override
+  String get selectAnotherImage => 'Select Another Image';
+
+  @override
+  String get extractedOrPastedText => 'Extracted or Pasted Text';
+
+  @override
+  String get pasteOrTypeHere => 'Paste or type training plan text here...';
+
+  @override
+  String get exampleFormat => 'Example Format';
+
+  @override
+  String get exampleFormatContent =>
+      'Day 1: Chest\nBench Press 3x10\nIncline Press 3x12\n\nDay 2: Back\nPull-ups 4x8\nRows 3x10';
+
+  @override
+  String get extractingText => 'Extracting text...';
+
+  @override
+  String get parsingPlan => 'Parsing plan...';
+
+  @override
+  String get startParsing => 'Start Parsing';
+
+  @override
+  String get extractionSuccess =>
+      'Text extracted successfully! Please review and edit if needed.';
+
+  @override
+  String get addDay => 'Add Day';
+
+  @override
+  String get selectDayOrAddNew => 'Select a day or add a new one';
+
+  @override
+  String get savePlan => 'Save Plan';
+
+  @override
+  String get aiGeneratingPlan => 'AI is generating training plan...';
+
+  @override
+  String generatingDay(int day) {
+    return 'Generating Day $day';
+  }
+
+  @override
+  String addedExercises(int count) {
+    return '$count exercises added';
+  }
+
+  @override
+  String completedDays(int count) {
+    return '$count days completed';
+  }
+
+  @override
+  String get noSetsYet => 'No sets yet. Click \"Add Set\" button.';
+
+  @override
+  String get editPlan => 'Edit Plan';
+
+  @override
+  String get importSuccess => 'Import Successful';
+
+  @override
+  String importWarnings(int count) {
+    return '$count warnings found';
+  }
+
+  @override
+  String get pleaseReview => 'Please review and adjust the plan as needed.';
 }

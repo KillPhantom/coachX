@@ -1,5 +1,5 @@
 # Uncomment this line to define a global platform for your project
-platform :ios, '15.0'
+platform :ios, '15.5'
 
 # CocoaPods analytics sends network stats synchronously affecting flutter build latency.
 ENV['COCOAPODS_DISABLE_STATS'] = 'true'
@@ -27,6 +27,9 @@ require File.expand_path(File.join('packages', 'flutter_tools', 'bin', 'podhelpe
 
 flutter_ios_podfile_setup
 
+# Force GTMSessionFetcher to use 3.x version for compatibility between Firebase and MLKit
+pod 'GTMSessionFetcher/Core', '~> 3.5'
+
 target 'Runner' do
   use_frameworks!
 
@@ -51,6 +54,9 @@ post_install do |installer|
         'PERMISSION_PHOTOS=1',
         'PERMISSION_MICROPHONE=1',
       ]
+
+      # Remove arm64 exclusion for simulator to allow running on Apple Silicon simulators
+      config.build_settings.delete 'EXCLUDED_ARCHS[sdk=iphonesimulator*]'
     end
   end
 end

@@ -49,6 +49,15 @@ class AppConstants {
   /// 图片压缩质量 (0-100)
   static const int imageQuality = 85;
 
+  /// 视频时长限制（秒）
+  static const int maxVideoSeconds = 60;
+
+  /// 视频压缩阈值（MB）
+  static const int videoCompressionThresholdMB = 50;
+
+  /// 每个动作最多上传视频数量
+  static const int maxVideosPerExercise = 3;
+
   // ==================== 日期格式 ====================
 
   /// 日期格式 yyyy-MM-dd
@@ -81,6 +90,26 @@ class AppConstants {
 
   /// 图片缓存最大数量
   static const int maxImageCacheCount = 200;
+
+  // ==================== Firebase Emulator 配置 ====================
+
+  /// Firebase Emulator 主机地址
+  ///
+  /// 📱 真实设备调试时的配置说明：
+  /// 1. 获取你的 Mac 局域网 IP：终端运行 `ipconfig getifaddr en0`
+  /// 2. 将下面的 IP 改为你的 Mac 局域网 IP（例如：'192.168.1.100'）
+  /// 3. 确保 Firebase Emulator 绑定到 0.0.0.0（见 firebase.json）
+  /// 4. 确保你的 iPhone 和 Mac 在同一局域网 (192.168.1.114)
+  ///
+  /// 💻 iOS 模拟器调试时：
+  /// - 使用 '127.0.0.1' 即可
+  static const String firebaseEmulatorHost = '192.168.1.114';
+
+  /// Firebase Functions Emulator 端口
+  static const int firebaseFunctionsEmulatorPort = 5001;
+
+  /// Firebase Firestore Emulator 端口
+  static const int firebaseFirestoreEmulatorPort = 8080;
 
   // ==================== 其他配置 ====================
 

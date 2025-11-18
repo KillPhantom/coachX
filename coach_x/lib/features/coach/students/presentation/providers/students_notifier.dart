@@ -1,8 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:coach_x/core/utils/logger.dart';
 import '../../data/models/students_page_state.dart';
-import '../../data/models/student_list_item_model.dart';
 import '../../data/repositories/student_repository.dart';
+import '../../data/cache/students_cache_service.dart';
 
 /// 学生列表状态管理
 class StudentsNotifier extends StateNotifier<StudentsPageState> {
@@ -121,6 +121,9 @@ class StudentsNotifier extends StateNotifier<StudentsPageState> {
   /// 刷新
   Future<void> refresh() async {
     AppLogger.info('刷新学生列表');
+
+    // 清除缓存
+    await StudentsCacheService.invalidateCache();
 
     // 重置状态并重新加载
     state = state.copyWith(

@@ -181,8 +181,9 @@ class CreateSupplementPlanNotifier
     if (timingIndex < 0 || timingIndex >= day.timings.length) return;
 
     final timing = day.timings[timingIndex];
-    if (supplementIndex < 0 || supplementIndex >= timing.supplements.length)
+    if (supplementIndex < 0 || supplementIndex >= timing.supplements.length) {
       return;
+    }
 
     final updatedSupplements = List<Supplement>.from(timing.supplements);
     updatedSupplements.removeAt(supplementIndex);
@@ -208,8 +209,9 @@ class CreateSupplementPlanNotifier
     if (timingIndex < 0 || timingIndex >= day.timings.length) return;
 
     final timing = day.timings[timingIndex];
-    if (supplementIndex < 0 || supplementIndex >= timing.supplements.length)
+    if (supplementIndex < 0 || supplementIndex >= timing.supplements.length) {
       return;
+    }
 
     final updatedSupplements = List<Supplement>.from(timing.supplements);
     updatedSupplements[supplementIndex] = supplement;
@@ -232,8 +234,9 @@ class CreateSupplementPlanNotifier
     if (timingIndex < 0 || timingIndex >= day.timings.length) return;
 
     final timing = day.timings[timingIndex];
-    if (supplementIndex < 0 || supplementIndex >= timing.supplements.length)
+    if (supplementIndex < 0 || supplementIndex >= timing.supplements.length) {
       return;
+    }
 
     final supplement = timing.supplements[supplementIndex];
     final updatedSupplement = supplement.copyWith(name: name, amount: amount);

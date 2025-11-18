@@ -1,7 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:coach_x/l10n/app_localizations.dart';
 import 'package:coach_x/core/theme/app_theme.dart';
+import 'package:coach_x/routes/route_names.dart';
 import '../providers/student_home_providers.dart';
 
 /// 今日训练计划区块
@@ -15,6 +17,7 @@ class TodayTrainingPlanSection extends ConsumerWidget {
     final l10n = AppLocalizations.of(context)!;
     final plansAsync = ref.watch(studentPlansProvider);
     final dayNumbers = ref.watch(currentDayNumbersProvider);
+    final latestTrainingAsync = ref.watch(latestTrainingProvider);
 
     return plansAsync.when(
       loading: () => const SizedBox.shrink(),
@@ -46,10 +49,47 @@ class TodayTrainingPlanSection extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // 训练日名称
-              Text(
-                trainingDay.name,
-                style: AppTextStyles.title3,
+              // 训练日名称 + 导航按钮
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // 左侧：训练日名称
+                  Text(trainingDay.name, style: AppTextStyles.title3),
+
+                  // 右侧：导航按钮
+                  GestureDetector(
+                    onTap: () => context.push(RouteNames.studentExerciseRecord),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          latestTrainingAsync.when(
+                            data: (latestTraining) {
+                              // 判断今天是否已有训练记录
+                              final hasRecordToday =
+                                  latestTraining != null &&
+                                  _isToday(latestTraining.date);
+                              return hasRecordToday
+                                  ? l10n.viewRecords
+                                  : l10n.startRecording;
+                            },
+                            loading: () => l10n.startRecording,
+                            error: (_, __) => l10n.startRecording,
+                          ),
+                          style: AppTextStyles.footnote.copyWith(
+                            color: CupertinoColors.systemBlue,
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        const Icon(
+                          CupertinoIcons.arrow_right,
+                          color: CupertinoColors.systemBlue,
+                          size: 14,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: AppDimensions.spacingM),
 
@@ -71,9 +111,7 @@ class TodayTrainingPlanSection extends ConsumerWidget {
     if (exercises.isEmpty) {
       return Text(
         l10n.noExercises,
-        style: AppTextStyles.callout.copyWith(
-          color: AppColors.textSecondary,
-        ),
+        style: AppTextStyles.callout.copyWith(color: AppColors.textSecondary),
       );
     }
 
@@ -85,9 +123,7 @@ class TodayTrainingPlanSection extends ConsumerWidget {
         final isLast = index == exercises.length - 1;
 
         return Padding(
-          padding: EdgeInsets.only(
-            bottom: isLast ? 0 : AppDimensions.spacingS,
-          ),
+          padding: EdgeInsets.only(bottom: isLast ? 0 : AppDimensions.spacingS),
           child: _buildExerciseCard(exercise, l10n, context),
         );
       }).toList(),
@@ -240,6 +276,22 @@ class TodayTrainingPlanSection extends ConsumerWidget {
     } else {
       // 情况3: reps 不同
       return l10n.exerciseSetsOnly(totalSets);
+    }
+  }
+
+  /// 判断日期是否为今天
+  ///
+  /// 参数 dateString 格式: "yyyy-MM-dd"
+  bool _isToday(String dateString) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+
+    try {
+      final date = DateTime.parse(dateString);
+      final dateOnly = DateTime(date.year, date.month, date.day);
+      return dateOnly.isAtSameMomentAs(today);
+    } catch (e) {
+      return false;
     }
   }
 }

@@ -48,71 +48,71 @@ class _InvitationCodeDialogState extends ConsumerState<InvitationCodeDialog> {
         child: SafeArea(
           child: DismissKeyboard(
             child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // 标题和关闭按钮
-              _buildHeader(l10n),
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // 标题和关闭按钮
+                _buildHeader(l10n),
 
-              const SizedBox(height: AppDimensions.spacingL),
+                const SizedBox(height: AppDimensions.spacingL),
 
-              // 说明
-              Text(
-                l10n.invitationCodeDescription,
-                style: AppTextStyles.subhead,
-              ),
+                // 说明
+                Text(
+                  l10n.invitationCodeDescription,
+                  style: AppTextStyles.subhead,
+                ),
 
-              const SizedBox(height: AppDimensions.spacingL),
+                const SizedBox(height: AppDimensions.spacingL),
 
-              // 输入区域
-              _buildInputSection(l10n),
+                // 输入区域
+                _buildInputSection(l10n),
 
-              const SizedBox(height: AppDimensions.spacingL),
+                const SizedBox(height: AppDimensions.spacingL),
 
-              // 分割线
-              Container(height: 1, color: AppColors.dividerLight),
+                // 分割线
+                Container(height: 1, color: AppColors.dividerLight),
 
-              const SizedBox(height: AppDimensions.spacingL),
+                const SizedBox(height: AppDimensions.spacingL),
 
-              // 现有邀请码列表
-              Text(
-                l10n.existingInvitationCodes,
-                style: AppTextStyles.bodyMedium,
-              ),
+                // 现有邀请码列表
+                Text(
+                  l10n.existingInvitationCodes,
+                  style: AppTextStyles.bodyMedium,
+                ),
 
-              const SizedBox(height: AppDimensions.spacingM),
+                const SizedBox(height: AppDimensions.spacingM),
 
-              Expanded(
-                child: codesAsync.when(
-                  data: (codes) {
-                    if (codes.isEmpty) {
-                      return Center(
-                        child: Text(
-                          l10n.noInvitationCodes,
-                          style: AppTextStyles.subhead,
-                        ),
+                Expanded(
+                  child: codesAsync.when(
+                    data: (codes) {
+                      if (codes.isEmpty) {
+                        return Center(
+                          child: Text(
+                            l10n.noInvitationCodes,
+                            style: AppTextStyles.subhead,
+                          ),
+                        );
+                      }
+
+                      return ListView.builder(
+                        itemCount: codes.length,
+                        itemBuilder: (context, index) {
+                          return InvitationCodeItem(code: codes[index]);
+                        },
                       );
-                    }
-
-                    return ListView.builder(
-                      itemCount: codes.length,
-                      itemBuilder: (context, index) {
-                        return InvitationCodeItem(code: codes[index]);
-                      },
-                    );
-                  },
-                  loading: () => const Center(child: LoadingIndicator()),
-                  error: (error, stack) => Center(
-                    child: Text(
-                      '${l10n.loadFailed}: $error',
-                      style: AppTextStyles.subhead.copyWith(
-                        color: AppColors.errorRed,
+                    },
+                    loading: () => const Center(child: LoadingIndicator()),
+                    error: (error, stack) => Center(
+                      child: Text(
+                        '${l10n.loadFailed}: $error',
+                        style: AppTextStyles.subhead.copyWith(
+                          color: AppColors.errorRed,
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
-            ],
-          ),
+              ],
+            ),
           ),
         ),
       ),
@@ -289,7 +289,7 @@ class _InvitationCodeDialogState extends ConsumerState<InvitationCodeDialog> {
             borderRadius: BorderRadius.circular(AppDimensions.radiusM),
             boxShadow: [
               BoxShadow(
-                color: CupertinoColors.black.withOpacity(0.15),
+                color: CupertinoColors.black.withValues(alpha: 0.15),
                 blurRadius: 10,
                 offset: const Offset(0, 2),
               ),

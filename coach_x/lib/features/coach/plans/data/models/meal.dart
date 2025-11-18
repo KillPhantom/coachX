@@ -6,26 +6,18 @@ class Meal {
   final String name;
   final String note;
   final List<FoodItem> items;
-  final bool completed;
   final List<String> images;
 
   const Meal({
     required this.name,
     this.note = '',
     required this.items,
-    this.completed = false,
     this.images = const [],
   });
 
   /// 创建空的餐次
   factory Meal.empty() {
-    return const Meal(
-      name: '',
-      note: '',
-      items: [],
-      completed: false,
-      images: [],
-    );
+    return const Meal(name: '', note: '', items: [], images: []);
   }
 
   /// 从 JSON 创建
@@ -44,7 +36,6 @@ class Meal {
       name: json['name'] as String? ?? '',
       note: json['note'] as String? ?? '',
       items: items,
-      completed: json['completed'] as bool? ?? false,
       images: images,
     );
   }
@@ -55,7 +46,6 @@ class Meal {
       'name': name,
       'note': note,
       'items': items.map((item) => item.toJson()).toList(),
-      'completed': completed,
       'images': images,
       'macros': macros.toJson(),
     };
@@ -71,14 +61,12 @@ class Meal {
     String? name,
     String? note,
     List<FoodItem>? items,
-    bool? completed,
     List<String>? images,
   }) {
     return Meal(
       name: name ?? this.name,
       note: note ?? this.note,
       items: items ?? this.items,
-      completed: completed ?? this.completed,
       images: images ?? this.images,
     );
   }
@@ -91,16 +79,11 @@ class Meal {
           name == other.name &&
           note == other.note &&
           items == other.items &&
-          completed == other.completed &&
           images == other.images;
 
   @override
   int get hashCode =>
-      name.hashCode ^
-      note.hashCode ^
-      items.hashCode ^
-      completed.hashCode ^
-      images.hashCode;
+      name.hashCode ^ note.hashCode ^ items.hashCode ^ images.hashCode;
 
   @override
   String toString() {

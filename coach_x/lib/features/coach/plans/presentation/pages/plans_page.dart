@@ -17,6 +17,7 @@ import '../widgets/plan_search_bar.dart';
 import '../widgets/plan_action_sheet.dart';
 import '../widgets/assign_plan_dialog.dart';
 import '../widgets/create_plan_dialog.dart';
+import '../widgets/exercise_library_entry.dart';
 
 /// 计划管理页面
 class PlansPage extends ConsumerStatefulWidget {
@@ -354,6 +355,8 @@ class _PlansPageState extends ConsumerState<PlansPage> {
               ],
             ),
           ),
+          // 动作库入口（仅在训练计划tab显示）
+          if (_selectedTabIndex == 0) const ExerciseLibraryEntry(),
           // 搜索栏
           PlanSearchBar(
             searchQuery: state.searchQuery,

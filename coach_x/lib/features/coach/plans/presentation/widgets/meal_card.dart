@@ -118,7 +118,7 @@ class _MealCardState extends State<MealCard>
         boxShadow: widget.isHighlighted
             ? [
                 BoxShadow(
-                  color: AppColors.primary.withOpacity(0.3),
+                  color: AppColors.primary.withValues(alpha: 0.3),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
@@ -193,7 +193,7 @@ class _MealCardState extends State<MealCard>
                   if (widget.onDelete != null)
                     CupertinoButton(
                       padding: EdgeInsets.zero,
-                      minSize: 0,
+                      minimumSize: Size.zero,
                       onPressed: widget.onDelete,
                       child: Icon(
                         CupertinoIcons.delete,
@@ -296,7 +296,7 @@ class _MealCardState extends State<MealCard>
                       if (widget.onAddFoodItem != null)
                         CupertinoButton(
                           padding: EdgeInsets.zero,
-                          minSize: 0,
+                          minimumSize: Size.zero,
                           onPressed: widget.onAddFoodItem,
                           child: Row(
                             children: [
@@ -367,7 +367,7 @@ class _MealCardState extends State<MealCard>
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(4),
       ),
       child: Row(

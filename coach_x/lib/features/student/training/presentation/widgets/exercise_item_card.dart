@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:coach_x/l10n/app_localizations.dart';
 import 'package:coach_x/core/theme/app_theme.dart';
 import 'package:coach_x/features/coach/plans/data/models/exercise.dart';
-import 'video_player_modal.dart';
+import 'package:coach_x/features/student/training/presentation/widgets/exercise_guidance_sheet.dart';
 
 /// 单个动作卡片组件
 ///
@@ -34,45 +34,26 @@ class ExerciseItemCard extends StatelessWidget {
           // 显示所有 TrainingSet
           _buildTrainingSets(l10n),
 
-          // Coach Notes
-          if (exercise.note.isNotEmpty) ...[
+          // 查看指导按钮（如果有 exerciseTemplateId）
+          if (exercise.exerciseTemplateId != null) ...[
             const SizedBox(height: AppDimensions.spacingS),
-            Text(
-              '${l10n.coachNote}:',
-              style: AppTextStyles.caption2.copyWith(
-                color: AppColors.textSecondary,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              exercise.note,
-              style: AppTextStyles.subhead.copyWith(
-                color: AppColors.textSecondary,
-              ),
-            ),
-          ],
-
-          // 视频链接
-          if (exercise.demoVideos.isNotEmpty) ...[
-            const SizedBox(height: AppDimensions.spacingS),
-            GestureDetector(
-              onTap: () {
-                VideoPlayerModal.show(context, videoUrls: exercise.demoVideos);
-              },
+            CupertinoButton(
+              padding: EdgeInsets.zero,
+              onPressed: () =>
+                  _showGuidanceSheet(context, exercise.exerciseTemplateId!),
               child: Row(
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   const Icon(
-                    CupertinoIcons.play_circle,
-                    size: 14,
-                    color: AppColors.primaryColor,
+                    CupertinoIcons.book,
+                    size: 16,
+                    color: AppColors.primary,
                   ),
-                  const SizedBox(width: AppDimensions.spacingXS),
+                  const SizedBox(width: 4),
                   Text(
-                    l10n.video,
-                    style: AppTextStyles.subhead.copyWith(
-                      color: AppColors.primaryColor,
-                      decoration: TextDecoration.underline,
+                    l10n.viewGuidance,
+                    style: AppTextStyles.caption1.copyWith(
+                      color: AppColors.primary,
                     ),
                   ),
                 ],
@@ -82,6 +63,11 @@ class ExerciseItemCard extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  /// 显示动作指导弹窗
+  void _showGuidanceSheet(BuildContext context, String templateId) {
+    ExerciseGuidanceSheet.show(context, templateId);
   }
 
   Widget _buildTrainingSets(AppLocalizations l10n) {

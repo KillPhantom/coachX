@@ -141,29 +141,6 @@ class RecordActivityBottomSheet extends StatelessWidget {
       ),
     );
   }
-
-  /// 显示TODO提示
-  static void _showTodoAlert(
-    BuildContext context,
-    String title,
-    String message,
-  ) {
-    final l10n = AppLocalizations.of(context)!;
-
-    showCupertinoDialog(
-      context: context,
-      builder: (context) => CupertinoAlertDialog(
-        title: Text('TODO: $title'),
-        content: Text(message),
-        actions: [
-          CupertinoDialogAction(
-            child: Text(l10n.know),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-        ],
-      ),
-    );
-  }
 }
 
 /// 记录选项卡片

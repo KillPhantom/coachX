@@ -20,9 +20,9 @@ class BadgeChip extends StatelessWidget {
         vertical: AppDimensions.paddingS - 2,
       ),
       decoration: BoxDecoration(
-        color: badgeColor.withOpacity(0.15),
+        color: badgeColor.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(AppDimensions.radiusFull),
-        border: Border.all(color: badgeColor.withOpacity(0.3), width: 1),
+        border: Border.all(color: badgeColor.withValues(alpha: 0.3), width: 1),
       ),
       child: Text(
         tag,

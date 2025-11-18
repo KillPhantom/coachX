@@ -10,10 +10,9 @@ import 'package:coach_x/features/student/body_stats/data/repositories/body_stats
 class BodyStatsHistoryNotifier extends StateNotifier<BodyStatsHistoryState> {
   final BodyStatsRepository _repository;
 
-  BodyStatsHistoryNotifier({
-    required BodyStatsRepository repository,
-  })  : _repository = repository,
-        super(BodyStatsHistoryState.initial()) {
+  BodyStatsHistoryNotifier({required BodyStatsRepository repository})
+    : _repository = repository,
+      super(BodyStatsHistoryState.initial()) {
     // 初始化时加载数据
     loadMeasurements();
   }
@@ -27,9 +26,9 @@ class BodyStatsHistoryNotifier extends StateNotifier<BodyStatsHistoryState> {
     try {
       AppLogger.info('📥 加载身体测量记录...');
 
-      // 计算日期范围
+      // 计算日期范围（始终获取最大范围 90 天的数据）
       final now = DateTime.now();
-      final startDate = now.subtract(Duration(days: state.selectedTimeRange.days));
+      final startDate = now.subtract(const Duration(days: 90));
 
       // 获取记录
       final measurements = await _repository.fetchMeasurements(
@@ -37,10 +36,7 @@ class BodyStatsHistoryNotifier extends StateNotifier<BodyStatsHistoryState> {
         endDate: now,
       );
 
-      state = state.copyWith(
-        measurements: measurements,
-        isLoading: false,
-      );
+      state = state.copyWith(measurements: measurements, isLoading: false);
 
       AppLogger.info('✅ 加载到 ${measurements.length} 条测量记录');
     } catch (e, stack) {
@@ -55,7 +51,7 @@ class BodyStatsHistoryNotifier extends StateNotifier<BodyStatsHistoryState> {
   /// 设置时间范围
   ///
   /// [range] 时间范围
-  Future<void> setTimeRange(TimeRange range) async {
+  void setTimeRange(TimeRange range) {
     if (state.selectedTimeRange == range) {
       AppLogger.info('⏰ 时间范围未改变: $range');
       return;
@@ -63,10 +59,8 @@ class BodyStatsHistoryNotifier extends StateNotifier<BodyStatsHistoryState> {
 
     AppLogger.info('⏰ 切换时间范围: ${state.selectedTimeRange} → $range');
 
+    // 只更新时间范围，filteredMeasurements getter 会自动过滤数据
     state = state.copyWith(selectedTimeRange: range);
-
-    // 重新加载数据
-    await loadMeasurements();
   }
 
   /// 删除记录

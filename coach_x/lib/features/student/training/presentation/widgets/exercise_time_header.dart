@@ -8,10 +8,7 @@ import 'package:coach_x/core/theme/app_theme.dart';
 class ExerciseTimeHeader extends StatelessWidget {
   final int timeSpent; // 秒数
 
-  const ExerciseTimeHeader({
-    super.key,
-    required this.timeSpent,
-  });
+  const ExerciseTimeHeader({super.key, required this.timeSpent});
 
   /// 格式化耗时为 MM:SS
   String _formatTime(int seconds) {

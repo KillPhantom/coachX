@@ -120,12 +120,6 @@ class _AIEditDietChatPanelState extends ConsumerState<AIEditDietChatPanel> {
     }
   }
 
-  Future<void> _rejectSuggestion() async {
-    await ref
-        .read(editDietConversationNotifierProvider.notifier)
-        .rejectSuggestion();
-  }
-
   @override
   Widget build(BuildContext context) {
     final messages = ref.watch(dietMessagesProvider);
@@ -327,7 +321,7 @@ class _AIEditDietChatPanelState extends ConsumerState<AIEditDietChatPanel> {
                 ),
                 color: CupertinoColors.systemGrey6.resolveFrom(context),
                 borderRadius: BorderRadius.circular(20),
-                minSize: 0,
+                minimumSize: Size.zero,
                 onPressed: () => _sendQuickMessage(action),
                 child: Text(
                   '"$action"',

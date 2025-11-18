@@ -45,6 +45,8 @@ class _ChatTabContentState extends ConsumerState<ChatTabContent> {
 
   /// 加载更多历史消息
   Future<void> _loadMoreMessages() async {
+    if (!mounted) return;
+
     final isLoading = ref.read(isLoadingMoreMessagesProvider);
     if (isLoading) return;
 
@@ -54,6 +56,8 @@ class _ChatTabContentState extends ConsumerState<ChatTabContent> {
     // 使用 ChatRepository.fetchMoreMessages
 
     await Future.delayed(const Duration(milliseconds: 500));
+
+    if (!mounted) return;
     ref.read(isLoadingMoreMessagesProvider.notifier).state = false;
   }
 

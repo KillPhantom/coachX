@@ -1,24 +1,25 @@
 import 'dart:math';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:coach_x/features/coach/plans/data/models/exercise.dart';
 import 'package:coach_x/features/coach/plans/data/models/plan_edit_suggestion.dart';
 import 'package:coach_x/features/coach/plans/data/models/training_set.dart';
 import 'package:coach_x/features/coach/plans/presentation/widgets/set_row.dart';
+import 'package:coach_x/features/student/training/presentation/providers/exercise_template_providers.dart';
+import 'package:coach_x/features/coach/exercise_library/presentation/widgets/create_exercise_sheet.dart';
 import 'package:coach_x/core/theme/app_colors.dart';
 import 'package:coach_x/core/theme/app_text_styles.dart';
 import 'package:coach_x/core/enums/exercise_type.dart';
+import 'package:coach_x/l10n/app_localizations.dart';
 
 /// 动作卡片组件
-class ExerciseCard extends StatefulWidget {
+class ExerciseCard extends ConsumerStatefulWidget {
   final Exercise exercise;
   final int index;
   final bool isExpanded;
   final VoidCallback? onTap;
   final VoidCallback? onDelete;
-  final ValueChanged<String>? onNameChanged;
-  final ValueChanged<String>? onNoteChanged;
   final VoidCallback? onAddSet;
-  final VoidCallback? onUploadGuide;
   final Widget? setsWidget;
 
   // Review Mode 相关
@@ -37,10 +38,7 @@ class ExerciseCard extends StatefulWidget {
     this.isExpanded = false,
     this.onTap,
     this.onDelete,
-    this.onNameChanged,
-    this.onNoteChanged,
     this.onAddSet,
-    this.onUploadGuide,
     this.setsWidget,
     this.activeSuggestion,
     this.isHighlighted = false,
@@ -52,21 +50,17 @@ class ExerciseCard extends StatefulWidget {
   });
 
   @override
-  State<ExerciseCard> createState() => _ExerciseCardState();
+  ConsumerState<ExerciseCard> createState() => _ExerciseCardState();
 }
 
-class _ExerciseCardState extends State<ExerciseCard>
+class _ExerciseCardState extends ConsumerState<ExerciseCard>
     with SingleTickerProviderStateMixin {
-  late TextEditingController _nameController;
-  late TextEditingController _noteController;
   AnimationController? _pulseController;
   Animation<double>? _pulseAnimation;
 
   @override
   void initState() {
     super.initState();
-    _nameController = TextEditingController(text: widget.exercise.name);
-    _noteController = TextEditingController(text: widget.exercise.note);
 
     // 脉冲动画控制器
     final controller = AnimationController(
@@ -89,14 +83,6 @@ class _ExerciseCardState extends State<ExerciseCard>
   @override
   void didUpdateWidget(covariant ExerciseCard oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.exercise.name != widget.exercise.name &&
-        _nameController.text != widget.exercise.name) {
-      _nameController.text = widget.exercise.name;
-    }
-    if (oldWidget.exercise.note != widget.exercise.note &&
-        _noteController.text != widget.exercise.note) {
-      _noteController.text = widget.exercise.note;
-    }
 
     // 控制脉冲动画的启动和停止
     if (widget.isHighlighted && !oldWidget.isHighlighted) {
@@ -109,8 +95,6 @@ class _ExerciseCardState extends State<ExerciseCard>
 
   @override
   void dispose() {
-    _nameController.dispose();
-    _noteController.dispose();
     _pulseController?.dispose();
     super.dispose();
   }
@@ -188,11 +172,11 @@ class _ExerciseCardState extends State<ExerciseCard>
                                 color:
                                     widget.exercise.type ==
                                         ExerciseType.strength
-                                    ? CupertinoColors.systemBlue.withOpacity(
-                                        0.15,
+                                    ? CupertinoColors.systemBlue.withValues(
+                                        alpha: 0.15,
                                       )
-                                    : CupertinoColors.systemRed.withOpacity(
-                                        0.15,
+                                    : CupertinoColors.systemRed.withValues(
+                                        alpha: 0.15,
                                       ),
                                 borderRadius: BorderRadius.circular(2),
                               ),
@@ -226,7 +210,7 @@ class _ExerciseCardState extends State<ExerciseCard>
                   if (widget.onDelete != null)
                     CupertinoButton(
                       padding: EdgeInsets.zero,
-                      minSize: 0,
+                      minimumSize: Size.zero,
                       onPressed: widget.onDelete,
                       child: Icon(
                         CupertinoIcons.delete,
@@ -260,53 +244,12 @@ class _ExerciseCardState extends State<ExerciseCard>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Exercise Name Input
-                  Text(
-                    '动作名称',
-                    style: AppTextStyles.caption1.copyWith(
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  CupertinoTextField(
-                    style: AppTextStyles.caption1,
-                    placeholder: '例如：深蹲、卧推',
-                    controller: _nameController,
-                    onChanged: widget.onNameChanged,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 6,
-                      vertical: 5,
-                    ),
-                    decoration: BoxDecoration(
-                      color: CupertinoColors.systemBackground.resolveFrom(
-                        context,
-                      ),
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                  ),
-
-                  const SizedBox(height: 7),
-
-                  // Exercise Note Input
-                  Text(
-                    '备注',
-                    style: AppTextStyles.caption1.copyWith(
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-
-                  // 备注对比显示（Review Mode）
-                  _buildNoteDisplay(context),
-
-                  const SizedBox(height: 7),
-
                   // Sets Title & Add Button
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        '训练组',
+                        AppLocalizations.of(context)!.trainingSets,
                         style: AppTextStyles.caption1.copyWith(
                           fontWeight: FontWeight.w500,
                         ),
@@ -314,7 +257,7 @@ class _ExerciseCardState extends State<ExerciseCard>
                       if (widget.onAddSet != null)
                         CupertinoButton(
                           padding: EdgeInsets.zero,
-                          minSize: 0,
+                          minimumSize: Size.zero,
                           onPressed: widget.onAddSet,
                           child: Row(
                             children: [
@@ -325,7 +268,7 @@ class _ExerciseCardState extends State<ExerciseCard>
                               ),
                               const SizedBox(width: 2),
                               Text(
-                                '添加组',
+                                AppLocalizations.of(context)!.addSet,
                                 style: AppTextStyles.caption1.copyWith(
                                   color: AppColors.primary,
                                 ),
@@ -346,47 +289,9 @@ class _ExerciseCardState extends State<ExerciseCard>
 
                   const SizedBox(height: 7),
 
-                  // Upload Guide Placeholder
-                  if (widget.onUploadGuide != null)
-                    CupertinoButton(
-                      padding: EdgeInsets.zero,
-                      onPressed: widget.onUploadGuide,
-                      child: Container(
-                        padding: const EdgeInsets.all(7),
-                        decoration: BoxDecoration(
-                          color: CupertinoColors.systemGrey5.resolveFrom(
-                            context,
-                          ),
-                          borderRadius: BorderRadius.circular(4),
-                          border: Border.all(
-                            color: CupertinoColors.separator.resolveFrom(
-                              context,
-                            ),
-                            style: BorderStyle.solid,
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              CupertinoIcons.cloud_upload,
-                              color: CupertinoColors.secondaryLabel.resolveFrom(
-                                context,
-                              ),
-                              size: 8,
-                            ),
-                            const SizedBox(width: 5),
-                            Text(
-                              '上传指导图片/视频（预留）',
-                              style: AppTextStyles.caption1.copyWith(
-                                color: CupertinoColors.secondaryLabel
-                                    .resolveFrom(context),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
+                  // Add Guidance Button
+                  if (widget.exercise.exerciseTemplateId != null)
+                    _buildAddGuidanceButton(context),
                 ],
               ),
             ),
@@ -497,78 +402,8 @@ class _ExerciseCardState extends State<ExerciseCard>
     return Column(children: setRows);
   }
 
-  /// 构建备注显示（支持 Review Mode 的 before/after 对比）
-  Widget _buildNoteDisplay(BuildContext context) {
-    // 判断是否是 Review Mode 下的 modifyExercise 类型
-    if (widget.isHighlighted &&
-        widget.activeSuggestion != null &&
-        widget.activeSuggestion!.type == ChangeType.modifyExercise) {
-      final before = widget.activeSuggestion!.before;
-      final after = widget.activeSuggestion!.after;
 
-      // 提取 before/after 备注（仅支持对象格式）
-      if (before is Map && after is Map) {
-        final beforeNote = before['note'] as String?;
-        final afterNote = after['note'] as String?;
-
-        // 如果备注有变化，显示对比
-        if (beforeNote != null &&
-            afterNote != null &&
-            beforeNote != afterNote) {
-          return Container(
-            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 5),
-            decoration: BoxDecoration(
-              color: CupertinoColors.systemBackground.resolveFrom(context),
-              borderRadius: BorderRadius.circular(4),
-              border: Border.all(
-                color: AppColors.primary.withOpacity(0.5),
-                width: 1.5,
-              ),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Before (红色删除线)
-                Text(
-                  beforeNote,
-                  style: AppTextStyles.caption1.copyWith(
-                    color: CupertinoColors.systemRed.resolveFrom(context),
-                    decoration: TextDecoration.lineThrough,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                // After (绿色)
-                Text(
-                  afterNote,
-                  style: AppTextStyles.caption1.copyWith(
-                    color: AppColors.success,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            ),
-          );
-        }
-      }
-    }
-
-    // 默认显示：正常输入框
-    return CupertinoTextField(
-      placeholder: '例如：注意膝盖不要超过脚尖',
-      controller: _noteController,
-      onChanged: widget.onNoteChanged,
-      minLines: 1,
-      maxLines: null,
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 5),
-      style: AppTextStyles.caption1,
-      decoration: BoxDecoration(
-        color: CupertinoColors.systemBackground.resolveFrom(context),
-        borderRadius: BorderRadius.circular(4),
-      ),
-    );
-  }
-
-  /// 构建动作名称显示（支持 Review Mode 的 before/after 对比）
+  /// 构建动作名称显示（从模板获取，支持 Review Mode 的 before/after 对比）
   Widget _buildExerciseNameDisplay(BuildContext context) {
     // 判断是否是 Review Mode 下的 modifyExercise 类型
     if (widget.isHighlighted &&
@@ -627,15 +462,132 @@ class _ExerciseCardState extends State<ExerciseCard>
       }
     }
 
-    // 默认显示：普通名称
-    return Text(
-      widget.exercise.name.isEmpty ? '未命名动作' : widget.exercise.name,
-      style: AppTextStyles.caption1.copyWith(
-        fontWeight: FontWeight.w600,
-        color: widget.exercise.name.isEmpty
-            ? CupertinoColors.placeholderText.resolveFrom(context)
-            : null,
+    // 默认显示：从模板获取名称
+    final templateId = widget.exercise.exerciseTemplateId;
+    final l10n = AppLocalizations.of(context)!;
+
+    if (templateId == null || templateId.isEmpty) {
+      return Text(
+        l10n.noTemplateLinked,
+        style: AppTextStyles.caption1.copyWith(
+          fontWeight: FontWeight.w600,
+          color: CupertinoColors.placeholderText.resolveFrom(context),
+        ),
+      );
+    }
+
+    final templateAsync = ref.watch(exerciseTemplateProvider(templateId));
+
+    return templateAsync.when(
+      data: (template) {
+        final name = template?.name ?? l10n.unknownExercise;
+        return Row(
+          children: [
+            Text(
+              name,
+              style: AppTextStyles.caption1.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            // 显示标签
+            if (template?.tags.isNotEmpty ?? false) ...[
+              const SizedBox(width: 4),
+              Wrap(
+                spacing: 2,
+                children: template!.tags.take(2).map((tag) {
+                  return Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 3,
+                      vertical: 1,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                    child: Text(
+                      tag,
+                      style: AppTextStyles.tabLabel.copyWith(
+                        color: AppColors.primary,
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
+            ],
+          ],
+        );
+      },
+      loading: () => const CupertinoActivityIndicator(),
+      error: (_, __) => Text(
+        l10n.loadFailed,
+        style: AppTextStyles.caption1.copyWith(
+          fontWeight: FontWeight.w600,
+          color: CupertinoColors.systemRed.resolveFrom(context),
+        ),
       ),
+    );
+  }
+
+  /// 构建"添加指导"按钮
+  Widget _buildAddGuidanceButton(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
+    return CupertinoButton(
+      padding: EdgeInsets.zero,
+      onPressed: () => _showGuidanceSheet(context),
+      child: Container(
+        padding: const EdgeInsets.all(7),
+        decoration: BoxDecoration(
+          color: AppColors.primary.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(4),
+          border: Border.all(
+            color: AppColors.primaryText,
+            width: 1,
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              CupertinoIcons.book,
+              color: AppColors.primaryText,
+              size: 14,
+            ),
+            const SizedBox(width: 5),
+            Text(
+              l10n.addGuidance,
+              style: AppTextStyles.caption1.copyWith(
+                color: AppColors.primaryText,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// 显示指导编辑 Sheet
+  Future<void> _showGuidanceSheet(BuildContext context) async {
+    final templateId = widget.exercise.exerciseTemplateId;
+    if (templateId == null || templateId.isEmpty) return;
+
+    // 先加载模板
+    final templateAsync = ref.read(exerciseTemplateProvider(templateId));
+
+    // 等待加载完成
+    final template = await templateAsync.when(
+      data: (t) async => t,
+      loading: () async => null,
+      error: (_, __) async => null,
+    );
+
+    if (!mounted) return;
+
+    // 打开编辑 Sheet
+    await CreateExerciseSheet.show(
+      context,
+      template: template,
     );
   }
 }

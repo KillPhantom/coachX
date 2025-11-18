@@ -41,8 +41,11 @@ class _FoodAnalysisBottomSheetState
       // 设置记录模式
       ref.read(aiFoodScannerProvider.notifier).setRecordMode(widget.recordMode);
 
-      // 上传图片（AI模式会自动分析，Simple模式不会）
-      ref.read(aiFoodScannerProvider.notifier).uploadImage(widget.imagePath);
+      // 只在 AI Scanner 模式下上传并分析
+      if (widget.recordMode == FoodRecordMode.aiScanner) {
+        ref.read(aiFoodScannerProvider.notifier).uploadImage(widget.imagePath);
+      }
+      // Simple Record 模式不上传，等待保存时再上传
     });
   }
 
@@ -52,15 +55,24 @@ class _FoodAnalysisBottomSheetState
     final state = ref.read(aiFoodScannerProvider);
 
     try {
-      // AI Scanner模式：如果没有选择餐次，先显示选择器
-      if (state.recordMode == FoodRecordMode.aiScanner &&
-          state.selectedMealName == null) {
-        await _showMealPickerForAIMode();
-        return;
+      // Simple Record 模式：如果图片未上传，先上传
+      if (state.recordMode == FoodRecordMode.simpleRecord &&
+          (state.imageUrl == null || state.imageUrl!.isEmpty)) {
+        // 开始上传
+        await ref
+            .read(aiFoodScannerProvider.notifier)
+            .uploadImage(widget.imagePath);
+
+        // 上传完成后，检查是否成功
+        final updatedState = ref.read(aiFoodScannerProvider);
+        if (updatedState.imageUrl == null || updatedState.imageUrl!.isEmpty) {
+          throw Exception('图片上传失败，请重试');
+        }
       }
 
-      // 确保有图片URL（必需）
-      if (state.imageUrl == null || state.imageUrl!.isEmpty) {
+      // AI Scanner 模式：确保有图片URL
+      if (state.recordMode == FoodRecordMode.aiScanner &&
+          (state.imageUrl == null || state.imageUrl!.isEmpty)) {
         throw Exception('图片尚未上传完成，请稍候再试');
       }
 
@@ -106,115 +118,55 @@ class _FoodAnalysisBottomSheetState
     }
   }
 
-  /// 显示餐次选择器（AI模式专用）
-  Future<void> _showMealPickerForAIMode() async {
-    final l10n = AppLocalizations.of(context)!;
-    final plansAsync = ref.read(studentPlansProvider);
-    final dayNumbers = ref.read(currentDayNumbersProvider);
-
-    if (plansAsync.value == null || plansAsync.value!.dietPlan == null) {
-      throw Exception('未找到饮食计划');
-    }
-
-    final plans = plansAsync.value!;
-    final dayNum = dayNumbers['diet'] ?? 1;
-
-    // 查找当前天数的dietDay
-    final dietDayIndex = plans.dietPlan!.days.indexWhere(
-      (day) => day.day == dayNum,
-    );
-    final dietDay = dietDayIndex != -1
-        ? plans.dietPlan!.days[dietDayIndex]
-        : plans.dietPlan!.days.first;
-
-    final availableMeals = dietDay.meals;
-
-    await showCupertinoModalPopup(
-      context: context,
-      builder: (BuildContext context) => Container(
-        height: 250,
-        color: AppColors.backgroundWhite,
-        child: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                CupertinoButton(
-                  child: Text(l10n.cancel, style: AppTextStyles.callout),
-                  onPressed: () => Navigator.of(context).pop(),
-                ),
-                CupertinoButton(
-                  child: Text(
-                    l10n.ok,
-                    style: AppTextStyles.callout.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    // 选择完成后自动保存
-                    _handleSave();
-                  },
-                ),
-              ],
-            ),
-            Expanded(
-              child: CupertinoPicker(
-                itemExtent: 40.0,
-                onSelectedItemChanged: (int index) {
-                  ref
-                      .read(aiFoodScannerProvider.notifier)
-                      .selectMeal(availableMeals[index].name);
-                },
-                children: availableMeals.map<Widget>((meal) {
-                  return Center(
-                    child: Text(meal.name, style: AppTextStyles.body),
-                  );
-                }).toList(),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final state = ref.watch(aiFoodScannerProvider);
     final plansAsync = ref.watch(studentPlansProvider);
 
-    return plansAsync.when(
-      loading: () => _buildLoadingView(context),
-      error: (error, stack) => _buildErrorView(context, error.toString()),
-      data: (plans) {
-        if (plans.dietPlan == null) {
-          return _buildNoPlanView(context, l10n);
-        }
+    return Stack(
+      children: [
+        // 主内容
+        plansAsync.when(
+          loading: () => _buildLoadingView(context),
+          error: (error, stack) => _buildErrorView(context, error.toString()),
+          data: (plans) {
+            if (plans.dietPlan == null) {
+              return _buildNoPlanView(context, l10n);
+            }
 
-        // 根据记录模式显示不同内容
-        return Container(
-          height: MediaQuery.of(context).size.height,
-          decoration: const BoxDecoration(
-            color: AppColors.backgroundWhite,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(24.0)),
-          ),
-          child: SafeArea(
-            child: Column(
-              children: [
-                _buildNavigationBar(context, l10n),
-                Expanded(
-                  child: state.recordMode == FoodRecordMode.aiScanner
-                      ? _buildAIScannerContent(context, l10n, state, plans)
-                      : _buildSimpleRecordContent(context, l10n, state, plans),
+            // 根据记录模式显示不同内容
+            return Container(
+              height: MediaQuery.of(context).size.height,
+              decoration: const BoxDecoration(
+                color: AppColors.backgroundWhite,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(24.0)),
+              ),
+              child: SafeArea(
+                child: Column(
+                  children: [
+                    _buildNavigationBar(context, l10n),
+                    Expanded(
+                      child: state.recordMode == FoodRecordMode.aiScanner
+                          ? _buildAIScannerContent(context, l10n, state, plans)
+                          : _buildSimpleRecordContent(
+                              context,
+                              l10n,
+                              state,
+                              plans,
+                            ),
+                    ),
+                    _buildSaveButton(l10n, state),
+                  ],
                 ),
-                _buildSaveButton(l10n, state),
-              ],
-            ),
-          ),
-        );
-      },
+              ),
+            );
+          },
+        ),
+
+        // 上传中覆盖层
+        if (state.isUploading) _buildUploadingOverlay(l10n),
+      ],
     );
   }
 
@@ -333,6 +285,19 @@ class _FoodAnalysisBottomSheetState
     state,
     plans,
   ) {
+    final dayNumbers = ref.watch(currentDayNumbersProvider);
+    final dayNum = dayNumbers['diet'] ?? 1;
+
+    // 查找当前天数的dietDay
+    final dietDayIndex = plans.dietPlan!.days.indexWhere(
+      (day) => day.day == dayNum,
+    );
+    final dietDay = dietDayIndex != -1
+        ? plans.dietPlan!.days[dietDayIndex]
+        : plans.dietPlan!.days.first;
+
+    final availableMeals = dietDay.meals;
+
     return ListView(
       padding: const EdgeInsets.all(AppDimensions.spacingL),
       children: [
@@ -346,6 +311,12 @@ class _FoodAnalysisBottomSheetState
         // AI分析结果
         if (!state.isAnalyzing && state.foods.isNotEmpty)
           _buildAIResultsView(l10n, state),
+
+        // 餐次选择器（AI分析完成后显示）
+        if (!state.isAnalyzing && state.foods.isNotEmpty) ...[
+          const SizedBox(height: AppDimensions.spacingL),
+          _buildMealSelector(l10n, availableMeals, state),
+        ],
 
         const SizedBox(height: AppDimensions.spacingXL),
       ],
@@ -428,9 +399,7 @@ class _FoodAnalysisBottomSheetState
           const SizedBox(height: AppDimensions.spacingM),
           Text(
             l10n.aiAnalyzing,
-            style: AppTextStyles.callout.copyWith(
-              color: AppColors.primaryText,
-            ),
+            style: AppTextStyles.callout.copyWith(color: AppColors.primaryText),
           ),
           const SizedBox(height: AppDimensions.spacingM),
           ClipRRect(
@@ -483,17 +452,19 @@ class _FoodAnalysisBottomSheetState
             ),
           ),
           const SizedBox(height: AppDimensions.spacingS),
-          ...foods.map((food) => Padding(
-                padding: const EdgeInsets.symmetric(
-                  vertical: AppDimensions.spacingXS,
+          ...foods.map(
+            (food) => Padding(
+              padding: const EdgeInsets.symmetric(
+                vertical: AppDimensions.spacingXS,
+              ),
+              child: Text(
+                '• ${food.name} ${food.estimatedWeight}',
+                style: AppTextStyles.footnote.copyWith(
+                  color: AppColors.textSecondary,
                 ),
-                child: Text(
-                  '• ${food.name} ${food.estimatedWeight}',
-                  style: AppTextStyles.footnote.copyWith(
-                    color: AppColors.textSecondary,
-                  ),
-                ),
-              )),
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -522,22 +493,22 @@ class _FoodAnalysisBottomSheetState
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               _buildMacroItem(
-                '🔥',
+                l10n.calories,
                 '${state.currentCalories?.toStringAsFixed(0) ?? 0}',
                 'kcal',
               ),
               _buildMacroItem(
-                '💪',
+                l10n.protein,
                 '${state.currentProtein?.toStringAsFixed(0) ?? 0}',
                 'g',
               ),
               _buildMacroItem(
-                '🍚',
+                l10n.carbohydrates,
                 '${state.currentCarbs?.toStringAsFixed(0) ?? 0}',
                 'g',
               ),
               _buildMacroItem(
-                '🥑',
+                l10n.fat,
                 '${state.currentFat?.toStringAsFixed(0) ?? 0}',
                 'g',
               ),
@@ -549,10 +520,15 @@ class _FoodAnalysisBottomSheetState
   }
 
   /// 构建单个营养指标
-  Widget _buildMacroItem(String emoji, String value, String unit) {
+  Widget _buildMacroItem(String label, String value, String unit) {
     return Column(
       children: [
-        Text(emoji, style: AppTextStyles.title3),
+        Text(
+          label,
+          style: AppTextStyles.caption1.copyWith(
+            color: AppColors.textSecondary,
+          ),
+        ),
         const SizedBox(height: AppDimensions.spacingXS),
         Text(
           value,
@@ -572,11 +548,7 @@ class _FoodAnalysisBottomSheetState
   }
 
   /// 构建餐次选择器
-  Widget _buildMealSelector(
-    AppLocalizations l10n,
-    List meals,
-    state,
-  ) {
+  Widget _buildMealSelector(AppLocalizations l10n, List meals, state) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -625,6 +597,24 @@ class _FoodAnalysisBottomSheetState
 
   /// 显示餐次选择器
   void _showMealPicker(List meals) {
+    final state = ref.read(aiFoodScannerProvider);
+
+    // 查找当前选中的餐次索引
+    int initialIndex = 0;
+    if (state.selectedMealName != null) {
+      final foundIndex = meals.indexWhere(
+        (meal) => meal.name == state.selectedMealName,
+      );
+      if (foundIndex != -1) {
+        initialIndex = foundIndex;
+      }
+    }
+
+    // 创建滚动控制器，初始化到选中的项
+    final scrollController = FixedExtentScrollController(
+      initialItem: initialIndex,
+    );
+
     showCupertinoModalPopup(
       context: context,
       builder: (BuildContext context) => Container(
@@ -649,12 +639,24 @@ class _FoodAnalysisBottomSheetState
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                  onPressed: () => Navigator.of(context).pop(),
+                  onPressed: () {
+                    // 如果用户没有滚动（selectedMealName仍为null），使用当前显示的选项
+                    final currentState = ref.read(aiFoodScannerProvider);
+                    if (currentState.selectedMealName == null &&
+                        meals.isNotEmpty) {
+                      final selectedIndex = scrollController.selectedItem;
+                      ref
+                          .read(aiFoodScannerProvider.notifier)
+                          .selectMeal(meals[selectedIndex].name);
+                    }
+                    Navigator.of(context).pop();
+                  },
                 ),
               ],
             ),
             Expanded(
               child: CupertinoPicker(
+                scrollController: scrollController,
                 itemExtent: 40.0,
                 onSelectedItemChanged: (int index) {
                   ref
@@ -678,6 +680,14 @@ class _FoodAnalysisBottomSheetState
   Widget _buildSaveButton(AppLocalizations l10n, state) {
     final canSave = _canSave(state);
 
+    // 确定按钮文本
+    String buttonText;
+    if (state.isUploading) {
+      buttonText = l10n.uploading;
+    } else {
+      buttonText = l10n.saveToMeal;
+    }
+
     return Container(
       padding: const EdgeInsets.all(AppDimensions.spacingL),
       decoration: const BoxDecoration(
@@ -693,7 +703,7 @@ class _FoodAnalysisBottomSheetState
           padding: const EdgeInsets.symmetric(vertical: AppDimensions.spacingM),
           borderRadius: BorderRadius.circular(AppDimensions.radiusM),
           child: Text(
-            l10n.saveToMeal,
+            buttonText,
             style: AppTextStyles.buttonMedium.copyWith(
               color: canSave ? AppColors.primaryText : AppColors.textSecondary,
             ),
@@ -705,14 +715,49 @@ class _FoodAnalysisBottomSheetState
 
   /// 判断是否可以保存
   bool _canSave(AIFoodAnalysisState state) {
-    if (state.isAnalyzing) return false;
+    // 上传中或分析中不可保存
+    if (state.isUploading || state.isAnalyzing) return false;
+
+    // 两种模式都必须选择餐次
+    if (state.selectedMealName == null) return false;
 
     if (state.recordMode == FoodRecordMode.aiScanner) {
       // AI模式：需要有AI分析结果
       return state.foods.isNotEmpty && state.currentCalories != null;
     } else {
-      // Simple模式：需要选择餐次且输入营养数据
-      return state.selectedMealName != null && state.currentCalories != null;
+      // Simple模式：需要输入营养数据
+      return state.currentCalories != null;
     }
+  }
+
+  /// 构建上传中覆盖层
+  Widget _buildUploadingOverlay(AppLocalizations l10n) {
+    return Positioned.fill(
+      child: Container(
+        color: Colors.black.withOpacity(0.5),
+        child: Center(
+          child: Container(
+            padding: const EdgeInsets.all(AppDimensions.spacingXL),
+            decoration: BoxDecoration(
+              color: AppColors.backgroundWhite,
+              borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const CupertinoActivityIndicator(radius: 20.0),
+                const SizedBox(height: AppDimensions.spacingM),
+                Text(
+                  l10n.uploading,
+                  style: AppTextStyles.body.copyWith(
+                    color: AppColors.primaryText,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }

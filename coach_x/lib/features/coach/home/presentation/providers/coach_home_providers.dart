@@ -1,8 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:coach_x/core/services/auth_service.dart';
+import 'package:coach_x/features/coach/training_reviews/data/models/training_review_list_item_model.dart';
+import 'package:coach_x/features/coach/training_reviews/presentation/providers/training_review_providers.dart';
 import '../../data/models/coach_summary_model.dart';
 import '../../data/models/event_reminder_model.dart';
-import '../../data/models/recent_activity_model.dart';
 
 /// 当前教练ID Provider
 final currentCoachIdProvider = Provider<String?>((ref) {
@@ -15,7 +16,7 @@ final currentCoachIdProvider = Provider<String?>((ref) {
 final coachSummaryProvider = FutureProvider<CoachSummaryModel>((ref) async {
   // TODO: 替换为真实API调用
   // 调用 Cloud Function: fetchStudentsStats()
-  // 整合未读消息统计和待审核训练数
+  // 整合未读消息统计和待审核训练数（过去30天）
   //
   // 示例API调用:
   // final response = await CloudFunctionsService.call('fetchStudentsStats');
@@ -25,7 +26,7 @@ final coachSummaryProvider = FutureProvider<CoachSummaryModel>((ref) async {
   await Future.delayed(const Duration(milliseconds: 500)); // 模拟网络延迟
 
   return CoachSummaryModel(
-    studentsCompletedToday: 15,
+    studentsCompletedLast30Days: 20,
     totalStudents: 25,
     unreadMessages: 20,
     unreviewedTrainings: 14,
@@ -91,52 +92,23 @@ final eventRemindersProvider = FutureProvider<List<EventReminderModel>>((
   ];
 });
 
-/// Recent Activities Provider
+/// Top 5 Pending Reviews Provider
 ///
-/// 提供Recent Activity列表
-final recentActivitiesProvider = FutureProvider<List<RecentActivityModel>>((
+/// 提供最新的5条待审核训练记录
+final top5PendingReviewsProvider = Provider<List<TrainingReviewListItemModel>>((
   ref,
-) async {
-  // TODO: 替换为真实数据查询
-  // 需要聚合多个数据源:
-  // 1. 最近训练记录 (dailyTraining)
-  // 2. 最近消息 (messages)
-  // 3. 最近打卡 (checkIns)
-  // 按时间排序，取最近3条
-  //
-  // 示例实现思路:
-  // 1. 查询教练的所有学生
-  // 2. 查询这些学生的最近活动（训练、消息、打卡）
-  // 3. 聚合排序，取最新的3条
-  // 4. 转换为RecentActivityModel
+) {
+  // 获取所有筛选后的训练审核记录
+  final allReviews = ref.watch(filteredTrainingReviewsProvider);
 
-  // Mock数据
-  await Future.delayed(const Duration(milliseconds: 500)); // 模拟网络延迟
+  // 过滤出未审核的记录
+  final pendingReviews = allReviews
+      .where((review) => !review.isReviewed)
+      .toList();
 
-  return [
-    RecentActivityModel(
-      studentId: 's1',
-      studentName: 'Liam Carter',
-      avatarUrl: null,
-      lastActiveTime: DateTime.now().subtract(const Duration(hours: 2)),
-      activityType: 'training',
-      activityDescription: 'Completed training',
-    ),
-    RecentActivityModel(
-      studentId: 's2',
-      studentName: 'Sophia Bennett',
-      avatarUrl: null,
-      lastActiveTime: DateTime.now().subtract(const Duration(days: 1)),
-      activityType: 'message',
-      activityDescription: 'Sent a message',
-    ),
-    RecentActivityModel(
-      studentId: 's3',
-      studentName: 'Ethan Harper',
-      avatarUrl: null,
-      lastActiveTime: DateTime.now().subtract(const Duration(days: 2)),
-      activityType: 'checkin',
-      activityDescription: 'Daily check-in',
-    ),
-  ];
+  // 按创建时间降序排序
+  pendingReviews.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+
+  // 取前5条
+  return pendingReviews.take(5).toList();
 });

@@ -3,6 +3,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:coach_x/core/theme/app_theme.dart';
 import 'package:coach_x/core/widgets/cupertino_card.dart';
 import '../../data/models/student_list_item_model.dart';
+import 'package:flutter/material.dart' show Icons;
 
 /// 学生卡片组件
 class StudentCard extends StatelessWidget {
@@ -43,7 +44,7 @@ class StudentCard extends StatelessWidget {
                 // 训练计划
                 if (student.exercisePlan != null)
                   _buildPlanInfo(
-                    icon: CupertinoIcons.sportscourt,
+                    icon: Icons.fitness_center,
                     label: student.exercisePlan!.name,
                   ),
 

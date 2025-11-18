@@ -27,7 +27,6 @@ class CoachPlanHeader extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-
           // 可展开的内容
           AnimatedCrossFade(
             firstChild: const SizedBox.shrink(),

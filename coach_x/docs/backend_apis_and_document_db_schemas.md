@@ -11,6 +11,7 @@ Google docs: https://docs.google.com/document/d/1yKQgZWjdeALkwrl2SHf6RjUnsCmeLxt
 - 学员与统计
   - fetchStudents(pageSize?, pageNumber?, otherParams?)
   - fetchStudentsStats()
+  - fetchStudentDetail(studentId, timeRange?)
 
 - 计划 CRUD 与分配
   - exercisePlan: action in [create | update | delete | get | list | copy]
@@ -32,6 +33,9 @@ Google docs: https://docs.google.com/document/d/1yKQgZWjdeALkwrl2SHf6RjUnsCmeLxt
   - getExerciseFeedback(exercisePlanId, exerciseIndex, trainingDate)
   - getExerciseHistoryFeedback(exercisePlanId, studentId, coachId, exerciseName, exerciseIndex, limit?)
 
+- 训练反馈
+  - fetchStudentFeedback(studentId, coachId, startDate?, endDate?, limit?)
+
 - 身体测量
   - saveMeasurementSession(session)
   - deleteMeasurementSession(sessionId)
@@ -40,6 +44,10 @@ Google docs: https://docs.google.com/document/d/1yKQgZWjdeALkwrl2SHf6RjUnsCmeLxt
 
 - 食物库
   - foodLibrary: action in [create | update | delete | get | list | search]
+
+- 动作库
+  - exerciseTemplate: action in [create | update | delete | get | list]
+  - deleteExerciseTemplate(templateId) - Checks if template is used in any plans before deletion
 
 - 邀请码
   - fetchInvitationCode()
@@ -108,9 +116,11 @@ Exercise
 | note | string |
 | type | "strength" | "cardio" |
 | sets | TrainingSet[] |
-| completed | boolean |
-| detailGuide | string |
-| demoVideos | string[] |
+| exerciseTemplateId | string (optional) |
+
+**Notes**:
+- `exerciseTemplateId`: Links to an ExerciseTemplate in the exercise library. If set, the exercise references a template for guidance (videos, images, text).
+- Removed fields: `completed`, `detailGuide`, `demoVideos` (moved to ExerciseTemplate)
 
 TrainingSet
 | columnName | data type |
@@ -118,6 +128,29 @@ TrainingSet
 | reps | string |
 | weight | string |
 | completed | boolean |
+
+### exerciseTemplates
+| columnName | data type |
+| --- | --- |
+| id | string |
+| ownerId | string |
+| name | string |
+| tags | string[] |
+| textGuidance | string (optional) |
+| imageUrls | string[] |
+| videoUrls | string[] |
+| thumbnailUrls | string[] |
+| createdAt | timestamp |
+| updatedAt | timestamp |
+
+**Notes**:
+- `ownerId`: The coach who created this template. Templates are private to each coach.
+- `tags`: Categorization tags (e.g., "chest", "compound", "beginner"). Used for searching and filtering.
+- `textGuidance`: Detailed instructions on how to perform the exercise.
+- `imageUrls`: Reference images showing proper form (max 5 images).
+- `videoUrls`: Demonstration videos. Multiple videos can be uploaded.
+- `thumbnailUrls`: Corresponding thumbnails for each video. Same array length as videoUrls.
+- Referenced by Exercise.exerciseTemplateId and StudentExercise.exerciseTemplateId
 
 ### dietPlan
 | columnName | data type |
@@ -154,8 +187,7 @@ Meal
 | note | string |
 | items | FoodItem[] |
 | images | string[] |
-| completed | boolean |
-| macros | Macros |
+| macros | Macros (computed from items) |
 
 FoodItem
 | columnName | data type |
@@ -208,7 +240,7 @@ Supplement
 | amount | string |
 | note | string |
 
-### dailyTraining
+### dailyTrainings
 | columnName | data type |
 | --- | --- |
 | id | string |
@@ -221,6 +253,12 @@ Supplement
 | supplements | StudentSupplement[] |
 | completionStatus | string |
 | isReviewed | boolean |
+| totalDuration | number (optional) |
+| extractedKeyFrames | Map<string, ExtractedKeyFrame> |
+
+**Notes**:
+- `totalDuration` is the total training session duration in seconds, measured from when the timer starts to when the last exercise is completed. Only saved when all exercises are completed and the timer was started.
+- `extractedKeyFrames` stores extracted keyframes separately from exercise data, using exercise index as key (e.g., "0", "1").
 
 TrainingDaySelection
 | columnName | data type |
@@ -240,8 +278,24 @@ StudentExercise
 | type | "strength" | "cardio" |
 | sets | TrainingSet[] |
 | completed | boolean |
-| videos | string[] |
+| videos | VideoRecord[] |
+| keyframes | string[] |
 | voiceFeedbacks | VoiceFeedback[] |
+| timeSpent | number (optional) |
+| exerciseTemplateId | string (optional) |
+
+**Notes**:
+- `exerciseTemplateId`: Links to an ExerciseTemplate. Copied from the Exercise in the training plan. Used to display exercise guidance (videos, images, text) in the student app.
+- `keyframes` field is automatically populated by backend when videos are uploaded. Contains URLs to 5 extracted keyframe images.
+- `timeSpent` is the duration in seconds for completing this specific exercise. Calculated from the time the user starts editing sets to when all sets are marked as completed.
+
+VideoRecord
+| columnName | data type |
+| --- | --- |
+| videoUrl | string |
+| thumbnailUrl | string |
+
+**Note**: `VideoRecord` contains both video and thumbnail URLs. The thumbnail is uploaded alongside the video to improve loading performance.
 
 VoiceFeedback
 | columnName | data type |
@@ -253,13 +307,30 @@ VoiceFeedback
 | formatTime | string |
 | tempUrl | string |
 
+ExtractedKeyFrame
+| columnName | data type | description |
+| --- | --- | --- |
+| exerciseName | string | 动作名称 |
+| keyframes | KeyframeData[] | 关键帧列表 |
+| method | string | 提取方法（"mediapipe_pose" 或 "uniform_sampling"） |
+
+**Note**: `ExtractedKeyFrame` stores keyframes extracted from exercise videos using AI pose detection or uniform sampling. The `method` field indicates which extraction algorithm was used.
+
+KeyframeData
+| columnName | data type | description |
+| --- | --- | --- |
+| url | string | 关键帧图片 URL（Firebase Storage） |
+| timestamp | float | 视频中的时间戳（秒） |
+
+**Note**: `KeyframeData` contains both the image URL and the timestamp in the source video where the keyframe was extracted.
+
 StudentDiet
 | columnName | data type |
 | --- | --- |
-| macros | Macros | null |
 | meals | Meal[] |
-| studentFeedback | string |
 | coachFeedback | string |
+
+**Note**: `macros` is computed from all meals' macros (sum of items). `studentFeedback` has been removed.
 
 StudentSupplement
 | columnName | data type |
@@ -303,6 +374,30 @@ FeedbackMessage
 | duration | number |
 | status | "sending" | "sent" | "failed" |
 | senderId | string |
+
+
+### dailyTrainingFeedback (Updated 2025-11-15)
+| columnName | data type | description |
+| --- | --- | --- |
+| id | string | Feedback ID |
+| dailyTrainingId | string | Link to dailyTraining record |
+| studentId | string | Student ID |
+| coachId | string | Coach ID |
+| trainingDate | string | Training date "yyyy-MM-dd" |
+| **exerciseIndex** | **number \| null** | **NEW: null = overall feedback, 0/1/2... = specific exercise** |
+| **exerciseName** | **string \| null** | **NEW: Exercise name for history queries (e.g., "Squat")** |
+| feedbackType | string | "text" \| "voice" \| "image" (required) |
+| textContent | string \| null | Text feedback content |
+| voiceUrl | string \| null | Voice file URL |
+| voiceDuration | number \| null | Voice duration in seconds |
+| imageUrl | string \| null | Image URL |
+| createdAt | timestamp | Creation time (milliseconds) |
+| isRead | boolean | Student has read |
+
+**Removed Fields** (for minimalism):
+- ❌ `trainingSummary` - Now calculated from dailyTraining in real-time
+- ❌ `exerciseFeedback`, `dietFeedback`, `overallFeedback` - Unified to new format
+- ❌ `updatedAt` - Feedback is immutable
 
 
 ### invitationCodes
@@ -430,7 +525,7 @@ MessageMetadata
 | `pages/login/login` | both | 登录与邀请码验证 | `UserService.login` | `login`, `verifyInvitationCode` |
 | `pages/privacyPolicy/privacyPolicy` | both | 隐私政策 | - | - |
 | `pages/studentPages/profileSetup/profileSetup` | student-only | 学生资料初始化 | `UserService.{fetchUserInfoWithoutUserID,updateUserInfo}` | `fetchUserInfo`, `updateUserInfo` |
-| `pages/studentPages/studentDetail/studentDetail` | coach-only | 学员详情（教练视角） | `UserService.fetchUserInfo`, `PlanOverviewService.getStudentPlans` | `fetchUserInfo`, `getStudentPlans` |
+| `pages/studentPages/studentDetail/studentDetail` | coach-only | 学员详情（教练视角） | `StudentDetailService.fetchStudentDetail` | `fetchStudentDetail` |
 | `pages/chat/chatList` | both | 对话列表 | `ChatRepository.watchConversations` | Firestore实时监听 |
 | `pages/chat/chatDetail` | both | 对话详情/发送消息 | `ChatRepository.{watchMessages,sendMessage,markMessagesAsRead}` | `sendMessage`, `fetchMessages`, `markMessagesAsRead` |
 

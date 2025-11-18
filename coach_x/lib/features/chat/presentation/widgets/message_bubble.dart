@@ -69,7 +69,7 @@ class MessageBubble extends StatelessWidget {
               _formatTimestamp(message.createdAt),
               style: AppTextStyles.caption1.copyWith(
                 color: _isMine
-                    ? AppColors.textPrimary.withOpacity(0.7)
+                    ? AppColors.textPrimary.withValues(alpha: 0.7)
                     : AppColors.textSecondary,
               ),
             ),
@@ -94,14 +94,6 @@ class MessageBubble extends StatelessWidget {
       case MessageType.video:
       case MessageType.voice:
         return MediaMessageWidget(message: message, isMine: _isMine);
-
-      default:
-        return Text(
-          message.content,
-          style: AppTextStyles.body.copyWith(
-            color: _isMine ? AppColors.textPrimary : AppColors.textPrimary,
-          ),
-        );
     }
   }
 
@@ -159,7 +151,7 @@ class MessageBubble extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
           decoration: BoxDecoration(
-            color: CupertinoColors.systemGrey.withOpacity(0.9),
+            color: CupertinoColors.systemGrey.withValues(alpha: 0.9),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Text(

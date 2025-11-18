@@ -127,7 +127,9 @@ class PlanTabsView extends ConsumerWidget {
       children: [
         // Dropdown
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingM),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppDimensions.spacingM,
+          ),
           child: PlanDropdown(
             plans: plans.exercisePlans,
             activePlanId: activeExercisePlanId,
@@ -152,10 +154,7 @@ class PlanTabsView extends ConsumerWidget {
 
         // Content
         Expanded(
-          child: TrainingPlanContent(
-            plan: activePlan,
-            onRefresh: onRefresh,
-          ),
+          child: TrainingPlanContent(plan: activePlan, onRefresh: onRefresh),
         ),
       ],
     );
@@ -171,7 +170,9 @@ class PlanTabsView extends ConsumerWidget {
       children: [
         // Dropdown
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingM),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppDimensions.spacingM,
+          ),
           child: PlanDropdown(
             plans: plans.dietPlans,
             activePlanId: activeDietPlanId,
@@ -196,10 +197,7 @@ class PlanTabsView extends ConsumerWidget {
 
         // Content
         Expanded(
-          child: DietPlanContent(
-            plan: activePlan,
-            onRefresh: onRefresh,
-          ),
+          child: DietPlanContent(plan: activePlan, onRefresh: onRefresh),
         ),
       ],
     );
@@ -215,7 +213,9 @@ class PlanTabsView extends ConsumerWidget {
       children: [
         // Dropdown
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingM),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppDimensions.spacingM,
+          ),
           child: PlanDropdown(
             plans: plans.supplementPlans,
             activePlanId: activeSupplementPlanId,
@@ -240,10 +240,7 @@ class PlanTabsView extends ConsumerWidget {
 
         // Content
         Expanded(
-          child: SupplementPlanContent(
-            plan: activePlan,
-            onRefresh: onRefresh,
-          ),
+          child: SupplementPlanContent(plan: activePlan, onRefresh: onRefresh),
         ),
       ],
     );

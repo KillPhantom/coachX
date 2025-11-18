@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:coach_x/core/theme/app_theme.dart';
 import 'package:coach_x/l10n/app_localizations.dart';
 import '../../data/models/plan_summary.dart';
+import 'package:flutter/material.dart' show Icons;
 
 /// 计划类型Section组件
 ///
@@ -320,7 +321,7 @@ class PlanTypeSection extends StatelessWidget {
   IconData _getPlanTypeIcon() {
     switch (planType) {
       case 'exercise':
-        return CupertinoIcons.sportscourt;
+        return Icons.fitness_center;
       case 'diet':
         return CupertinoIcons.square_list;
       case 'supplement':

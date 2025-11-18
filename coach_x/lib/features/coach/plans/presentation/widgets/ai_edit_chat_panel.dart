@@ -6,7 +6,6 @@ import 'package:coach_x/core/widgets/dismiss_keyboard_on_scroll.dart';
 import 'package:coach_x/features/coach/plans/data/models/exercise_plan_model.dart';
 import 'package:coach_x/features/coach/plans/data/models/plan_edit_suggestion.dart';
 import 'package:coach_x/features/coach/plans/presentation/providers/edit_conversation_providers.dart';
-import 'package:coach_x/features/coach/plans/presentation/providers/suggestion_review_providers.dart';
 import 'package:coach_x/features/coach/plans/presentation/widgets/chat_message_bubble.dart';
 
 /// AI 编辑对话面板
@@ -89,59 +88,6 @@ class _AIEditChatPanelState extends ConsumerState<AIEditChatPanel> {
   void _sendQuickMessage(String message) {
     _messageController.text = message;
     _sendMessage();
-  }
-
-  Future<void> _applySuggestion() async {
-    final notifier = ref.read(editConversationNotifierProvider.notifier);
-    final suggestion = ref.read(pendingSuggestionProvider);
-
-    if (suggestion != null) {
-      // 1. 应用修改（通过 changes 生成新计划）
-      await notifier.applySuggestion();
-
-      // 2. 获取应用修改后的计划
-      final updatedPlan = ref
-          .read(editConversationNotifierProvider)
-          .currentPlan;
-      if (updatedPlan != null) {
-        // 同步新计划到父组件
-        widget.onPlanModified(updatedPlan);
-
-        // 3. 使用新计划启动 Review Mode
-        ref
-            .read(suggestionReviewNotifierProvider.notifier)
-            .startReview(suggestion, updatedPlan);
-        ref.read(isReviewModeProvider.notifier).state = true;
-      }
-
-      // 4. 通知父组件（让父组件关闭对话框）
-      if (widget.onSuggestionApplied != null) {
-        widget.onSuggestionApplied!();
-      }
-    }
-  }
-
-  Future<void> _rejectSuggestion() async {
-    await ref
-        .read(editConversationNotifierProvider.notifier)
-        .rejectSuggestion();
-  }
-
-  void _previewChanges() {
-    // TODO: 实现预览功能
-    showCupertinoDialog(
-      context: context,
-      builder: (context) => CupertinoAlertDialog(
-        title: const Text('预览功能'),
-        content: const Text('预览功能即将推出'),
-        actions: [
-          CupertinoDialogAction(
-            child: const Text('确定'),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-        ],
-      ),
-    );
   }
 
   @override
@@ -343,7 +289,7 @@ class _AIEditChatPanelState extends ConsumerState<AIEditChatPanel> {
                 ),
                 color: CupertinoColors.systemGrey6.resolveFrom(context),
                 borderRadius: BorderRadius.circular(20),
-                minSize: 0,
+                minimumSize: Size.zero,
                 onPressed: () => _sendQuickMessage(action),
                 child: Text(
                   '"$action"',
@@ -428,7 +374,7 @@ class _AIEditChatPanelState extends ConsumerState<AIEditChatPanel> {
                       ? LinearGradient(
                           colors: [
                             AppColors.primary,
-                            AppColors.primary.withOpacity(0.8),
+                            AppColors.primary.withValues(alpha: 0.8),
                           ],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,

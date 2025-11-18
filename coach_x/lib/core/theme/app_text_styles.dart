@@ -124,6 +124,15 @@ class AppTextStyles {
     height: 1.3,
   );
 
+  /// 说明文字3 - 9px, Regular
+  static const TextStyle caption3 = TextStyle(
+    fontFamily: _fontFamily,
+    fontSize: 9,
+    fontWeight: FontWeight.w400,
+    color: AppColors.textTertiary,
+    height: 1.3,
+  );
+
   // ==================== 按钮样式 ====================
 
   /// 大按钮文字 - 17px, SemiBold
@@ -149,7 +158,7 @@ class AppTextStyles {
     fontFamily: _fontFamily,
     fontSize: 13,
     fontWeight: FontWeight.w500,
-        color: AppColors.primaryText,
+    color: AppColors.primaryText,
     height: 1.2,
   );
 

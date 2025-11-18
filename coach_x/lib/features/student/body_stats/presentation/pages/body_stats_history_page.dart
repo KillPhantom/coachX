@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:coach_x/l10n/app_localizations.dart';
 import 'package:coach_x/core/theme/app_theme.dart';
+import 'package:coach_x/routes/route_names.dart';
 import 'package:coach_x/features/student/body_stats/data/models/time_range_enum.dart';
 import 'package:coach_x/features/student/body_stats/presentation/providers/body_stats_providers.dart';
 import 'package:coach_x/features/student/body_stats/presentation/widgets/weight_trend_chart.dart';
@@ -22,68 +23,23 @@ class BodyStatsHistoryPage extends ConsumerWidget {
 
     return CupertinoPageScaffold(
       backgroundColor: AppColors.backgroundLight,
-      child: SafeArea(
-        child: Column(
-          children: [
-            // 顶部导航栏
-            _buildNavigationBar(context, l10n),
-
-            // 内容区域
-            Expanded(
-              child: state.isLoading
-                  ? const Center(
-                      child: CupertinoActivityIndicator(radius: 20),
-                    )
-                  : !state.hasData
-                      ? _buildEmptyState(l10n)
-                      : _buildContent(context, ref, l10n, state, displayUnit),
-            ),
-          ],
+      navigationBar: CupertinoNavigationBar(
+        backgroundColor: AppColors.backgroundWhite,
+        middle: Text(l10n.bodyStatsHistory, style: AppTextStyles.navTitle),
+        leading: CupertinoButton(
+          padding: EdgeInsets.zero,
+          onPressed: () => context.go(RouteNames.studentHome),
+          child: const Icon(CupertinoIcons.back, color: AppColors.primaryDark),
+        ),
+        border: const Border(
+          bottom: BorderSide(color: AppColors.dividerLight, width: 0.5),
         ),
       ),
-    );
-  }
-
-  /// 构建导航栏
-  Widget _buildNavigationBar(BuildContext context, AppLocalizations l10n) {
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppDimensions.spacingM,
-        vertical: AppDimensions.spacingS,
-      ),
-      decoration: const BoxDecoration(
-        color: AppColors.backgroundWhite,
-        border: Border(
-          bottom: BorderSide(
-            color: AppColors.dividerLight,
-            width: 1,
-          ),
-        ),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          // 返回按钮
-          CupertinoButton(
-            padding: EdgeInsets.zero,
-            onPressed: () => context.pop(),
-            child: const Icon(
-              CupertinoIcons.back,
-              color: AppColors.primaryText,
-              size: 28,
-            ),
-          ),
-
-          // 标题
-          Text(
-            l10n.bodyStatsHistory,
-            style: AppTextStyles.title3,
-          ),
-
-          // 占位（保持对称）
-          const SizedBox(width: 44),
-        ],
-      ),
+      child: state.isLoading
+          ? const Center(child: CupertinoActivityIndicator(radius: 20))
+          : !state.hasData
+          ? _buildEmptyState(l10n)
+          : _buildContent(context, ref, l10n, state, displayUnit),
     );
   }
 
@@ -101,9 +57,7 @@ class BodyStatsHistoryPage extends ConsumerWidget {
           const SizedBox(height: AppDimensions.spacingL),
           Text(
             l10n.noBodyStatsData,
-            style: AppTextStyles.body.copyWith(
-              color: AppColors.textSecondary,
-            ),
+            style: AppTextStyles.body.copyWith(color: AppColors.textSecondary),
           ),
         ],
       ),
@@ -127,97 +81,94 @@ class BodyStatsHistoryPage extends ConsumerWidget {
             await ref.read(bodyStatsHistoryProvider.notifier).refresh();
           },
         ),
-          // 时间范围选择器
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.all(AppDimensions.spacingM),
-              child: _buildTimeRangeSelector(context, ref, l10n, state),
-            ),
+        // 时间范围选择器
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.all(AppDimensions.spacingM),
+            child: _buildTimeRangeSelector(context, ref, l10n, state),
           ),
+        ),
 
-          // 图表区域
-          if (state.hasFilteredData)
-            SliverToBoxAdapter(
-              child: Container(
-                margin: const EdgeInsets.symmetric(
-                  horizontal: AppDimensions.spacingM,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.backgroundWhite,
-                  borderRadius: BorderRadius.circular(AppDimensions.radiusL),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.shadowColor.withOpacity(0.08),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(AppDimensions.spacingM),
-                      child: Text(
-                        l10n.weightTrend,
-                        style: AppTextStyles.bodyMedium.copyWith(
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                    WeightTrendChart(
-                      measurements: state.filteredMeasurements,
-                      displayUnit: displayUnit,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-
-          // 历史记录标题
-          if (state.hasFilteredData)
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(
-                  AppDimensions.spacingM,
-                  AppDimensions.spacingL,
-                  AppDimensions.spacingM,
-                  AppDimensions.spacingS,
-                ),
-                child: Text(
-                  l10n.history,
-                  style: AppTextStyles.bodyMedium.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ),
-
-          // 历史记录列表
-          if (state.hasFilteredData)
-            SliverPadding(
-              padding: const EdgeInsets.symmetric(
+        // 图表区域
+        if (state.hasFilteredData)
+          SliverToBoxAdapter(
+            child: Container(
+              margin: const EdgeInsets.symmetric(
                 horizontal: AppDimensions.spacingM,
               ),
-              sliver: SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  (context, index) {
-                    final measurement = state.filteredMeasurements[index];
-                    return MeasurementRecordCard(
-                      measurement: measurement,
-                      displayUnit: displayUnit,
-                    );
-                  },
-                  childCount: state.filteredMeasurements.length,
+              decoration: BoxDecoration(
+                color: AppColors.backgroundWhite,
+                borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.shadowColor.withOpacity(0.08),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(AppDimensions.spacingM),
+                    child: Text(
+                      l10n.weightTrend,
+                      style: AppTextStyles.bodyMedium.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  WeightTrendChart(
+                    measurements: state.filteredMeasurements,
+                    displayUnit: displayUnit,
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+        // 历史记录标题
+        if (state.hasFilteredData)
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(
+                AppDimensions.spacingM,
+                AppDimensions.spacingL,
+                AppDimensions.spacingM,
+                AppDimensions.spacingS,
+              ),
+              child: Text(
+                l10n.history,
+                style: AppTextStyles.bodyMedium.copyWith(
+                  fontWeight: FontWeight.w600,
                 ),
               ),
             ),
-
-          // 底部间距
-          const SliverToBoxAdapter(
-            child: SizedBox(height: AppDimensions.spacingXL),
           ),
-        ],
+
+        // 历史记录列表
+        if (state.hasFilteredData)
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppDimensions.spacingM,
+            ),
+            sliver: SliverList(
+              delegate: SliverChildBuilderDelegate((context, index) {
+                final measurement = state.filteredMeasurements[index];
+                return MeasurementRecordCard(
+                  measurement: measurement,
+                  displayUnit: displayUnit,
+                );
+              }, childCount: state.filteredMeasurements.length),
+            ),
+          ),
+
+        // 底部间距（足够容纳展开的内容和系统安全区域）
+        SliverToBoxAdapter(
+          child: SizedBox(height: MediaQuery.of(context).padding.bottom + 120),
+        ),
+      ],
     );
   }
 
@@ -233,10 +184,7 @@ class BodyStatsHistoryPage extends ConsumerWidget {
       decoration: BoxDecoration(
         color: AppColors.backgroundWhite,
         borderRadius: BorderRadius.circular(AppDimensions.radiusL),
-        border: Border.all(
-          color: AppColors.dividerLight,
-          width: 1,
-        ),
+        border: Border.all(color: AppColors.dividerLight, width: 1),
       ),
       child: CupertinoSegmentedControl<TimeRange>(
         groupValue: state.selectedTimeRange,

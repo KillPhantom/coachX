@@ -1,11 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:coach_x/l10n/app_localizations.dart';
 import 'package:coach_x/core/theme/app_theme.dart';
 import 'package:coach_x/features/chat/presentation/providers/chat_detail_providers.dart';
 import 'package:coach_x/features/chat/presentation/widgets/chat_tab_content.dart';
-import 'package:coach_x/features/chat/presentation/widgets/feedback_tab_placeholder.dart';
+import 'package:coach_x/features/chat/presentation/widgets/feedback_tab_content.dart';
 import 'package:coach_x/features/chat/presentation/widgets/message_input_bar.dart';
 import 'package:coach_x/features/chat/presentation/widgets/chat_ai_panel.dart';
 
@@ -62,7 +61,7 @@ class ChatDetailPage extends ConsumerWidget {
           Expanded(
             child: selectedTab == ChatDetailTab.chat
                 ? ChatTabContent(conversationId: conversationId)
-                : const FeedbackTabPlaceholder(),
+                : FeedbackTabContent(conversationId: conversationId),
           ),
 
           // 消息输入栏（仅在 Chat Tab 显示）

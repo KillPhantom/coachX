@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:coach_x/features/student/training/data/models/student_exercise_model.dart';
 
 /// 训练记录页面状态
@@ -15,6 +17,8 @@ class ExerciseRecordState {
   final Map<int, DateTime> exerciseStartTimes; // 每个 exercise 的开始时间
   final DateTime? currentExerciseStartTime; // 当前 Exercise 的开始时间
   final int? currentExerciseIndex; // 当前正在计时的 Exercise 索引
+  final Map<String, StreamSubscription<double>>
+  uploadSubscriptions; // 上传订阅管理（用于取消上传）
 
   const ExerciseRecordState({
     this.exercises = const [],
@@ -30,6 +34,7 @@ class ExerciseRecordState {
     this.exerciseStartTimes = const {},
     this.currentExerciseStartTime,
     this.currentExerciseIndex,
+    this.uploadSubscriptions = const {},
   });
 
   /// 创建初始状态
@@ -52,6 +57,7 @@ class ExerciseRecordState {
     Map<int, DateTime>? exerciseStartTimes,
     DateTime? currentExerciseStartTime,
     int? currentExerciseIndex,
+    Map<String, StreamSubscription<double>>? uploadSubscriptions,
     bool clearError = false,
   }) {
     return ExerciseRecordState(
@@ -66,8 +72,10 @@ class ExerciseRecordState {
       timerStartTime: timerStartTime ?? this.timerStartTime,
       isTimerRunning: isTimerRunning ?? this.isTimerRunning,
       exerciseStartTimes: exerciseStartTimes ?? this.exerciseStartTimes,
-      currentExerciseStartTime: currentExerciseStartTime ?? this.currentExerciseStartTime,
+      currentExerciseStartTime:
+          currentExerciseStartTime ?? this.currentExerciseStartTime,
       currentExerciseIndex: currentExerciseIndex ?? this.currentExerciseIndex,
+      uploadSubscriptions: uploadSubscriptions ?? this.uploadSubscriptions,
     );
   }
 

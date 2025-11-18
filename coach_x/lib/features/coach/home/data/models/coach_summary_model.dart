@@ -2,8 +2,8 @@
 ///
 /// 用于表示教练首页的统计信息
 class CoachSummaryModel {
-  /// 今日完成训练的学生数
-  final int studentsCompletedToday;
+  /// 过去30天完成训练的学生数
+  final int studentsCompletedLast30Days;
 
   /// 总学生数
   final int totalStudents;
@@ -18,7 +18,7 @@ class CoachSummaryModel {
   final DateTime lastUpdated;
 
   const CoachSummaryModel({
-    required this.studentsCompletedToday,
+    required this.studentsCompletedLast30Days,
     required this.totalStudents,
     required this.unreadMessages,
     required this.unreviewedTrainings,
@@ -28,7 +28,7 @@ class CoachSummaryModel {
   /// 从JSON创建
   factory CoachSummaryModel.fromJson(Map<String, dynamic> json) {
     return CoachSummaryModel(
-      studentsCompletedToday: json['studentsCompletedToday'] as int,
+      studentsCompletedLast30Days: json['studentsCompletedLast30Days'] as int,
       totalStudents: json['totalStudents'] as int,
       unreadMessages: json['unreadMessages'] as int,
       unreviewedTrainings: json['unreviewedTrainings'] as int,
@@ -39,7 +39,7 @@ class CoachSummaryModel {
   /// 转换为JSON
   Map<String, dynamic> toJson() {
     return {
-      'studentsCompletedToday': studentsCompletedToday,
+      'studentsCompletedLast30Days': studentsCompletedLast30Days,
       'totalStudents': totalStudents,
       'unreadMessages': unreadMessages,
       'unreviewedTrainings': unreviewedTrainings,
@@ -51,7 +51,7 @@ class CoachSummaryModel {
   ///
   /// 例如: "15/25"
   String get completionRate {
-    return '$studentsCompletedToday/$totalStudents';
+    return '$studentsCompletedLast30Days/$totalStudents';
   }
 
   /// 获取完成率百分比
@@ -59,20 +59,20 @@ class CoachSummaryModel {
   /// 例如: 0.6 (60%)
   double get completionPercentage {
     if (totalStudents == 0) return 0.0;
-    return studentsCompletedToday / totalStudents;
+    return studentsCompletedLast30Days / totalStudents;
   }
 
   /// 复制并修改
   CoachSummaryModel copyWith({
-    int? studentsCompletedToday,
+    int? studentsCompletedLast30Days,
     int? totalStudents,
     int? unreadMessages,
     int? unreviewedTrainings,
     DateTime? lastUpdated,
   }) {
     return CoachSummaryModel(
-      studentsCompletedToday:
-          studentsCompletedToday ?? this.studentsCompletedToday,
+      studentsCompletedLast30Days:
+          studentsCompletedLast30Days ?? this.studentsCompletedLast30Days,
       totalStudents: totalStudents ?? this.totalStudents,
       unreadMessages: unreadMessages ?? this.unreadMessages,
       unreviewedTrainings: unreviewedTrainings ?? this.unreviewedTrainings,

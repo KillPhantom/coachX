@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:coach_x/l10n/app_localizations.dart';
 import 'package:coach_x/core/theme/app_theme.dart';
+import 'package:coach_x/core/utils/image_compressor.dart';
+import 'package:coach_x/core/utils/logger.dart';
 import 'package:coach_x/core/widgets/keyboard_adaptive_padding.dart';
 import 'package:coach_x/features/student/body_stats/presentation/widgets/photo_thumbnail.dart';
 import 'package:coach_x/features/student/body_stats/presentation/providers/body_stats_providers.dart';
@@ -36,15 +38,30 @@ class _BodyStatsInputSheetState extends ConsumerState<BodyStatsInputSheet> {
   /// 选择照片
   Future<void> _pickImage(ImageSource source) async {
     try {
-      final XFile? image = await _imagePicker.pickImage(
-        source: source,
-        maxWidth: 1920,
-        maxHeight: 1920,
-        imageQuality: 85,
-      );
+      // 步骤1: 使用 ImagePicker 获取原始图片
+      final XFile? image = await _imagePicker.pickImage(source: source);
 
       if (image != null) {
-        ref.read(bodyStatsRecordProvider.notifier).addPhoto(image.path);
+        String? compressedPath;
+        try {
+          // 步骤2: 使用 ImageCompressor 压缩图片
+          compressedPath = await ImageCompressor.compressImage(
+            image.path,
+            quality: 85,
+            maxWidth: 1920,
+            maxHeight: 1920,
+          );
+
+          // 步骤3: 添加压缩后的图片路径
+          ref.read(bodyStatsRecordProvider.notifier).addPhoto(compressedPath);
+
+          AppLogger.info('✅ 身体照片压缩并添加成功');
+        } catch (e, stackTrace) {
+          AppLogger.error('❌ 身体照片压缩失败', e, stackTrace);
+          // 压缩失败时，使用原始图片（fallback）
+          ref.read(bodyStatsRecordProvider.notifier).addPhoto(image.path);
+          AppLogger.warning('⚠️ 使用原始图片（未压缩）');
+        }
       }
     } catch (e) {
       // 显示错误提示
@@ -82,10 +99,29 @@ class _BodyStatsInputSheetState extends ConsumerState<BodyStatsInputSheet> {
       }
     }
 
-    // 保存记录
-    final success = await ref
+    // 生成今天的日期
+    final recordDate = DateTime.now().toIso8601String().split('T')[0];
+
+    // 检查今天是否已有记录
+    final existingId = await ref
         .read(bodyStatsRecordProvider.notifier)
-        .saveRecord();
+        .checkExistingRecord(recordDate);
+
+    bool success = false;
+
+    if (existingId != null && mounted) {
+      // 已有记录，显示确认对话框
+      final confirmed = await _showOverrideConfirmation(context, recordDate);
+      if (!confirmed) return;
+
+      // 用户确认，更新记录
+      success = await ref
+          .read(bodyStatsRecordProvider.notifier)
+          .updateRecord(existingId);
+    } else {
+      // 没有记录，正常保存
+      success = await ref.read(bodyStatsRecordProvider.notifier).saveRecord();
+    }
 
     if (success && mounted) {
       // 关闭弹窗
@@ -118,6 +154,35 @@ class _BodyStatsInputSheetState extends ConsumerState<BodyStatsInputSheet> {
         ],
       ),
     );
+  }
+
+  /// 显示覆盖确认对话框
+  Future<bool> _showOverrideConfirmation(
+    BuildContext context,
+    String recordDate,
+  ) async {
+    final l10n = AppLocalizations.of(context)!;
+
+    final result = await showCupertinoDialog<bool>(
+      context: context,
+      builder: (context) => CupertinoAlertDialog(
+        title: Text(l10n.recordExistsTitle),
+        content: Text(l10n.recordExistsMessage(recordDate)),
+        actions: [
+          CupertinoDialogAction(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(l10n.cancel),
+          ),
+          CupertinoDialogAction(
+            isDestructiveAction: true,
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text(l10n.replace),
+          ),
+        ],
+      ),
+    );
+
+    return result ?? false;
   }
 
   @override

@@ -112,6 +112,101 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    // ==================== Daily Trainings Collection ====================
+
+    match /dailyTrainings/{trainingId} {
+      // 允许教练读取他们管理的学生的训练记录
+      // 允许学生读取自己的训练记录
+      allow read: if isSignedIn() && (
+        resource.data.coachID == request.auth.uid ||
+        resource.data.studentID == request.auth.uid
+      );
+
+      // 允许学生创建和更新自己的训练记录
+      allow create, update: if isSignedIn() &&
+        request.resource.data.studentID == request.auth.uid;
+
+      // 允许教练更新训练记录的审核状态和视频 isReviewed 字段
+      allow update: if isSignedIn() &&
+        resource.data.coachID == request.auth.uid;
+
+      // 不允许删除训练记录
+      allow delete: if false;
+    }
+
+    // ==================== Daily Training Feedback Collection ====================
+
+    match /dailyTrainingFeedback/{feedbackId} {
+      // 允许教练和学生获取单个反馈文档
+      allow get: if isSignedIn() && (
+        resource.data.coachId == request.auth.uid ||
+        resource.data.studentId == request.auth.uid
+      );
+
+      // 允许教练和学生列表查询他们相关的反馈
+      // 查询时必须包含 coachId 或 studentId 过滤条件
+      allow list: if isSignedIn();
+
+      // 只允许教练创建反馈
+      allow create: if isSignedIn() &&
+        request.resource.data.coachId == request.auth.uid;
+
+      // 只允许教练更新反馈，或者学生标记为已读
+      allow update: if isSignedIn() && (
+        resource.data.coachId == request.auth.uid ||
+        (resource.data.studentId == request.auth.uid &&
+         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['isRead', 'updatedAt']))
+      );
+
+      // 不允许删除反馈
+      allow delete: if false;
+    }
+
+    // ==================== Body Measure Collection ====================
+
+    match /bodyMeasure/{measureId} {
+      // Helper function: 检查是否为学生本人或其教练
+      function isStudentOrCoach(studentId) {
+        return request.auth.uid == studentId ||
+               get(/databases/$(database)/documents/users/$(studentId)).data.coachId == request.auth.uid;
+      }
+
+      // 允许学生读取自己的体重记录
+      // 允许教练读取其管理的学生的体重记录
+      allow read: if isSignedIn() && isStudentOrCoach(resource.data.studentID);
+
+      // 只允许学生创建和更新自己的体重记录
+      allow create, update: if isSignedIn() &&
+        request.resource.data.studentID == request.auth.uid;
+
+      // 不允许删除体重记录
+      allow delete: if false;
+    }
+
+    // ==================== Exercise Templates Collection ====================
+
+    match /exerciseTemplates/{templateId} {
+      // 允许教练读取自己的动作模板
+      allow read: if isSignedIn() && resource.data.ownerId == request.auth.uid;
+
+      // 允许教练创建、更新、删除自己的动作模板
+      allow create, update, delete: if isSignedIn() &&
+        request.resource.data.ownerId == request.auth.uid;
+    }
+
+    // ==================== Exercise Tags Subcollection ====================
+
+    match /users/{userId}/exerciseTags/{tagId} {
+      // 允许用户读取自己的标签
+      allow read: if isSignedIn() && userId == request.auth.uid;
+
+      // 允许用户创建、删除自己的标签
+      allow create, delete: if isSignedIn() && userId == request.auth.uid;
+
+      // 不允许更新标签（如需修改，删除后重建）
+      allow update: if false;
+    }
+
     // ==================== Default Deny ====================
 
     // 默认拒绝所有其他访问

@@ -1,7 +1,7 @@
 # Exercise Record Page 架构文档
 
-**版本**: 2.2
-**更新日期**: 2025-11-08
+**版本**: 2.4
+**更新日期**: 2025-11-16
 **作者**: Claude Code
 
 ---
@@ -282,34 +282,53 @@ ExerciseRecordNotifier.toggleSetCompleted(exerciseIndex, setIndex)
     └─ 显示输入框，允许重新编辑
 ```
 
-### 6. 视频上传流程
+### 6. 视频上传流程（v2.4 更新）
 
 ```
 用户点击 "录制视频" 占位符
     ↓
-MyRecordingsSection._showRecordOptions()
+VideoUploadSection._showVideoSourceOptions()
     ↓
-[TODO: 选择相机录制 or 从相册选择]
+选择相机录制 or 从相册选择
     ↓
 获得 File videoFile
     ↓
-ExerciseRecordCard.onVideoUploaded(videoFile)
+VideoUploadSection._processAndUploadVideo(videoFile)
     ↓
-ExerciseRecordNotifier.uploadVideo(exerciseIndex, videoFile)
+├─ 生成缩略图（本地临时文件）
+│  └─ VideoUtils.generateThumbnail()
+│
+├─ 添加到 VideoUploadSection._videos (pending 状态)
+│
+├─ 回调: onVideoSelected(index, file)
+│  └─ ExerciseRecordNotifier.addPendingVideo(index, file.path, null)
+│      └─ 添加到 state.exercises[index].videos (pending, 缩略图为 null)
+│
+└─ 启动后台压缩和上传
     ↓
-├─ 构建存储路径
-│  └─ 'students/trainings/{date}/{exerciseIndex}/{timestamp}.mp4'
-│
-├─ Repository.uploadVideo(file, path)
-│  └─ FirebaseStorage.putFile()
-│      └─ 返回 downloadUrl
-│
-├─ 更新本地状态
-│  └─ exercises[index].videos.add(downloadUrl)
-│
-└─ 自动保存
-    └─ saveRecord()
+    VideoUploadSection._compressAndUpload()
+        ↓
+        ├─ 条件压缩（如果超过阈值）
+        │
+        ├─ 上传视频到 Firebase Storage
+        │  └─ 路径: 'students/trainings/{userId}/{timestamp}.mp4'
+        │
+        ├─ 上传缩略图到 Firebase Storage
+        │  └─ 路径: 'students/trainings/{userId}/{timestamp}_thumb.jpg'
+        │
+        └─ 回调: onUploadCompleted(index, videoUrl, thumbnailUrl)
+            └─ ExerciseRecordNotifier.completeVideoUpload(exerciseIndex, videoIndex, videoUrl, thumbnailUrl)
+                ├─ 更新 state.exercises[exerciseIndex].videos[videoIndex]
+                │  └─ status = completed, downloadUrl, thumbnailUrl
+                │
+                └─ 立即保存到 Firestore
+                    └─ saveRecord()
 ```
+
+**v2.4 关键变更**:
+- ✅ 使用 VideoUploadSection 自管理上传（不再重复上传）
+- ✅ 通过回调同步状态到 ExerciseRecordNotifier
+- ✅ 上传完成后立即保存
 
 ### 7. 视频删除流程
 
@@ -341,9 +360,7 @@ ExerciseRecordPage (Stateful)
 ├── CupertinoPageScaffold
 │   ├── CupertinoNavigationBar
 │   │   ├── middle: Text("训练记录")
-│   │   └── trailing: Row
-│   │       ├── Timer Icon (启动计时器)
-│   │       └── Add Icon (添加自定义动作)
+│   │   └── trailing: Timer Icon (启动计时器)
 │   │
 │   └── SafeArea
 │       └── Column
@@ -466,110 +483,21 @@ final exerciseRecordNotifierProvider =
 
 ## 核心功能实现
 
-### 1. Debounce 自动保存
+**关键方法** (详见代码):
 
-**实现位置**: `ExerciseRecordNotifier.updateSetRealtime()`
+| 功能 | 方法 | 位置 |
+|------|------|------|
+| Set 编辑 | `updateSetRealtime()` | `exercise_record_notifier.dart` |
+| 快捷完成 | `quickComplete()` | `exercise_record_notifier.dart` |
+| 视频上传 | `addPendingVideo()`, `completeVideoUpload()` | `exercise_record_notifier.dart` |
+| 计时器 | `startTimer()`, `stopTimer()` | `exercise_record_notifier.dart` |
+| 数据保存 | `saveRecord()` | `exercise_record_notifier.dart` |
 
-```dart
-Timer? _debounceTimer;
-
-void updateSetRealtime(int exerciseIndex, int setIndex, TrainingSet set) {
-  // 更新本地状态
-  final exercise = state.exercises[exerciseIndex];
-  final updatedExercise = exercise.updateSet(setIndex, set);
-  updateExercise(exerciseIndex, updatedExercise);
-
-  // Debounce 保存
-  _debounceTimer?.cancel();
-  _debounceTimer = Timer(const Duration(milliseconds: 500), () {
-    saveRecord().catchError((e) => AppLogger.error('实时保存失败', e));
-  });
-}
-```
-
-**优点**:
-- 减少频繁的网络请求
-- 提升用户体验（无感保存）
-- 避免并发冲突
-
-**注意事项**:
-- 必须在 `dispose()` 时取消 Timer
-- 错误处理要优雅（不能阻塞 UI）
-
-### 2. 状态切换（可编辑 ↔ 已完成）
-
-**实现位置**: `SetInputRow` 组件
-
-```dart
-// 未完成状态：显示可编辑输入框
-CupertinoTextField(
-  controller: _repsController,
-  onChanged: (value) {
-    final updatedSet = widget.set.copyWith(reps: value);
-    widget.onChanged(updatedSet);  // 触发实时保存
-  },
-)
-
-// 已完成状态：显示只读文本 + checkmark
-GestureDetector(
-  onTap: widget.onToggleEdit,  // 点击重新编辑
-  child: Container(
-    // 浅色背景 + 绿色边框
-    child: Row([
-      Text('${set.reps} reps x ${set.weight} kg'),
-      Icon(CupertinoIcons.checkmark_circle_fill),
-    ]),
-  ),
-)
-```
-
-### 3. 视频缩略图生成
-
-**实现位置**: `VideoThumbnailCard._loadThumbnailAndDuration()`
-
-```dart
-Future<void> _loadThumbnailAndDuration() async {
-  // 异步生成缩略图
-  final thumbnail = await VideoUtils.generateThumbnail(widget.videoUrl);
-
-  // 异步获取视频时长
-  final duration = await VideoUtils.getVideoDuration(widget.videoUrl);
-
-  if (mounted) {
-    setState(() {
-      _thumbnailFile = thumbnail;
-      _duration = duration;
-      _isLoading = false;
-    });
-  }
-}
-```
-
-**优化**:
-- 使用 `video_thumbnail` package (原生支持)
-- 缓存到临时目录（避免重复生成）
-- 异步加载（不阻塞主线程）
-
-### 4. 快捷完成
-
-**实现位置**: `ExerciseRecordNotifier.quickComplete()`
-
-```dart
-Future<void> quickComplete(int index) async {
-  // 1. 标记完成（保留 prefill data）
-  final exercise = state.exercises[index];
-  final completedExercise = exercise.copyWith(completed: true);
-  updateExercise(index, completedExercise);
-
-  // 2. 立即保存（不走 debounce）
-  await saveRecord();
-}
-```
-
-**关键点**:
-- 使用计划的默认数据（不需要手动输入）
-- 立即保存（不延迟）
-- 适合快速打卡场景
+**设计原则**:
+- ✅ 仅 exercise 完成时保存（节省 Firebase 写入）
+- ✅ 状态同步：VideoUploadSection ↔ Notifier
+- ✅ 异步操作：视频压缩、上传不阻塞 UI
+- ✅ Auto-dispose: 离开页面自动释放资源
 
 ---
 
@@ -669,45 +597,15 @@ students/trainings/2025-11-08/1/1700000000000.mp4
 
 ## UI 设计规范
 
-### 颜色使用
+**参考**:
+- 全局样式: `lib/core/theme/app_text_styles.dart`, `lib/core/theme/app_colors.dart`
+- 设计系统: [CLAUDE.md](../CLAUDE.md#typography)
 
-| 元素 | 颜色 | 说明 |
-|------|------|------|
-| 未完成 Set 背景 | `AppColors.backgroundWhite` | 白色 |
-| 已完成 Set 背景 | `AppColors.primaryColor.withOpacity(0.1)` | 浅黄色 |
-| 已完成 Set 边框 | `AppColors.primaryColor.withOpacity(0.3)` | 半透明黄色 |
-| Checkmark 图标 | `AppColors.primaryColor` | 主题黄色 |
-| 删除按钮 | `CupertinoColors.systemRed` | 系统红色 |
-| 占位框边框 | `AppColors.dividerLight` | 浅灰色虚线 |
-
-### 字体使用
-
-| 元素 | 字体样式 | 大小 |
-|------|---------|------|
-| 动作名称 | `AppTextStyles.callout` (Bold) | 16px |
-| Set 标签 | `AppTextStyles.callout` | 16px |
-| 输入框文字 | `AppTextStyles.body` | 17px |
-| 教练备注 | `AppTextStyles.subhead` | 15px |
-| 快捷完成按钮 | `AppTextStyles.footnote` | 13px |
-| 视频时长 | `AppTextStyles.caption2` | 11px |
-
-### 尺寸规范
-
-| 元素 | 宽度 | 高度 | 圆角 |
-|------|------|------|------|
-| Exercise Card | 100% | auto | 12px |
-| Set Input Row | 100% | auto | 8px |
-| Video Thumbnail | 100px | 100px | 12px |
-| Video Placeholder | 100px | 100px | 12px |
-| Checkmark Icon | 24px | 24px | - |
-| Delete Button | 24px | 24px | 圆形 |
-
-### 间距规范
-
-- Card 间距: `16px`
-- Set 行间距: `8px`
-- 区域内边距: `16px`
-- 小元素间距: `8px`
+**关键样式**:
+- **已完成状态**: 绿色 checkmark (`AppColors.successGreen`)
+- **卡片圆角**: `12px` (AppDimensions.radiusM)
+- **间距**: `16px` (Card), `8px` (行间距)
+- **字体**: `AppTextStyles.callout` (动作), `AppTextStyles.body` (输入)
 
 ---
 
@@ -782,19 +680,7 @@ GoRoute(
 
 **调用位置**: `MyRecordingsSection._showRecordOptions()`
 
-### 2. 自定义动作添加
-
-**状态**: 🚧 待实现
-
-**功能**:
-- 点击右上角 "+" 按钮
-- 弹出对话框输入动作名称、Sets 数量
-- 添加到当日记录（不影响计划）
-- 保存到 Firestore
-
-**实现位置**: `ExerciseRecordPage._showAddCustomExerciseAlert()`
-
-### 3. 视频压缩优化
+### 2. 视频压缩优化
 
 **状态**: 💡 建议
 
@@ -804,7 +690,7 @@ GoRoute(
 - 显示上传进度
 - 支持后台上传
 
-### 4. 离线模式支持
+### 3. 离线模式支持
 
 **状态**: 💡 建议
 
@@ -813,7 +699,7 @@ GoRoute(
 - 网络恢复后自动同步
 - 冲突解决策略（后写入覆盖）
 
-### 5. 教练反馈集成
+### 4. 教练反馈集成
 
 **状态**: 💡 未来功能
 
@@ -833,7 +719,7 @@ class VoiceFeedbackModel {
 }
 ```
 
-### 6. 数据分析
+### 5. 数据分析
 
 **状态**: 💡 未来功能
 
@@ -843,7 +729,7 @@ class VoiceFeedbackModel {
 - 视频上传次数统计
 - 与计划对比分析
 
-### 7. 社交分享
+### 6. 社交分享
 
 **状态**: 💡 未来功能
 
@@ -851,118 +737,6 @@ class VoiceFeedbackModel {
 - 分享训练视频到社交平台
 - 生成训练成果卡片
 - 与好友对比数据
-
----
-
-## 常见问题 (FAQ)
-
-### Q1: 为什么保存时需要 FirebaseAuth.currentUser.uid？
-
-**A**: 后端 Cloud Function 需要 `studentID` 字段来标识数据所有权，不能从认证上下文自动获取（与其他 API 不同），必须显式传递。
-
-### Q2: 为什么使用 debounce 而不是立即保存？
-
-**A**:
-- 减少网络请求频率（用户可能连续编辑多个 Set）
-- 避免 Firestore 写入配额过快消耗
-- 提升 UI 响应速度（不阻塞输入）
-
-### Q3: 视频删除后 Storage 文件会被删除吗？
-
-**A**:
-- **当前实现**: 只删除 Firestore 引用，不删除 Storage 文件
-- **原因**: 避免误删、保留教练反馈历史
-- **建议**: 添加定期清理任务（Cloud Function + Scheduler）
-
-### Q4: 如何处理日期跨越时区问题？
-
-**A**:
-- 使用 `DateFormat('yyyy-MM-dd').format(DateTime.now())` 获取本地日期
-- 后端按字符串存储（不做时区转换）
-- 保证同一自然日的数据一致性
-
-### Q5: 为什么 ExerciseRecordState 使用 List 而不是 Map？
-
-**A**:
-- 保持顺序（计划中的动作有固定顺序）
-- 简化 UI 渲染（ListView.builder 直接使用 index）
-- 避免 Map key 管理复杂性
-
----
-
-## 性能优化建议
-
-### 1. 视频缩略图缓存
-
-**问题**: 每次打开页面重新生成缩略图
-
-**优化**:
-```dart
-// 使用 cached_network_image 缓存逻辑
-// 或者存储缩略图 URL 到 Firestore
-final thumbnailUrl = '${videoUrl}_thumbnail.jpg';
-```
-
-### 2. Provider Auto-Dispose
-
-**已实现**: ✅
-```dart
-StateNotifierProvider.autoDispose<...>
-```
-
-**优点**:
-- 离开页面自动释放内存
-- 取消未完成的异步操作
-- 防止内存泄漏
-
-### 3. 输入框 Controller 管理
-
-**已实现**: ✅ SetInputRow 内部管理 TextEditingController
-
-**优点**:
-- 避免父组件重建时 Controller 丢失
-- 正确处理 dispose 生命周期
-
-### 4. 列表滚动优化
-
-**建议**:
-```dart
-ListView.builder(
-  itemExtent: 200, // 固定高度（如果可能）
-  cacheExtent: 500, // 预加载范围
-)
-```
-
----
-
-## 测试清单
-
-### 功能测试
-
-- [ ] 页面加载显示今日计划的动作
-- [ ] 修改 Set 的 reps/weight 能实时保存
-- [ ] 点击"快捷完成"能标记动作完成
-- [ ] 已完成的 Set 显示绿色 checkmark
-- [ ] 点击已完成的 Set 能重新编辑
-- [ ] 上传视频显示缩略图和时长
-- [ ] 删除视频后列表更新
-- [ ] 最多只能上传3个视频
-- [ ] 离开页面后数据持久化
-
-### 边界测试
-
-- [ ] 没有训练计划时显示空状态
-- [ ] 网络断开时显示错误提示
-- [ ] 视频上传失败后的错误处理
-- [ ] 多次快速编辑 Set 不会导致数据丢失
-- [ ] 视频时长超过1分钟时提示错误
-
-### 性能测试
-
-- [ ] 包含10个动作时滚动流畅
-- [ ] 上传大视频（50MB）时不卡顿
-- [ ] 缩略图生成不阻塞主线程
-- [ ] 离开页面后内存正常释放
 
 ---
 
@@ -986,276 +760,119 @@ ListView.builder(
 
 ---
 
-## v2.0 更新摘要（2025-01-08）
+## 版本历史
 
-### 🎯 核心功能升级
+### v2.0-v2.2 (2025-01-08 至 2025-11-08)
+**核心变更**:
+- ✅ PageView 横向滚动 + 自定义页面指示器
+- ✅ 训练计时器（全局 + 单个 exercise）
+- ✅ 智能保存策略（仅 exercise 完成时保存）
+- ✅ 自动完成逻辑（reps 不为空 → Set 完成）
+- ✅ 重新编辑已完成 Set
+- ✅ Weight 输入支持文本（如"自重"）
+- ✅ 祝贺横幅 + 进度条
 
-#### 1. PageView 横向滚动 ✅
-- **变更**: ListView.builder → PageView.builder
-- **新增**: 底部 `SmoothPageIndicator` 页面指示器
-- **新增**: Exercise 完成后自动滑到下一页（300ms 动画）
-- **优点**: 更好的用户体验，每次专注一个动作
+**详细信息**: 参见 Git 历史 `git log --grep="v2.[0-2]"`
+## v2.3 更新摘要（2025-11-15）
 
-#### 2. 训练计时器 ✅
-- **新增组件**: `TimerHeader` (全局计时器，HH:MM:SS)
-- **新增组件**: `ExerciseTimeHeader` (动作耗时，MM:SS)
-- **新增字段**: `ExerciseRecordState.timerStartTime`, `isTimerRunning`, `exerciseStartTimes`
-- **新增字段**: `StudentExerciseModel.timeSpent` (秒数)
-- **交互**: 右上角 Timer Icon → 确认对话框 → 启动计时
-- **自动记录**: 首次编辑时记录开始时间，完成时计算耗时
+### 🎯 核心功能新增
 
-#### 3. 智能保存策略 ✅
-- **移除**: Set 修改时的 debounce 自动保存（500ms）
-- **新增**: 仅在 Exercise 完成时保存
-- **优点**: 节省 Firebase 写入次数，降低成本
-- **场景**: Set 编辑不触发保存，只有所有 Sets 完成后才保存
+#### 训练总时长 (totalDuration) ✅
 
-#### 4. 自动完成逻辑 ✅
-- **自动标记 Set**: reps 不为空时，自动 `set.completed = true`
-- **自动完成 Exercise**: 所有 Sets 完成后，自动 `exercise.completed = true`
-- **自动滑动**: Exercise 完成后，PageView 自动滑到下一个
-- **自动保存**: Exercise 完成时立即保存到 Firebase
+**功能描述**:
+- 记录从启动计时器到最后一个 exercise 完成的总时长（秒数）
+- 用于教练查看学生训练效率和 AI 分析运动表现
+- 区别于各 exercise 的 `timeSpent`（单个动作耗时）
 
-#### 5. 重新编辑支持 ✅
-- **新增**: 点击已完成的 Set（绿色 checkmark）可重新编辑
-- **自动取消**: 点击后自动取消 Exercise 的完成状态
-- **UI 更新**: SetInputRow 清空文本，显示输入框
-- **灵活性**: 允许用户修正错误输入
+**实现细节**:
 
-#### 6. Weight 输入优化 ✅
-- **移除**: "kg" suffix label
-- **新增**: Placeholder "自重/60kg" (i18n)
-- **支持**: 文本输入，如 "自重"、"60kg"、"155 lbs"
-- **限制**: 最多 10 字符
-- **移除**: 数字限制 `FilteringTextInputFormatter`
+**1. 数据模型变更**
 
-#### 7. UI 细节改进 ✅
-- **ExerciseRecordCard**:
-  - 添加 Material `Icons.fitness_center` icon
-  - 完成后显示绿色 border (`AppColors.successGreen`)
-  - 移除背景色变化（保持白色）
-  - 教练备注移到 Sets 之前
-- **SetInputRow**:
-  - Checkmark 改为绿色（`AppColors.successGreen`）
-  - Placeholder 显示计划默认值
-  - 快捷完成时自动填充 placeholder
-- **ExerciseRecordPage**:
-  - NavigationBar trailing 添加 Timer Icon 和 Add Icon
+`DailyTrainingModel` 新增字段:
+```dart
+final int? totalDuration;  // 训练总时长（秒数），nullable
+```
 
-### 🗂️ 数据模型变更
+**2. 保存逻辑**
+
+位置：`ExerciseRecordNotifier.saveRecord()` (exercise_record_notifier.dart:347-354)
 
 ```dart
-// ExerciseRecordState 新增字段
-+ DateTime? timerStartTime
-+ bool isTimerRunning
-+ Map<int, DateTime> exerciseStartTimes
-+ Duration get elapsedTime
-
-// StudentExerciseModel 新增字段
-+ int? timeSpent
-
-// TrainingSet 行为变更
-weight: 字符串类型，支持文本输入（最多10字符）
-completed: reps 不为空时自动标记为 true
-```
-
-### 📦 新增依赖
-
-```yaml
-smooth_page_indicator: ^1.2.0
-```
-
-### 🔧 业务逻辑变更
-
-```dart
-// ExerciseRecordNotifier 新增方法
-+ startTimer() / stopTimer()
-+ _recordExerciseStartTime(int index)
-+ _calculateExerciseTimeSpent(int index) -> int?
-+ _checkAndCompleteExercise(int index)
-
-// ExerciseRecordNotifier 修改方法
-~ updateSetRealtime() - 移除 debounce 保存，添加自动完成检查
-~ quickComplete() - 添加耗时计算
-~ toggleSetCompleted() - 添加取消 Exercise 完成状态逻辑
-```
-
-### 🎨 新增 UI 组件
-
-1. **TimerHeader** (`timer_header.dart`)
-   - 全局计时器显示
-   - Timer.periodic 每秒刷新
-   - 格式: HH:MM:SS
-
-2. **ExerciseTimeHeader** (`exercise_time_header.dart`)
-   - 动作耗时显示
-   - 格式: ⏱️ 用时: MM:SS
-   - 样式: caption1, 浅灰背景
-
-### 🌐 国际化新增
-
-```json
-// app_en.arb & app_zh.arb
-"startTimerConfirmTitle": "Start Timer" / "开始计时"
-"startTimerConfirmMessage": "Start training timer?" / "确认开始训练计时吗？"
-"startTimerButton": "Start" / "开始"
-"weightPlaceholder": "Bodyweight/60kg" / "自重/60kg"
-"timeSpentLabel": "Time Spent" / "用时"
-"trainingRecord": "Training Record" / "训练记录"
-"loadFailed": "Load Failed" / "加载失败"
-"retry": "Retry" / "重试"
-"noExercises": "No Exercises" / "暂无训练动作"
-"addCustomExerciseHint": "Tap '+' to add" / "点击右上角\"+\"添加"
-```
-
-### 🐛 Bug 修复
-
-1. **Set 无法重新编辑** - 修复 `toggleSetCompleted` 逻辑
-2. **计时器不刷新** - `TimerHeader` 改为接收 `DateTime? startTime` 而非 `Duration`
-
-### 📝 文档更新
-
-- 版本号: 1.0 → 2.0
-- 更新日期: 2025-01-08
-- 新增章节: 计时器流程、重新编辑流程、v2.0 优化点
-- 更新章节: 所有数据结构、组件层次、数据流
-
----
-
-**文档维护**: 此文档应随代码更新保持同步。如有架构变更，请及时更新相应章节。
-
-**v2.0 贡献者**: Claude Code
-**v2.0 审核**: 待用户测试反馈
-
----
-
-## v2.1 更新摘要（2025-11-08）
-
-### 🎯 核心功能优化
-
-#### 1. 移除自动跳转逻辑 ✅
-**变更**:
-- 删除 `_autoScrollToNext` 方法
-- 删除监听 completed 数量变化的 `ref.listen`
-- 用户完成 exercise 后不再自动跳转到下一页
-
-**优点**:
-- 用户完全控制页面导航
-- 避免在重新编辑场景下意外跳转
-- 更符合用户预期的交互行为
-
-#### 2. 自定义页面指示器 ✅
-**新增组件**: `CustomPageIndicator`
-
-**功能**:
-- 显示格式: `1 / 3 (2 completed)`
-- 左右箭头按钮支持点击切换页面
-- 实时显示当前页/总页数/已完成数量
-
-**实现位置**: `lib/features/student/training/presentation/widgets/custom_page_indicator.dart`
-
-**UI布局**:
-```
-[<] 箭头  |  1 / 3 (2 completed)  |  [>] 箭头
-```
-
-**替换**: 移除 `smooth_page_indicator` 依赖
-
-#### 3. 双列计时器 UI ✅
-**组件**: `TimerHeader` 重新设计
-
-**布局**:
-```
-┌──────────────────────────────────────────┐
-│ 当前动作              总时长              │
-│ 05:23:45            01:23:45            │
-│ (MM:SS:MS)          (HH:MM:SS)          │
-└──────────────────────────────────────────┘
-```
-
-**变更**:
-- 左列: 当前Exercise耗时（分:秒:毫秒，2位）
-- 右列: 全局计时器（时:分:秒）
-- 刷新频率: 每100毫秒（支持毫秒显示）
-
-**新增参数**: `DateTime? currentExerciseStartTime`
-
-#### 4. 智能计时器重置逻辑 ✅
-**新增字段** (`ExerciseRecordState`):
-```dart
-final DateTime? currentExerciseStartTime;  // 当前Exercise开始时间
-final int? currentExerciseIndex;           // 当前Exercise索引
-Duration? get currentExerciseElapsed;      // 计算属性
-```
-
-**新增方法** (`ExerciseRecordNotifier`):
-```dart
-void startExerciseTimer(int index)         // 启动Exercise计时
-void resetExerciseTimer(int newIndex)      // 重置到新Exercise
-void _resetTimerToNextIncomplete(int completedIndex)  // 智能查找下一个未完成
-```
-
-**重置逻辑**:
-1. ✅ 页面滑动**不会**重置计时器
-2. ✅ Exercise完成时**自动**重置计时器
-3. ✅ 优先重置到完成exercise **后面**的第一个未完成exercise
-4. ✅ 如果后面没有，从头查找
-5. ✅ 所有exercise完成后停止重置
-
-**触发时机**:
-- `_checkAndCompleteExercise()` - 所有Sets完成时
-- `quickComplete()` - 快捷完成时
-
-#### 5. 计时器计算优化 ✅
-**修改**: `_calculateExerciseTimeSpent(int index)`
-
-**逻辑**:
-```dart
-// 优先使用 currentExerciseStartTime
-if (state.currentExerciseIndex == index && state.currentExerciseStartTime != null) {
-  return DateTime.now().difference(state.currentExerciseStartTime!).inSeconds;
+// 计算 totalDuration（仅当所有 exercise 完成且计时器运行过）
+int? totalDuration;
+final allExercisesCompleted = state.exercises.isNotEmpty &&
+                               state.exercises.every((e) => e.completed);
+if (allExercisesCompleted && state.timerStartTime != null) {
+  totalDuration = DateTime.now().difference(state.timerStartTime!).inSeconds;
 }
-// 降级使用 exerciseStartTimes
-return exerciseStartTimes[index] 的耗时;
 ```
 
-**优点**: 更精确地跟踪当前正在进行的exercise耗时
+**3. 保存条件**
+
+| 场景 | 计时器状态 | 完成状态 | totalDuration |
+|------|-----------|---------|---------------|
+| 完成所有 exercise + 启动计时器 | ✅ 已启动 | ✅ 全部完成 | 实际秒数 ✅ |
+| 完成部分 exercise + 启动计时器 | ✅ 已启动 | ❌ 部分完成 | null ❌ |
+| 完成所有 exercise + 未启动计时器 | ❌ 未启动 | ✅ 全部完成 | null ❌ |
+| 中途退出页面 | - | ❌ 部分完成 | null ❌ (不保存) |
+
+**4. 数据关系**
+
+```
+totalDuration (全局总时长)
+    ≥
+sum(exercise.timeSpent) (各动作耗时总和)
+
+差值 = 休息时间 + 页面浏览时间 + 其他非训练时间
+```
+
+**示例**:
+```json
+{
+  "id": "abc123",
+  "date": "2025-11-15",
+  "totalDuration": 1800,  // 30 分钟（从启动计时器到完成所有动作）
+  "exercises": [
+    {
+      "name": "Barbell Squats",
+      "timeSpent": 180,    // 3 分钟（该动作实际操作时间）
+      "completed": true
+    },
+    {
+      "name": "Deadlift",
+      "timeSpent": 240,    // 4 分钟
+      "completed": true
+    },
+    {
+      "name": "Bench Press",
+      "timeSpent": 200,    // 3.3 分钟
+      "completed": true
+    }
+    // sum(timeSpent) = 620s (10.3 分钟)
+    // totalDuration = 1800s (30 分钟)
+    // 差值 = 1180s (19.7 分钟休息/切换时间)
+  ]
+}
+```
 
 ---
 
 ### 🗂️ 数据模型变更
 
-#### ExerciseRecordState
+#### DailyTrainingModel
 ```dart
 // 新增字段
-+ DateTime? currentExerciseStartTime
-+ int? currentExerciseIndex
-
-// 新增计算属性
-+ Duration? get currentExerciseElapsed
++ int? totalDuration  // 训练总时长（秒数）
 ```
 
-#### 组件参数变更
-```dart
-// TimerHeader
-+ DateTime? currentExerciseStartTime  // 新增参数
+#### 后端 Schema 更新
 
-// CustomPageIndicator (新组件)
-+ int currentPage
-+ int totalPages
-+ int completedCount
-+ VoidCallback? onPreviousPage
-+ VoidCallback? onNextPage
+**dailyTrainings 集合** (`backend_apis_and_document_db_schemas.md:227`):
+```
+| totalDuration | number (optional) |
 ```
 
----
-
-### 📦 依赖变更
-
-**移除**:
-```yaml
-- smooth_page_indicator: ^1.2.0  # 不再使用
-```
+**说明**: 从启动计时器到最后一个 exercise 完成的总时长（秒数），仅在所有 exercise 完成且计时器已启动时保存。
 
 ---
 
@@ -1263,279 +880,167 @@ return exerciseStartTimes[index] 的耗时;
 
 #### ExerciseRecordNotifier
 ```dart
-// 新增方法
-+ startExerciseTimer(int index)
-+ resetExerciseTimer(int newIndex)
-+ _resetTimerToNextIncomplete(int completedIndex)
-
 // 修改方法
-~ _calculateExerciseTimeSpent()  // 优先使用currentExerciseStartTime
-~ _checkAndCompleteExercise()    // 完成后重置计时器
-~ quickComplete()                // 完成后重置计时器
+~ saveRecord()  // 添加 totalDuration 计算逻辑
 ```
 
-#### ExerciseRecordPage
-```dart
-// 修改方法
-~ _onPageChanged()  // 简化逻辑，不再重置计时器
-~ _startTimerMode() // 启动时同时启动第一个exercise计时器
-
-// 移除方法
-- _autoScrollToNext()  // 删除自动跳转
-```
+**计算时机**:
+- 每次调用 `saveRecord()` 时检查条件
+- 如果满足条件（所有 exercise 完成 + 计时器启动），计算并保存
+- 不满足条件时，`totalDuration` 保持为 null
 
 ---
 
-### 🎨 新增 UI 组件
+### 📦 兼容性
 
-#### CustomPageIndicator
-**文件**: `lib/features/student/training/presentation/widgets/custom_page_indicator.dart`
+**向后兼容**: ✅
+- `totalDuration` 为可选字段（nullable）
+- 旧记录没有此字段不影响读取
+- 后端 Cloud Functions 无需修改（已支持任意字段）
 
-**职责**:
-- 显示当前页/总页数/已完成数
-- 左右箭头导航
-- 根据状态禁用箭头（首页/末页）
-
-**样式**:
-- 左右箭头使用 `CupertinoIcons.chevron_left/right`
-- 中间文本居中显示
-- 禁用状态箭头变灰色
-
----
-
-### 🌐 国际化新增
-
-```json
-// app_en.arb & app_zh.arb
-"completedCount": "{count} completed" / "{count} 已完成"
-"currentExercise": "Current Exercise" / "当前动作"
-"totalDuration": "Total Duration" / "总时长"
-```
-
----
-
-### 🐛 Bug 修复
-
-1. **计时器在滑动时归零** - 修复：页面切换不再重置计时器
-2. **向后滑到已完成exercise时重置** - 修复：只有切换到**未完成**exercise时才重置
-3. **未使用的导入和字段** - 清理代码，移除 `flutter/material.dart` 导入和 `_previousExerciseCount` 字段
+**Coach 端显示**: ⚠️ 待开发
+- 当前仅实现 Student 端数据保存
+- Coach 端查看功能需单独实现
 
 ---
 
 ### 📝 文档更新
 
-- 版本号: 2.0 → 2.1
-- 更新日期: 2025-11-08
-- 新增章节: v2.1 更新摘要
-- 更新章节: 核心特性、技术栈、数据模型
+**已更新文档**:
+1. `docs/backend_apis_and_document_db_schemas.md`
+   - 添加 `dailyTrainings.totalDuration` 字段说明
+   - 补充 `StudentExercise.timeSpent` 字段说明（已有功能，补充文档）
+
+2. `docs/student/exercise_record_page_architecture.md` (本文档)
+   - 版本号: 2.2 → 2.3
+   - 新增 v2.3 更新摘要
 
 ---
 
-### 🔄 用户体验改进
+### 🎯 用途
 
-#### 导航控制
-- ✅ 用户可随意滑动查看不同exercise，不会被强制跳转
-- ✅ 点击左右箭头快速切换
-- ✅ 底部指示器清晰显示进度
+**1. 教练端分析**:
+- 查看学生训练效率（实际操作时间 vs 总时长）
+- 评估训练节奏和休息时间合理性
+- 对比不同学生的训练速度
 
-#### 计时体验
-- ✅ 滑动浏览不影响计时
-- ✅ Exercise完成后自动切换到下一个
-- ✅ 精确到10毫秒的当前exercise计时
-- ✅ 全局总时长一目了然
-
-#### 灵活性
-- ✅ 支持非顺序完成（跳过某些exercise）
-- ✅ 计时器智能适应完成顺序
-- ✅ 随时可回头完成跳过的exercise
+**2. AI 分析**:
+- 分析运动表现趋势
+- 评估训练强度和恢复时间
+- 提供个性化建议
 
 ---
 
-**v2.1 贡献者**: Claude Code
-**v2.1 审核**: 待用户测试反馈
+**v2.3 贡献者**: Claude Code
+**v2.3 审核**: 待用户测试反馈
 
 ---
 
-## v2.2 更新摘要（2025-11-08）
+## v2.4 更新摘要（2025-11-16）
 
-### 🎨 UI 优化
+### 🐛 Bug 修复
 
-#### CustomPageIndicator 进度条显示 ✅
+#### 问题 1: 第二个视频切换 exercise 后消失
+**根本原因**: `ExerciseRecordCard` 只传入 `completed` 状态的视频给 `VideoUploadSection`
 
-**变更**:
-- 移除文字显示 `(X completed)`
-- 新增底部绿色进度条，直观显示完成比例
-- 布局变更: `Row` (单层) → `Column` (双层: 箭头+页码 | 进度条)
+**修复**:
+- 移除视频过滤逻辑，传入所有视频状态（pending, uploading, completed, error）
+- 位置: `exercise_record_card.dart:171`
 
-**目标布局**:
-```
-┌───────────────────────────────────────┐
-│  <       1 / 3        >               │ ← 箭头导航 + 页码
-│  ███████████░░░░░░░░░░░░░░░░░░░      │ ← 进度条（completedCount / totalPages）
-└───────────────────────────────────────┘
-```
+#### 问题 2: 第二个视频没保存到后端
+**根本原因**: 双重状态管理冲突
+- `VideoUploadSection` 自管理上传，完成后更新自己的状态
+- `ExerciseRecordNotifier` 的状态未同步，保存时被过滤
 
-**进度条规格**:
-- **填充色**: `AppColors.successGreen` (#10B981, 绿色)
-- **背景色**: `AppColors.dividerLight` (#E5E7EB, 浅灰色)
-- **高度**: 4.0
-- **圆角**: `AppDimensions.radiusFull` (完全圆角)
-- **进度计算**: `completedCount / totalPages` (自动处理边界情况)
-
-**实现细节**:
-- 使用 `Stack` + `FractionallySizedBox` 实现自定义进度条
-- 使用 `ClipRRect` 实现圆角效果
-- 使用 `clamp(0.0, 1.0)` 限制进度值范围
-- 箭头行与进度条间距: `AppDimensions.spacingS` (8.0)
-
-**代码变更**:
-```dart
-// 进度计算（边界安全）
-final double progress = totalPages > 0 ? completedCount / totalPages : 0.0;
-
-// 进度条组件
-ClipRRect(
-  borderRadius: BorderRadius.circular(AppDimensions.radiusFull),
-  child: SizedBox(
-    height: 4.0,
-    child: Stack(
-      children: [
-        Container(decoration: BoxDecoration(color: AppColors.dividerLight)),
-        FractionallySizedBox(
-          widthFactor: progress.clamp(0.0, 1.0),
-          alignment: Alignment.centerLeft,
-          child: Container(decoration: BoxDecoration(color: AppColors.successGreen)),
-        ),
-      ],
-    ),
-  ),
-)
-```
-
-**移除依赖**:
-- 移除 `AppLocalizations` 导入（不再使用 `l10n.completedCount()`）
-
-**边界处理**:
-- ✅ `totalPages = 0` → `progress = 0.0`
-- ✅ `completedCount = 0` → `progress = 0.0`
-- ✅ `completedCount = totalPages` → `progress = 1.0`
-- ✅ `completedCount > totalPages` → `progress = 1.0` (clamp 限制)
+**修复**:
+- 新增 `addPendingVideo()` 方法：添加 pending 视频占位符
+- 新增 `completeVideoUpload()` 方法：同步上传完成状态并保存
+- 通过 `onUploadCompleted` 回调正确同步状态
 
 ---
 
-### 🔄 用户体验改进
+### 🔧 技术变更
 
-#### 视觉清晰度提升
-- ✅ 绿色进度条与 ExerciseRecordCard 的绿色 checkmark 保持一致
-- ✅ 进度一目了然，无需阅读文字
-- ✅ 页码与进度条分离，各司其职（导航 vs 进度）
+#### ExerciseRecordNotifier 新增方法
 
-#### 设计语义
-- ✅ 绿色 = 成功/完成（符合通用设计语言）
-- ✅ 进度条 = 整体完成度（与 Set 完成状态区分）
-- ✅ 极简风格（移除冗余文字）
+**`addPendingVideo(int exerciseIndex, String localPath, String? thumbnailPath)`**
+- 功能: 添加 pending 状态视频，不启动上传
+- 由 VideoUploadSection 选择视频后调用
+- 位置: `exercise_record_notifier.dart:709-732`
 
----
+**`completeVideoUpload(int exerciseIndex, int videoIndex, String downloadUrl, {String? thumbnailUrl})`**
+- 功能: 更新视频状态为 completed，立即保存到 Firestore
+- 由 VideoUploadSection 上传完成后调用
+- 位置: `exercise_record_notifier.dart:737-781`
 
-#### Congrats Banner 祝贺横幅 ✅
+#### 旧方法标记为 Deprecated
 
-**功能**: 当所有 exercise 完成时，在页面顶部显示祝贺横幅
-
-**显示条件**:
-```dart
-state.exercises.isNotEmpty && state.exercises.every((e) => e.completed)
-```
-
-**样式规格**:
-- **布局**: Row（单行横向布局）
-- **背景**: `AppColors.primaryColor` (米黄色 #F2E8CF)
-- **圆角**: `AppDimensions.radiusL` (12.0)
-- **图标**: `Icons.celebration` (24px, 棕色 `AppColors.primaryAction`)
-  - ✅ **动画**: 缩放动画 (1.0 ↔ 1.2, 1秒周期, easeInOut)
-- **文字**: `l10n.congratsMessageCompact`
-  - 英文: "Congrats! All exercises done!"
-  - 中文: "恭喜！所有训练已完成！"
-  - 样式: `AppTextStyles.footnote` (13px, Regular)
-  - 颜色: `AppColors.textPrimary`
-  - 约束: `maxLines: 1`, `overflow: TextOverflow.ellipsis`
-- **间距**: 图标与文字间距 8.0
-
-**位置**: CustomPageIndicator 下方（页面最底部）
-
-**内边距**:
-- 外层: `Padding(left: 16.0, right: 16.0, top: 12.0, bottom: 8.0)`
-- 内层: `Container(horizontal: 16.0, vertical: 12.0)`
-
-**组件文件**: `lib/features/student/training/presentation/widgets/congrats_banner.dart`
-
-**国际化字段**:
-- `congratsMessageCompact` - 单行紧凑文字（当前使用）
-- `congratsTitle` - 标题文字（已废弃）
-- `congratsMessage` - 多行文字（已废弃）
-
-**技术实现**:
-- **组件类型**: StatefulWidget (支持动画)
-- **Mixin**: SingleTickerProviderStateMixin
-- **AnimationController**:
-  - 持续时间: 1000ms
-  - 重复模式: `repeat(reverse: true)`
-  - Vsync: this
-- **ScaleAnimation**:
-  - Tween: 1.0 → 1.2
-  - Curve: Curves.easeInOut
-- **应用方式**: ScaleTransition 包裹图标
-
-**性能优化**:
-- ✅ 使用 AnimationController 而非 TweenAnimationBuilder（性能更优）
-- ✅ 在 dispose 中正确释放 controller（避免内存泄漏）
-- ✅ 动画仅应用于图标（减少重绘区域）
-
-#### 单行布局优化 ✅
-
-**变更**: Column（多行）→ Row（单行）
-
-**调整前后对比**:
-| 维度 | 多行布局 | 单行布局（当前） |
-|------|---------|-----------------|
-| **布局** | Column（垂直） | Row（水平） |
-| **图标大小** | 32px | 24px |
-| **文字** | 标题 + 副标题（2行） | 合并为1行 |
-| **垂直占用** | ~80-100px | ~40-50px（减少50%） |
-| **文字内容** | "Congrats!" + "You have..." | "Congrats! All exercises done!" |
-
-**优点**:
-- ✅ 节省50%垂直空间
-- ✅ 更紧凑，一目了然
-- ✅ 适合底部显示
-
-#### 位置优化 ✅
-
-**变更**: 从顶部移动到底部
-
-**调整前后对比**:
-| 位置 | 优点 | 缺点 |
-|------|------|------|
-| **顶部**（旧） | 立即看到 | ❌ 占用宝贵空间，压缩内容 |
-| **底部**（新） | ✅ 不影响主内容，视觉流程更自然 | 需向下滑动查看 |
-
-**新位置**: CustomPageIndicator 下方
-- ✅ 进度条100% + Congrats Banner = 双重视觉强化
-- ✅ 符合"完成 → 确认 → 奖励"的自然流程
-- ✅ Exercise Card 获得更多垂直空间
-
-**新布局结构**:
-```
-Column(
-  children: [
-    TimerHeader (if running),
-    Expanded(PageView),
-    CustomPageIndicator,     ← 进度条
-    CongratsBanner,          ← 紧随其后
-  ],
-)
-```
+- `uploadVideo()` - 现由 VideoUploadSection 处理
+- `_compressAndUpload()` - 现由 VideoUploadSection 处理
+- `_startAsyncUpload()` - 现由 VideoUploadSection 处理
 
 ---
 
-**v2.2 贡献者**: Claude Code
-**v2.2 审核**: 待用户测试反馈
+### 📊 数据流更新
+
+**新的视频上传流程** (v2.4):
+
+```
+用户选择视频
+    ↓
+VideoUploadSection 生成缩略图（本地）
+    ↓
+VideoUploadSection 添加到自己的 _videos (pending)
+    ↓
+回调: onVideoSelected(index, file)
+    ↓
+ExerciseRecordNotifier.addPendingVideo()
+    └─ 添加到 state.exercises[i].videos (pending, 缩略图路径为 null)
+    ↓
+VideoUploadSection 启动后台压缩和上传
+    ↓
+上传进度更新: VideoUploadSection._videos[i].progress
+    ↓
+上传完成: 获取 downloadUrl 和 thumbnailUrl
+    ↓
+回调: onUploadCompleted(index, downloadUrl, thumbnailUrl)
+    ↓
+ExerciseRecordNotifier.completeVideoUpload()
+    ├─ 更新 state.exercises[i].videos[i].status = completed
+    ├─ 设置 downloadUrl 和 thumbnailUrl
+    └─ 立即保存到 Firestore ✅
+```
+
+**对比旧流程** (v2.3):
+- ❌ 双重上传逻辑（ExerciseRecordNotifier 和 VideoUploadSection 都上传）
+- ❌ 状态不同步（VideoUploadSection 完成了，notifier 还是 pending）
+- ❌ 只传入 completed 视频（切换后丢失 uploading 的视频）
+
+---
+
+### 🔄 职责划分
+
+| 组件 | 职责 | v2.4 变更 |
+|------|------|-----------|
+| **VideoUploadSection** | UI 展示、视频选择、压缩上传 | 无变更（继续负责上传） |
+| **ExerciseRecordNotifier** | 唯一状态源、数据持久化 | ✅ 新增状态同步方法 |
+| **ExerciseRecordCard** | UI 容器、回调连接 | ✅ 传入所有视频、连接新回调 |
+| **ExerciseRecordPage** | 页面管理、回调绑定 | ✅ 绑定新的回调方法 |
+
+---
+
+### 📝 关键代码位置
+
+| 文件 | 变更 |
+|------|------|
+| `exercise_record_notifier.dart:709-781` | 新增 `addPendingVideo()` 和 `completeVideoUpload()` |
+| `exercise_record_notifier.dart:414-417` | 标记 `uploadVideo()` 为 Deprecated |
+| `exercise_record_card.dart:171` | 移除视频过滤 |
+| `exercise_record_card.dart:26-27` | 新增 `onVideoUploadCompleted` 回调参数 |
+| `exercise_record_card.dart:175-183` | 修改回调逻辑 |
+| `exercise_record_page.dart:295-311` | 连接新回调 |
+
+---
+
+**v2.4 贡献者**: Claude Code
+**v2.4 审核**: 待用户测试反馈

@@ -37,10 +37,7 @@ class DismissKeyboardOnScroll extends StatelessWidget {
   /// 子widget（通常是 ScrollView）
   final Widget child;
 
-  const DismissKeyboardOnScroll({
-    super.key,
-    required this.child,
-  });
+  const DismissKeyboardOnScroll({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {

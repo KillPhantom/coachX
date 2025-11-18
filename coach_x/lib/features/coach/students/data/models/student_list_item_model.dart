@@ -1,16 +1,37 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:hive/hive.dart';
 import 'student_plan_info.dart';
 
+part 'student_list_item_model.g.dart';
+
 /// 学生列表项模型
+@HiveType(typeId: 20)
 class StudentListItemModel {
+  @HiveField(0)
   final String id;
+
+  @HiveField(1)
   final String name;
+
+  @HiveField(2)
   final String email;
+
+  @HiveField(3)
   final String? avatarUrl;
+
+  @HiveField(4)
   final String coachId;
+
+  @HiveField(5)
   final StudentPlanInfo? exercisePlan;
+
+  @HiveField(6)
   final StudentPlanInfo? dietPlan;
+
+  @HiveField(7)
   final StudentPlanInfo? supplementPlan;
+
+  @HiveField(8)
   final DateTime? createdAt;
 
   const StudentListItemModel({

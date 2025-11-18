@@ -1,7 +1,17 @@
+import 'package:hive/hive.dart';
+
+part 'student_plan_info.g.dart';
+
 /// 学生计划信息模型
+@HiveType(typeId: 22)
 class StudentPlanInfo {
+  @HiveField(0)
   final String id;
+
+  @HiveField(1)
   final String name;
+
+  @HiveField(2)
   final String type; // 'exercise', 'diet', 'supplement'
 
   const StudentPlanInfo({

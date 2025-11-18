@@ -62,6 +62,7 @@ alwaysApply: true
 产物与目录规范
 - 文档：
   - 总览：`coach_x/README.md`（项目总reference）
+  - Page及feature文档目录 : `coach_x/docs/` 
   - 若文档缺失，助手在计划/执行过程应创建占位并在状态区块提示
 - 任何生成的脚本或一次性工具：`scripts/mx_*`
 
@@ -94,7 +95,7 @@ flutter pub run build_runner build --delete-conflicting-outputs
 
 # Code analysis and formatting
 flutter analyze                 # Check for issues
-flutter format .               # Format all Dart files
+dart format .               # Format all Dart files
 
 
 ```bash
@@ -354,3 +355,43 @@ functions/
 - **Code Generation**: Run `flutter pub run build_runner build` after modifying Riverpod providers
 - **Firebase Local**: Use emulators for faster iteration and free testing
 - **Documentation**: Update relevant docs when making architectural changes
+
+## Recent Feature Updates
+
+### Training Feed Page (2025-11-17)
+
+**Location**: `lib/features/chat/presentation/pages/training_feed_page.dart`
+
+**Description**: Immersive TikTok/Reels-style training review feed for coaches to review student training videos and exercises.
+
+**Key Features**:
+- Full-screen vertical swipe feed (PageView-based)
+- Three types of feed items:
+  - Video items: Student training videos with keyframe timeline
+  - Text card items: Exercise summaries without videos
+  - Completion placeholder: End-of-feed indicator
+- Keyframe timeline with thumbnail scrubbing
+- Dual-mode feedback system (coach review + history)
+- Detail bottom sheet for exercise info
+
+**Navigation**:
+```dart
+context.push('/coach/training-feed/$dailyTrainingId?studentId=$studentId&studentName=$studentName');
+```
+
+**Related Files**:
+- Models: `training_feed_item.dart`, `feed_item_type.dart`, `video_model.dart`
+- Repository: `training_feed_repository.dart`, `training_feed_repository_impl.dart`
+- Widgets: `feed_video_player.dart`, `video_feed_item.dart`, `text_feed_item.dart`, `completion_feed_item.dart`, `keyframe_timeline.dart`, `feed_comment_sheet.dart`, `feed_detail_bottom_sheet.dart`
+- Providers: `training_feed_providers.dart`
+
+**Documentation**: See `TRAINING_FEED_IMPLEMENTATION_PLAN.md` for full implementation details.
+
+**Breaking Changes**:
+- `TrainingFeedbackModel` now uses `exerciseTemplateId` instead of `exerciseIndex`
+- `FeedbackRepository` methods updated to use `exerciseTemplateId` parameter
+- `ExerciseFeedbackHistorySection` and `FeedbackInputBar` parameter changes
+
+**Firestore Changes**:
+- New indexes for `dailyTrainingFeedback` collection with `exerciseTemplateId` field
+- Updated security rules for video `isReviewed` field updates

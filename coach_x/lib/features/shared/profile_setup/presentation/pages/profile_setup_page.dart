@@ -337,7 +337,7 @@ class _ProfileSetupPageState extends ConsumerState<ProfileSetupPage> {
         padding: const EdgeInsets.all(AppDimensions.paddingM),
         decoration: BoxDecoration(
           color: isSelected
-              ? AppColors.primaryColor.withOpacity(0.1)
+              ? AppColors.primaryColor.withValues(alpha: 0.1)
               : AppColors.backgroundWhite,
           border: Border.all(
             color: isSelected ? AppColors.primaryColor : AppColors.borderColor,
@@ -408,7 +408,7 @@ class _ProfileSetupPageState extends ConsumerState<ProfileSetupPage> {
         padding: const EdgeInsets.all(AppDimensions.paddingM),
         decoration: BoxDecoration(
           color: isSelected
-              ? AppColors.primaryColor.withOpacity(0.1)
+              ? AppColors.primaryColor.withValues(alpha: 0.1)
               : AppColors.backgroundWhite,
           border: Border.all(
             color: isSelected ? AppColors.primaryColor : AppColors.borderColor,

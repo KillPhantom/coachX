@@ -28,9 +28,7 @@ class WeightTrendChart extends StatelessWidget {
         alignment: Alignment.center,
         child: Text(
           'No data to display',
-          style: AppTextStyles.body.copyWith(
-            color: AppColors.textSecondary,
-          ),
+          style: AppTextStyles.body.copyWith(color: AppColors.textSecondary),
         ),
       );
     }
@@ -65,10 +63,7 @@ class WeightTrendChart extends StatelessWidget {
             drawVerticalLine: false,
             horizontalInterval: 1,
             getDrawingHorizontalLine: (value) {
-              return FlLine(
-                color: AppColors.dividerLight,
-                strokeWidth: 1,
-              );
+              return FlLine(color: AppColors.dividerLight, strokeWidth: 1);
             },
           ),
           titlesData: FlTitlesData(
@@ -122,9 +117,7 @@ class WeightTrendChart extends StatelessWidget {
               ),
             ),
           ),
-          borderData: FlBorderData(
-            show: false,
-          ),
+          borderData: FlBorderData(show: false),
           minX: 0,
           maxX: (sortedMeasurements.length - 1).toDouble(),
           minY: yMin,

@@ -6,6 +6,9 @@ class AIFoodAnalysisState {
   /// 是否正在分析
   final bool isAnalyzing;
 
+  /// 是否正在上传图片
+  final bool isUploading;
+
   /// 分析进度 (0.0 - 1.0)
   final double progress;
 
@@ -41,6 +44,7 @@ class AIFoodAnalysisState {
 
   const AIFoodAnalysisState({
     this.isAnalyzing = false,
+    this.isUploading = false,
     this.progress = 0.0,
     this.foods = const [],
     this.errorMessage,
@@ -95,6 +99,7 @@ class AIFoodAnalysisState {
   /// 复制并修改部分字段
   AIFoodAnalysisState copyWith({
     bool? isAnalyzing,
+    bool? isUploading,
     double? progress,
     List<RecognizedFood>? foods,
     String? errorMessage,
@@ -109,6 +114,7 @@ class AIFoodAnalysisState {
   }) {
     return AIFoodAnalysisState(
       isAnalyzing: isAnalyzing ?? this.isAnalyzing,
+      isUploading: isUploading ?? this.isUploading,
       progress: progress ?? this.progress,
       foods: foods ?? this.foods,
       errorMessage: errorMessage,
@@ -131,7 +137,7 @@ class AIFoodAnalysisState {
 
   @override
   String toString() {
-    return 'AIFoodAnalysisState(analyzing: $isAnalyzing, progress: $progress, '
+    return 'AIFoodAnalysisState(analyzing: $isAnalyzing, uploading: $isUploading, progress: $progress, '
         'foods: ${foods.length}, error: $errorMessage, meal: $selectedMealName, '
         'imageUrl: $imageUrl, currentMacros: [$currentCalories, $currentProtein, $currentCarbs, $currentFat], '
         'recordMode: $recordMode)';

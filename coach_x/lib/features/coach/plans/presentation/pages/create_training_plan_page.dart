@@ -5,25 +5,23 @@ import 'package:coach_x/core/theme/app_colors.dart';
 import 'package:coach_x/core/theme/app_text_styles.dart';
 import 'package:coach_x/core/utils/logger.dart';
 import 'package:coach_x/core/enums/ai_status.dart';
-import 'package:coach_x/core/widgets/dismiss_keyboard_on_scroll.dart';
+import 'package:coach_x/features/coach/plans/data/models/create_plan_page_state.dart';
+import 'package:coach_x/features/coach/plans/data/models/create_training_plan_state.dart';
+import 'package:coach_x/features/coach/plans/data/models/import_result.dart';
 import 'package:coach_x/features/coach/plans/data/models/exercise.dart';
 import 'package:coach_x/features/coach/plans/data/models/training_set.dart';
-import 'package:coach_x/features/coach/plans/data/models/create_training_plan_state.dart';
 import 'package:coach_x/features/coach/plans/data/models/exercise_plan_model.dart';
 import 'package:coach_x/features/coach/plans/data/models/suggestion_review_state.dart';
 import 'package:coach_x/features/coach/plans/presentation/providers/create_training_plan_providers.dart';
-import 'package:coach_x/features/coach/plans/presentation/providers/edit_conversation_providers.dart';
 import 'package:coach_x/features/coach/plans/presentation/providers/suggestion_review_providers.dart';
-import 'package:coach_x/features/coach/plans/presentation/widgets/plan_header_widget.dart';
-import 'package:coach_x/features/coach/plans/presentation/widgets/day_pill.dart';
-import 'package:coach_x/features/coach/plans/presentation/widgets/training_day_editor.dart';
-import 'package:coach_x/features/coach/plans/presentation/widgets/exercise_card.dart';
-import 'package:coach_x/features/coach/plans/presentation/widgets/set_row.dart';
-import 'package:coach_x/features/coach/plans/presentation/widgets/guide_upload_placeholder.dart';
-import 'package:coach_x/features/coach/plans/presentation/widgets/import_plan_sheet.dart';
-import 'package:coach_x/features/coach/plans/presentation/widgets/guided_creation_sheet.dart';
+import 'package:coach_x/features/coach/plans/presentation/providers/edit_conversation_providers.dart';
+import 'package:coach_x/features/coach/plans/presentation/widgets/create_plan/initial_view.dart';
+import 'package:coach_x/features/coach/plans/presentation/widgets/create_plan/ai_guided_view.dart';
+import 'package:coach_x/features/coach/plans/presentation/widgets/create_plan/text_import_view.dart';
+import 'package:coach_x/features/coach/plans/presentation/widgets/create_plan/editing_view.dart';
 import 'package:coach_x/features/coach/plans/presentation/widgets/ai_edit_chat_panel.dart';
 import 'package:coach_x/features/coach/plans/presentation/widgets/review_mode_overlay.dart';
+import 'package:coach_x/l10n/app_localizations.dart';
 
 /// 创建/编辑训练计划页面
 class CreateTrainingPlanPage extends ConsumerStatefulWidget {
@@ -38,65 +36,59 @@ class CreateTrainingPlanPage extends ConsumerStatefulWidget {
 
 class _CreateTrainingPlanPageState
     extends ConsumerState<CreateTrainingPlanPage> {
+  // 页面状态
+  CreatePlanPageState _pageState = CreatePlanPageState.initial;
+
   // 当前选中的训练日索引
   int? _selectedDayIndex;
-
-  // Auto-scroll 相关
-  final ScrollController _exercisesScrollController = ScrollController();
-  final Map<String, GlobalKey> _exerciseKeys = {}; // key format: "day_exercise"
 
   @override
   void initState() {
     super.initState();
     // 加载计划或创建新计划
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final notifier = ref.read(createTrainingPlanNotifierProvider.notifier);
-
-      AppLogger.debug('🔍 接收到的 planId: ${widget.planId}');
-
       if (widget.planId != null && widget.planId!.isNotEmpty) {
         // 编辑模式：加载现有计划
-        AppLogger.info('📝 编辑模式 - 加载计划 ID: ${widget.planId}');
-        final success = await notifier.loadPlan(widget.planId!);
-        if (success && mounted) {
-          final state = ref.read(createTrainingPlanNotifierProvider);
-          AppLogger.info('✅ 计划加载成功 - 训练日数量: ${state.days.length}');
-          if (state.days.isNotEmpty) {
-            setState(() {
-              _selectedDayIndex = 0;
-            });
-          }
-        } else if (mounted) {
-          // 加载失败，显示错误并返回
-          AppLogger.error('❌ 加载计划失败');
-          _showErrorDialog(context, '加载计划失败');
-        }
+        await _loadPlan();
       } else {
-        // 创建模式：添加第一个训练日作为默认
-        AppLogger.info('➕ 创建模式 - 初始化新计划 (planId: ${widget.planId})');
-        final state = ref.read(createTrainingPlanNotifierProvider);
-        if (state.days.isEmpty) {
-          notifier.addDay(name: 'Day 1');
-          setState(() {
-            _selectedDayIndex = 0;
-          });
-        }
+        // 创建模式：显示初始选择页面
+        setState(() {
+          _pageState = CreatePlanPageState.initial;
+        });
       }
     });
   }
 
+  /// 加载现有计划
+  Future<void> _loadPlan() async {
+    final notifier = ref.read(createTrainingPlanNotifierProvider.notifier);
+
+    AppLogger.info('📝 编辑模式 - 加载计划 ID: ${widget.planId}');
+    final success = await notifier.loadPlan(widget.planId!);
+
+    if (success && mounted) {
+      final state = ref.read(createTrainingPlanNotifierProvider);
+      AppLogger.info('✅ 计划加载成功 - 训练日数量: ${state.days.length}');
+
+      setState(() {
+        _pageState = CreatePlanPageState.editing;
+        _selectedDayIndex = state.days.isNotEmpty ? 0 : null;
+      });
+    } else if (mounted) {
+      // 加载失败，显示错误并返回
+      AppLogger.error('❌ 加载计划失败');
+      _showErrorDialog(context, '加载计划失败');
+    }
+  }
+
   @override
   void dispose() {
-    // 清理 ScrollController
-    _exercisesScrollController.dispose();
-
-    // 注意：不能在 dispose 中使用 ref，因为 widget 已被标记为销毁
-    // 对话历史的清理可以在 notifier 内部的自动清理机制中处理
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final state = ref.watch(createTrainingPlanNotifierProvider);
     final notifier = ref.read(createTrainingPlanNotifierProvider.notifier);
 
@@ -104,43 +96,31 @@ class _CreateTrainingPlanPageState
     final isReviewMode = ref.watch(isReviewModeProvider);
     final reviewState = ref.watch(suggestionReviewNotifierProvider);
 
-    // 监听 review state 变化（统一处理滚动和完成）
-    ref.listen<SuggestionReviewState?>(suggestionReviewNotifierProvider, (
+    // 监听 AI 生成状态变化（自动切换到编辑模式）
+    ref.listen<CreateTrainingPlanState>(createTrainingPlanNotifierProvider, (
       previous,
       next,
     ) {
       if (!mounted) return;
 
-      // 处理当前修改变化 - 自动滚动
-      final currentChange = next?.currentChange;
-      final previousChange = previous?.currentChange;
-
-      if (currentChange != null && currentChange != previousChange) {
-        // 1. 切换到正确的训练日标签（如果需要）
-        if (currentChange.dayIndex != _selectedDayIndex) {
-          setState(() {
-            _selectedDayIndex = currentChange.dayIndex;
-          });
-        }
-
-        // 2. 滚动到对应的 ExerciseCard
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (!mounted) return;
-
-          final exerciseKey =
-              '${currentChange.dayIndex}_${currentChange.exerciseIndex ?? 0}';
-          final key = _exerciseKeys[exerciseKey];
-
-          if (key?.currentContext != null) {
-            Scrollable.ensureVisible(
-              key!.currentContext!,
-              duration: const Duration(milliseconds: 300),
-              curve: Curves.easeInOut,
-              alignment: 0.2, // 20% from top of viewport
-            );
-          }
+      // AI 生成完成 → 自动切换到编辑模式
+      if (previous?.aiStatus == AIGenerationStatus.generating &&
+          next.aiStatus == AIGenerationStatus.success &&
+          _pageState == CreatePlanPageState.aiGuided) {
+        setState(() {
+          _pageState = CreatePlanPageState.editing;
+          _selectedDayIndex = next.days.isNotEmpty ? 0 : null;
         });
+        AppLogger.info('✅ AI 生成完成，切换到编辑模式');
       }
+    });
+
+    // 监听 review state 变化（处理 Review 完成）
+    ref.listen<SuggestionReviewState?>(suggestionReviewNotifierProvider, (
+      previous,
+      next,
+    ) {
+      if (!mounted) return;
 
       // 处理 Review 完成
       if (next != null && next.isComplete && isReviewMode) {
@@ -160,251 +140,16 @@ class _CreateTrainingPlanPageState
 
     return CupertinoPageScaffold(
       backgroundColor: CupertinoColors.systemGroupedBackground,
-      navigationBar: CupertinoNavigationBar(
-        backgroundColor: CupertinoColors.systemBackground.resolveFrom(context),
-        middle: Text(
-          state.isEditMode ? 'Edit Training Plan' : 'Create Training Plan',
-          style: AppTextStyles.callout.copyWith(fontWeight: FontWeight.w600),
-        ),
-        leading: CupertinoButton(
-          padding: EdgeInsets.zero,
-          onPressed: () => _onBack(context, notifier),
-          child: const Icon(CupertinoIcons.back, color: AppColors.primaryText),
-        ),
-        trailing: CupertinoButton(
-          padding: EdgeInsets.zero,
-          onPressed: () {
-            // 根据是否是编辑模式显示不同的功能
-            if (state.isEditMode) {
-              _showAIEditChatPanel(context, notifier);
-            } else {
-              _showCreationModeMenu(context, notifier);
-            }
-          },
-          child: const Icon(
-            CupertinoIcons.sparkles,
-            color: CupertinoColors.activeBlue,
-          ),
-        ),
-      ),
+      navigationBar: _buildNavigationBar(context, l10n, state, notifier),
       child: Stack(
         children: [
           // Main Content
-          SafeArea(
-            child: Column(
-              children: [
-                // Plan Header
-                PlanHeaderWidget(
-                  planName: state.planName,
-                  onNameChanged: notifier.updatePlanName,
-                  totalDays: state.totalDays,
-                  totalExercises: state.totalExercises,
-                  totalSets: state.totalSets,
-                ),
-
-                // Horizontal Day Pills Scroll View
-                Container(
-                  height: 52,
-                  padding: const EdgeInsets.symmetric(vertical: 6),
-                  decoration: BoxDecoration(
-                    color: CupertinoColors.systemBackground.resolveFrom(
-                      context,
-                    ),
-                    border: Border(
-                      bottom: BorderSide(
-                        color: CupertinoColors.separator.resolveFrom(context),
-                      ),
-                    ),
-                  ),
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    itemCount: state.days.length + 1, // +1 for Add button
-                    itemBuilder: (context, index) {
-                      if (index == state.days.length) {
-                        // Add Day Button
-                        return GestureDetector(
-                          onTap: () => _onAddDay(notifier),
-                          child: Container(
-                            margin: const EdgeInsets.only(right: 8),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 10,
-                            ),
-                            decoration: BoxDecoration(
-                              color: AppColors.primaryText.withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(20),
-                              border: Border.all(
-                                color: AppColors.primaryText.withOpacity(0.3),
-                              ),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  CupertinoIcons.add,
-                                  color: AppColors.primaryText,
-                                  size: 18,
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  'Add Day',
-                                  style: AppTextStyles.footnote.copyWith(
-                                    color: AppColors.primaryText,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
-                      }
-
-                      final day = state.days[index];
-                      return DayPill(
-                        label: day.name,
-                        dayNumber: day.day,
-                        isSelected: _selectedDayIndex == index,
-                        onTap: () {
-                          setState(() {
-                            _selectedDayIndex = index;
-                          });
-                        },
-                        onLongPress: () => _showDayOptionsMenu(
-                          context,
-                          notifier,
-                          index,
-                          day.name,
-                        ),
-                      );
-                    },
-                  ),
-                ),
-
-                // Content Area
-                Expanded(
-                  child:
-                      _selectedDayIndex != null &&
-                          _selectedDayIndex! < state.days.length
-                      ? DismissKeyboardOnScroll(
-                          child: SingleChildScrollView(
-                            child: TrainingDayEditor(
-                            onAddExercise: () =>
-                                _onAddExercise(notifier, _selectedDayIndex!),
-                            exercisesWidget: _buildExercisesList(
-                              context,
-                              notifier,
-                              _selectedDayIndex!,
-                              state.days[_selectedDayIndex!].exercises,
-                              isReviewMode: isReviewMode,
-                              reviewState: reviewState,
-                            ),
-                          ),
-                          ),
-                        )
-                      : Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                CupertinoIcons.calendar_badge_plus,
-                                size: 64,
-                                color: CupertinoColors.secondaryLabel
-                                    .resolveFrom(context),
-                              ),
-                              const SizedBox(height: 16),
-                              Text(
-                                'Select a day or add a new one',
-                                style: AppTextStyles.callout.copyWith(
-                                  color: CupertinoColors.secondaryLabel
-                                      .resolveFrom(context),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                ),
-
-                // AI 思考面板（仅在生成时显示）
-                if (state.aiStatus == AIGenerationStatus.generating)
-                  _buildAIThinkingPanel(context, state),
-
-                // Save Button (Fixed at bottom)
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: CupertinoColors.systemBackground.resolveFrom(
-                      context,
-                    ),
-                    border: Border(
-                      top: BorderSide(
-                        color: CupertinoColors.separator.resolveFrom(context),
-                      ),
-                    ),
-                  ),
-                  child: SafeArea(
-                    top: false,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        // Save Button
-                        CupertinoButton(
-                          padding: EdgeInsets.zero,
-                          onPressed: state.canSave && !state.isLoading
-                              ? () => _onSave(context, notifier)
-                              : null,
-                          child: Container(
-                            width: double.infinity,
-                            height: 50,
-                            decoration: BoxDecoration(
-                              color: state.canSave && !state.isLoading
-                                  ? AppColors.primary
-                                  : CupertinoColors.quaternarySystemFill
-                                        .resolveFrom(context),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            alignment: Alignment.center,
-                            child: state.isLoading
-                                ? const CupertinoActivityIndicator(
-                                    color: CupertinoColors.white,
-                                  )
-                                : Text(
-                                    'Save Plan',
-                                    style: TextStyle(
-                                      color: state.canSave
-                                          ? CupertinoColors.systemGrey
-                                          : CupertinoColors.quaternaryLabel
-                                                .resolveFrom(context),
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                          ),
-                        ),
-
-                        // Validation Errors
-                        if (state.validationErrors.isNotEmpty)
-                          Padding(
-                            padding: const EdgeInsets.only(top: 8),
-                            child: Text(
-                              state.validationErrors.first,
-                              style: AppTextStyles.footnote.copyWith(
-                                color: CupertinoColors.systemRed,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
+          SafeArea(child: _buildBody(context, state, notifier)),
 
           // Loading Overlay
           if (state.isLoading)
             Container(
-              color: CupertinoColors.black.withOpacity(0.3),
+              color: CupertinoColors.black.withValues(alpha: 0.3),
               child: const Center(
                 child: CupertinoActivityIndicator(radius: 16),
               ),
@@ -421,106 +166,168 @@ class _CreateTrainingPlanPageState
     );
   }
 
-  // ==================== AI 思考面板 ====================
+  // ==================== UI 构建方法 ====================
 
-  /// 构建 AI 思考面板
-  Widget _buildAIThinkingPanel(
+  /// 构建导航栏
+  CupertinoNavigationBar _buildNavigationBar(
+    BuildContext context,
+    AppLocalizations l10n,
+    CreateTrainingPlanState state,
+    notifier,
+  ) {
+    return CupertinoNavigationBar(
+      backgroundColor: CupertinoColors.systemBackground.resolveFrom(context),
+      middle: Text(_getTitle(l10n, state), style: AppTextStyles.navTitle),
+      leading: CupertinoButton(
+        padding: EdgeInsets.zero,
+        onPressed: () => _onBack(context, notifier),
+        child: const Icon(CupertinoIcons.back, color: AppColors.primaryText),
+      ),
+      trailing: _pageState == CreatePlanPageState.editing && state.isEditMode
+          ? CupertinoButton(
+              padding: EdgeInsets.zero,
+              onPressed: () => _showAIEditChatPanel(context, notifier),
+              child: const Icon(
+                CupertinoIcons.sparkles,
+                color: CupertinoColors.activeBlue,
+              ),
+            )
+          : null,
+    );
+  }
+
+  /// 获取页面标题
+  String _getTitle(AppLocalizations l10n, CreateTrainingPlanState state) {
+    if (_pageState == CreatePlanPageState.editing && state.isEditMode) {
+      return l10n.editPlan;
+    }
+    return l10n.createPlanTitle;
+  }
+
+  /// 构建主体内容（根据页面状态路由）
+  Widget _buildBody(
     BuildContext context,
     CreateTrainingPlanState state,
+    notifier,
   ) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: CupertinoColors.systemBackground.resolveFrom(context),
-        border: Border(
-          top: BorderSide(
-            color: CupertinoColors.separator.resolveFrom(context),
-          ),
-        ),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // 标题和加载动画
-          Row(
+    switch (_pageState) {
+      case CreatePlanPageState.initial:
+        return InitialView(
+          onAIGuidedTap: _onAIGuidedTap,
+          onTextImportTap: _onTextImportTap,
+          onManualCreateTap: _onManualCreateTap,
+        );
+
+      case CreatePlanPageState.aiGuided:
+        return AIGuidedView(
+          onGenerationStart: () {
+            // AI 生成开始后，页面状态保持在 aiGuided
+            // 等待生成完成后自动切换到 editing（通过 listener）
+            AppLogger.info('🤖 AI 引导生成开始');
+          },
+        );
+
+      case CreatePlanPageState.textImport:
+        return TextImportView(onImportSuccess: _onImportSuccess);
+
+      case CreatePlanPageState.editing:
+        return EditingView(
+          state: state,
+          notifier: notifier,
+          selectedDayIndex: _selectedDayIndex,
+          onDayIndexChanged: (index) {
+            setState(() {
+              _selectedDayIndex = index;
+            });
+          },
+          onAddDay: () => _onAddDay(notifier),
+          onDeleteDay: (index) => _onDeleteDay(notifier, index),
+          onDeleteExercise: (dayIndex, exerciseIndex) =>
+              _onDeleteExercise(notifier, dayIndex, exerciseIndex),
+          onAddSet: (dayIndex, exerciseIndex) =>
+              _onAddSet(notifier, dayIndex, exerciseIndex),
+          onDeleteSet: (dayIndex, exerciseIndex, setIndex) =>
+              _onDeleteSet(notifier, dayIndex, exerciseIndex, setIndex),
+          onSave: () => _onSave(context, notifier),
+          onAcceptSuggestion: _onAcceptSuggestion,
+          onRejectSuggestion: _onRejectSuggestion,
+          onAcceptAll: _onAcceptAll,
+          onRejectAll: _onRejectAll,
+        );
+    }
+  }
+
+  // ==================== 状态切换方法 ====================
+
+  /// AI 引导创建
+  void _onAIGuidedTap() {
+    final notifier = ref.read(createTrainingPlanNotifierProvider.notifier);
+    notifier.reset();
+    setState(() {
+      _pageState = CreatePlanPageState.aiGuided;
+    });
+    AppLogger.info('🤖 AI 引导创建模式 - 已重置状态');
+  }
+
+  /// 文本导入
+  void _onTextImportTap() {
+    final notifier = ref.read(createTrainingPlanNotifierProvider.notifier);
+    notifier.reset();
+    setState(() {
+      _pageState = CreatePlanPageState.textImport;
+    });
+    AppLogger.info('📄 文本导入模式 - 已重置状态');
+  }
+
+  /// 手动创建
+  void _onManualCreateTap() {
+    final notifier = ref.read(createTrainingPlanNotifierProvider.notifier);
+    notifier.reset();
+    notifier.addDay(name: 'Day 1');
+    setState(() {
+      _pageState = CreatePlanPageState.editing;
+      _selectedDayIndex = 0;
+    });
+    AppLogger.info('✍️ 手动创建模式 - 已重置状态并添加第一天');
+  }
+
+  /// 导入成功
+  void _onImportSuccess(ImportResult result) {
+    final l10n = AppLocalizations.of(context)!;
+    final notifier = ref.read(createTrainingPlanNotifierProvider.notifier);
+
+    if (result.plan != null) {
+      // 加载导入的计划到状态中
+      notifier.loadFromImportResult(result);
+
+      setState(() {
+        _pageState = CreatePlanPageState.editing;
+        _selectedDayIndex = 0;
+      });
+
+      // 显示成功提示
+      showCupertinoDialog(
+        context: context,
+        builder: (context) => CupertinoAlertDialog(
+          title: Text(l10n.importSuccess),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              const CupertinoActivityIndicator(),
-              const SizedBox(width: 12),
-              Text(
-                'AI 正在生成训练计划...',
-                style: AppTextStyles.callout.copyWith(
-                  fontWeight: FontWeight.w600,
-                  color: CupertinoColors.label.resolveFrom(context),
-                ),
-              ),
+              if (result.warnings.isNotEmpty)
+                Text(l10n.importWarnings(result.warnings.length)),
+              const SizedBox(height: 8),
+              Text(l10n.pleaseReview),
             ],
           ),
-
-          // 当前进度
-          if (state.currentDayNumber != null) ...[
-            const SizedBox(height: 12),
-            Text(
-              '正在生成第 ${state.currentDayNumber} 天',
-              style: AppTextStyles.footnote.copyWith(
-                color: CupertinoColors.secondaryLabel.resolveFrom(context),
-              ),
-            ),
-
-            // 当前天的动作进度
-            if (state.currentDayInProgress != null &&
-                state.currentDayInProgress!.exercises.isNotEmpty) ...[
-              const SizedBox(height: 8),
-              Text(
-                '已添加 ${state.currentDayInProgress!.exercises.length} 个动作',
-                style: AppTextStyles.caption1.copyWith(
-                  color: CupertinoColors.secondaryLabel.resolveFrom(context),
-                ),
-              ),
-
-              // 显示最新添加的动作（最多显示最后3个）
-              ...state.currentDayInProgress!.exercises.reversed
-                  .take(3)
-                  .map(
-                    (exercise) => Padding(
-                      padding: const EdgeInsets.only(top: 4),
-                      child: Row(
-                        children: [
-                          Icon(
-                            CupertinoIcons.checkmark_circle_fill,
-                            size: 14,
-                            color: AppColors.success,
-                          ),
-                          const SizedBox(width: 6),
-                          Expanded(
-                            child: Text(
-                              exercise.name,
-                              style: AppTextStyles.caption1,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-            ],
-          ],
-
-          // 已完成的训练日列表
-          if (state.days.isNotEmpty) ...[
-            const SizedBox(height: 12),
-            Text(
-              '已完成 ${state.days.length} 天',
-              style: AppTextStyles.footnote.copyWith(
-                fontWeight: FontWeight.w500,
-                color: AppColors.success,
-              ),
+          actions: [
+            CupertinoDialogAction(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(l10n.ok),
             ),
           ],
-        ],
-      ),
-    );
+        ),
+      );
+    }
   }
 
   // ==================== Event Handlers ====================
@@ -598,9 +405,11 @@ class _CreateTrainingPlanPageState
 
   // ---------- Original Event Handlers ----------
 
-  /// 返回
+  /// 返回（支持多层级返回）
   void _onBack(BuildContext context, notifier) {
-    if (notifier.state.hasUnsavedChanges) {
+    // 场景 1: 在编辑模式且有未保存的更改 → 显示确认对话框
+    if (_pageState == CreatePlanPageState.editing &&
+        notifier.state.hasUnsavedChanges) {
       showCupertinoDialog(
         context: context,
         builder: (context) => CupertinoAlertDialog(
@@ -634,23 +443,38 @@ class _CreateTrainingPlanPageState
               ),
               onPressed: () {
                 Navigator.of(context).pop();
-                // 清除对话历史
-                ref
-                    .read(editConversationNotifierProvider.notifier)
-                    .clearConversationStorage(widget.planId);
-                context.pop();
+                // 判断是否回到 initial 或完全退出
+                if (widget.planId == null) {
+                  // 创建模式：返回到 initial
+                  setState(() => _pageState = CreatePlanPageState.initial);
+                } else {
+                  // 编辑模式：清除对话历史并退出
+                  ref
+                      .read(editConversationNotifierProvider.notifier)
+                      .clearConversationStorage(widget.planId);
+                  context.pop();
+                }
               },
             ),
           ],
         ),
       );
-    } else {
-      // 清除对话历史
-      ref
-          .read(editConversationNotifierProvider.notifier)
-          .clearConversationStorage(widget.planId);
-      context.pop();
+      return;
     }
+
+    // 场景 2: 在 editing/aiGuided/textImport 状态且为创建模式 → 返回到 initial
+    if (_pageState != CreatePlanPageState.initial && widget.planId == null) {
+      setState(() => _pageState = CreatePlanPageState.initial);
+      AppLogger.info('🔙 返回到创建方式选择页面');
+      return;
+    }
+
+    // 场景 3: 在 initial 状态或编辑模式无更改 → 退出页面
+    ref
+        .read(editConversationNotifierProvider.notifier)
+        .clearConversationStorage(widget.planId);
+    context.pop();
+    AppLogger.info('🔙 退出创建训练计划页面');
   }
 
   /// 添加训练日
@@ -697,11 +521,6 @@ class _CreateTrainingPlanPageState
         ],
       ),
     );
-  }
-
-  /// 添加动作
-  void _onAddExercise(notifier, int dayIndex) {
-    notifier.addExercise(dayIndex, exercise: Exercise.empty());
   }
 
   /// 删除动作
@@ -762,131 +581,6 @@ class _CreateTrainingPlanPageState
     }
   }
 
-  // ==================== UI Builders ====================
-
-  /// 构建动作列表
-  Widget _buildExercisesList(
-    BuildContext context,
-    notifier,
-    int dayIndex,
-    List<Exercise> exercises, {
-    required bool isReviewMode,
-    required SuggestionReviewState? reviewState,
-  }) {
-    // Review Mode 相关状态（从参数获取，避免重复 watch）
-    final currentChange = reviewState?.currentChange;
-
-    if (exercises.isEmpty) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 20),
-        child: Text(
-          'No movements yet. Click "Add" to add one.',
-          style: AppTextStyles.footnote.copyWith(
-            color: CupertinoColors.secondaryLabel,
-          ),
-          textAlign: TextAlign.center,
-        ),
-      );
-    }
-
-    return Column(
-      children: exercises.asMap().entries.map((entry) {
-        final exerciseIndex = entry.key;
-        final exercise = entry.value;
-
-        // 检查当前动作是否有激活的建议
-        final hasActiveSuggestion =
-            isReviewMode &&
-            currentChange != null &&
-            currentChange.dayIndex == dayIndex &&
-            currentChange.exerciseIndex == exerciseIndex;
-
-        // 为每个 ExerciseCard 分配 GlobalKey 用于自动滚动
-        final exerciseKey = '${dayIndex}_$exerciseIndex';
-        _exerciseKeys.putIfAbsent(exerciseKey, () => GlobalKey());
-
-        return ExerciseCard(
-          key: _exerciseKeys[exerciseKey],
-          exercise: exercise,
-          index: exerciseIndex,
-          isExpanded: true,
-          onTap: null,
-          onDelete: () => _onDeleteExercise(notifier, dayIndex, exerciseIndex),
-          onNameChanged: (name) =>
-              notifier.updateExerciseName(dayIndex, exerciseIndex, name),
-          onNoteChanged: (note) =>
-              notifier.updateExerciseNote(dayIndex, exerciseIndex, note),
-          // Review Mode 参数
-          activeSuggestion: hasActiveSuggestion ? currentChange : null,
-          isHighlighted: hasActiveSuggestion,
-          onAcceptSuggestion: hasActiveSuggestion
-              ? () => _onAcceptSuggestion()
-              : null,
-          onRejectSuggestion: hasActiveSuggestion
-              ? () => _onRejectSuggestion()
-              : null,
-          onAcceptAll: hasActiveSuggestion ? () => _onAcceptAll() : null,
-          onRejectAll: hasActiveSuggestion ? () => _onRejectAll() : null,
-          suggestionProgress: reviewState?.progressText,
-          onAddSet: () => _onAddSet(notifier, dayIndex, exerciseIndex),
-          onUploadGuide: () =>
-              GuideUploadPlaceholder.showPlaceholderDialog(context),
-          setsWidget: _buildSetsList(
-            context,
-            notifier,
-            dayIndex,
-            exerciseIndex,
-            exercise.sets,
-          ),
-        );
-      }).toList(),
-    );
-  }
-
-  /// 构建 Sets 列表
-  Widget _buildSetsList(
-    BuildContext context,
-    notifier,
-    int dayIndex,
-    int exerciseIndex,
-    List<TrainingSet> sets,
-  ) {
-    if (sets.isEmpty) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        child: Text(
-          'No sets yet. Click "Add Set" button.',
-          style: AppTextStyles.caption1.copyWith(
-            color: CupertinoColors.secondaryLabel,
-          ),
-          textAlign: TextAlign.center,
-        ),
-      );
-    }
-
-    return Column(
-      children: sets.asMap().entries.map((entry) {
-        final setIndex = entry.key;
-        final set = entry.value;
-
-        return SetRow(
-          set: set,
-          index: setIndex,
-          onRepsChanged: (reps) {
-            final updatedSet = set.copyWith(reps: reps);
-            notifier.updateSet(dayIndex, exerciseIndex, setIndex, updatedSet);
-          },
-          onWeightChanged: (weight) {
-            final updatedSet = set.copyWith(weight: weight);
-            notifier.updateSet(dayIndex, exerciseIndex, setIndex, updatedSet);
-          },
-          onDelete: () =>
-              _onDeleteSet(notifier, dayIndex, exerciseIndex, setIndex),
-        );
-      }).toList(),
-    );
-  }
-
   // ==================== Dialogs ====================
 
   /// 显示成功对话框
@@ -931,94 +625,6 @@ class _CreateTrainingPlanPageState
     );
   }
 
-  /// 显示创建模式菜单
-  void _showCreationModeMenu(BuildContext context, dynamic notifier) {
-    showCupertinoModalPopup(
-      context: context,
-      builder: (BuildContext context) => CupertinoActionSheet(
-        title: const Text('选择创建方式'),
-        message: const Text('你可以手动创建、导入图片或使用AI引导'),
-        actions: [
-          CupertinoActionSheetAction(
-            onPressed: () {
-              Navigator.of(context).pop();
-              _showImportSheet(context, notifier);
-            },
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(CupertinoIcons.photo, color: AppColors.primaryText),
-                const SizedBox(width: 8),
-                const Text('导入图片', style: AppTextStyles.body),
-              ],
-            ),
-          ),
-          CupertinoActionSheetAction(
-            onPressed: () {
-              Navigator.of(context).pop();
-              _showGuidedCreationSheet(context, notifier);
-            },
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(CupertinoIcons.sparkles, color: AppColors.primaryText),
-                const SizedBox(width: 8),
-                const Text('AI 引导创建', style: AppTextStyles.body),
-              ],
-            ),
-          ),
-        ],
-        cancelButton: CupertinoActionSheetAction(
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-          isDefaultAction: true,
-          child: const Text('取消', style: AppTextStyles.body),
-        ),
-      ),
-    );
-  }
-
-  /// 显示导入计划 Sheet
-  void _showImportSheet(BuildContext context, dynamic notifier) {
-    showCupertinoModalPopup(
-      context: context,
-      builder: (BuildContext context) => ImportPlanSheet(
-        onImportSuccess: (result) {
-          // 导入成功，加载计划到当前状态
-          notifier.loadFromImportResult(result);
-
-          // 显示成功提示
-          showCupertinoDialog(
-            context: context,
-            builder: (context) => CupertinoAlertDialog(
-              title: const Text('导入成功'),
-              content: Text(
-                '已成功导入计划：${result.plan?.name ?? "未知"}\n'
-                '包含 ${result.plan?.totalDays ?? 0} 个训练日\n'
-                '置信度：${(result.confidence * 100).toInt()}%',
-              ),
-              actions: [
-                CupertinoDialogAction(
-                  child: const Text('确定'),
-                  onPressed: () => Navigator.of(context).pop(),
-                ),
-              ],
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  /// 显示AI引导创建 Sheet
-  void _showGuidedCreationSheet(BuildContext context, dynamic notifier) {
-    showCupertinoModalPopup(
-      context: context,
-      builder: (BuildContext context) => const GuidedCreationSheet(),
-    );
-  }
-
   /// 显示AI编辑对话面板
   void _showAIEditChatPanel(BuildContext context, dynamic notifier) {
     // 构建当前计划对象
@@ -1043,109 +649,6 @@ class _CreateTrainingPlanPageState
           notifier: notifier,
         );
       },
-    );
-  }
-
-  /// 显示训练日选项菜单（长按pill）
-  void _showDayOptionsMenu(
-    BuildContext context,
-    dynamic notifier,
-    int dayIndex,
-    String currentName,
-  ) {
-    showCupertinoModalPopup(
-      context: context,
-      builder: (BuildContext context) => CupertinoActionSheet(
-        title: const Text('训练日选项'),
-        actions: [
-          CupertinoActionSheetAction(
-            onPressed: () {
-              Navigator.of(context).pop();
-              _showEditDayNameDialog(context, notifier, dayIndex, currentName);
-            },
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(CupertinoIcons.pencil, color: AppColors.primaryText),
-                const SizedBox(width: 8),
-                const Text('编辑名称', style: AppTextStyles.body),
-              ],
-            ),
-          ),
-          CupertinoActionSheetAction(
-            onPressed: () {
-              Navigator.of(context).pop();
-              _onDeleteDay(notifier, dayIndex);
-            },
-            isDestructiveAction: true,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(
-                  CupertinoIcons.delete,
-                  color: CupertinoColors.systemRed,
-                ),
-                const SizedBox(width: 8),
-                const Text('删除训练日'),
-              ],
-            ),
-          ),
-        ],
-        cancelButton: CupertinoActionSheetAction(
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-          isDefaultAction: true,
-          child: const Text('取消', style: AppTextStyles.body),
-        ),
-      ),
-    );
-  }
-
-  /// 显示编辑训练日名称对话框
-  void _showEditDayNameDialog(
-    BuildContext context,
-    dynamic notifier,
-    int dayIndex,
-    String currentName,
-  ) {
-    final TextEditingController controller = TextEditingController(
-      text: currentName,
-    );
-
-    showCupertinoDialog(
-      context: context,
-      builder: (context) => CupertinoAlertDialog(
-        title: const Text('编辑训练日名称'),
-        content: Padding(
-          padding: const EdgeInsets.only(top: 16),
-          child: CupertinoTextField(
-            controller: controller,
-            placeholder: '例如：腿部力量训练',
-            autofocus: true,
-          ),
-        ),
-        actions: [
-          CupertinoDialogAction(
-            child: const Text('取消'),
-            onPressed: () {
-              controller.dispose();
-              Navigator.of(context).pop();
-            },
-          ),
-          CupertinoDialogAction(
-            child: const Text('保存'),
-            onPressed: () {
-              final newName = controller.text.trim();
-              if (newName.isNotEmpty) {
-                notifier.updateDayName(dayIndex, newName);
-              }
-              controller.dispose();
-              Navigator.of(context).pop();
-            },
-          ),
-        ],
-      ),
     );
   }
 }

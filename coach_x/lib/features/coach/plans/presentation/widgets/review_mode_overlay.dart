@@ -146,7 +146,7 @@ class ReviewModeOverlay extends ConsumerWidget {
               // 查看全部按钮
               CupertinoButton(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                minSize: 0,
+                minimumSize: Size.zero,
                 onPressed: () => ref
                     .read(suggestionReviewNotifierProvider.notifier)
                     .toggleShowAllChanges(),
@@ -162,7 +162,7 @@ class ReviewModeOverlay extends ConsumerWidget {
               // 退出按钮
               CupertinoButton(
                 padding: EdgeInsets.zero,
-                minSize: 0,
+                minimumSize: Size.zero,
                 onPressed: () => _cancelReview(context, ref),
                 child: Container(
                   width: 28,
@@ -771,7 +771,7 @@ class ReviewModeOverlay extends ConsumerWidget {
               const Spacer(),
               CupertinoButton(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                minSize: 0,
+                minimumSize: Size.zero,
                 onPressed: () => ref
                     .read(suggestionReviewNotifierProvider.notifier)
                     .toggleShowAllChanges(),
@@ -785,7 +785,7 @@ class ReviewModeOverlay extends ConsumerWidget {
               ),
               CupertinoButton(
                 padding: EdgeInsets.zero,
-                minSize: 0,
+                minimumSize: Size.zero,
                 onPressed: () => _cancelReview(context, ref),
                 child: Container(
                   width: 28,
@@ -1146,32 +1146,6 @@ class ReviewModeOverlay extends ConsumerWidget {
     } catch (e) {
       // 出错时返回默认格式
       return 'Day${change.dayIndex + 1}';
-    }
-  }
-
-  /// 获取修改类型标签
-  String _getChangeTypeLabel(ChangeType type) {
-    switch (type) {
-      case ChangeType.modifyExercise:
-        return '修改动作';
-      case ChangeType.addExercise:
-        return '添加动作';
-      case ChangeType.removeExercise:
-        return '删除动作';
-      case ChangeType.modifyExerciseSets:
-        return '修改训练组';
-      case ChangeType.addDay:
-        return '添加训练日';
-      case ChangeType.removeDay:
-        return '删除训练日';
-      case ChangeType.modifyDayName:
-        return '修改名称';
-      case ChangeType.reorder:
-        return '调整顺序';
-      case ChangeType.adjustIntensity:
-        return '调整强度';
-      case ChangeType.other:
-        return '其他修改';
     }
   }
 }
