@@ -122,7 +122,7 @@ class _ExerciseSearchBarState extends ConsumerState<ExerciseSearchBar>
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
-                color: AppColors.primary,
+                border: Border.all(color: AppColors.primary),
                 borderRadius: BorderRadius.circular(6),
               ),
               child: Text(

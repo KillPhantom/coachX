@@ -54,7 +54,7 @@ class TodayTrainingPlanSection extends ConsumerWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   // 左侧：训练日名称
-                  Text(trainingDay.name, style: AppTextStyles.title3),
+                  Text(trainingDay.name, style: AppTextStyles.body),
 
                   // 右侧：导航按钮
                   GestureDetector(
@@ -166,18 +166,6 @@ class TodayTrainingPlanSection extends ConsumerWidget {
                     color: AppColors.textSecondary,
                   ),
                 ),
-
-                // Coach Notes (如果有)
-                if (exercise.note != null && exercise.note.isNotEmpty) ...[
-                  const SizedBox(height: AppDimensions.spacingS),
-                  const SizedBox(height: 2),
-                  Text(
-                    exercise.note,
-                    style: AppTextStyles.caption1.copyWith(
-                      color: AppColors.textSecondary,
-                    ),
-                  ),
-                ],
               ],
             ),
           ),

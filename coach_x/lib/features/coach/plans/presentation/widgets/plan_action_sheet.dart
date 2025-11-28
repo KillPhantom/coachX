@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:coach_x/core/theme/app_text_styles.dart';
 import 'package:coach_x/l10n/app_localizations.dart';
 import '../../data/models/plan_base_model.dart';
 
@@ -21,20 +22,20 @@ class PlanActionSheet {
             onPressed: () {
               Navigator.pop(context, PlanAction.assign);
             },
-            child: Text(l10n.assignToStudent),
+            child: Text(l10n.assignToStudent, style: AppTextStyles.bodyMedium),
           ),
           CupertinoActionSheetAction(
             onPressed: () {
               Navigator.pop(context, PlanAction.copy);
             },
-            child: Text(l10n.copyPlan),
+            child: Text(l10n.copyPlan, style: AppTextStyles.bodyMedium),
           ),
           CupertinoActionSheetAction(
             isDestructiveAction: true,
             onPressed: () {
               Navigator.pop(context, PlanAction.delete);
             },
-            child: Text(l10n.deletePlan),
+            child: Text(l10n.deletePlan, style: AppTextStyles.bodyMedium),
           ),
         ],
         cancelButton: CupertinoActionSheetAction(
@@ -42,7 +43,7 @@ class PlanActionSheet {
           onPressed: () {
             Navigator.pop(context);
           },
-          child: Text(l10n.cancel),
+          child: Text(l10n.cancel, style: AppTextStyles.bodyMedium),
         ),
       ),
     );

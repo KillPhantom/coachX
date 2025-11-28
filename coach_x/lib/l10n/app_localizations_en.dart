@@ -75,6 +75,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get retry => 'Retry';
 
   @override
+  String get retryGeneration => 'Retry';
+
+  @override
   String get cancel => 'Cancel';
 
   @override
@@ -343,6 +346,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get generateFailed => 'Generate failed';
+
+  @override
+  String get generationFailed => 'Generation Failed';
 
   @override
   String get invitationCodeGenerated =>
@@ -667,6 +673,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noExercises => 'No Exercises';
+
+  @override
+  String get serverError => 'Server error, please try again';
 
   @override
   String get sets => 'sets';
@@ -1830,4 +1839,82 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get pleaseReview => 'Please review and adjust the plan as needed.';
+
+  @override
+  String get aiStreamingTitle => 'AI Training Plan Generator';
+
+  @override
+  String get aiStreamingSubtitle => 'Creating your personalized training plan';
+
+  @override
+  String get step1Title => 'Analyzing Requirements';
+
+  @override
+  String get step1Description =>
+      'Validating your training goals and parameters...';
+
+  @override
+  String get step2Title => 'Generating Training Plan';
+
+  @override
+  String get step2Description => 'AI is designing your workout routine...';
+
+  @override
+  String get step3Title => 'Matching Exercise Library';
+
+  @override
+  String get step3Description => 'Checking reusable exercises...';
+
+  @override
+  String get step4Title => 'Finalizing';
+
+  @override
+  String get step4Description => 'Final review and validation...';
+
+  @override
+  String get summaryTitle => 'Generation Complete!';
+
+  @override
+  String get statTotalDays => 'Training Days';
+
+  @override
+  String get statTotalExercises => 'Total Exercises';
+
+  @override
+  String get statReusedExercises => 'Reused';
+
+  @override
+  String get statNewExercises => 'New';
+
+  @override
+  String get viewFullPlan => 'View Full Plan';
+
+  @override
+  String get confirmCreateTemplatesTitle => 'Create Exercise Templates';
+
+  @override
+  String confirmCreateTemplates(int count) {
+    return 'Will create $count new exercise templates to your library';
+  }
+
+  @override
+  String get confirmCreateButton => 'Confirm Create';
+
+  @override
+  String get creatingTemplates => 'Creating templates...';
+
+  @override
+  String get mealRecordExists => 'Meal Record Exists';
+
+  @override
+  String get confirmOverwriteMeal =>
+      'A record already exists for this meal. Continuing will overwrite the previous record. Do you want to continue?';
+
+  @override
+  String get overwrite => 'Overwrite';
+
+  @override
+  String mealNumberFormat(int number) {
+    return 'Meal $number';
+  }
 }

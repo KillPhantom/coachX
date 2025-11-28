@@ -8,12 +8,18 @@ class DietDayEditor extends StatelessWidget {
   final VoidCallback? onAddMeal;
   final Widget? mealsWidget;
   final Macros? totalMacros;
+  final ValueChanged<double>? onProteinChanged;
+  final ValueChanged<double>? onCarbsChanged;
+  final ValueChanged<double>? onFatChanged;
 
   const DietDayEditor({
     super.key,
     this.onAddMeal,
     this.mealsWidget,
     this.totalMacros,
+    this.onProteinChanged,
+    this.onCarbsChanged,
+    this.onFatChanged,
   });
 
   @override
@@ -34,14 +40,15 @@ class DietDayEditor extends StatelessWidget {
           // Daily Total Macros Summary
           if (totalMacros != null) ...[
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: AppColors.primaryLight,
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(16),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Header Row: Title - Kcal
                   Row(
                     children: [
                       Icon(
@@ -54,43 +61,47 @@ class DietDayEditor extends StatelessWidget {
                         'Daily Total',
                         style: AppTextStyles.callout.copyWith(
                           fontWeight: FontWeight.w600,
-                          color: AppColors.primaryText,
+                          color: AppColors.primaryAction,
                         ),
+                      ),
+                      const SizedBox(width: 12),
+                      // Calories Badge (Read-only, Calculated)
+                      _buildMacroBadge(
+                        context,
+                        '${(totalMacros!.protein * 4 + totalMacros!.carbs * 4 + totalMacros!.fat * 9).toStringAsFixed(0)} Kcal',
+                        AppColors.secondaryPurple,
                       ),
                     ],
                   ),
-                  const SizedBox(height: 10),
-                  Wrap(
-                    spacing: 10,
-                    runSpacing: 10,
+                  const SizedBox(height: 16),
+                  // Macros Row: Protein, Carbs, Fat
+                  Row(
                     children: [
-                      _buildMacroChip(
-                        context,
-                        '${totalMacros!.protein.toStringAsFixed(1)}g',
-                        '蛋白质',
-                        CupertinoIcons.bolt_fill,
-                        AppColors.secondaryBlue,
+                      Expanded(
+                        child: _EditableMacroBadge(
+                          value: totalMacros!.protein,
+                          label: '蛋白质',
+                          color: AppColors.secondaryBlue,
+                          onChanged: onProteinChanged,
+                        ),
                       ),
-                      _buildMacroChip(
-                        context,
-                        '${totalMacros!.carbs.toStringAsFixed(1)}g',
-                        '碳水',
-                        CupertinoIcons.flame_fill,
-                        AppColors.secondaryOrange,
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: _EditableMacroBadge(
+                          value: totalMacros!.carbs,
+                          label: '碳水',
+                          color: AppColors.secondaryOrange,
+                          onChanged: onCarbsChanged,
+                        ),
                       ),
-                      _buildMacroChip(
-                        context,
-                        '${totalMacros!.fat.toStringAsFixed(1)}g',
-                        '脂肪',
-                        CupertinoIcons.drop_fill,
-                        AppColors.secondaryRed,
-                      ),
-                      _buildMacroChip(
-                        context,
-                        totalMacros!.calories.toStringAsFixed(0),
-                        '卡路里',
-                        CupertinoIcons.flame_fill,
-                        AppColors.secondaryPurple,
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: _EditableMacroBadge(
+                          value: totalMacros!.fat,
+                          label: '脂肪',
+                          color: AppColors.secondaryRed,
+                          onChanged: onFatChanged,
+                        ),
                       ),
                     ],
                   ),
@@ -142,33 +153,116 @@ class DietDayEditor extends StatelessWidget {
     );
   }
 
-  Widget _buildMacroChip(
-    BuildContext context,
-    String value,
-    String label,
-    IconData icon,
-    Color color,
-  ) {
+  Widget _buildMacroBadge(BuildContext context, String value, Color color) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
       ),
-      child: Row(
+      child: Text(
+        value,
+        style: AppTextStyles.caption1.copyWith(
+          fontWeight: FontWeight.w600,
+          color: AppColors.primaryAction,
+        ),
+      ),
+    );
+  }
+}
+
+class _EditableMacroBadge extends StatefulWidget {
+  final double value;
+  final String label;
+  final Color color;
+  final ValueChanged<double>? onChanged;
+
+  const _EditableMacroBadge({
+    required this.value,
+    required this.label,
+    required this.color,
+    this.onChanged,
+  });
+
+  @override
+  State<_EditableMacroBadge> createState() => _EditableMacroBadgeState();
+}
+
+class _EditableMacroBadgeState extends State<_EditableMacroBadge> {
+  late TextEditingController _controller;
+  final FocusNode _focusNode = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: widget.value.toStringAsFixed(1));
+    _focusNode.addListener(_onFocusChange);
+  }
+
+  @override
+  void didUpdateWidget(covariant _EditableMacroBadge oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!_focusNode.hasFocus &&
+        widget.value != double.tryParse(_controller.text)) {
+      _controller.text = widget.value.toStringAsFixed(1);
+    }
+  }
+
+  void _onFocusChange() {
+    if (!_focusNode.hasFocus) {
+      // On blur, ensure the text matches the current value format
+      _controller.text = widget.value.toStringAsFixed(1);
+    } else {
+      // On focus, select all text for easy replacement
+      _controller.selection = TextSelection(
+        baseOffset: 0,
+        extentOffset: _controller.text.length,
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: widget.color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(label, style: AppTextStyles.caption1.copyWith()),
-              Text(
-                value,
-                style: AppTextStyles.caption2.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
+          CupertinoTextField(
+            controller: _controller,
+            focusNode: _focusNode,
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            textAlign: TextAlign.center,
+            decoration: null,
+            style: AppTextStyles.caption1.copyWith(
+              fontWeight: FontWeight.w600,
+              color: AppColors.primaryAction,
+            ),
+            onChanged: (value) {
+              final newValue = double.tryParse(value);
+              if (newValue != null && widget.onChanged != null) {
+                widget.onChanged!(newValue);
+              }
+            },
+          ),
+          const SizedBox(height: 2),
+          Text(
+            widget.label,
+            style: AppTextStyles.caption2.copyWith(
+              color: CupertinoColors.secondaryLabel,
+              fontSize: 10,
+            ),
           ),
         ],
       ),

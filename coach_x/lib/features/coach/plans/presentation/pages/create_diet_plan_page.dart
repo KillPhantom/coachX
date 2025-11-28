@@ -9,7 +9,9 @@ import 'package:coach_x/features/coach/plans/data/models/meal.dart';
 import 'package:coach_x/features/coach/plans/data/models/food_item.dart';
 import 'package:coach_x/features/coach/plans/data/models/diet_plan_model.dart';
 import 'package:coach_x/features/coach/plans/data/models/diet_plan_edit_suggestion.dart';
+import 'package:coach_x/features/coach/plans/data/models/diet_suggestion_review_state.dart';
 import 'package:coach_x/features/coach/plans/presentation/providers/create_diet_plan_providers.dart';
+import 'package:coach_x/features/coach/plans/presentation/providers/create_diet_plan_notifier.dart';
 import 'package:coach_x/features/coach/plans/presentation/providers/diet_suggestion_review_providers.dart';
 import 'package:coach_x/features/coach/plans/presentation/widgets/plan_header_widget.dart';
 import 'package:coach_x/features/coach/plans/presentation/widgets/day_pill.dart';
@@ -88,59 +90,68 @@ class _CreateDietPlanPageState extends ConsumerState<CreateDietPlanPage> {
     super.dispose();
   }
 
+  /// 滚动到高亮的 meal card
+  void _scrollToHighlightedMeal(int dayIndex, int? mealIndex) {
+    if (mealIndex == null) return;
+
+    final mealKey = '${dayIndex}_$mealIndex';
+    final globalKey = _mealKeys[mealKey];
+
+    if (globalKey?.currentContext != null) {
+      // 使用 Scrollable.ensureVisible 自动滚动到目标 widget
+      Scrollable.ensureVisible(
+        globalKey!.currentContext!,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+        alignment: 0.2, // 将卡片滚动到屏幕 20% 的位置（靠上）
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(createDietPlanNotifierProvider);
     final notifier = ref.read(createDietPlanNotifierProvider.notifier);
-
-    // 监听 Review Mode 状态，自动展开对应的 Day 和 Meal
     final reviewState = ref.watch(dietSuggestionReviewNotifierProvider);
-    if (reviewState != null && reviewState.currentChange != null) {
-      final currentChange = reviewState.currentChange!;
+    final isDietReviewMode = ref.watch(isDietReviewModeProvider);
 
-      // 自动切换到对应的 Day
-      if (_selectedDayIndex != currentChange.dayIndex) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (mounted) {
+    // 监听 Review Mode 高亮变化，自动切换 day、展开 meal 并滚动
+    ref.listen<DietSuggestionReviewState?>(
+      dietSuggestionReviewNotifierProvider,
+      (previous, next) {
+        if (!mounted) return;
+
+        // 当有新的 currentChange 时，自动切换 day、展开 meal 并滚动
+        if (next != null && next.currentChange != null && isDietReviewMode) {
+          final currentChange = next.currentChange!;
+
+          // 1. 切换到目标 Day
+          if (_selectedDayIndex != currentChange.dayIndex) {
             setState(() {
               _selectedDayIndex = currentChange.dayIndex;
             });
           }
-        });
-      }
 
-      // 自动展开对应的 Meal
-      if (currentChange.mealIndex != null &&
-          _expandedMealIndex != currentChange.mealIndex) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (mounted) {
+          // 2. 展开目标 Meal
+          if (currentChange.mealIndex != null &&
+              _expandedMealIndex != currentChange.mealIndex) {
             setState(() {
               _expandedMealIndex = currentChange.mealIndex;
             });
           }
-        });
-      }
 
-      // 自动滚动到对应的 Meal
-      if (currentChange.mealIndex != null) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (!mounted) return;
-
-          final mealKey =
-              '${currentChange.dayIndex}_${currentChange.mealIndex ?? 0}';
-          final key = _mealKeys[mealKey];
-
-          if (key?.currentContext != null) {
-            Scrollable.ensureVisible(
-              key!.currentContext!,
-              duration: const Duration(milliseconds: 300),
-              curve: Curves.easeInOut,
-              alignment: 0.2, // 20% from top of viewport
-            );
+          // 3. 延迟执行，等待 UI 更新完成后滚动
+          if (currentChange.mealIndex != null) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              _scrollToHighlightedMeal(
+                currentChange.dayIndex,
+                currentChange.mealIndex,
+              );
+            });
           }
-        });
-      }
-    }
+        }
+      },
+    );
 
     return CupertinoPageScaffold(
       backgroundColor: CupertinoColors.systemGroupedBackground,
@@ -280,7 +291,23 @@ class _CreateDietPlanPageState extends ConsumerState<CreateDietPlanPage> {
                               onAddMeal: () =>
                                   _onAddMeal(notifier, _selectedDayIndex!),
                               totalMacros:
+                                  state.days[_selectedDayIndex!].targetMacros ??
                                   state.days[_selectedDayIndex!].macros,
+                              onProteinChanged: (value) =>
+                                  notifier.updateDayTargetMacros(
+                                    _selectedDayIndex!,
+                                    protein: value,
+                                  ),
+                              onCarbsChanged: (value) =>
+                                  notifier.updateDayTargetMacros(
+                                    _selectedDayIndex!,
+                                    carbs: value,
+                                  ),
+                              onFatChanged: (value) =>
+                                  notifier.updateDayTargetMacros(
+                                    _selectedDayIndex!,
+                                    fat: value,
+                                  ),
                               mealsWidget: _buildMealsList(
                                 context,
                                 notifier,
@@ -412,8 +439,9 @@ class _CreateDietPlanPageState extends ConsumerState<CreateDietPlanPage> {
   // ==================== Event Handlers ====================
 
   /// 返回
-  void _onBack(BuildContext context, notifier) {
-    if (notifier.state.hasUnsavedChanges) {
+  void _onBack(BuildContext context, CreateDietPlanNotifier notifier) {
+    final state = ref.read(createDietPlanNotifierProvider);
+    if (state.hasUnsavedChanges) {
       showCupertinoDialog(
         context: context,
         builder: (context) => CupertinoAlertDialog(
@@ -458,18 +486,55 @@ class _CreateDietPlanPageState extends ConsumerState<CreateDietPlanPage> {
     }
   }
 
+  // ... (other methods)
+
+  /// 保存计划
+  Future<void> _onSave(
+    BuildContext context,
+    CreateDietPlanNotifier notifier,
+  ) async {
+    AppLogger.info('💾 准备保存饮食计划');
+
+    // 验证
+    notifier.validate();
+    // Re-read state after validation to check for errors
+    var state = ref.read(createDietPlanNotifierProvider);
+    if (state.validationErrors.isNotEmpty) {
+      _showErrorDialog(context, state.validationErrors.first);
+      return;
+    }
+
+    // 保存
+    final success = await notifier.savePlan();
+
+    if (!context.mounted) return;
+
+    if (success) {
+      AppLogger.info('✅ 饮食计划保存成功');
+      _showSuccessDialog(context);
+    } else {
+      // Re-read state to check for error message
+      state = ref.read(createDietPlanNotifierProvider);
+      if (state.errorMessage != null) {
+        AppLogger.error('❌ 饮食计划保存失败: ${state.errorMessage}');
+        _showErrorDialog(context, state.errorMessage!);
+      }
+    }
+  }
+
   /// 添加饮食日
-  void _onAddDay(notifier) {
+  void _onAddDay(CreateDietPlanNotifier notifier) {
     notifier.addDay();
     // 自动选择新添加的饮食日
     setState(() {
-      _selectedDayIndex = notifier.state.days.length - 1;
+      _selectedDayIndex =
+          ref.read(createDietPlanNotifierProvider).days.length - 1;
       _expandedMealIndex = null;
     });
   }
 
   /// 删除饮食日
-  void _onDeleteDay(notifier, int index) {
+  void _onDeleteDay(CreateDietPlanNotifier notifier, int index) {
     showCupertinoDialog(
       context: context,
       builder: (context) => CupertinoAlertDialog(
@@ -505,12 +570,16 @@ class _CreateDietPlanPageState extends ConsumerState<CreateDietPlanPage> {
   }
 
   /// 添加餐次
-  void _onAddMeal(notifier, int dayIndex) {
+  void _onAddMeal(CreateDietPlanNotifier notifier, int dayIndex) {
     notifier.addMeal(dayIndex, meal: Meal.empty());
   }
 
   /// 删除餐次
-  void _onDeleteMeal(notifier, int dayIndex, int mealIndex) {
+  void _onDeleteMeal(
+    CreateDietPlanNotifier notifier,
+    int dayIndex,
+    int mealIndex,
+  ) {
     showCupertinoDialog(
       context: context,
       builder: (context) => CupertinoAlertDialog(
@@ -540,36 +609,22 @@ class _CreateDietPlanPageState extends ConsumerState<CreateDietPlanPage> {
   }
 
   /// 添加食物条目
-  void _onAddFoodItem(notifier, int dayIndex, int mealIndex) {
+  void _onAddFoodItem(
+    CreateDietPlanNotifier notifier,
+    int dayIndex,
+    int mealIndex,
+  ) {
     notifier.addFoodItem(dayIndex, mealIndex, item: FoodItem.empty());
   }
 
   /// 删除食物条目
-  void _onDeleteFoodItem(notifier, int dayIndex, int mealIndex, int itemIndex) {
+  void _onDeleteFoodItem(
+    CreateDietPlanNotifier notifier,
+    int dayIndex,
+    int mealIndex,
+    int itemIndex,
+  ) {
     notifier.removeFoodItem(dayIndex, mealIndex, itemIndex);
-  }
-
-  /// 保存计划
-  Future<void> _onSave(BuildContext context, notifier) async {
-    AppLogger.info('💾 准备保存饮食计划');
-
-    // 验证
-    notifier.validate();
-    if (notifier.state.validationErrors.isNotEmpty) {
-      _showErrorDialog(context, notifier.state.validationErrors.first);
-      return;
-    }
-
-    // 保存
-    final success = await notifier.savePlan();
-
-    if (success && mounted) {
-      AppLogger.info('✅ 饮食计划保存成功');
-      _showSuccessDialog(context);
-    } else if (mounted && notifier.state.errorMessage != null) {
-      AppLogger.error('❌ 饮食计划保存失败: ${notifier.state.errorMessage}');
-      _showErrorDialog(context, notifier.state.errorMessage!);
-    }
   }
 
   // ==================== UI Builders ====================

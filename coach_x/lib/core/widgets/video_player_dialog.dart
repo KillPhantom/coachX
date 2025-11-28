@@ -221,7 +221,7 @@ class _VideoPlayerDialogState extends ConsumerState<VideoPlayerDialog> {
 
       // 2. 截取当前帧
       final timestamp = position.inSeconds.toDouble();
-      final framePath = await _extractFrame(videoPath, position.inMilliseconds);
+      final framePath = await _extractFrame(videoPath, position.inMilliseconds, _currentPage);
 
       // 3. 保存到 Firestore
       await _saveManualKeyframe(
@@ -229,6 +229,7 @@ class _VideoPlayerDialogState extends ConsumerState<VideoPlayerDialog> {
         timestamp,
         widget.dailyTrainingId!,
         widget.exerciseIndex!,
+        _currentPage, // 传递当前视频索引
         widget.exerciseName ?? 'Unknown Exercise',
       );
 
@@ -254,13 +255,13 @@ class _VideoPlayerDialogState extends ConsumerState<VideoPlayerDialog> {
   }
 
   /// 截取指定时间的视频帧
-  Future<String> _extractFrame(String videoPath, int timeMs) async {
+  Future<String> _extractFrame(String videoPath, int timeMs, int videoIndex) async {
     final tempDir = await getTemporaryDirectory();
     final timestamp = DateTime.now().millisecondsSinceEpoch;
     final framePath = path.join(
       tempDir.path,
       'manual_keyframes',
-      'frame_${widget.dailyTrainingId}_${widget.exerciseIndex}_$timestamp.jpg',
+      'frame_${widget.dailyTrainingId}_${widget.exerciseIndex}_${videoIndex}_$timestamp.jpg',
     );
 
     // 确保目录存在
@@ -290,6 +291,7 @@ class _VideoPlayerDialogState extends ConsumerState<VideoPlayerDialog> {
     double timestamp,
     String trainingId,
     int exerciseIndex,
+    int videoIndex,
     String exerciseName,
   ) async {
     final docRef = FirebaseFirestore.instance
@@ -307,14 +309,26 @@ class _VideoPlayerDialogState extends ConsumerState<VideoPlayerDialog> {
     );
 
     final exerciseKey = exerciseIndex.toString();
-    final exerciseData = safeMapCast(
+    final videoKey = videoIndex.toString();
+
+    // 获取 exercise 层级数据
+    final exerciseLevelData = safeMapCast(
       extractedKeyFrames[exerciseKey],
-      'exerciseData',
+      'exerciseLevel',
+    );
+    final exerciseLevel = exerciseLevelData != null
+        ? Map<String, dynamic>.from(exerciseLevelData)
+        : <String, dynamic>{};
+
+    // 获取 video 层级数据
+    final videoLevelData = safeMapCast(
+      exerciseLevel[videoKey],
+      'videoLevel',
     );
 
     // 获取现有关键帧
-    final existingKeyframes = exerciseData != null
-        ? safeMapListCast(exerciseData['keyframes'], 'keyframes')
+    final existingKeyframes = videoLevelData != null
+        ? safeMapListCast(videoLevelData['keyframes'], 'keyframes')
         : <Map<String, dynamic>>[];
 
     // 添加新关键帧
@@ -334,20 +348,26 @@ class _VideoPlayerDialogState extends ConsumerState<VideoPlayerDialog> {
       return timestampA.compareTo(timestampB);
     });
 
-    // 更新 Firestore
-    extractedKeyFrames[exerciseKey] = {
+    // 更新 video 层级数据
+    exerciseLevel[videoKey] = {
       'exerciseName': exerciseName,
       'keyframes': existingKeyframes,
       'extractedAt': FieldValue.serverTimestamp(),
       'method': 'manual', // 标记为手动提取
     };
 
+    // 更新 exercise 层级数据
+    extractedKeyFrames[exerciseKey] = exerciseLevel;
+
     await docRef.update({'extractedKeyFrames': extractedKeyFrames});
+
+    AppLogger.info('Saved manual keyframe: exerciseIndex=$exerciseIndex, videoIndex=$videoIndex, timestamp=$timestamp');
 
     // 后台上传到 Storage
     _uploadKeyframeInBackground(
       trainingId,
       exerciseIndex,
+      videoIndex,
       framePath,
       existingKeyframes.length - 1,
     );
@@ -357,6 +377,7 @@ class _VideoPlayerDialogState extends ConsumerState<VideoPlayerDialog> {
   void _uploadKeyframeInBackground(
     String trainingId,
     int exerciseIndex,
+    int videoIndex,
     String framePath,
     int frameIndex,
   ) {
@@ -364,6 +385,7 @@ class _VideoPlayerDialogState extends ConsumerState<VideoPlayerDialog> {
       _performBackgroundUpload(
         trainingId,
         exerciseIndex,
+        videoIndex,
         framePath,
         frameIndex,
       ),
@@ -373,6 +395,7 @@ class _VideoPlayerDialogState extends ConsumerState<VideoPlayerDialog> {
   Future<void> _performBackgroundUpload(
     String trainingId,
     int exerciseIndex,
+    int videoIndex,
     String framePath,
     int frameIndex,
   ) async {
@@ -380,12 +403,12 @@ class _VideoPlayerDialogState extends ConsumerState<VideoPlayerDialog> {
       AppLogger.info('Uploading manual keyframe to Storage...');
 
       final storagePath =
-          'training_keyframes/$trainingId/ex${exerciseIndex}_manual_frame$frameIndex.jpg';
+          'training_keyframes/$trainingId/ex${exerciseIndex}_v${videoIndex}_frame$frameIndex.jpg';
       final file = File(framePath);
       final url = await StorageService.uploadFile(file, storagePath);
 
       // 更新 Firestore URL
-      await _updateKeyframeUrl(trainingId, exerciseIndex, frameIndex, url);
+      await _updateKeyframeUrl(trainingId, exerciseIndex, videoIndex, frameIndex, url);
 
       AppLogger.info('Manual keyframe uploaded: $url');
     } catch (e, stackTrace) {
@@ -396,6 +419,7 @@ class _VideoPlayerDialogState extends ConsumerState<VideoPlayerDialog> {
   Future<void> _updateKeyframeUrl(
     String trainingId,
     int exerciseIndex,
+    int videoIndex,
     int frameIndex,
     String url,
   ) async {
@@ -413,24 +437,40 @@ class _VideoPlayerDialogState extends ConsumerState<VideoPlayerDialog> {
       );
 
       final exerciseKey = exerciseIndex.toString();
-      final exerciseData = safeMapCast(
+      final videoKey = videoIndex.toString();
+
+      // 获取 exercise 层级
+      final exerciseLevelData = safeMapCast(
         extractedKeyFrames[exerciseKey],
-        'exerciseData',
+        'exerciseLevel',
       );
 
-      if (exerciseData != null) {
-        final keyframes = safeMapListCast(
-          exerciseData['keyframes'],
-          'keyframes',
+      if (exerciseLevelData != null) {
+        final exerciseLevel = Map<String, dynamic>.from(exerciseLevelData);
+
+        // 获取 video 层级
+        final videoLevelData = safeMapCast(
+          exerciseLevel[videoKey],
+          'videoLevel',
         );
 
-        if (frameIndex < keyframes.length) {
-          keyframes[frameIndex]['url'] = url;
-          keyframes[frameIndex]['uploadStatus'] = 'uploaded';
-          exerciseData['keyframes'] = keyframes;
-          extractedKeyFrames[exerciseKey] = exerciseData;
+        if (videoLevelData != null) {
+          final videoLevel = Map<String, dynamic>.from(videoLevelData);
+          final keyframes = safeMapListCast(
+            videoLevel['keyframes'],
+            'keyframes',
+          );
 
-          await docRef.update({'extractedKeyFrames': extractedKeyFrames});
+          if (frameIndex < keyframes.length) {
+            keyframes[frameIndex]['url'] = url;
+            keyframes[frameIndex]['uploadStatus'] = 'uploaded';
+            videoLevel['keyframes'] = keyframes;
+            exerciseLevel[videoKey] = videoLevel;
+            extractedKeyFrames[exerciseKey] = exerciseLevel;
+
+            await docRef.update({'extractedKeyFrames': extractedKeyFrames});
+            AppLogger.info('Updated keyframe URL: exerciseIndex=$exerciseIndex, videoIndex=$videoIndex, frameIndex=$frameIndex');
+          }
         }
       }
     } catch (e, stackTrace) {

@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:coach_x/features/coach/plans/data/models/create_training_plan_state.dart';
+import 'package:coach_x/features/coach/plans/data/models/create_plan_page_state.dart';
 import 'package:coach_x/features/coach/plans/data/models/exercise_training_day.dart';
 import 'package:coach_x/features/coach/plans/data/models/exercise.dart';
 import 'package:coach_x/features/coach/plans/data/repositories/plan_repository_impl.dart';
@@ -99,6 +100,14 @@ final isAIGeneratingProvider = Provider.autoDispose<bool>((ref) {
 final hasSuggestionsProvider = Provider.autoDispose<bool>((ref) {
   final state = ref.watch(createTrainingPlanNotifierProvider);
   return state.hasSuggestions;
+});
+
+// ==================== 页面状态 Provider ====================
+
+/// 页面状态 Provider（管理页面在不同创建方式之间的切换）
+final createPlanPageStateProvider =
+    StateProvider.autoDispose<CreatePlanPageState>((ref) {
+  return CreatePlanPageState.initial;
 });
 
 // ==================== Repository Provider ====================

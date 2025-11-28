@@ -131,4 +131,106 @@ class DailyTrainingRepositoryImpl implements DailyTrainingRepository {
       rethrow;
     }
   }
+
+  @override
+  Future<void> addKeyframe(
+    String dailyTrainingId,
+    String exerciseTemplateId,
+    int videoIndex,
+    String imageUrl,
+    String? localPath,
+    double timestamp,
+  ) async {
+    try {
+      AppLogger.info(
+        '添加关键帧: $dailyTrainingId, exerciseTemplateId: $exerciseTemplateId',
+      );
+
+      final doc = await FirestoreService.getDocument(
+        'dailyTrainings',
+        dailyTrainingId,
+      );
+
+      if (!doc.exists) {
+        throw Exception('Daily Training 不存在: $dailyTrainingId');
+      }
+
+      final data = doc.data() as Map<String, dynamic>;
+
+      // Find exercise index by template ID
+      final exercises = (data['exercises'] as List<dynamic>?)
+          ?.cast<Map<String, dynamic>>();
+
+      if (exercises == null) {
+        throw Exception('Exercises 不存在');
+      }
+
+      int exerciseIndex = -1;
+      String exerciseName = '';
+
+      for (int i = 0; i < exercises.length; i++) {
+        if (exercises[i]['exerciseTemplateId'] == exerciseTemplateId) {
+          exerciseIndex = i;
+          exerciseName = exercises[i]['name'] ?? '';
+          break;
+        }
+      }
+
+      if (exerciseIndex == -1) {
+        throw Exception(
+          'Exercise with template ID $exerciseTemplateId not found',
+        );
+      }
+
+      final extractedKeyFrames = Map<String, dynamic>.from(
+        data['extractedKeyFrames'] ?? {},
+      );
+
+      final exerciseIndexStr = exerciseIndex.toString();
+      final videoIndexStr = videoIndex.toString();
+
+      // Get exercise level (Map<videoIndex, videoData>)
+      final exerciseLevel = Map<String, dynamic>.from(
+        extractedKeyFrames[exerciseIndexStr] as Map<String, dynamic>? ?? {},
+      );
+
+      // Get video level data
+      final videoData = Map<String, dynamic>.from(
+        exerciseLevel[videoIndexStr] as Map<String, dynamic>? ??
+            {'exerciseName': exerciseName, 'keyframes': [], 'method': 'manual'},
+      );
+
+      final keyframes = List<Map<String, dynamic>>.from(
+        (videoData['keyframes'] as List<dynamic>?)
+                ?.cast<Map<String, dynamic>>() ??
+            [],
+      );
+
+      // Add new keyframe
+      keyframes.add({
+        'url': imageUrl,
+        'localPath': localPath,
+        'timestamp': timestamp,
+        'uploadStatus': 'uploaded',
+      });
+
+      // Sort by timestamp
+      keyframes.sort(
+        (a, b) => (a['timestamp'] as num).compareTo(b['timestamp'] as num),
+      );
+
+      videoData['keyframes'] = keyframes;
+      exerciseLevel[videoIndexStr] = videoData;
+      extractedKeyFrames[exerciseIndexStr] = exerciseLevel;
+
+      await FirestoreService.updateDocument('dailyTrainings', dailyTrainingId, {
+        'extractedKeyFrames': extractedKeyFrames,
+      });
+
+      AppLogger.info('关键帧添加成功: $dailyTrainingId');
+    } catch (e, stackTrace) {
+      AppLogger.error('添加关键帧失败: $dailyTrainingId', e, stackTrace);
+      rethrow;
+    }
+  }
 }

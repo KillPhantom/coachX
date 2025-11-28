@@ -6,6 +6,52 @@
 
 import json
 
+# ==================== 训练风格推断 ====================
+
+def _infer_training_styles(goal: str) -> str:
+    """
+    根据训练目标推断合适的训练风格
+
+    Args:
+        goal: 训练目标 (muscle_gain, fat_loss, strength, etc.)
+
+    Returns:
+        训练风格描述字符串
+    """
+    style_map = {
+        'muscle_gain': """- 金字塔递增：重量递增，次数递减（如 12→10→8→6），适合肌肉增长
+- 低次数高重量：3-6次，适合力量和肌肉增长
+- 递减组：力竭后立即减重继续，增加肌肉刺激
+建议：以复合动作为主，重量逐渐递增，充分刺激目标肌群""",
+
+        'fat_loss': """- 超级组：连续做两个动作不休息，提高代谢
+- 高次数低重量：12-20次，提高心率和燃脂效果
+- 间歇训练：高强度运动和休息交替，最大化燃脂
+- 循环训练：多个动作循环进行，保持高心率
+建议：减少休息时间，保持训练强度和心率""",
+
+        'strength': """- 低次数高重量：3-6次，适合力量训练
+- 金字塔递增：逐渐增加重量，提升最大力量
+建议：以大重量复合动作为主，充分休息（90-180秒）""",
+
+        'endurance': """- 高次数低重量：15-20次，提高肌肉耐力
+- 循环训练：多个动作循环进行，提升心肺功能
+- 间歇训练：提高有氧能力
+建议：控制休息时间，保持较高训练量""",
+
+        'athletic': """- 爆发力训练：快速动作，适合运动表现
+- 功能性训练：结合多关节动作
+- 间歇训练：提高爆发力和恢复能力
+建议：动作选择多样化，注重速度和协调性""",
+
+        'tone': """- 高次数低重量：12-20次，塑造肌肉线条
+- 超级组：提高训练密度
+- 循环训练：全身协调发展
+建议：控制休息时间，注重动作质量""",
+    }
+
+    return style_map.get(goal, style_map['muscle_gain'])
+
 # ==================== 系统角色定义 ====================
 
 def get_system_prompt(language: str = '中文') -> str:
@@ -220,7 +266,7 @@ STRUCTURED_PLAN_TEMPLATE = """基于以下明确的参数生成训练计划：
 每天动作数: {exercises_per_day_min}-{exercises_per_day_max} 个
 每个动作组数: {sets_per_exercise_min}-{sets_per_exercise_max} 组
 
-【训练风格】
+【推荐训练风格】（AI 可根据实际情况灵活调整）
 {training_styles}
 
 【可用设备】
@@ -233,7 +279,7 @@ STRUCTURED_PLAN_TEMPLATE = """基于以下明确的参数生成训练计划：
 2. 每个训练日包含 {exercises_per_day_min}-{exercises_per_day_max} 个动作
 3. 每个动作包含 {sets_per_exercise_min}-{sets_per_exercise_max} 组
 4. 动作选择符合目标肌群和可用设备
-5. 训练风格体现在组数和次数配置中
+5. 根据训练目标灵活运用推荐的训练风格，体现在组数、次数和休息时间配置中
 6. 总训练量符合 {workload} 级别
 
 返回 JSON 格式如下：
@@ -273,7 +319,7 @@ SINGLE_DAY_PROMPT_TEMPLATE = """你是一位专业的私人健身教练，现在
 - 单次训练时长: {duration} 分钟
 - 目标肌群: {muscle_groups}
 - 训练强度: {workload}
-- 训练风格: {styles}
+- 推荐训练风格（可灵活调整）: {styles}
 - 可用设备: {equipment}
 
 **每天训练要求：**
@@ -405,12 +451,9 @@ def build_structured_plan_prompt(params: dict) -> tuple:
     # 格式化肌肉群
     muscle_groups_str = ', '.join(params.get('muscle_groups', []))
 
-    # 格式化训练风格
-    training_styles = params.get('training_styles', [])
-    if training_styles:
-        training_styles_str = '\n'.join([f'- {style}' for style in training_styles])
-    else:
-        training_styles_str = '- 标准训练'
+    # 根据目标推断训练风格
+    goal = params.get('goal', 'muscle_gain')
+    training_styles_str = _infer_training_styles(goal)
 
     # 格式化设备
     equipment = params.get('equipment', [])
@@ -467,8 +510,9 @@ def build_single_day_prompt(
     # 目标肌群
     muscle_groups_text = "、".join(params.get('muscle_groups', []))
 
-    # 训练风格
-    styles_text = "、".join(params.get('training_styles', [])) if params.get('training_styles') else "不限"
+    # 根据目标推断训练风格
+    goal = params.get('goal', 'muscle_gain')
+    styles_text = _infer_training_styles(goal)
 
     # 可用设备
     equipment_text = "、".join(params.get('equipment', [])) if params.get('equipment') else "不限"
@@ -593,7 +637,7 @@ def _format_exercise_library(exercise_templates: list) -> tuple:
     格式化动作库列表
 
     Args:
-        exercise_templates: 动作模板列表，每个模板包含 name 和 tags
+        exercise_templates: 动作模板列表，每个模板包含 id, name 和 tags
 
     Returns:
         (exercise_library_section, exercise_selection_rule) 元组
@@ -605,9 +649,11 @@ def _format_exercise_library(exercise_templates: list) -> tuple:
     exercise_lines = []
     for template in exercise_templates:
         name = template.get('name', '未知动作')
+        template_id = template.get('id', '')
         tags = template.get('tags', [])
         tags_text = f"（{', '.join(tags)}）" if tags else ""
-        exercise_lines.append(f"   - {name}{tags_text}")
+        # 包含 ID
+        exercise_lines.append(f"   - {name} [ID: {template_id}]{tags_text}")
 
     exercise_list_text = '\n'.join(exercise_lines)
 
@@ -616,7 +662,8 @@ def _format_exercise_library(exercise_templates: list) -> tuple:
 {exercise_list_text}
 """
 
-    selection_rule = "- **重要：必须从上述动作库中选择动作（使用完全相同的名称）**"
+    # 更新选择规则
+    selection_rule = "- **重要：必须从上述动作库中选择动作，并在返回数据的 exerciseTemplateId 字段中填入对应的 ID**"
 
     return (library_section, selection_rule)
 

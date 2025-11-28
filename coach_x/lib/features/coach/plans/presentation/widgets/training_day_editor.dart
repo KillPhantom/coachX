@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart' show ReorderableListView;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:coach_x/core/services/auth_service.dart';
 import 'package:coach_x/core/utils/logger.dart';
@@ -9,12 +10,16 @@ import './exercise_search_bar.dart';
 /// 训练日编辑面板
 class TrainingDayEditor extends ConsumerWidget {
   final int dayIndex;
-  final Widget? exercisesWidget;
+  final List<Widget> exerciseCards;
+  final Function(int, int) onReorder;
+  final ScrollController? scrollController;
 
   const TrainingDayEditor({
     super.key,
     required this.dayIndex,
-    this.exercisesWidget,
+    required this.exerciseCards,
+    required this.onReorder,
+    this.scrollController,
   });
 
   @override
@@ -29,10 +34,12 @@ class TrainingDayEditor extends ConsumerWidget {
           ),
         ),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ExerciseSearchBar(
+      child: ReorderableListView(
+        scrollController: scrollController,
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        header: Padding(
+          padding: const EdgeInsets.only(bottom: 12),
+          child: ExerciseSearchBar(
             onTemplateSelected: (template) {
               // 选择已存在的模板
               _addExerciseFromTemplate(
@@ -47,16 +54,9 @@ class TrainingDayEditor extends ConsumerWidget {
               await _createAndAddExercise(ref, context, dayIndex, exerciseName);
             },
           ),
-
-          const SizedBox(height: 12),
-
-          // Exercises List
-          if (exercisesWidget != null)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              child: exercisesWidget!,
-            ),
-        ],
+        ),
+        onReorder: onReorder,
+        children: exerciseCards,
       ),
     );
   }

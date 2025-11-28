@@ -213,3 +213,16 @@ class ExerciseFeedbackParams {
   @override
   int get hashCode => Object.hash(studentId, exerciseTemplateId);
 }
+
+/// Daily Training 反馈 Provider
+/// 监听指定 dailyTrainingId 的所有反馈（图文项级别）
+final dailyTrainingFeedbacksProvider =
+    StreamProvider.family<List<TrainingFeedbackModel>, String>((
+      ref,
+      dailyTrainingId,
+    ) {
+      final repository = ref.watch(feedbackRepositoryProvider);
+      return repository.getDailyTrainingFeedbacks(
+        dailyTrainingId: dailyTrainingId,
+      );
+    });

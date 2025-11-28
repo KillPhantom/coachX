@@ -6,6 +6,8 @@ import 'package:coach_x/core/services/ai_service.dart';
 import 'package:coach_x/core/utils/logger.dart';
 import 'package:coach_x/core/utils/plan_validator.dart';
 import 'package:coach_x/features/coach/plans/data/models/create_training_plan_state.dart';
+import 'package:coach_x/features/coach/plans/data/models/create_plan_page_state.dart';
+import 'package:coach_x/features/coach/plans/data/models/ai_streaming_stats.dart';
 import 'package:coach_x/features/coach/plans/data/models/exercise_training_day.dart';
 import 'package:coach_x/features/coach/plans/data/models/exercise.dart';
 import 'package:coach_x/features/coach/plans/data/models/training_set.dart';
@@ -15,12 +17,16 @@ import 'package:coach_x/features/coach/plans/data/models/import_result.dart';
 import 'package:coach_x/features/coach/plans/data/models/plan_generation_params.dart';
 import 'package:coach_x/features/coach/plans/data/repositories/plan_repository.dart';
 import 'package:coach_x/features/coach/exercise_library/presentation/providers/exercise_library_providers.dart';
+import 'create_training_plan_providers.dart';
 
 /// 创建训练计划状态管理
 class CreateTrainingPlanNotifier
     extends StateNotifier<CreateTrainingPlanState> {
   final PlanRepository _planRepository;
   final Ref _ref;
+
+  /// 记录前一个页面状态，用于返回导航
+  CreatePlanPageState? _previousPageState;
 
   CreateTrainingPlanNotifier(this._planRepository, this._ref)
     : super(const CreateTrainingPlanState());
@@ -35,6 +41,90 @@ class CreateTrainingPlanNotifier
   /// 更新描述
   void updateDescription(String description) {
     state = state.copyWith(description: description);
+  }
+
+  // ==================== 页面状态管理 ====================
+
+  /// 更新页面状态
+  void updatePageState(CreatePlanPageState pageState) {
+    // 记录当前状态作为前一个状态
+    final currentState = _ref.read(createPlanPageStateProvider);
+    if (currentState != pageState) {
+      _previousPageState = currentState;
+    }
+
+    // 通过 ref 更新页面状态 provider
+    _ref.read(createPlanPageStateProvider.notifier).state = pageState;
+    AppLogger.debug('📄 更新页面状态: $currentState → $pageState');
+  }
+
+  /// 获取前一个页面状态
+  CreatePlanPageState? get previousPageState => _previousPageState;
+
+  // ==================== AI 流式生成步骤管理 ====================
+
+  /// 更新流式生成步骤
+  void _updateStreamingStep(int step, double progress) {
+    state = state.copyWith(
+      currentStep: step,
+      currentStepProgress: progress,
+    );
+    AppLogger.debug('📊 Streaming Step: $step, Progress: $progress%');
+  }
+
+  /// 重置流式统计
+  void _resetStreamingStats() {
+    state = state.copyWith(
+      aiStreamingStats: const AIStreamingStats(),
+      currentStep: 0,
+      currentStepProgress: 0.0,
+    );
+  }
+
+  /// 计算动作统计
+  ///
+  /// 对比生成的动作和动作库，统计复用和新建的数量
+  AIStreamingStats _calculateExerciseStats() {
+    final exerciseTemplates = _ref.read(exerciseTemplatesProvider);
+    final allExercises = <String>[];
+    final reusedExercises = <String>[];
+    final newExercises = <String>[];
+    int totalSets = 0;
+
+    // 收集所有动作名称
+    for (final day in state.days) {
+      for (final exercise in day.exercises) {
+        allExercises.add(exercise.name);
+        totalSets += exercise.sets.length;
+
+        // 检查是否在动作库中（模糊匹配）
+        final isInLibrary = exerciseTemplates.any((template) =>
+            template.name.trim().toLowerCase() ==
+            exercise.name.trim().toLowerCase());
+
+        if (isInLibrary) {
+          if (!reusedExercises.contains(exercise.name)) {
+            reusedExercises.add(exercise.name);
+          }
+        } else {
+          if (!newExercises.contains(exercise.name)) {
+            newExercises.add(exercise.name);
+          }
+        }
+      }
+    }
+
+    final stats = AIStreamingStats(
+      totalDays: state.days.length,
+      totalExercises: allExercises.toSet().length,
+      reusedExercises: reusedExercises.length,
+      newExercises: newExercises.length,
+      newExerciseNames: newExercises,
+      totalSets: totalSets,
+    );
+
+    AppLogger.info('📊 Exercise Stats: $stats');
+    return stats;
   }
 
   // ==================== 训练日管理 ====================
@@ -199,6 +289,31 @@ class CreateTrainingPlanNotifier
       exerciseTemplateId: templateId,
     );
     updateExercise(dayIndex, exerciseIndex, updatedExercise);
+  }
+
+  /// 重新排序动作
+  void reorderExercise(int dayIndex, int oldIndex, int newIndex) {
+    if (dayIndex < 0 || dayIndex >= state.days.length) return;
+
+    final day = state.days[dayIndex];
+    if (oldIndex < 0 || oldIndex >= day.exercises.length) return;
+    if (newIndex < 0 || newIndex > day.exercises.length) return;
+
+    // ReorderableListView 的 newIndex 如果在 oldIndex 之后，需要减 1
+    if (oldIndex < newIndex) {
+      newIndex -= 1;
+    }
+
+    final updatedExercises = List<Exercise>.from(day.exercises);
+    final exercise = updatedExercises.removeAt(oldIndex);
+    updatedExercises.insert(newIndex, exercise);
+
+    final updatedDay = day.copyWith(exercises: updatedExercises);
+    updateDay(dayIndex, updatedDay);
+
+    AppLogger.debug(
+      '🔄 重新排序动作 - Day ${dayIndex + 1}: $oldIndex -> $newIndex',
+    );
   }
 
   // ==================== Set 管理 ====================
@@ -627,15 +742,21 @@ class CreateTrainingPlanNotifier
     try {
       AppLogger.info('🔄 开始流式生成训练计划');
 
+      // ✅ 保存参数到 state，用于重试
+      state = state.copyWith(lastGenerationParams: params);
+
+      // 切换到 aiStreaming 状态，显示进度页面
+      updatePageState(CreatePlanPageState.aiStreaming);
+
+      // Step 1: 分析训练要求 (20%)
+      _updateStreamingStep(1, 20);
+
       // 获取教练的动作库列表
       final exerciseTemplates = _ref.read(exerciseTemplatesProvider);
 
-      // 如果有动作库，添加到参数中
       if (exerciseTemplates.isNotEmpty) {
         params = params.copyWith(exerciseTemplates: exerciseTemplates);
-        AppLogger.info(
-          '📚 已添加 ${exerciseTemplates.length} 个动作模板到生成参数',
-        );
+        AppLogger.info('📚 已添加 ${exerciseTemplates.length} 个动作模板到生成参数');
       } else {
         AppLogger.info('⚠️ 未找到动作库，AI 将自由选择动作名称');
       }
@@ -649,12 +770,19 @@ class CreateTrainingPlanNotifier
         currentDayNumber: null,
       );
 
+      // 延迟 500ms 让用户看到 Step 1
+      await Future.delayed(const Duration(milliseconds: 500));
+
+      // Step 2: 生成训练计划 (20% → 85%)
+      _updateStreamingStep(2, 20);
+
+      final totalDays = params.daysPerWeek;
+      int completedDays = 0;
+
       // 监听流式事件
-      await for (final event in AIService.generatePlanStreaming(
-        params: params,
-      )) {
+      await for (final event in AIService.generatePlanStreaming(params: params)) {
         if (event.isThinking) {
-          // 思考过程（目前不需要显示，但保留日志）
+          // 思考过程
           if (event.content != null) {
             AppLogger.debug('💭 思考: ${event.content}');
           }
@@ -665,15 +793,9 @@ class CreateTrainingPlanNotifier
             currentDayInProgress: ExerciseTrainingDay.empty(event.day!),
             currentDayNumber: event.day,
           );
-        } else if (event.isExerciseStart) {
-          // 动作开始（可选，仅记录日志）
-          AppLogger.debug(
-            '🏋️ 开始添加动作 ${event.exerciseIndex}/${event.totalExercises}: ${event.exerciseName}',
-          );
         } else if (event.isExerciseComplete) {
           // 动作完成 - 追加到当前训练日
-          if (state.currentDayInProgress != null &&
-              event.exerciseData != null) {
+          if (state.currentDayInProgress != null && event.exerciseData != null) {
             final updatedDay = state.currentDayInProgress!.addExercise(
               event.exerciseData!,
             );
@@ -683,7 +805,7 @@ class CreateTrainingPlanNotifier
             );
           }
         } else if (event.isDayComplete) {
-          // 一天完成 - 将当前训练日添加到列表
+          // 一天完成
           if (state.currentDayInProgress != null) {
             final updatedDays = [...state.days, state.currentDayInProgress!];
             state = state.copyWith(
@@ -691,19 +813,40 @@ class CreateTrainingPlanNotifier
               currentDayInProgress: null,
               currentDayNumber: null,
             );
+            completedDays++;
+
+            // 更新 Step 2 进度 (20% → 85%)
+            final progress = 20 + (65 * completedDays / totalDays);
+            _updateStreamingStep(2, progress);
+
             AppLogger.info('🎉 第 ${event.day} 天已完成');
           }
         } else if (event.isComplete) {
-          // 全部完成
+          // Step 3: 匹配动作库 (85% → 95%)
+          _updateStreamingStep(3, 85);
+          await Future.delayed(const Duration(milliseconds: 500));
+
+          // 计算统计
+          final stats = _calculateExerciseStats();
+          state = state.copyWith(aiStreamingStats: stats);
+
+          _updateStreamingStep(3, 95);
+          await Future.delayed(const Duration(milliseconds: 500));
+
+          // Step 4: 完成 (100%)
+          _updateStreamingStep(4, 100);
+
           state = state.copyWith(
             aiStatus: AIGenerationStatus.success,
             currentDayInProgress: null,
             currentDayNumber: null,
           );
           AppLogger.info('🎉 流式生成完成 - 共 ${state.days.length} 天');
+
+          // 保持在 aiStreaming 状态，等待用户点击"查看完整计划"按钮
           break;
         } else if (event.isError) {
-          // 错误
+          // 错误 - 保持在 aiStreaming 状态显示错误
           state = state.copyWith(
             aiStatus: AIGenerationStatus.error,
             errorMessage: event.error ?? '生成失败',
@@ -711,6 +854,9 @@ class CreateTrainingPlanNotifier
             currentDayNumber: null,
           );
           AppLogger.error('❌ 流式生成失败: ${event.error}');
+
+          // ✅ 保持在 aiStreaming 状态，不回退到 aiGuided
+
           break;
         }
       }
@@ -722,7 +868,30 @@ class CreateTrainingPlanNotifier
         currentDayInProgress: null,
         currentDayNumber: null,
       );
+
+      // ✅ 保持在 aiStreaming 状态，不回退到 aiGuided
     }
+  }
+
+  /// 重试生成训练计划
+  ///
+  /// 使用上一次保存的参数重新生成
+  Future<void> retryGeneration() async {
+    if (state.lastGenerationParams == null) {
+      AppLogger.warning('⚠️ 无法重试：未找到上次生成的参数');
+      state = state.copyWith(
+        errorMessage: '无法重试，请返回重新填写参数',
+      );
+      return;
+    }
+
+    AppLogger.info('🔄 重试生成训练计划');
+
+    // 重置错误状态和步骤进度
+    _resetStreamingStats();
+
+    // 使用保存的参数重新生成
+    await generateFromParamsStreaming(state.lastGenerationParams!);
   }
 
   /// 应用 AI 修改的计划
@@ -738,5 +907,60 @@ class CreateTrainingPlanNotifier
     );
 
     AppLogger.info('计划已更新 - ${modifiedPlan.days.length} 个训练日');
+  }
+
+  // ==================== 批量创建模板 ====================
+
+  /// 批量创建动作模板
+  ///
+  /// [exerciseNames] 需要创建的动作名称列表
+  ///
+  /// 返回 Map<exerciseName, templateId>
+  Future<Map<String, String>> createExerciseTemplatesBatch(
+    List<String> exerciseNames,
+  ) async {
+    try {
+      AppLogger.info('🔧 开始批量创建 ${exerciseNames.length} 个动作模板');
+
+      state = state.copyWith(loadingStatus: LoadingStatus.loading);
+
+      final repository = _ref.read(exerciseLibraryRepositoryProvider);
+      final templateIdMap = await repository.batchCreateTemplates(exerciseNames);
+
+      state = state.copyWith(loadingStatus: LoadingStatus.success);
+
+      AppLogger.info('✅ 批量创建完成: $templateIdMap');
+      return templateIdMap;
+    } catch (e) {
+      AppLogger.error('❌ 批量创建模板失败', e);
+      state = state.copyWith(
+        loadingStatus: LoadingStatus.error,
+        errorMessage: '创建动作模板失败: $e',
+      );
+      rethrow;
+    }
+  }
+
+  /// 注入 exerciseTemplateId 到计划中
+  ///
+  /// [templateIdMap] 动作名称 → 模板ID 的映射
+  void injectTemplateIdsIntoPlan(Map<String, String> templateIdMap) {
+    AppLogger.info('💉 开始注入 exerciseTemplateId');
+
+    final updatedDays = state.days.map((day) {
+      final updatedExercises = day.exercises.map((exercise) {
+        final templateId = templateIdMap[exercise.name];
+        if (templateId != null) {
+          AppLogger.debug('  ${exercise.name} → $templateId');
+          return exercise.copyWith(exerciseTemplateId: templateId);
+        }
+        return exercise;
+      }).toList();
+
+      return day.copyWith(exercises: updatedExercises);
+    }).toList();
+
+    state = state.copyWith(days: updatedDays);
+    AppLogger.info('✅ 注入完成');
   }
 }

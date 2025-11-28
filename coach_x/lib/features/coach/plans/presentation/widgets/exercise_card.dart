@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart' show ReorderableDragStartListener, Curves, CurvedAnimation, Tween;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:coach_x/features/coach/plans/data/models/exercise.dart';
 import 'package:coach_x/features/coach/plans/data/models/plan_edit_suggestion.dart';
@@ -9,14 +10,13 @@ import 'package:coach_x/features/student/training/presentation/providers/exercis
 import 'package:coach_x/features/coach/exercise_library/presentation/widgets/create_exercise_sheet.dart';
 import 'package:coach_x/core/theme/app_colors.dart';
 import 'package:coach_x/core/theme/app_text_styles.dart';
-import 'package:coach_x/core/enums/exercise_type.dart';
 import 'package:coach_x/l10n/app_localizations.dart';
 
 /// 动作卡片组件
 class ExerciseCard extends ConsumerStatefulWidget {
   final Exercise exercise;
   final int index;
-  final bool isExpanded;
+  final bool initiallyExpanded;
   final VoidCallback? onTap;
   final VoidCallback? onDelete;
   final VoidCallback? onAddSet;
@@ -35,7 +35,7 @@ class ExerciseCard extends ConsumerStatefulWidget {
     super.key,
     required this.exercise,
     required this.index,
-    this.isExpanded = false,
+    this.initiallyExpanded = false,
     this.onTap,
     this.onDelete,
     this.onAddSet,
@@ -55,12 +55,14 @@ class ExerciseCard extends ConsumerStatefulWidget {
 
 class _ExerciseCardState extends ConsumerState<ExerciseCard>
     with SingleTickerProviderStateMixin {
+  bool? _isExpanded;
   AnimationController? _pulseController;
   Animation<double>? _pulseAnimation;
 
   @override
   void initState() {
     super.initState();
+    _isExpanded = widget.initiallyExpanded;
 
     // 脉冲动画控制器
     final controller = AnimationController(
@@ -99,57 +101,104 @@ class _ExerciseCardState extends ConsumerState<ExerciseCard>
     super.dispose();
   }
 
+  void _toggleExpansion() {
+    setState(() {
+      _isExpanded = !(_isExpanded ?? widget.initiallyExpanded);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    final isExpanded = _isExpanded ?? widget.initiallyExpanded;
+    
     Widget cardWidget = Container(
-      margin: const EdgeInsets.only(bottom: 5),
+      margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
         color: widget.isHighlighted
             ? CupertinoColors.systemBackground.resolveFrom(context)
-            : CupertinoColors.systemGrey6.resolveFrom(context),
-        borderRadius: BorderRadius.circular(10),
+            : CupertinoColors.white,
+        borderRadius: BorderRadius.circular(16),
         border: widget.isHighlighted
             ? Border.all(color: AppColors.primary, width: 2.5)
-            : (widget.isExpanded
-                  ? Border.all(color: AppColors.primary, width: 1.5)
-                  : null),
+            : null,
         boxShadow: widget.isHighlighted
             ? [
+                // Highlighted: Primary color glow effect
                 BoxShadow(
-                  color: AppColors.primary.withOpacity(0.3),
-                  blurRadius: 8,
+                  color: AppColors.primary.withOpacity(0.35),
+                  blurRadius: 18,
+                  spreadRadius: 1,
+                  offset: const Offset(0, 0),
+                ),
+                // Highlighted: Enhanced tight shadow
+                BoxShadow(
+                  color: CupertinoColors.systemGrey.withOpacity(0.15),
+                  blurRadius: 6,
                   offset: const Offset(0, 2),
                 ),
+                // Highlighted: Enhanced soft shadow
+                BoxShadow(
+                  color: CupertinoColors.systemGrey.withOpacity(0.25),
+                  blurRadius: 18,
+                  offset: const Offset(0, 6),
+                ),
               ]
-            : null,
+            : [
+                // Normal: Tight shadow for definition
+                BoxShadow(
+                  color: CupertinoColors.systemGrey.withOpacity(0.12),
+                  blurRadius: 6,
+                  offset: const Offset(0, 2),
+                ),
+                // Normal: Soft shadow for depth
+                BoxShadow(
+                  color: CupertinoColors.systemGrey.withOpacity(0.18),
+                  blurRadius: 15,
+                  offset: const Offset(0, 5),
+                ),
+              ],
       ),
       child: Column(
         children: [
           // Header
           GestureDetector(
-            onTap: widget.onTap,
+            onTap: _toggleExpansion,
+            behavior: HitTestBehavior.opaque,
             child: Container(
-              padding: const EdgeInsets.all(7),
+              padding: const EdgeInsets.fromLTRB(12, 12, 16, 12),
               child: Row(
                 children: [
+                  // Drag Handle
+                  ReorderableDragStartListener(
+                    index: widget.index,
+                    child: Container(
+                      padding: const EdgeInsets.all(8),
+                      child: Icon(
+                        CupertinoIcons.bars,
+                        color: CupertinoColors.systemGrey3,
+                        size: 20,
+                      ),
+                    ),
+                  ),
+                  
                   // Exercise Number
                   Container(
-                    width: 17,
-                    height: 17,
+                    width: 18,
+                    height: 18,
                     decoration: BoxDecoration(
-                      color: AppColors.primary.withOpacity(0.15),
-                      borderRadius: BorderRadius.circular(4),
+                      color: AppColors.primaryLight,
+                      borderRadius: BorderRadius.circular(9),
                     ),
                     alignment: Alignment.center,
                     child: Text(
                       '${widget.index + 1}',
                       style: AppTextStyles.caption1.copyWith(
-                        color: AppColors.primary,
+                        color: AppColors.primaryAction,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
-                  const SizedBox(width: 6),
+                  const SizedBox(width: 12),
 
                   // Exercise Info
                   Expanded(
@@ -158,74 +207,40 @@ class _ExerciseCardState extends ConsumerState<ExerciseCard>
                       children: [
                         // Name
                         _buildExerciseNameDisplay(context),
-                        const SizedBox(height: 1),
-                        // Type & Sets
-                        Row(
-                          children: [
-                            // Type Badge
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 4,
-                                vertical: 1,
-                              ),
-                              decoration: BoxDecoration(
-                                color:
-                                    widget.exercise.type ==
-                                        ExerciseType.strength
-                                    ? CupertinoColors.systemBlue.withValues(
-                                        alpha: 0.15,
-                                      )
-                                    : CupertinoColors.systemRed.withValues(
-                                        alpha: 0.15,
-                                      ),
-                                borderRadius: BorderRadius.circular(2),
-                              ),
-                              child: Text(
-                                widget.exercise.type.displayName,
-                                style: AppTextStyles.tabLabel.copyWith(
-                                  color:
-                                      widget.exercise.type ==
-                                          ExerciseType.strength
-                                      ? CupertinoColors.systemBlue
-                                      : CupertinoColors.systemRed,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 5),
-                            // Sets Count
-                            Text(
-                              '${widget.exercise.totalSets} 组',
-                              style: AppTextStyles.caption2.copyWith(
-                                color: CupertinoColors.secondaryLabel
-                                    .resolveFrom(context),
-                              ),
-                            ),
-                          ],
-                        ),
+                        const SizedBox(height: 4),
+
                       ],
                     ),
                   ),
 
-                  // Delete Button
-                  if (widget.onDelete != null)
-                    CupertinoButton(
-                      padding: EdgeInsets.zero,
-                      minimumSize: Size.zero,
-                      onPressed: widget.onDelete,
-                      child: Icon(
-                        CupertinoIcons.delete,
-                        color: CupertinoColors.systemRed.resolveFrom(context),
-                        size: 14,
+                  // Sets Count
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: CupertinoColors.systemGrey6,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text(
+                      '${widget.exercise.totalSets} Sets',
+                      style: AppTextStyles.caption1.copyWith(
+                        color: CupertinoColors.secondaryLabel,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
+                  ),
+                  
+                  const SizedBox(width: 12),
 
                   // Expand Icon
                   Icon(
-                    widget.isExpanded
+                    isExpanded
                         ? CupertinoIcons.chevron_up
                         : CupertinoIcons.chevron_down,
-                    color: CupertinoColors.secondaryLabel.resolveFrom(context),
-                    size: 14,
+                    color: CupertinoColors.systemGrey3,
+                    size: 16,
                   ),
                 ],
               ),
@@ -233,65 +248,108 @@ class _ExerciseCardState extends ConsumerState<ExerciseCard>
           ),
 
           // Expanded Content
-          if (widget.isExpanded) ...[
+          if (isExpanded) ...[
             Container(
               height: 1,
-              color: CupertinoColors.separator.resolveFrom(context),
+              color: CupertinoColors.systemGrey6,
             ),
 
             Padding(
-              padding: const EdgeInsets.all(6),
+              padding: const EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Sets Title & Add Button
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        AppLocalizations.of(context)!.trainingSets,
-                        style: AppTextStyles.caption1.copyWith(
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      if (widget.onAddSet != null)
-                        CupertinoButton(
-                          padding: EdgeInsets.zero,
-                          minimumSize: Size.zero,
-                          onPressed: widget.onAddSet,
-                          child: Row(
-                            children: [
-                              Icon(
-                                CupertinoIcons.add_circled_solid,
-                                color: AppColors.primary,
-                                size: 11,
-                              ),
-                              const SizedBox(width: 2),
-                              Text(
-                                AppLocalizations.of(context)!.addSet,
-                                style: AppTextStyles.caption1.copyWith(
-                                  color: AppColors.primary,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 5),
-
                   // Sets List
                   if (widget.isHighlighted && widget.activeSuggestion != null)
                     _buildReviewModeSets(widget.activeSuggestion!)
                   else if (widget.setsWidget != null)
                     widget.setsWidget!,
 
-                  const SizedBox(height: 7),
+                  const SizedBox(height: 12),
 
-                  // Add Guidance Button
-                  if (widget.exercise.exerciseTemplateId != null)
-                    _buildAddGuidanceButton(context),
+                  // Actions Row
+                  Row(
+                    children: [
+                      // Add Set Button
+                      if (widget.onAddSet != null)
+                        CupertinoButton(
+                          padding: EdgeInsets.zero,
+                          minSize: 0,
+                          onPressed: widget.onAddSet,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 6,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.primary.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  CupertinoIcons.add,
+                                  color: AppColors.primary,
+                                  size: 14,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  AppLocalizations.of(context)!.addSet,
+                                  style: AppTextStyles.caption1.copyWith(
+                                    color: AppColors.primary,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+
+                      const Spacer(),
+
+                      // Guidance Button
+                      if (widget.exercise.exerciseTemplateId != null)
+                        CupertinoButton(
+                          padding: EdgeInsets.zero,
+                          minSize: 0,
+                          onPressed: () => _showGuidanceSheet(context),
+                          child: Container(
+                            padding: const EdgeInsets.all(6),
+                            decoration: BoxDecoration(
+                              color: CupertinoColors.systemGrey6,
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Icon(
+                              CupertinoIcons.book,
+                              color: CupertinoColors.secondaryLabel,
+                              size: 16,
+                            ),
+                          ),
+                        ),
+                        
+                      const SizedBox(width: 12),
+                      
+                      // Delete Button
+                      if (widget.onDelete != null)
+                        CupertinoButton(
+                          padding: EdgeInsets.zero,
+                          minSize: 0,
+                          onPressed: widget.onDelete,
+                          child: Container(
+                            padding: const EdgeInsets.all(6),
+                            decoration: BoxDecoration(
+                              color: CupertinoColors.systemRed.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Icon(
+                              CupertinoIcons.delete,
+                              color: CupertinoColors.systemRed,
+                              size: 16,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
                 ],
               ),
             ),
@@ -310,9 +368,6 @@ class _ExerciseCardState extends ConsumerState<ExerciseCard>
         child: cardWidget,
       );
     }
-
-    // 移除了 SuggestionOverlay，因为 Review Mode 已经有主要的修改详情卡片
-    // 显示在 exercise_card 上方的小卡片会遮挡内容
 
     return cardWidget;
   }

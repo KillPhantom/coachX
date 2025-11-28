@@ -31,6 +31,13 @@ abstract class ExerciseLibraryRepository {
   /// Returns: 新创建的模板 ID
   Future<String> quickCreateTemplate(String coachId, String name);
 
+  /// 批量创建动作模板
+  ///
+  /// [exerciseNames] 动作名称列表
+  ///
+  /// Returns: Map<exerciseName, templateId>
+  Future<Map<String, String>> batchCreateTemplates(List<String> exerciseNames);
+
   /// 更新动作模板
   Future<void> updateTemplate(String id, Map<String, dynamic> data);
 

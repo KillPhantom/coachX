@@ -10,16 +10,16 @@ class AppColors {
   static const Color primaryColor = Color(0xFFF2E8CF);
 
   /// 主色文字
-  static const Color primaryText = Color(0xFF6B5E3F);
+  static const Color primaryText = Color.fromARGB(255, 141, 130, 112);
 
   /// 主色浅色背景
   static const Color primaryLight = Color(0xFFFDFAF3);
 
   /// 主色交互色
-  static const Color primaryAction = Color(0xFF9F8B5E);
+  static const Color primaryAction = Color(0xFFA88B70);
 
   // 别名（用于简化使用）
-  static const Color primary = Color(0xFFf0e9d8); // 主要交互色
+  static const Color primary = Color.fromARGB(255, 164, 147, 109); // 主要交互色
   static const Color primaryDark = Color(0xFF3D3424); // 主要交互色深色版
 
   // ==================== 辅助色系 ====================
@@ -73,7 +73,7 @@ class AppColors {
 
   // ==================== 功能色 ====================
   /// 成功/完成 - 绿色
-  static const Color successGreen = Color(0xFF10B981);
+  static const Color successGreen = Color(0xFF7D8471);
   static const Color success = successGreen; // 别名
 
   /// 警告 - 黄色

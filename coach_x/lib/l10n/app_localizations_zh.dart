@@ -75,6 +75,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get retry => '重试';
 
   @override
+  String get retryGeneration => '重新生成';
+
+  @override
   String get cancel => '取消';
 
   @override
@@ -338,6 +341,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get generateFailed => '生成失败';
+
+  @override
+  String get generationFailed => '生成失败';
 
   @override
   String get invitationCodeGenerated => '邀请码生成成功';
@@ -659,6 +665,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get noExercises => '暂无训练动作';
+
+  @override
+  String get serverError => '服务器错误，请重试';
 
   @override
   String get sets => '组';
@@ -1816,4 +1825,80 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get pleaseReview => '请检查并根据需要调整计划。';
+
+  @override
+  String get aiStreamingTitle => 'AI 训练计划生成器';
+
+  @override
+  String get aiStreamingSubtitle => '正在为您定制专属训练方案';
+
+  @override
+  String get step1Title => '分析训练要求';
+
+  @override
+  String get step1Description => '正在验证您的训练目标和参数...';
+
+  @override
+  String get step2Title => '生成训练计划';
+
+  @override
+  String get step2Description => 'AI 正在为您设计训练动作...';
+
+  @override
+  String get step3Title => '匹配动作库';
+
+  @override
+  String get step3Description => '正在检查可复用的动作...';
+
+  @override
+  String get step4Title => '完成生成';
+
+  @override
+  String get step4Description => '最后检查和验证...';
+
+  @override
+  String get summaryTitle => '生成完成！';
+
+  @override
+  String get statTotalDays => '训练天数';
+
+  @override
+  String get statTotalExercises => '训练动作';
+
+  @override
+  String get statReusedExercises => '复用';
+
+  @override
+  String get statNewExercises => '新建';
+
+  @override
+  String get viewFullPlan => '查看完整计划';
+
+  @override
+  String get confirmCreateTemplatesTitle => '创建动作模板';
+
+  @override
+  String confirmCreateTemplates(int count) {
+    return '将创建 $count 个新动作模板到您的动作库';
+  }
+
+  @override
+  String get confirmCreateButton => '确认创建';
+
+  @override
+  String get creatingTemplates => '正在创建模板...';
+
+  @override
+  String get mealRecordExists => '该餐次已有记录';
+
+  @override
+  String get confirmOverwriteMeal => '该餐次已有记录，继续保存将覆盖之前的记录，是否继续？';
+
+  @override
+  String get overwrite => '覆盖';
+
+  @override
+  String mealNumberFormat(int number) {
+    return '第$number顿';
+  }
 }

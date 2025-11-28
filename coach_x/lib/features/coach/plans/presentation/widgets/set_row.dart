@@ -91,30 +91,38 @@ class _SetRowState extends State<SetRow> {
   /// 正常模式布局（可编辑）
   Widget _buildNormalLayout(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 2),
-      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 6),
-      decoration: BoxDecoration(
-        color: CupertinoColors.systemBackground.resolveFrom(context),
-        borderRadius: BorderRadius.circular(4),
-        border: Border.all(
-          color: CupertinoColors.separator.resolveFrom(context),
-        ),
-      ),
+      margin: const EdgeInsets.only(bottom: 4),
       child: Row(
         children: [
           // Set Number
           _buildSetNumber(context),
-          const SizedBox(width: 6),
+          const SizedBox(width: 8),
 
           // Reps Input
-          Expanded(flex: 2, child: _buildRepsInput(context, editable: true)),
+          Expanded(
+            child: _buildCompactInput(
+              context,
+              controller: _repsController,
+              placeholder: '10',
+              onChanged: widget.onRepsChanged,
+              editable: true,
+            ),
+          ),
 
-          const SizedBox(width: 6),
+          const SizedBox(width: 8),
 
           // Weight Input
-          Expanded(flex: 2, child: _buildWeightInput(context, editable: true)),
+          Expanded(
+            child: _buildCompactInput(
+              context,
+              controller: _weightController,
+              placeholder: '60kg',
+              onChanged: widget.onWeightChanged,
+              editable: true,
+            ),
+          ),
 
-          const SizedBox(width: 5),
+          const SizedBox(width: 8),
 
           // Delete Button
           if (widget.onDelete != null)
@@ -125,10 +133,41 @@ class _SetRowState extends State<SetRow> {
               child: Icon(
                 CupertinoIcons.minus_circle_fill,
                 color: CupertinoColors.systemRed.resolveFrom(context),
-                size: 12,
+                size: 20,
               ),
             ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildCompactInput(
+    BuildContext context, {
+    required TextEditingController controller,
+    required String placeholder,
+    required ValueChanged<String>? onChanged,
+    required bool editable,
+  }) {
+    return SizedBox(
+      height: 32,
+      child: CupertinoTextField(
+        controller: controller,
+        placeholder: placeholder,
+        onChanged: editable ? onChanged : null,
+        enabled: editable,
+        keyboardType: TextInputType.text,
+        textAlign: TextAlign.center,
+        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 0),
+        decoration: BoxDecoration(
+          color: CupertinoColors.systemGrey6.resolveFrom(context),
+          borderRadius: BorderRadius.circular(6),
+        ),
+        style: AppTextStyles.body.copyWith(
+          fontWeight: FontWeight.w500,
+        ),
+        placeholderStyle: AppTextStyles.body.copyWith(
+          color: CupertinoColors.placeholderText,
+        ),
       ),
     );
   }
@@ -370,8 +409,12 @@ class _SetRowState extends State<SetRow> {
       textAlign: TextAlign.center,
       padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 4),
       decoration: BoxDecoration(
-        color: CupertinoColors.systemGrey6.resolveFrom(context),
-        borderRadius: BorderRadius.circular(2),
+        color: CupertinoColors.white,
+        borderRadius: BorderRadius.circular(4),
+        border: Border.all(
+          color: AppColors.dividerLight,
+          width: 0.5,
+        ),
       ),
       style: AppTextStyles.caption1,
     );
@@ -388,8 +431,12 @@ class _SetRowState extends State<SetRow> {
       textAlign: TextAlign.center,
       padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 4),
       decoration: BoxDecoration(
-        color: CupertinoColors.systemGrey6.resolveFrom(context),
-        borderRadius: BorderRadius.circular(2),
+        color: CupertinoColors.white,
+        borderRadius: BorderRadius.circular(4),
+        border: Border.all(
+          color: AppColors.dividerLight,
+          width: 0.5,
+        ),
       ),
       style: AppTextStyles.caption1,
     );

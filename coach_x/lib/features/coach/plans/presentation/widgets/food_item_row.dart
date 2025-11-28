@@ -206,14 +206,6 @@ class _FoodItemRowState extends State<FoodItemRow>
     });
   }
 
-  /// 获取输入框边框颜色
-  Color _getBorderColor(BuildContext context, bool hasValue) {
-    if (_showValidationError && !hasValue) {
-      return CupertinoColors.systemRed;
-    }
-    return CupertinoColors.separator.resolveFrom(context);
-  }
-
   /// Sparkle 按钮点击处理
   void _onSparklePressed() {
     final hasFood = _foodController.text.trim().isNotEmpty;
@@ -311,7 +303,7 @@ class _FoodItemRowState extends State<FoodItemRow>
         color: CupertinoColors.systemBackground.resolveFrom(context),
         borderRadius: BorderRadius.circular(6),
         border: Border.all(
-          color: AppColors.primary.withOpacity(0.5),
+          color: AppColors.primary.withValues(alpha: 0.5),
           width: 1.5,
         ),
       ),
@@ -326,7 +318,7 @@ class _FoodItemRowState extends State<FoodItemRow>
                 width: 16,
                 height: 16,
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withOpacity(0.15),
+                  color: AppColors.primary.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 alignment: Alignment.center,
@@ -506,249 +498,227 @@ class _FoodItemRowState extends State<FoodItemRow>
     final hasAmount = _amountController.text.trim().isNotEmpty;
     final canFetch = hasFood && hasAmount;
 
-    return Stack(
-      clipBehavior: Clip.none,
-      children: [
-        // 主容器
-        Container(
-          margin: const EdgeInsets.only(bottom: 6),
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: CupertinoColors.systemBackground.resolveFrom(context),
-            borderRadius: BorderRadius.circular(6),
-            border: Border.all(
-              color: CupertinoColors.separator.resolveFrom(context),
-            ),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        color: CupertinoColors.systemBackground.resolveFrom(context),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: CupertinoColors.separator.resolveFrom(context),
+          width: 0.5,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Row 1: Number | Name | Amount | Sparkle | Delete
+          Row(
             children: [
-              // 第一行：序号 + 食物名称 + 分量 + Sparkle
-              Row(
-                children: [
-                  // 序号徽章
-                  Container(
-                    width: 16,
-                    height: 16,
-                    decoration: BoxDecoration(
-                      color: AppColors.primary.withOpacity(0.15),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    alignment: Alignment.center,
-                    child: Text(
-                      '${widget.index + 1}',
-                      style: AppTextStyles.tabLabel.copyWith(
-                        color: AppColors.primary,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-
-                  // 食物名称输入框
-                  Flexible(
-                    flex: 3,
-                    child: CupertinoTextField(
-                      controller: _foodController,
-                      placeholder: '食物名称',
-                      onChanged: (value) {
-                        setState(() {
-                          if (_showValidationError && value.trim().isNotEmpty) {
-                            _showValidationError = false;
-                          }
-                        });
-                        if (widget.onFoodChanged != null) {
-                          widget.onFoodChanged!(value);
-                        }
-                      },
-                      style: AppTextStyles.caption1,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 6,
-                      ),
-                      decoration: BoxDecoration(
-                        color: CupertinoColors.systemGrey6.resolveFrom(context),
-                        borderRadius: BorderRadius.circular(4),
-                        border: Border.all(
-                          color: _getBorderColor(context, hasFood),
-                          width: 1,
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(width: 6),
-
-                  // 分量输入框
-                  Flexible(
-                    flex: 2,
-                    child: CupertinoTextField(
-                      controller: _amountController,
-                      placeholder: '分量',
-                      onChanged: (value) {
-                        setState(() {
-                          if (_showValidationError && value.trim().isNotEmpty) {
-                            _showValidationError = false;
-                          }
-                        });
-                        if (widget.onAmountChanged != null) {
-                          widget.onAmountChanged!(value);
-                        }
-                      },
-                      style: AppTextStyles.caption1,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 6,
-                      ),
-                      decoration: BoxDecoration(
-                        color: CupertinoColors.systemGrey6.resolveFrom(context),
-                        borderRadius: BorderRadius.circular(4),
-                        border: Border.all(
-                          color: _getBorderColor(context, hasAmount),
-                          width: 1,
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(width: 4),
-
-                  // Sparkle 图标按钮
-                  Padding(
-                    padding: const EdgeInsets.only(right: 16),
-                    child: CupertinoButton(
-                      padding: EdgeInsets.zero,
-                      minimumSize: Size.zero,
-                      onPressed: _isLoadingMacros ? null : _onSparklePressed,
-                      child: _isLoadingMacros
-                          ? const CupertinoActivityIndicator(radius: 8)
-                          : Icon(
-                              CupertinoIcons.sparkles,
-                              color: canFetch
-                                  ? AppColors.primary
-                                  : CupertinoColors.quaternaryLabel.resolveFrom(
-                                      context,
-                                    ),
-                              size: 20,
-                            ),
-                    ),
-                  ),
-                ],
-              ),
-
-              // 错误提示（可选）
-              if (_aiErrorMessage != null) ...[
-                const SizedBox(height: 4),
-                Text(
-                  _aiErrorMessage!,
-                  style: AppTextStyles.tabLabel.copyWith(
-                    color: CupertinoColors.systemRed,
+              // Number Badge
+              Container(
+                width: 20,
+                height: 20,
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                alignment: Alignment.center,
+                child: Text(
+                  '${widget.index + 1}',
+                  style: AppTextStyles.caption2.copyWith(
+                    color: AppColors.primary,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-              ],
+              ),
+              const SizedBox(width: 8),
 
-              const SizedBox(height: 6),
+              // Food Name Input
+              Expanded(
+                flex: 3,
+                child: _buildCompactInput(
+                  context,
+                  controller: _foodController,
+                  placeholder: '食物名称',
+                  onChanged: (value) {
+                    setState(() {
+                      if (_showValidationError && value.trim().isNotEmpty) {
+                        _showValidationError = false;
+                      }
+                    });
+                    if (widget.onFoodChanged != null) {
+                      widget.onFoodChanged!(value);
+                    }
+                  },
+                  hasError: _showValidationError && !hasFood,
+                ),
+              ),
 
-              // 第二行：营养数据输入框
-              Row(
-                children: [
-                  // 蛋白质
-                  Expanded(
-                    child: _buildNutritionField(
-                      context: context,
-                      controller: _proteinController,
-                      label: '蛋白质(g)',
-                      onChanged: (value) {
-                        final num = double.tryParse(value);
-                        if (num != null && widget.onProteinChanged != null) {
-                          widget.onProteinChanged!(num);
-                        }
-                      },
-                    ),
+              const SizedBox(width: 8),
+
+              // Amount Input
+              Expanded(
+                flex: 2,
+                child: _buildCompactInput(
+                  context,
+                  controller: _amountController,
+                  placeholder: '分量',
+                  onChanged: (value) {
+                    setState(() {
+                      if (_showValidationError && value.trim().isNotEmpty) {
+                        _showValidationError = false;
+                      }
+                    });
+                    if (widget.onAmountChanged != null) {
+                      widget.onAmountChanged!(value);
+                    }
+                  },
+                  hasError: _showValidationError && !hasAmount,
+                ),
+              ),
+
+              const SizedBox(width: 8),
+
+              // Sparkle Button
+              CupertinoButton(
+                padding: EdgeInsets.zero,
+                minimumSize: Size.zero,
+                onPressed: _isLoadingMacros ? null : _onSparklePressed,
+                child: _isLoadingMacros
+                    ? const CupertinoActivityIndicator(radius: 8)
+                    : Icon(
+                        CupertinoIcons.sparkles,
+                        color: canFetch
+                            ? AppColors.primary
+                            : CupertinoColors.quaternaryLabel.resolveFrom(
+                                context,
+                              ),
+                        size: 18,
+                      ),
+              ),
+
+              const SizedBox(width: 8),
+
+              // Delete Button
+              if (widget.onDelete != null)
+                CupertinoButton(
+                  padding: EdgeInsets.zero,
+                  minimumSize: Size.zero,
+                  onPressed: widget.onDelete,
+                  child: Icon(
+                    CupertinoIcons.minus_circle_fill,
+                    color: CupertinoColors.systemRed.resolveFrom(context),
+                    size: 20,
                   ),
-                  const SizedBox(width: 6),
+                ),
+            ],
+          ),
 
-                  // 碳水
-                  Expanded(
-                    child: _buildNutritionField(
-                      context: context,
-                      controller: _carbsController,
-                      label: '碳水(g)',
-                      onChanged: (value) {
-                        final num = double.tryParse(value);
-                        if (num != null && widget.onCarbsChanged != null) {
-                          widget.onCarbsChanged!(num);
-                        }
-                      },
-                    ),
-                  ),
-                  const SizedBox(width: 6),
+          // Error Message
+          if (_aiErrorMessage != null) ...[
+            const SizedBox(height: 4),
+            Text(
+              _aiErrorMessage!,
+              style: AppTextStyles.caption2.copyWith(
+                color: CupertinoColors.systemRed,
+              ),
+            ),
+          ],
 
-                  // 脂肪
-                  Expanded(
-                    child: _buildNutritionField(
-                      context: context,
-                      controller: _fatController,
-                      label: '脂肪(g)',
-                      onChanged: (value) {
-                        final num = double.tryParse(value);
-                        if (num != null && widget.onFatChanged != null) {
-                          widget.onFatChanged!(num);
-                        }
-                      },
-                    ),
-                  ),
-                  const SizedBox(width: 6),
+          const SizedBox(height: 8),
 
-                  // 卡路里
-                  Expanded(
-                    child: _buildNutritionField(
-                      context: context,
-                      controller: _caloriesController,
-                      label: '卡路里',
-                      onChanged: (value) {
-                        final num = double.tryParse(value);
-                        if (num != null && widget.onCaloriesChanged != null) {
-                          widget.onCaloriesChanged!(num);
-                        }
-                      },
-                    ),
-                  ),
-                ],
+          // Row 2: Macros Inputs
+          Row(
+            children: [
+              Expanded(
+                child: _buildNutritionField(
+                  context: context,
+                  controller: _proteinController,
+                  label: '蛋白质',
+                  onChanged: (value) {
+                    final num = double.tryParse(value);
+                    if (num != null && widget.onProteinChanged != null) {
+                      widget.onProteinChanged!(num);
+                    }
+                  },
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: _buildNutritionField(
+                  context: context,
+                  controller: _carbsController,
+                  label: '碳水',
+                  onChanged: (value) {
+                    final num = double.tryParse(value);
+                    if (num != null && widget.onCarbsChanged != null) {
+                      widget.onCarbsChanged!(num);
+                    }
+                  },
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: _buildNutritionField(
+                  context: context,
+                  controller: _fatController,
+                  label: '脂肪',
+                  onChanged: (value) {
+                    final num = double.tryParse(value);
+                    if (num != null && widget.onFatChanged != null) {
+                      widget.onFatChanged!(num);
+                    }
+                  },
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: _buildNutritionField(
+                  context: context,
+                  controller: _caloriesController,
+                  label: '卡路里',
+                  onChanged: (value) {
+                    final num = double.tryParse(value);
+                    if (num != null && widget.onCaloriesChanged != null) {
+                      widget.onCaloriesChanged!(num);
+                    }
+                  },
+                ),
               ),
             ],
           ),
-        ),
+        ],
+      ),
+    );
+  }
 
-        // 右上角删除按钮
-        if (widget.onDelete != null)
-          Positioned(
-            top: -6,
-            right: -6,
-            child: Container(
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: CupertinoColors.systemBackground.resolveFrom(context),
-                boxShadow: [
-                  BoxShadow(
-                    color: CupertinoColors.black.withOpacity(0.1),
-                    blurRadius: 4,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: CupertinoButton(
-                padding: EdgeInsets.zero,
-                onPressed: widget.onDelete, minimumSize: Size(24, 24),
-                child: Icon(
-                  CupertinoIcons.xmark_circle_fill,
-                  color: CupertinoColors.systemRed.resolveFrom(context),
-                  size: 24,
-                ),
-              ),
-            ),
-          ),
-      ],
+  Widget _buildCompactInput(
+    BuildContext context, {
+    required TextEditingController controller,
+    required String placeholder,
+    required ValueChanged<String> onChanged,
+    bool hasError = false,
+  }) {
+    return SizedBox(
+      height: 32,
+      child: CupertinoTextField(
+        controller: controller,
+        placeholder: placeholder,
+        onChanged: onChanged,
+        style: AppTextStyles.caption1.copyWith(fontWeight: FontWeight.w500),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+        decoration: BoxDecoration(
+          color: CupertinoColors.systemGrey6.resolveFrom(context),
+          borderRadius: BorderRadius.circular(6),
+          border: hasError
+              ? Border.all(color: CupertinoColors.systemRed, width: 1)
+              : null,
+        ),
+        placeholderStyle: AppTextStyles.caption1.copyWith(
+          color: CupertinoColors.placeholderText,
+        ),
+      ),
     );
   }
 
@@ -759,25 +729,30 @@ class _FoodItemRowState extends State<FoodItemRow>
     required ValueChanged<String> onChanged,
   }) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Text(
           label,
-          style: AppTextStyles.tabLabel.copyWith(
+          style: AppTextStyles.caption2.copyWith(
             color: CupertinoColors.secondaryLabel.resolveFrom(context),
+            fontSize: 10,
           ),
         ),
         const SizedBox(height: 2),
-        CupertinoTextField(
-          controller: controller,
-          placeholder: '0',
-          onChanged: onChanged,
-          keyboardType: const TextInputType.numberWithOptions(decimal: true),
-          style: AppTextStyles.caption1,
-          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-          decoration: BoxDecoration(
-            color: CupertinoColors.systemGrey6.resolveFrom(context),
-            borderRadius: BorderRadius.circular(4),
+        SizedBox(
+          height: 28,
+          child: CupertinoTextField(
+            controller: controller,
+            placeholder: '0',
+            onChanged: onChanged,
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            style: AppTextStyles.caption2.copyWith(fontWeight: FontWeight.w500),
+            textAlign: TextAlign.center,
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 0),
+            decoration: BoxDecoration(
+              color: CupertinoColors.systemGrey6.resolveFrom(context),
+              borderRadius: BorderRadius.circular(4),
+            ),
           ),
         ),
       ],

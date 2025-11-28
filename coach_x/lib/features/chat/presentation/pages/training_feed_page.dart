@@ -30,77 +30,274 @@ class TrainingFeedPage extends ConsumerStatefulWidget {
   ConsumerState<TrainingFeedPage> createState() => _TrainingFeedPageState();
 }
 
-class _TrainingFeedPageState extends ConsumerState<TrainingFeedPage> {
+enum _ActiveSheet { none, detail, comment }
+
+class _TrainingFeedPageState extends ConsumerState<TrainingFeedPage>
+    with SingleTickerProviderStateMixin {
   late PageController _pageController;
+  late AnimationController _sheetAnimationController;
+  _ActiveSheet _activeSheet = _ActiveSheet.none;
+  dynamic _selectedFeedItem;
+  double _sheetHeight = 0.0;
+  final DraggableScrollableController _sheetController =
+      DraggableScrollableController();
 
   @override
   void initState() {
     super.initState();
     final initialIndex = ref.read(currentFeedIndexProvider);
     _pageController = PageController(initialPage: initialIndex);
+    _sheetAnimationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
   }
 
   @override
   void dispose() {
     _pageController.dispose();
+    _sheetController.dispose();
+    _sheetAnimationController.dispose();
     super.dispose();
+  }
+
+  void _closeSheet() {
+    _sheetAnimationController.reverse().then((_) {
+      if (mounted) {
+        setState(() {
+          _activeSheet = _ActiveSheet.none;
+          _sheetHeight = 0.0;
+          _selectedFeedItem = null;
+        });
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final feedItemsAsync = ref.watch(feedItemsProvider(widget.dailyTrainingId));
+    final feedItemsState = ref.watch(feedItemsNotifierProvider(widget.dailyTrainingId));
+    final feedItems = feedItemsState.items;
+    final currentIndex = ref.watch(currentFeedIndexProvider);
 
     return CupertinoPageScaffold(
+      backgroundColor: CupertinoColors.black,
       navigationBar: CupertinoNavigationBar(
-        middle: Text(widget.studentName, style: AppTextStyles.navTitle),
-        trailing: _buildInfoButton(),
+        backgroundColor: CupertinoColors.black,
+        border: null,
+        middle: feedItems.isEmpty || currentIndex >= feedItems.length
+            ? Text(
+                widget.studentName,
+                style: AppTextStyles.navTitle.copyWith(
+                  color: CupertinoColors.white,
+                ),
+              )
+            : Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    widget.studentName,
+                    style: AppTextStyles.navTitle.copyWith(
+                      color: CupertinoColors.white,
+                      fontSize: 14,
+                    ),
+                  ),
+                  Text(
+                    '${feedItemsState.reviewedCount}/${feedItemsState.totalContentCount}',
+                    style: AppTextStyles.caption1.copyWith(
+                      color: CupertinoColors.white.withOpacity(0.7),
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+              ),
+        leading: CupertinoButton(
+          padding: EdgeInsets.zero,
+          child: const Icon(CupertinoIcons.back, color: CupertinoColors.white),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
       ),
       child: SafeArea(
-        child: feedItemsAsync.when(
-          data: (feedItems) {
-            if (feedItems.isEmpty) {
-              return Center(
-                child: Text(l10n.noTrainingRecords, style: AppTextStyles.body),
-              );
-            }
+        bottom: false,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final availableHeight = constraints.maxHeight;
 
-            return PageView.builder(
-              controller: _pageController,
-              scrollDirection: Axis.vertical,
-              itemCount: feedItems.length,
-              onPageChanged: (index) {
-                ref.read(currentFeedIndexProvider.notifier).state = index;
-              },
-              itemBuilder: (context, index) {
-                final feedItem = feedItems[index];
+            return Stack(
+              children: [
+                // Layer 1: Content (Video/Feed)
+                // Shrinks to top when sheet is open
+                AnimatedBuilder(
+                  animation: _sheetAnimationController,
+                  builder: (context, child) {
+                    // Calculate the actual visible height of the sheet
+                    // During animation: sheetHeight * animationValue
+                    // During drag: sheetHeight (animationValue is 1.0)
+                    final visibleSheetHeight =
+                        _sheetHeight * _sheetAnimationController.value;
 
-                return _buildFeedItem(feedItem);
-              },
+                    return Positioned(
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      bottom: visibleSheetHeight * availableHeight,
+                      child: child!,
+                    );
+                  },
+                  child: feedItemsState.isLoading
+                      ? const Center(
+                          child: CupertinoActivityIndicator(
+                            color: CupertinoColors.white,
+                          ),
+                        )
+                      : feedItemsState.error != null
+                          ? Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    l10n.error,
+                                    style: AppTextStyles.title3.copyWith(
+                                      color: CupertinoColors.white,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 12),
+                                  Text(
+                                    feedItemsState.error!,
+                                    style: AppTextStyles.body.copyWith(
+                                      color: CupertinoColors.white,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                  const SizedBox(height: 24),
+                                  CupertinoButton.filled(
+                                    onPressed: () {
+                                      ref
+                                          .read(feedItemsNotifierProvider(
+                                                  widget.dailyTrainingId)
+                                              .notifier)
+                                          .refresh();
+                                    },
+                                    child: Text(l10n.retry),
+                                  ),
+                                ],
+                              ),
+                            )
+                          : feedItems.isEmpty
+                              ? Center(
+                                  child: Text(
+                                    l10n.noTrainingRecords,
+                                    style: AppTextStyles.body.copyWith(
+                                      color: CupertinoColors.white,
+                                    ),
+                                  ),
+                                )
+                              : PageView.builder(
+                                  controller: _pageController,
+                                  scrollDirection: Axis.vertical,
+                                  itemCount: feedItems.length,
+                                  onPageChanged: (index) {
+                                    // 更新当前索引
+                                    final previousIndex = ref.read(currentFeedIndexProvider);
+                                    ref
+                                        .read(currentFeedIndexProvider.notifier)
+                                        .state = index;
+
+                                    // 上滑时，标记前一个 Feed Item 为已批阅
+                                    if (index > previousIndex && previousIndex < feedItems.length) {
+                                      final previousItem = feedItems[previousIndex];
+                                      // 只标记内容项（排除 Completion Item）
+                                      if (previousItem.type.isContentItem) {
+                                        ref
+                                            .read(feedItemsNotifierProvider(
+                                                    widget.dailyTrainingId)
+                                                .notifier)
+                                            .markItemReviewed(previousItem.id);
+                                      }
+                                    }
+                                  },
+                                  itemBuilder: (context, index) {
+                                    final feedItem = feedItems[index];
+                                    return _buildFeedItem(feedItem);
+                                  },
+                                ),
+                ),
+
+                // Layer 1.5: Barrier (Disable video interaction)
+                if (_activeSheet != _ActiveSheet.none)
+                  Positioned.fill(
+                    child: GestureDetector(
+                      behavior: HitTestBehavior.translucent,
+                      onTap: _closeSheet,
+                      child: Container(color: const Color(0x00000000)),
+                    ),
+                  ),
+
+                // Layer 2: Bottom Sheet
+                if (_activeSheet != _ActiveSheet.none &&
+                    _selectedFeedItem != null)
+                  NotificationListener<DraggableScrollableNotification>(
+                    onNotification: (notification) {
+                      // Update sheet height for video resizing
+                      setState(() {
+                        _sheetHeight = notification.extent;
+                      });
+
+                      // Auto-close if dragged down significantly
+                      if (notification.extent <= 0.05) {
+                        _closeSheet();
+                      }
+                      return true;
+                    },
+                    child: SlideTransition(
+                      position:
+                          Tween<Offset>(
+                            begin: const Offset(0, 1),
+                            end: Offset.zero,
+                          ).animate(
+                            CurvedAnimation(
+                              parent: _sheetAnimationController,
+                              curve: Curves.easeOutCubic,
+                            ),
+                          ),
+                      child: DraggableScrollableSheet(
+                        controller: _sheetController,
+                        snap: true,
+                        snapSizes: _activeSheet == _ActiveSheet.detail
+                            ? [0.0, 0.5, 0.65]
+                            : [0.0, 0.7, 0.95],
+                        initialChildSize: _activeSheet == _ActiveSheet.detail
+                            ? 0.5
+                            : 0.7,
+                        minChildSize: 0.0,
+                        maxChildSize: _activeSheet == _ActiveSheet.detail
+                            ? 0.65
+                            : 0.95,
+                        builder: (context, scrollController) {
+                          if (_activeSheet == _ActiveSheet.detail) {
+                            return FeedDetailSheet(
+                              feedItem: _selectedFeedItem,
+                              scrollController: scrollController,
+                              onClose: _closeSheet,
+                            );
+                          } else {
+                            return FeedCommentSheetWidget(
+                              dailyTrainingId: widget.dailyTrainingId,
+                              studentId: widget.studentId,
+                              exerciseTemplateId:
+                                  _selectedFeedItem.exerciseTemplateId,
+                              exerciseName: _selectedFeedItem.exerciseName,
+                              scrollController: scrollController,
+                              onClose: _closeSheet,
+                            );
+                          }
+                        },
+                      ),
+                    ),
+                  ),
+              ],
             );
           },
-          loading: () => const Center(child: CupertinoActivityIndicator()),
-          error: (error, stackTrace) => Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(l10n.error, style: AppTextStyles.title3),
-                const SizedBox(height: 12),
-                Text(
-                  error.toString(),
-                  style: AppTextStyles.body,
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 24),
-                CupertinoButton.filled(
-                  onPressed: () {
-                    ref.invalidate(feedItemsProvider(widget.dailyTrainingId));
-                  },
-                  child: Text(l10n.retry),
-                ),
-              ],
-            ),
-          ),
         ),
       ),
     );
@@ -113,6 +310,7 @@ class _TrainingFeedPageState extends ConsumerState<TrainingFeedPage> {
           feedItem: feedItem,
           onCommentTap: () => _showCommentSheet(feedItem),
           onDetailTap: () => _showDetailSheet(feedItem),
+          isSheetOpen: _activeSheet != _ActiveSheet.none,
         );
 
       case FeedItemType.textCard:
@@ -131,60 +329,32 @@ class _TrainingFeedPageState extends ConsumerState<TrainingFeedPage> {
   }
 
   void _showCommentSheet(feedItem) {
-    FeedCommentSheet.show(
-      context,
-      dailyTrainingId: widget.dailyTrainingId,
-      studentId: widget.studentId,
-      exerciseTemplateId: feedItem.exerciseTemplateId,
-      exerciseName: feedItem.exerciseName,
-    );
+    setState(() {
+      _activeSheet = _ActiveSheet.comment;
+      _selectedFeedItem = feedItem;
+      _sheetHeight = 0.7; // Set initial target height
+    });
+    _sheetAnimationController.forward();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_sheetController.isAttached) {
+        _sheetController.jumpTo(0.7);
+      }
+    });
   }
 
   void _showDetailSheet(feedItem) {
-    FeedDetailBottomSheet.show(context, feedItem: feedItem);
-  }
+    setState(() {
+      _activeSheet = _ActiveSheet.detail;
+      _selectedFeedItem = feedItem;
+      _sheetHeight = 0.5; // Set initial target height
+    });
+    _sheetAnimationController.forward();
 
-  Widget _buildInfoButton() {
-    return CupertinoButton(
-      padding: EdgeInsets.zero,
-      onPressed: () {
-        // TODO: 显示训练记录概览
-        _showTrainingInfo();
-      },
-      child: const Icon(CupertinoIcons.info_circle, size: 24),
-    );
-  }
-
-  void _showTrainingInfo() {
-    final l10n = AppLocalizations.of(context)!;
-    final dailyTrainingAsync = ref.read(
-      dailyTrainingStreamProvider(widget.dailyTrainingId).future,
-    );
-
-    showCupertinoDialog(
-      context: context,
-      builder: (context) => CupertinoAlertDialog(
-        title: Text(l10n.trainingInfo),
-        content: FutureBuilder(
-          future: dailyTrainingAsync,
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              final training = snapshot.data!;
-              return Text(
-                '${l10n.trainingDate}: ${training.date}\n'
-                '${l10n.totalExercises}: ${training.exercises?.length ?? 0}',
-              );
-            }
-            return const CupertinoActivityIndicator();
-          },
-        ),
-        actions: [
-          CupertinoDialogAction(
-            child: Text(l10n.ok),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-        ],
-      ),
-    );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_sheetController.isAttached) {
+        _sheetController.jumpTo(0.5);
+      }
+    });
   }
 }

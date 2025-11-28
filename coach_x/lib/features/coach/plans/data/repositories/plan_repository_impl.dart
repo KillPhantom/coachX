@@ -326,7 +326,7 @@ class PlanRepositoryImpl implements PlanRepository {
         '👥 ${action == 'assign' ? '分配' : '取消分配'}计划: $planType/$planId 给 ${studentIds.length} 位学生',
       );
 
-      final result = await CloudFunctionsService.call('assignPlan', {
+      final result = await CloudFunctionsService.call('assign_plan', {
         'action': action,
         'planType': planType,
         'planId': planId,

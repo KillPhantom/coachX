@@ -78,8 +78,11 @@ class _FeedbackInputBarState extends ConsumerState<FeedbackInputBar> {
                     controller: _textController,
                     enabled: !isSubmitting && !voiceState.isRecording,
                     onChanged: (value) {
+                      print('🔍 [FeedbackInputBar] Text changed: "$value"');
                       ref.read(feedbackTextInputProvider.notifier).state =
                           value;
+                      final updatedValue = ref.read(feedbackTextInputProvider);
+                      print('📊 [FeedbackInputBar] Provider updated to: "$updatedValue"');
                     },
                   ),
                 ),
@@ -113,9 +116,12 @@ class _FeedbackInputBarState extends ConsumerState<FeedbackInputBar> {
     final voiceState = ref.read(feedbackVoiceStateProvider);
     final imageState = ref.read(feedbackImageStateProvider);
 
-    return textInput.trim().isNotEmpty ||
+    final canSend = textInput.trim().isNotEmpty ||
         voiceState.isCompleted ||
         imageState != null;
+
+    print('🔍 [_canSend] textInput: "$textInput", voiceCompleted: ${voiceState.isCompleted}, hasImage: ${imageState != null}, canSend: $canSend');
+    return canSend;
   }
 
   // ==================== 语音录制处理 ====================
@@ -252,25 +258,43 @@ class _FeedbackInputBarState extends ConsumerState<FeedbackInputBar> {
   // ==================== 发送处理 ====================
 
   void _handleSend() async {
+    print('🔍 [_handleSend] Called');
     final textInput = ref.read(feedbackTextInputProvider);
-    if (textInput.trim().isEmpty) return;
+    print('📊 [_handleSend] textInput from provider: "$textInput"');
 
+    if (textInput.trim().isEmpty) {
+      print('❌ [_handleSend] Text is empty, returning');
+      return;
+    }
+
+    print('✅ [_handleSend] Calling _sendTextFeedback with: "${textInput.trim()}"');
     await _sendTextFeedback(textInput.trim());
   }
 
   Future<void> _sendTextFeedback(String text) async {
     try {
-      ref.read(isSubmittingFeedbackProvider.notifier).state = true;
+      print('📤 [_sendTextFeedback] Start');
+      print('📊 [_sendTextFeedback] text: "$text"');
+      print('📊 [_sendTextFeedback] dailyTrainingId: ${widget.dailyTrainingId}');
+      print('📊 [_sendTextFeedback] exerciseTemplateId: ${widget.exerciseTemplateId}');
+      print('📊 [_sendTextFeedback] exerciseName: ${widget.exerciseName}');
 
+      ref.read(isSubmittingFeedbackProvider.notifier).state = true;
+      print('📊 [_sendTextFeedback] isSubmitting set to true');
+
+      print('📊 [_sendTextFeedback] Fetching reviewData...');
       final reviewData = await ref.read(
         reviewPageDataProvider(widget.dailyTrainingId).future,
       );
 
       if (reviewData == null) {
+        print('❌ [_sendTextFeedback] reviewData is null');
         throw Exception('Review data not found');
       }
+      print('✅ [_sendTextFeedback] reviewData fetched successfully');
 
       final repository = ref.read(feedbackRepositoryProvider);
+      print('📊 [_sendTextFeedback] Calling repository.addFeedback...');
       await repository.addFeedback(
         dailyTrainingId: widget.dailyTrainingId,
         studentId: reviewData.dailyTraining.studentId,
@@ -281,13 +305,16 @@ class _FeedbackInputBarState extends ConsumerState<FeedbackInputBar> {
         feedbackType: 'text',
         textContent: text,
       );
+      print('✅ [_sendTextFeedback] repository.addFeedback completed');
 
       // 清空输入
       _textController.clear();
       ref.read(feedbackTextInputProvider.notifier).state = '';
+      print('📊 [_sendTextFeedback] Input cleared');
 
       AppLogger.info('发送文字反馈成功');
     } catch (e, stackTrace) {
+      print('❌ [_sendTextFeedback] Error: $e');
       AppLogger.error('发送文字反馈失败', e, stackTrace);
       if (mounted) {
         final l10n = AppLocalizations.of(context)!;
@@ -295,6 +322,7 @@ class _FeedbackInputBarState extends ConsumerState<FeedbackInputBar> {
       }
     } finally {
       ref.read(isSubmittingFeedbackProvider.notifier).state = false;
+      print('📊 [_sendTextFeedback] isSubmitting set to false');
     }
   }
 
@@ -616,8 +644,12 @@ class _SendButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print('🔍 [_SendButton] build, enabled: $enabled');
     return GestureDetector(
-      onTap: enabled ? onTap : null,
+      onTap: enabled ? () {
+        print('🔍 [_SendButton] onTap triggered!');
+        onTap();
+      } : null,
       child: Container(
         width: 40,
         height: 40,

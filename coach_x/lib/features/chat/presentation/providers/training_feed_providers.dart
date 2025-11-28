@@ -3,17 +3,27 @@ import '../../data/repositories/training_feed_repository.dart';
 import '../../data/repositories/training_feed_repository_impl.dart';
 import '../../data/models/training_feed_item.dart';
 import '../../../student/home/data/models/daily_training_model.dart';
+import 'feed_items_notifier.dart';
 
 /// Repository Provider
 final trainingFeedRepositoryProvider = Provider<TrainingFeedRepository>((ref) {
   return TrainingFeedRepositoryImpl();
 });
 
-/// Feed Items Provider
-final feedItemsProvider = FutureProvider.family<List<TrainingFeedItem>, String>(
-  (ref, dailyTrainingId) async {
-    final repository = ref.watch(trainingFeedRepositoryProvider);
-    return repository.generateFeedItems(dailyTrainingId);
+/// Feed Items Notifier Provider
+final feedItemsNotifierProvider = StateNotifierProvider.family<
+    FeedItemsNotifier,
+    FeedItemsState,
+    String>((ref, dailyTrainingId) {
+  final repository = ref.watch(trainingFeedRepositoryProvider);
+  return FeedItemsNotifier(repository, dailyTrainingId);
+});
+
+/// Feed Items Provider (computed from notifier state)
+final feedItemsProvider = Provider.family<List<TrainingFeedItem>, String>(
+  (ref, dailyTrainingId) {
+    final state = ref.watch(feedItemsNotifierProvider(dailyTrainingId));
+    return state.items;
   },
 );
 

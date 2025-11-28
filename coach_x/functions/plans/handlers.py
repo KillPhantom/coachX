@@ -993,9 +993,6 @@ def _validate_diet_plan_data(plan_data: Dict[str, Any]) -> str:
         if not isinstance(meals, list):
             return f'第 {i+1} 个饮食日的 meals 必须是数组'
 
-        if len(meals) == 0:
-            return f'第 {i+1} 个饮食日至少需要一个餐次'
-
         # 验证每个餐次
         for j, meal in enumerate(meals):
             if not isinstance(meal, dict):

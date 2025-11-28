@@ -1,17 +1,15 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart' show Divider;
+import 'package:flutter/material.dart' show Colors;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:coach_x/l10n/app_localizations.dart';
 import 'package:coach_x/core/theme/app_theme.dart';
 import 'package:coach_x/core/widgets/keyboard_adaptive_padding.dart';
-import 'package:coach_x/core/widgets/video_upload_section.dart';
-import 'package:coach_x/core/enums/video_source.dart';
-import 'package:coach_x/core/models/video_upload_state.dart';
 import 'package:coach_x/core/services/auth_service.dart';
 import '../../data/models/exercise_template_model.dart';
-import '../providers/exercise_library_providers.dart';
-import 'tag_selector.dart';
-import 'image_upload_grid.dart';
+import 'package:coach_x/features/coach/exercise_library/presentation/providers/exercise_library_providers.dart';
+import 'package:coach_x/features/coach/exercise_library/data/models/exercise_tag_model.dart';
+import 'package:coach_x/features/coach/exercise_library/presentation/widgets/tag_selector.dart';
+import 'unified_media_upload_section.dart';
 
 /// Create Exercise Sheet - 创建/编辑动作底部弹窗
 ///
@@ -44,7 +42,6 @@ class _CreateExerciseSheetState extends ConsumerState<CreateExerciseSheet> {
   List<String> _videoUrls = [];
   List<String> _thumbnailUrls = [];
   List<String> _imageUrls = [];
-  List<VideoUploadState> _initialVideos = [];
   bool _isSaving = false;
 
   bool get _isEditMode => widget.template != null;
@@ -65,17 +62,6 @@ class _CreateExerciseSheetState extends ConsumerState<CreateExerciseSheet> {
       _videoUrls = List.from(widget.template!.videoUrls);
       _thumbnailUrls = List.from(widget.template!.thumbnailUrls);
       _imageUrls = List.from(widget.template!.imageUrls);
-
-      // 构建初始视频状态列表（包含缩略图信息）
-      _initialVideos = [];
-      for (int i = 0; i < _videoUrls.length; i++) {
-        _initialVideos.add(
-          VideoUploadState.completed(
-            _videoUrls[i],
-            thumbnailUrl: i < _thumbnailUrls.length ? _thumbnailUrls[i] : null,
-          ),
-        );
-      }
     }
   }
 
@@ -93,7 +79,7 @@ class _CreateExerciseSheetState extends ConsumerState<CreateExerciseSheet> {
 
     return KeyboardAdaptivePadding(
       child: Container(
-        height: MediaQuery.of(context).size.height * 0.9,
+        height: MediaQuery.of(context).size.height * 0.5,
         decoration: const BoxDecoration(
           color: AppColors.backgroundWhite,
           borderRadius: BorderRadius.vertical(top: Radius.circular(24.0)),
@@ -103,15 +89,24 @@ class _CreateExerciseSheetState extends ConsumerState<CreateExerciseSheet> {
           child: Column(
             children: [
               // 顶部拖拽条
-              Padding(
-                padding: const EdgeInsets.only(top: 12.0, bottom: 8.0),
-                child: Center(
-                  child: Container(
-                    width: 40.0,
-                    height: 4.0,
-                    decoration: BoxDecoration(
-                      color: AppColors.dividerLight,
-                      borderRadius: BorderRadius.circular(2.0),
+              GestureDetector(
+                onVerticalDragUpdate: (details) {
+                  if (details.primaryDelta! > 0) {
+                    Navigator.of(context).pop();
+                  }
+                },
+                child: Container(
+                  color: Colors.transparent, // Expand hit test area
+                  width: double.infinity,
+                  padding: const EdgeInsets.only(top: 12.0, bottom: 8.0),
+                  child: Center(
+                    child: Container(
+                      width: 40.0,
+                      height: 4.0,
+                      decoration: BoxDecoration(
+                        color: AppColors.dividerLight,
+                        borderRadius: BorderRadius.circular(2.0),
+                      ),
                     ),
                   ),
                 ),
@@ -125,13 +120,23 @@ class _CreateExerciseSheetState extends ConsumerState<CreateExerciseSheet> {
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Text(
-                      _isEditMode ? l10n.editExercise : l10n.createExercise,
-                      style: AppTextStyles.callout.copyWith(
-                        fontWeight: FontWeight.w600,
+                    // 动作名称（Title Style）
+                    Expanded(
+                      child: CupertinoTextField(
+                        controller: _nameController,
+                        placeholder: 'Exercise Name',
+                        placeholderStyle: AppTextStyles.title3.copyWith(
+                          color: AppColors.textTertiary,
+                        ),
+                        style: AppTextStyles.title3,
+                        padding: EdgeInsets.zero,
+                        decoration: null, // No border
+                        cursorColor: AppColors.primaryColor,
                       ),
                     ),
+                    const SizedBox(width: 16),
                     CupertinoButton(
                       padding: EdgeInsets.zero,
                       onPressed: _isSaving ? null : _save,
@@ -141,6 +146,7 @@ class _CreateExerciseSheetState extends ConsumerState<CreateExerciseSheet> {
                               l10n.save,
                               style: AppTextStyles.buttonMedium.copyWith(
                                 color: AppColors.primaryAction,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
                     ),
@@ -148,105 +154,74 @@ class _CreateExerciseSheetState extends ConsumerState<CreateExerciseSheet> {
                 ),
               ),
 
-              Divider(height: 1),
-
               // Body (可滚动)
               Expanded(
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(AppDimensions.spacingL),
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingL),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // 动作名称（必填）
-                      Text(l10n.exerciseName, style: AppTextStyles.callout),
-                      const SizedBox(height: AppDimensions.spacingS),
-                      CupertinoTextField(
-                        controller: _nameController,
-                        placeholder: l10n.exerciseNameHint,
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: AppColors.backgroundWhite,
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(
-                            color: AppColors.dividerLight,
-                            width: 1,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: AppDimensions.spacingL),
-
-                      // 标签选择（必填）
+                      // 标签选择（Dynamic + Allow Add）
                       TagSelector(
                         selectedTags: _selectedTags,
-                        availableTags: tags,
+                        availableTags: [
+                          ...tags,
+                          // Ensure selected tags are visible even if not in availableTags
+                          ..._selectedTags
+                              .where((tag) => !tags.any((t) => t.name == tag))
+                              .map((name) => ExerciseTagModel(
+                                    id: name, // Use name as ID for temp tags
+                                    name: name,
+                                    createdAt: DateTime.now(),
+                                  )),
+                        ],
+                        allowAdd: true,
+                        showTitle: false,
                         onTagsChanged: (newTags) {
                           setState(() {
                             _selectedTags = newTags;
                           });
                         },
                       ),
-                      const SizedBox(height: AppDimensions.spacingL),
+                      const SizedBox(height: AppDimensions.spacingM),
 
-                      // 指导视频（支持多视频）
-                      VideoUploadSection(
-                        storagePathPrefix:
-                            'exercise_videos/${AuthService.currentUserId}/',
-                        maxVideos: 5,
-                        maxSeconds: 300,
-                        videoSource: VideoSource.galleryOnly,
-                        cardWidth: 160,
-                        cardHeight: 120,
-                        initialVideos: _initialVideos,
-                        onUploadCompleted: (index, videoUrl, thumbnailUrl) {
-                          setState(() {
-                            if (index >= _videoUrls.length) {
-                              _videoUrls.add(videoUrl);
-                              _thumbnailUrls.add(thumbnailUrl ?? '');
-                            } else {
-                              _videoUrls[index] = videoUrl;
-                              _thumbnailUrls[index] = thumbnailUrl ?? '';
-                            }
-                          });
-                        },
-                        onVideoDeleted: (index) {
-                          setState(() {
-                            if (index < _videoUrls.length) {
-                              _videoUrls.removeAt(index);
-                              _thumbnailUrls.removeAt(index);
-                            }
-                          });
-                        },
+                      // Unified Media Section
+                      UnifiedMediaUploadSection(
+                        initialVideoUrls: _videoUrls,
+                        initialThumbnailUrls: _thumbnailUrls,
+                        initialImageUrls: _imageUrls,
+                        onVideoUrlsChanged: (urls) => _videoUrls = urls,
+                        onThumbnailUrlsChanged: (urls) => _thumbnailUrls = urls,
+                        onImageUrlsChanged: (urls) => _imageUrls = urls,
                       ),
-                      const SizedBox(height: AppDimensions.spacingL),
+                      const SizedBox(height: AppDimensions.spacingM),
 
-                      // 文字说明
-                      Text(l10n.textGuidance, style: AppTextStyles.callout),
-                      const SizedBox(height: AppDimensions.spacingS),
-                      CupertinoTextField(
-                        controller: _textGuidanceController,
-                        placeholder: l10n.textGuidanceHint,
-                        maxLines: 5,
-                        padding: const EdgeInsets.all(12),
+                      // 文字说明 (Highlighted)
+                      Container(
+                        padding: const EdgeInsets.all(AppDimensions.spacingS),
                         decoration: BoxDecoration(
-                          color: AppColors.backgroundWhite,
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(
-                            color: AppColors.dividerLight,
-                            width: 1,
+                          color: AppColors.backgroundSecondary,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: CupertinoTextField(
+                          controller: _textGuidanceController,
+                          placeholder: 'Add detailed guidance...',
+                          placeholderStyle: AppTextStyles.body.copyWith(
+                            color: AppColors.textTertiary,
+                            fontSize: 14,
                           ),
+                          style: AppTextStyles.body.copyWith(fontSize: 14),
+                          maxLines: 5,
+                          minLines: 3,
+                          padding: EdgeInsets.zero,
+                          decoration: null,
+                          cursorColor: AppColors.primaryColor,
                         ),
                       ),
-                      const SizedBox(height: AppDimensions.spacingL),
-
-                      // 辅助图片（可折叠）
-                      ImageUploadGrid(
-                        imageUrls: _imageUrls,
-                        onImagesChanged: (urls) {
-                          setState(() {
-                            _imageUrls = urls;
-                          });
-                        },
-                      ),
+                      
+                      // Bottom Padding
+                      const SizedBox(height: 40),
                     ],
                   ),
                 ),
@@ -267,6 +242,8 @@ class _CreateExerciseSheetState extends ConsumerState<CreateExerciseSheet> {
       return;
     }
 
+    // Tags are optional now? User said "change the tag to only keep Strength / Cardio". 
+    // Usually tags are required, but let's keep it required for now.
     if (_selectedTags.isEmpty) {
       _showError(l10n.atLeastOneTag);
       return;

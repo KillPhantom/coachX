@@ -82,6 +82,34 @@ class CreateDietPlanNotifier extends StateNotifier<CreateDietPlanState> {
     updateDay(dayIndex, updatedDay);
   }
 
+  /// 更新饮食日目标宏量营养素
+  void updateDayTargetMacros(
+    int dayIndex, {
+    double? protein,
+    double? carbs,
+    double? fat,
+  }) {
+    if (dayIndex < 0 || dayIndex >= state.days.length) return;
+
+    final day = state.days[dayIndex];
+    final currentTarget = day.targetMacros ?? day.macros;
+
+    final newProtein = protein ?? currentTarget.protein;
+    final newCarbs = carbs ?? currentTarget.carbs;
+    final newFat = fat ?? currentTarget.fat;
+    final newCalories = (newProtein * 4) + (newCarbs * 4) + (newFat * 9);
+
+    final updatedTarget = currentTarget.copyWith(
+      protein: newProtein,
+      carbs: newCarbs,
+      fat: newFat,
+      calories: newCalories,
+    );
+
+    final updatedDay = day.copyWith(targetMacros: updatedTarget);
+    updateDay(dayIndex, updatedDay);
+  }
+
   // ==================== 餐次管理 ====================
 
   /// 添加餐次
@@ -266,13 +294,6 @@ class CreateDietPlanNotifier extends StateNotifier<CreateDietPlanState> {
     // 验证每个饮食日
     for (int i = 0; i < state.days.length; i++) {
       final day = state.days[i];
-
-      // 验证至少有一个餐次
-      if (day.meals.isEmpty) {
-        errors.add('第 ${i + 1} 天至少需要添加一个餐次');
-        continue;
-      }
-
       // 验证每个餐次
       for (int j = 0; j < day.meals.length; j++) {
         final meal = day.meals[j];

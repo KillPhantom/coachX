@@ -73,11 +73,55 @@ class _EditingViewState extends ConsumerState<EditingView> {
     super.dispose();
   }
 
+  /// 滚动到高亮的 exercise card
+  void _scrollToHighlightedCard(int dayIndex, int? exerciseIndex) {
+    if (exerciseIndex == null) return;
+
+    final exerciseKey = '${dayIndex}_$exerciseIndex';
+    final globalKey = _exerciseKeys[exerciseKey];
+
+    if (globalKey?.currentContext != null) {
+      // 使用 Scrollable.ensureVisible 自动滚动到目标 widget
+      Scrollable.ensureVisible(
+        globalKey!.currentContext!,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+        alignment: 0.2, // 将卡片滚动到屏幕 20% 的位置（靠上）
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final isReviewMode = ref.watch(isReviewModeProvider);
     final reviewState = ref.watch(suggestionReviewNotifierProvider);
+
+    // 监听 Review Mode 高亮变化，自动切换 day 并滚动到目标卡片
+    ref.listen<SuggestionReviewState?>(suggestionReviewNotifierProvider, (
+      previous,
+      next,
+    ) {
+      if (!mounted) return;
+
+      // 当有新的 currentChange 时，自动切换 day 并滚动
+      if (next != null && next.currentChange != null && isReviewMode) {
+        final targetDayIndex = next.currentChange!.dayIndex;
+
+        // 如果目标 day 不同，先切换到目标 day
+        if (widget.selectedDayIndex != targetDayIndex) {
+          widget.onDayIndexChanged(targetDayIndex);
+        }
+
+        // 延迟执行，等待 UI 更新完成后滚动
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _scrollToHighlightedCard(
+            next.currentChange!.dayIndex,
+            next.currentChange!.exerciseIndex,
+          );
+        });
+      }
+    });
 
     return Column(
       children: [
@@ -118,7 +162,7 @@ class _EditingViewState extends ConsumerState<EditingView> {
                       vertical: 10,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.primaryText.withValues(alpha: 0.1),
+                      color: AppColors.primaryText.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
                         color: AppColors.primaryText.withValues(alpha: 0.3),
@@ -135,10 +179,7 @@ class _EditingViewState extends ConsumerState<EditingView> {
                         const SizedBox(width: 4),
                         Text(
                           l10n.addDay,
-                          style: AppTextStyles.footnote.copyWith(
-                            color: AppColors.primaryText,
-                            fontWeight: FontWeight.w600,
-                          ),
+                          style: AppTextStyles.footnote,
                         ),
                       ],
                     ),
@@ -164,18 +205,23 @@ class _EditingViewState extends ConsumerState<EditingView> {
               widget.selectedDayIndex != null &&
                   widget.selectedDayIndex! < widget.state.days.length
               ? DismissKeyboardOnScroll(
-                  child: SingleChildScrollView(
-                    controller: _exercisesScrollController,
-                    child: TrainingDayEditor(
-                      dayIndex: widget.selectedDayIndex!,
-                      exercisesWidget: _buildExercisesList(
-                        context,
-                        widget.selectedDayIndex!,
-                        widget.state.days[widget.selectedDayIndex!].exercises,
-                        isReviewMode: isReviewMode,
-                        reviewState: reviewState,
-                      ),
+                  child: TrainingDayEditor(
+                    dayIndex: widget.selectedDayIndex!,
+                    scrollController: _exercisesScrollController,
+                    exerciseCards: _buildExercisesList(
+                      context,
+                      widget.selectedDayIndex!,
+                      widget.state.days[widget.selectedDayIndex!].exercises,
+                      isReviewMode: isReviewMode,
+                      reviewState: reviewState,
                     ),
+                    onReorder: (oldIndex, newIndex) {
+                      widget.notifier.reorderExercise(
+                        widget.selectedDayIndex!,
+                        oldIndex,
+                        newIndex,
+                      );
+                    },
                   ),
                 )
               : Center(
@@ -233,11 +279,11 @@ class _EditingViewState extends ConsumerState<EditingView> {
                     width: double.infinity,
                     height: 50,
                     decoration: BoxDecoration(
-                      color: widget.state.canSave && !widget.state.isLoading
-                          ? AppColors.primary
-                          : CupertinoColors.quaternarySystemFill.resolveFrom(
+                      border  : widget.state.canSave && !widget.state.isLoading
+                          ? Border.all(color: AppColors.primary)
+                          : Border.all(color: CupertinoColors.quaternarySystemFill.resolveFrom(
                               context,
-                            ),
+                            )),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     alignment: Alignment.center,
@@ -377,7 +423,7 @@ class _EditingViewState extends ConsumerState<EditingView> {
     );
   }
 
-  Widget _buildExercisesList(
+  List<Widget> _buildExercisesList(
     BuildContext context,
     int dayIndex,
     List<Exercise> exercises, {
@@ -388,60 +434,61 @@ class _EditingViewState extends ConsumerState<EditingView> {
     final currentChange = reviewState?.currentChange;
 
     if (exercises.isEmpty) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 20),
-        child: Text(
-          l10n.noExercisesYet,
-          style: AppTextStyles.footnote.copyWith(
-            color: CupertinoColors.secondaryLabel,
+      return [
+        Padding(
+          key: const ValueKey('empty_placeholder'),
+          padding: const EdgeInsets.symmetric(vertical: 20),
+          child: Text(
+            l10n.noExercisesYet,
+            style: AppTextStyles.footnote.copyWith(
+              color: CupertinoColors.secondaryLabel,
+            ),
+            textAlign: TextAlign.center,
           ),
-          textAlign: TextAlign.center,
-        ),
-      );
+        )
+      ];
     }
 
-    return Column(
-      children: exercises.asMap().entries.map((entry) {
-        final exerciseIndex = entry.key;
-        final exercise = entry.value;
+    return exercises.asMap().entries.map((entry) {
+      final exerciseIndex = entry.key;
+      final exercise = entry.value;
 
-        final hasActiveSuggestion =
-            isReviewMode &&
-            currentChange != null &&
-            currentChange.dayIndex == dayIndex &&
-            currentChange.exerciseIndex == exerciseIndex;
+      final hasActiveSuggestion =
+          isReviewMode &&
+          currentChange != null &&
+          currentChange.dayIndex == dayIndex &&
+          currentChange.exerciseIndex == exerciseIndex;
 
-        final exerciseKey = '${dayIndex}_$exerciseIndex';
-        _exerciseKeys.putIfAbsent(exerciseKey, () => GlobalKey());
+      final exerciseKey = '${dayIndex}_$exerciseIndex';
+      _exerciseKeys.putIfAbsent(exerciseKey, () => GlobalKey());
 
-        return ExerciseCard(
-          key: _exerciseKeys[exerciseKey],
-          exercise: exercise,
-          index: exerciseIndex,
-          isExpanded: true,
-          onTap: null,
-          onDelete: () => widget.onDeleteExercise(dayIndex, exerciseIndex),
-          activeSuggestion: hasActiveSuggestion ? currentChange : null,
-          isHighlighted: hasActiveSuggestion,
-          onAcceptSuggestion: hasActiveSuggestion
-              ? widget.onAcceptSuggestion
-              : null,
-          onRejectSuggestion: hasActiveSuggestion
-              ? widget.onRejectSuggestion
-              : null,
-          onAcceptAll: hasActiveSuggestion ? widget.onAcceptAll : null,
-          onRejectAll: hasActiveSuggestion ? widget.onRejectAll : null,
-          suggestionProgress: reviewState?.progressText,
-          onAddSet: () => widget.onAddSet(dayIndex, exerciseIndex),
-          setsWidget: _buildSetsList(
-            context,
-            dayIndex,
-            exerciseIndex,
-            exercise.sets,
-          ),
-        );
-      }).toList(),
-    );
+      return ExerciseCard(
+        key: _exerciseKeys[exerciseKey],
+        exercise: exercise,
+        index: exerciseIndex,
+        initiallyExpanded: true,
+        onTap: null,
+        onDelete: () => widget.onDeleteExercise(dayIndex, exerciseIndex),
+        activeSuggestion: hasActiveSuggestion ? currentChange : null,
+        isHighlighted: hasActiveSuggestion,
+        onAcceptSuggestion: hasActiveSuggestion
+            ? widget.onAcceptSuggestion
+            : null,
+        onRejectSuggestion: hasActiveSuggestion
+            ? widget.onRejectSuggestion
+            : null,
+        onAcceptAll: hasActiveSuggestion ? widget.onAcceptAll : null,
+        onRejectAll: hasActiveSuggestion ? widget.onRejectAll : null,
+        suggestionProgress: reviewState?.progressText,
+        onAddSet: () => widget.onAddSet(dayIndex, exerciseIndex),
+        setsWidget: _buildSetsList(
+          context,
+          dayIndex,
+          exerciseIndex,
+          exercise.sets,
+        ),
+      );
+    }).toList();
   }
 
   Widget _buildSetsList(

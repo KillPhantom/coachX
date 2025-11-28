@@ -76,6 +76,7 @@ class StudentDetailPage extends ConsumerWidget {
                 child: StudentHistorySection(
                   recentTrainings: studentDetail.recentTrainings,
                   studentId: studentId,
+                  studentName: studentDetail.basicInfo.name,
                 ),
               ),
 

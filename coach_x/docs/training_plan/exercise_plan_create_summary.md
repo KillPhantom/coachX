@@ -441,7 +441,6 @@ initial → [返回] → 退出页面
 
 ### 相关文档
 
-- 实施进度：`CREATE_PLAN_PAGE_REFACTOR_EXECUTION.md`
 - 后端 API：`docs/backend_apis_and_document_db_schemas.md`
 - 原创建流程：本文档前面章节
 
@@ -698,11 +697,49 @@ if (exerciseTemplates != null && exerciseTemplates!.isNotEmpty)
 
 ### 相关文档
 
-- 执行计划：`docs/training_plan/ai_streaming_overview_implementation.md`
 - 后端 API：`docs/backend_apis_and_document_db_schemas.md`
 - 动作库实现：`docs/training_plan/exercise_library_implementation.md`
 
 ---
 
-**最后更新**: 2025-11-17
-**项目状态**: 📋 计划完成（等待执行）
+## 🎨 UI/UX 深度重构 (2025-11-19)
+
+### 概述
+基于 "Extension of Mind" (思维延伸) 设计理念，对文本导入和 AI 引导创建流程进行了深度重构，旨在降低认知负荷，提供更流畅的交互体验。
+
+### 1. TextImportView (智能文本画布)
+
+**设计理念**: Direct-to-Editing (直接编辑)
+- 摒弃了传统的 "选择模式 -> 操作" 流程。
+- 用户进入页面即处于编辑状态，无需点击开始。
+
+**核心特性**:
+- **全屏编辑器**: 类似 iOS 备忘录的沉浸式体验。
+- **智能追加**: 连续扫描图片时，OCR 识别内容自动追加到文末，光标自动定位。
+- **底部工具栏**: 集成扫描、示例、清空功能，操作触手可及。
+- **极简交互**: 移除冗余的确认弹窗，使用触觉反馈 (Haptic Feedback) 确认操作。
+
+**文件**: `lib/features/coach/plans/presentation/widgets/create_plan/text_import_view.dart`
+
+### 2. AIGuidedView (分步卡片流)
+
+**设计理念**: Progressive Card Flow (渐进式卡片流)
+- 将复杂的长表单拆解为 3 个专注的步骤。
+- 每次只让用户做 2-3 个关键决策。
+
+**步骤拆分**:
+1. **Step 1: 目标与水平** (The Goal) - 确定大方向。
+2. **Step 2: 时间与重点** (The Focus) - 分配时间预算和训练部位。
+3. **Step 3: 场景与微调** (The Context) - 确定训练环境。
+
+**智能特性**:
+- **参数推导**: 移除了 `exercisesPerDay` 和 `setsPerExercise` 等微观参数的手动设置。系统根据用户的 `TrainingLevel` 和 `durationMinutes` 自动推导最佳值。
+- **场景预设**: 提供 "健身房"、"居家"、"自重" 等一键预设，自动填充复杂的设备列表。
+- **可视化反馈**: 使用线性进度条和清晰的步骤标题。
+
+**文件**: `lib/features/coach/plans/presentation/widgets/create_plan/ai_guided_view.dart`
+
+---
+
+**最后更新**: 2025-11-19
+**项目状态**: ✅ 已完成

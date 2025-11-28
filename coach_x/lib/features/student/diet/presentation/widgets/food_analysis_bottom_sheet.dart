@@ -49,10 +49,50 @@ class _FoodAnalysisBottomSheetState
     });
   }
 
+  /// 检查meal是否已存在记录
+  bool _checkMealExists() {
+    final state = ref.read(aiFoodScannerProvider);
+    final todayTrainingAsync = ref.read(optimizedTodayTrainingProvider);
+
+    if (state.selectedMealName == null) return false;
+
+    final todayTraining = todayTrainingAsync.value;
+    if (todayTraining?.diet == null) return false;
+
+    return todayTraining!.diet!.meals.any(
+      (meal) => meal.name == state.selectedMealName,
+    );
+  }
+
   /// 保存记录
   Future<void> _handleSave() async {
     final l10n = AppLocalizations.of(context)!;
     final state = ref.read(aiFoodScannerProvider);
+
+    // 检查meal是否已存在，如果存在则显示确认对话框
+    if (_checkMealExists()) {
+      final confirmed = await showCupertinoDialog<bool>(
+        context: context,
+        builder: (dialogContext) => CupertinoAlertDialog(
+          title: Text(l10n.mealRecordExists),
+          content: Text(l10n.confirmOverwriteMeal),
+          actions: [
+            CupertinoDialogAction(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: Text(l10n.cancel),
+            ),
+            CupertinoDialogAction(
+              isDestructiveAction: true,
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              child: Text(l10n.overwrite),
+            ),
+          ],
+        ),
+      );
+
+      // 用户取消，不继续保存
+      if (confirmed != true) return;
+    }
 
     try {
       // Simple Record 模式：如果图片未上传，先上传
@@ -312,10 +352,33 @@ class _FoodAnalysisBottomSheetState
         if (!state.isAnalyzing && state.foods.isNotEmpty)
           _buildAIResultsView(l10n, state),
 
-        // 餐次选择器（AI分析完成后显示）
+        // 餐次选择器或自动命名提示（AI分析完成后显示）
         if (!state.isAnalyzing && state.foods.isNotEmpty) ...[
           const SizedBox(height: AppDimensions.spacingL),
-          _buildMealSelector(l10n, availableMeals, state),
+          if (availableMeals.isNotEmpty)
+            _buildMealSelector(l10n, availableMeals, state)
+          else
+            () {
+              // 自动命名模式：生成 meal 名称并自动选中
+              final todayTrainingAsync = ref.watch(
+                optimizedTodayTrainingProvider,
+              );
+              final existingMealCount =
+                  todayTrainingAsync.value?.diet?.meals.length ?? 0;
+              final mealNumber = existingMealCount + 1;
+              final autoMealName = l10n.mealNumberFormat(mealNumber);
+
+              // 自动设置选中的 meal 名称
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (state.selectedMealName == null) {
+                  ref
+                      .read(aiFoodScannerProvider.notifier)
+                      .selectMeal(autoMealName);
+                }
+              });
+
+              return _buildAutoMealNameHint(l10n, mealNumber);
+            }(),
         ],
 
         const SizedBox(height: AppDimensions.spacingXL),
@@ -358,11 +421,34 @@ class _FoodAnalysisBottomSheetState
         _buildPhotoPreview(),
         const SizedBox(height: AppDimensions.spacingL),
 
-        // 餐次选择
-        _buildMealSelector(l10n, availableMeals, state),
+        // 餐次选择或自动命名提示
+        if (availableMeals.isNotEmpty)
+          _buildMealSelector(l10n, availableMeals, state)
+        else
+          () {
+            // 自动命名模式：生成 meal 名称并自动选中
+            final todayTrainingAsync = ref.watch(
+              optimizedTodayTrainingProvider,
+            );
+            final existingMealCount =
+                todayTrainingAsync.value?.diet?.meals.length ?? 0;
+            final mealNumber = existingMealCount + 1;
+            final autoMealName = l10n.mealNumberFormat(mealNumber);
 
-        // 营养输入卡片
-        if (selectedMeal != null) ...[
+            // 自动设置选中的 meal 名称
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (state.selectedMealName == null) {
+                ref
+                    .read(aiFoodScannerProvider.notifier)
+                    .selectMeal(autoMealName);
+              }
+            });
+
+            return _buildAutoMealNameHint(l10n, mealNumber);
+          }(),
+
+        // 营养输入卡片（仅在有计划 meal 时显示）
+        if (selectedMeal != null && availableMeals.isNotEmpty) ...[
           const SizedBox(height: AppDimensions.spacingL),
           MealProgressInputCard(planMeal: selectedMeal),
         ],
@@ -544,6 +630,36 @@ class _FoodAnalysisBottomSheetState
           ),
         ),
       ],
+    );
+  }
+
+  /// 构建自动命名提示
+  Widget _buildAutoMealNameHint(AppLocalizations l10n, int mealNumber) {
+    return Container(
+      padding: const EdgeInsets.all(AppDimensions.spacingM),
+      decoration: BoxDecoration(
+        color: AppColors.primaryColor.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusM),
+        border: Border.all(color: AppColors.primaryColor.withOpacity(0.3)),
+      ),
+      child: Row(
+        children: [
+          const Icon(
+            CupertinoIcons.info_circle,
+            color: AppColors.primaryColor,
+            size: 20,
+          ),
+          const SizedBox(width: AppDimensions.spacingS),
+          Expanded(
+            child: Text(
+              l10n.mealNumberFormat(mealNumber),
+              style: AppTextStyles.callout.copyWith(
+                color: AppColors.primaryText,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 

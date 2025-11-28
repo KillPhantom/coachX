@@ -8,11 +8,14 @@ class DietDay {
   final List<Meal> meals;
   final bool completed;
 
+  final Macros? targetMacros;
+
   const DietDay({
     required this.day,
     required this.name,
     required this.meals,
     this.completed = false,
+    this.targetMacros,
   });
 
   /// 创建空的饮食日
@@ -37,6 +40,11 @@ class DietDay {
       name: json['name'] as String? ?? '',
       meals: meals,
       completed: json['completed'] as bool? ?? false,
+      targetMacros: json['targetMacros'] != null
+          ? Macros.fromJson(
+              Map<String, dynamic>.from(json['targetMacros'] as Map),
+            )
+          : null,
     );
   }
 
@@ -47,6 +55,7 @@ class DietDay {
       'name': name,
       'meals': meals.map((meal) => meal.toJson()).toList(),
       'completed': completed,
+      'targetMacros': targetMacros?.toJson(),
     };
   }
 
@@ -61,12 +70,14 @@ class DietDay {
     String? name,
     List<Meal>? meals,
     bool? completed,
+    Macros? targetMacros,
   }) {
     return DietDay(
       day: day ?? this.day,
       name: name ?? this.name,
       meals: meals ?? this.meals,
       completed: completed ?? this.completed,
+      targetMacros: targetMacros ?? this.targetMacros,
     );
   }
 
@@ -78,11 +89,16 @@ class DietDay {
           day == other.day &&
           name == other.name &&
           meals == other.meals &&
-          completed == other.completed;
+          completed == other.completed &&
+          targetMacros == other.targetMacros;
 
   @override
   int get hashCode =>
-      day.hashCode ^ name.hashCode ^ meals.hashCode ^ completed.hashCode;
+      day.hashCode ^
+      name.hashCode ^
+      meals.hashCode ^
+      completed.hashCode ^
+      targetMacros.hashCode;
 
   @override
   String toString() {

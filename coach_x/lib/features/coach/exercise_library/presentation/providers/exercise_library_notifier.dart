@@ -259,8 +259,8 @@ class ExerciseLibraryNotifier extends StateNotifier<ExerciseLibraryState> {
   /// 确保预设标签存在
   Future<void> ensureDefaultTags() async {
     try {
-      // 预设标签（中文）
-      final defaultTags = ['力量', '有氧', '胸', '腿', '背', '肩', '手臂'];
+      // 预设标签
+      final defaultTags = ['Strength', 'Cardio'];
 
       for (final tagName in defaultTags) {
         // 检查是否已存在

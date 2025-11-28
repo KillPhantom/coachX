@@ -230,7 +230,13 @@ abstract class AppLocalizations {
   /// **'Retry'**
   String get retry;
 
-  /// Cancel button
+  /// Retry generation button
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get retryGeneration;
+
+  /// Cancel button text
   ///
   /// In en, this message translates to:
   /// **'Cancel'**
@@ -739,6 +745,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Generate failed'**
   String get generateFailed;
+
+  /// AI generation failed title
+  ///
+  /// In en, this message translates to:
+  /// **'Generation Failed'**
+  String get generationFailed;
 
   /// Invitation code generated success
   ///
@@ -1333,6 +1345,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No Exercises'**
   String get noExercises;
+
+  /// Server error message
+  ///
+  /// In en, this message translates to:
+  /// **'Server error, please try again'**
+  String get serverError;
 
   /// Sets label (plural)
   ///
@@ -3577,6 +3595,150 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Please review and adjust the plan as needed.'**
   String get pleaseReview;
+
+  /// AI streaming page title
+  ///
+  /// In en, this message translates to:
+  /// **'AI Training Plan Generator'**
+  String get aiStreamingTitle;
+
+  /// AI streaming page subtitle
+  ///
+  /// In en, this message translates to:
+  /// **'Creating your personalized training plan'**
+  String get aiStreamingSubtitle;
+
+  /// Step 1 title
+  ///
+  /// In en, this message translates to:
+  /// **'Analyzing Requirements'**
+  String get step1Title;
+
+  /// Step 1 description
+  ///
+  /// In en, this message translates to:
+  /// **'Validating your training goals and parameters...'**
+  String get step1Description;
+
+  /// Step 2 title
+  ///
+  /// In en, this message translates to:
+  /// **'Generating Training Plan'**
+  String get step2Title;
+
+  /// Step 2 description
+  ///
+  /// In en, this message translates to:
+  /// **'AI is designing your workout routine...'**
+  String get step2Description;
+
+  /// Step 3 title
+  ///
+  /// In en, this message translates to:
+  /// **'Matching Exercise Library'**
+  String get step3Title;
+
+  /// Step 3 description
+  ///
+  /// In en, this message translates to:
+  /// **'Checking reusable exercises...'**
+  String get step3Description;
+
+  /// Step 4 title
+  ///
+  /// In en, this message translates to:
+  /// **'Finalizing'**
+  String get step4Title;
+
+  /// Step 4 description
+  ///
+  /// In en, this message translates to:
+  /// **'Final review and validation...'**
+  String get step4Description;
+
+  /// Summary card title
+  ///
+  /// In en, this message translates to:
+  /// **'Generation Complete!'**
+  String get summaryTitle;
+
+  /// Total training days stat label
+  ///
+  /// In en, this message translates to:
+  /// **'Training Days'**
+  String get statTotalDays;
+
+  /// Total exercises stat label
+  ///
+  /// In en, this message translates to:
+  /// **'Total Exercises'**
+  String get statTotalExercises;
+
+  /// Reused exercises stat label
+  ///
+  /// In en, this message translates to:
+  /// **'Reused'**
+  String get statReusedExercises;
+
+  /// New exercises stat label
+  ///
+  /// In en, this message translates to:
+  /// **'New'**
+  String get statNewExercises;
+
+  /// View full plan button text
+  ///
+  /// In en, this message translates to:
+  /// **'View Full Plan'**
+  String get viewFullPlan;
+
+  /// Confirm create templates dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Create Exercise Templates'**
+  String get confirmCreateTemplatesTitle;
+
+  /// Confirm create templates message
+  ///
+  /// In en, this message translates to:
+  /// **'Will create {count} new exercise templates to your library'**
+  String confirmCreateTemplates(int count);
+
+  /// Confirm create button text
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Create'**
+  String get confirmCreateButton;
+
+  /// Creating templates progress text
+  ///
+  /// In en, this message translates to:
+  /// **'Creating templates...'**
+  String get creatingTemplates;
+
+  /// Title when meal record already exists
+  ///
+  /// In en, this message translates to:
+  /// **'Meal Record Exists'**
+  String get mealRecordExists;
+
+  /// Confirmation message for overwriting existing meal record
+  ///
+  /// In en, this message translates to:
+  /// **'A record already exists for this meal. Continuing will overwrite the previous record. Do you want to continue?'**
+  String get confirmOverwriteMeal;
+
+  /// Overwrite button text
+  ///
+  /// In en, this message translates to:
+  /// **'Overwrite'**
+  String get overwrite;
+
+  /// Auto-generated meal name format
+  ///
+  /// In en, this message translates to:
+  /// **'Meal {number}'**
+  String mealNumberFormat(int number);
 }
 
 class _AppLocalizationsDelegate

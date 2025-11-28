@@ -32,8 +32,8 @@ class DayPill extends StatelessWidget {
         decoration: BoxDecoration(
           color: isSelected ? AppColors.primary : AppColors.primaryLight,
           borderRadius: BorderRadius.circular(20),
-          border: isSelected ? Border.all(color: AppColors.primaryText) : null,
-        ),
+          border:  Border.all(color: AppColors.primaryAction),
+        ), 
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -42,14 +42,16 @@ class DayPill extends StatelessWidget {
               width: 18,
               height: 18,
               decoration: BoxDecoration(
-                color: AppColors.primaryLight,
+                color: CupertinoColors.white.withOpacity(0.2),
                 borderRadius: BorderRadius.circular(12),
               ),
               alignment: Alignment.center,
               child: Text(
                 '$dayNumber',
                 style: AppTextStyles.caption1.copyWith(
-                  color: AppColors.primaryText,
+                  color: isSelected
+                      ? CupertinoColors.white
+                      : AppColors.primaryAction,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -59,7 +61,9 @@ class DayPill extends StatelessWidget {
             Text(
               label,
               style: AppTextStyles.footnote.copyWith(
-                color: AppColors.primaryText,
+                color: isSelected
+                    ? CupertinoColors.white
+                    : AppColors.primaryAction,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
               ),
             ),

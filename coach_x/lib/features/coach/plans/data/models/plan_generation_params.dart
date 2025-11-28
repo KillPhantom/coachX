@@ -1,6 +1,5 @@
 import 'package:coach_x/core/enums/training_goal.dart';
 import 'package:coach_x/core/enums/muscle_group.dart';
-import 'package:coach_x/core/enums/training_style.dart';
 import 'package:coach_x/core/enums/equipment.dart';
 import 'package:coach_x/core/enums/training_level.dart';
 import 'package:coach_x/core/enums/workload_level.dart';
@@ -40,9 +39,6 @@ class PlanGenerationParams {
   /// 每动作组数（最大值）
   final int setsPerExerciseMax;
 
-  /// 训练风格（可多选）
-  final List<TrainingStyle> trainingStyles;
-
   /// 可用设备（可多选）
   final List<Equipment> equipment;
 
@@ -68,7 +64,6 @@ class PlanGenerationParams {
     required this.exercisesPerDayMax,
     required this.setsPerExerciseMin,
     required this.setsPerExerciseMax,
-    required this.trainingStyles,
     required this.equipment,
     this.notes,
     this.language = '中文',
@@ -88,7 +83,6 @@ class PlanGenerationParams {
       exercisesPerDayMax: 6,
       setsPerExerciseMin: 3,
       setsPerExerciseMax: 5,
-      trainingStyles: [TrainingStyle.pyramid],
       equipment: [Equipment.barbell, Equipment.dumbbell],
       notes: null,
       language: '中文',
@@ -107,7 +101,6 @@ class PlanGenerationParams {
     int? exercisesPerDayMax,
     int? setsPerExerciseMin,
     int? setsPerExerciseMax,
-    List<TrainingStyle>? trainingStyles,
     List<Equipment>? equipment,
     String? notes,
     String? language,
@@ -124,7 +117,6 @@ class PlanGenerationParams {
       exercisesPerDayMax: exercisesPerDayMax ?? this.exercisesPerDayMax,
       setsPerExerciseMin: setsPerExerciseMin ?? this.setsPerExerciseMin,
       setsPerExerciseMax: setsPerExerciseMax ?? this.setsPerExerciseMax,
-      trainingStyles: trainingStyles ?? this.trainingStyles,
       equipment: equipment ?? this.equipment,
       notes: notes ?? this.notes,
       language: language ?? this.language,
@@ -145,16 +137,20 @@ class PlanGenerationParams {
       'exercises_per_day_max': exercisesPerDayMax,
       'sets_per_exercise_min': setsPerExerciseMin,
       'sets_per_exercise_max': setsPerExerciseMax,
-      'training_styles': trainingStyles.map((s) => s.toJsonString()).toList(),
       'equipment': equipment.map((e) => e.toJsonString()).toList(),
       if (notes != null) 'notes': notes,
       'language': language,
-      // 动作库列表（仅传递 name 和 tags）
+      // 动作库列表（传递完整数据：id + name + tags）
       if (exerciseTemplates != null && exerciseTemplates!.isNotEmpty)
-        'exercise_templates': exerciseTemplates!.map((template) => {
-          'name': template.name,
-          'tags': template.tags,
-        }).toList(),
+        'exercise_templates': exerciseTemplates!
+            .map(
+              (template) => {
+                'id': template.id,
+                'name': template.name,
+                'tags': template.tags,
+              },
+            )
+            .toList(),
     };
   }
 
@@ -173,9 +169,6 @@ class PlanGenerationParams {
       exercisesPerDayMax: json['exercises_per_day_max'] as int,
       setsPerExerciseMin: json['sets_per_exercise_min'] as int,
       setsPerExerciseMax: json['sets_per_exercise_max'] as int,
-      trainingStyles: (json['training_styles'] as List<dynamic>)
-          .map((s) => trainingStyleFromString(s as String))
-          .toList(),
       equipment: (json['equipment'] as List<dynamic>)
           .map((e) => equipmentFromString(e as String))
           .toList(),
@@ -202,9 +195,6 @@ class PlanGenerationParams {
     // 组数范围验证
     if (setsPerExerciseMin > setsPerExerciseMax) return false;
     if (setsPerExerciseMin < 1 || setsPerExerciseMax > 10) return false;
-
-    // 必须选择至少一种训练风格
-    if (trainingStyles.isEmpty) return false;
 
     // 必须选择至少一种设备
     if (equipment.isEmpty) return false;
@@ -234,10 +224,6 @@ class PlanGenerationParams {
 
     if (setsPerExerciseMin > setsPerExerciseMax) {
       errors.add('组数最小值不能大于最大值');
-    }
-
-    if (trainingStyles.isEmpty) {
-      errors.add('请至少选择一种训练风格');
     }
 
     if (equipment.isEmpty) {
