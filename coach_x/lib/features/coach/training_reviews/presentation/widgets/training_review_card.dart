@@ -21,7 +21,9 @@ class TrainingReviewCard extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         // 跳转到训练详情审核页面
-        context.push('/training-review/${item.dailyTrainingId}');
+        context.push(
+          '/coach/training-feed/${item.dailyTrainingId}?studentId=${item.studentId}&studentName=${item.studentName}',
+        );
       },
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),

@@ -11,28 +11,24 @@ import '../../../../core/theme/app_colors.dart';
 /// 显示 Feed Item 的详细信息
 /// - 视频项：显示视频列表、动作详情
 /// - 图文项：显示组数、重量、次数汇总
-class FeedDetailBottomSheet extends ConsumerWidget {
+/// Feed 详情 Sheet (Inline)
+class FeedDetailSheet extends ConsumerWidget {
   final TrainingFeedItem feedItem;
+  final ScrollController scrollController;
+  final VoidCallback onClose;
 
-  const FeedDetailBottomSheet({super.key, required this.feedItem});
-
-  /// 显示 Bottom Sheet
-  static Future<void> show(
-    BuildContext context, {
-    required TrainingFeedItem feedItem,
-  }) {
-    return showCupertinoModalPopup(
-      context: context,
-      builder: (context) => FeedDetailBottomSheet(feedItem: feedItem),
-    );
-  }
+  const FeedDetailSheet({
+    super.key,
+    required this.feedItem,
+    required this.scrollController,
+    required this.onClose,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
 
     return Container(
-      height: MediaQuery.of(context).size.height * 0.7,
       decoration: BoxDecoration(
         color: AppColors.backgroundWhite,
         borderRadius: const BorderRadius.only(
@@ -42,57 +38,70 @@ class FeedDetailBottomSheet extends ConsumerWidget {
       ),
       child: Column(
         children: [
-          // Handle bar
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(vertical: 12),
-            child: Center(
-              child: Container(
-                width: 36,
-                height: 5,
-                decoration: BoxDecoration(
-                  color: AppColors.dividerLight,
-                  borderRadius: BorderRadius.circular(2.5),
-                ),
-              ),
+          // Draggable Header
+          SingleChildScrollView(
+            controller: scrollController,
+            physics: const BouncingScrollPhysics(
+              parent: AlwaysScrollableScrollPhysics(),
             ),
-          ),
-
-          // 标题
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
+            child: Column(
               children: [
-                Expanded(
-                  child: Text(
-                    feedItem.exerciseName ?? l10n.exerciseDetails,
-                    style: AppTextStyles.title3,
-                    overflow: TextOverflow.ellipsis,
+                // Handle bar
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  child: Center(
+                    child: Container(
+                      width: 36,
+                      height: 5,
+                      decoration: BoxDecoration(
+                        color: AppColors.dividerLight,
+                        borderRadius: BorderRadius.circular(2.5),
+                      ),
+                    ),
                   ),
                 ),
-                CupertinoButton(
-                  padding: EdgeInsets.zero,
-                  minimumSize: Size.zero,
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: Icon(
-                    CupertinoIcons.xmark_circle_fill,
-                    color: AppColors.textTertiary,
-                    size: 24,
+
+                // 标题
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          feedItem.exerciseName ?? l10n.exerciseDetails,
+                          style: AppTextStyles.title3,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      CupertinoButton(
+                        padding: EdgeInsets.zero,
+                        minimumSize: Size.zero,
+                        onPressed: onClose,
+                        child: Icon(
+                          CupertinoIcons.xmark_circle_fill,
+                          color: AppColors.textTertiary,
+                          size: 24,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
+                const SizedBox(height: 16),
               ],
             ),
           ),
 
-          const SizedBox(height: 16),
-
-          // 内容区域
+          // Scrollable Content (Independent)
           Expanded(
-            child: feedItem.type == FeedItemType.video
-                ? _VideoDetailsContent(feedItem: feedItem)
-                : feedItem.type == FeedItemType.textCard
-                ? _TextCardDetailsContent(feedItem: feedItem)
-                : const SizedBox(),
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              child: feedItem.type == FeedItemType.video
+                  ? _VideoDetailsContent(feedItem: feedItem)
+                  : feedItem.type == FeedItemType.textCard
+                  ? _TextCardDetailsContent(feedItem: feedItem)
+                  : const SizedBox(),
+            ),
           ),
         ],
       ),
@@ -113,8 +122,10 @@ class _VideoDetailsContent extends StatelessWidget {
     final videoIndex = metadata['videoIndex'] as int;
     final totalVideos = metadata['totalVideos'] as int;
     final duration = metadata['duration'] as int?;
+    final timeSpent = metadata['timeSpent'] as int?;
+    final sets = metadata['sets'] as List?;
 
-    return SingleChildScrollView(
+    return Padding(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -140,6 +151,13 @@ class _VideoDetailsContent extends StatelessWidget {
                     value: _formatDuration(duration),
                   ),
                 ],
+                if (timeSpent != null) ...[
+                  const SizedBox(height: 12),
+                  _DetailRow(
+                    label: '耗时', // TODO: l10n
+                    value: _formatDuration(timeSpent),
+                  ),
+                ],
                 const SizedBox(height: 12),
                 _DetailRow(
                   label: l10n.reviewStatus,
@@ -151,6 +169,65 @@ class _VideoDetailsContent extends StatelessWidget {
               ],
             ),
           ),
+
+          if (sets != null && sets.isNotEmpty) ...[
+            const SizedBox(height: 24),
+            Text(l10n.setDetails, style: AppTextStyles.title3),
+            const SizedBox(height: 12),
+            ...sets.asMap().entries.map((entry) {
+              final index = entry.key;
+              final set = entry.value as Map<String, dynamic>;
+              return _buildSetItem(index, set);
+            }),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSetItem(int index, Map<String, dynamic> set) {
+    final completed = set['completed'] as bool? ?? false;
+    final weight = num.tryParse(set['weight']?.toString() ?? '');
+    final reps = int.tryParse(set['reps']?.toString() ?? '');
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: completed
+            ? AppColors.primary.withOpacity(0.1)
+            : AppColors.backgroundSecondary,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: completed
+              ? AppColors.primary
+              : AppColors.dividerLight,
+          width: 1,
+        ),
+      ),
+      child: Row(
+        children: [
+          Text(
+            '${index + 1}',
+            style: AppTextStyles.bodyMedium.copyWith(
+              color: completed
+                  ? AppColors.primary
+                  : AppColors.textSecondary,
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Text(
+              '${weight ?? '-'} kg × ${reps ?? '-'}',
+              style: AppTextStyles.body,
+            ),
+          ),
+          if (completed)
+            Icon(
+              CupertinoIcons.checkmark_circle_fill,
+              size: 20,
+              color: AppColors.primary,
+            ),
         ],
       ),
     );
@@ -171,15 +248,134 @@ class _TextCardDetailsContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
     final metadata = feedItem.metadata!;
+    final isAggregated = metadata['isAggregated'] == true;
+
+    if (isAggregated) {
+      return _buildAggregatedContent(context, metadata);
+    } else {
+      return _buildSingleContent(context, metadata);
+    }
+  }
+
+  Widget _buildAggregatedContent(BuildContext context, Map<String, dynamic> metadata) {
+    final exercises = metadata['exercises'] as List? ?? [];
+    final meals = metadata['meals'] as List? ?? [];
+
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (exercises.isNotEmpty) ...[
+            Text('非视频动作', style: AppTextStyles.title3),
+            const SizedBox(height: 16),
+            ...exercises.map((e) {
+              final exercise = e as Map<String, dynamic>;
+              final name = exercise['name'] as String? ?? '';
+              final sets = exercise['sets'] as List? ?? [];
+              
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(name, style: AppTextStyles.bodySemiBold),
+                  const SizedBox(height: 8),
+                  ...sets.asMap().entries.map((entry) {
+                     return _buildSetItem(entry.key, entry.value as Map<String, dynamic>);
+                  }),
+                  const SizedBox(height: 24),
+                ],
+              );
+            }),
+            Container(height: 1, color: AppColors.dividerLight),
+            const SizedBox(height: 24),
+          ],
+
+          if (meals.isNotEmpty) ...[
+            Text('饮食记录', style: AppTextStyles.title3),
+            const SizedBox(height: 16),
+            ...meals.map((m) {
+              final meal = m as Map<String, dynamic>;
+              final name = meal['name'] as String? ?? 'Meal';
+              final images = meal['images'] as List? ?? [];
+              final items = meal['items'] as List? ?? [];
+              
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(name, style: AppTextStyles.bodySemiBold),
+                  const SizedBox(height: 8),
+                  
+                  // Meal Images
+                  if (images.isNotEmpty)
+                    SizedBox(
+                      height: 120,
+                      child: ListView.separated(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: images.length,
+                        separatorBuilder: (_, __) => const SizedBox(width: 8),
+                        itemBuilder: (context, index) {
+                          return ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: Image.network(
+                              images[index] as String,
+                              width: 120,
+                              height: 120,
+                              fit: BoxFit.cover,
+                              errorBuilder: (_, __, ___) => Container(
+                                width: 120,
+                                height: 120,
+                                color: AppColors.backgroundSecondary,
+                                child: const Icon(CupertinoIcons.photo),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  if (images.isNotEmpty) const SizedBox(height: 12),
+
+                  // Food Items list
+                  if (items.isNotEmpty)
+                    ...items.map((item) {
+                      final foodItem = item as Map<String, dynamic>;
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 4),
+                        child: Row(
+                          children: [
+                             Text(
+                               '• ${foodItem['name']}',
+                               style: AppTextStyles.body,
+                             ),
+                             const Spacer(),
+                             Text(
+                               '${foodItem['amount']} ${foodItem['unit']}',
+                               style: AppTextStyles.body.copyWith(color: AppColors.textSecondary),
+                             ),
+                          ],
+                        ),
+                      );
+                    }),
+
+                  const SizedBox(height: 24),
+                ],
+              );
+            }),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSingleContent(BuildContext context, Map<String, dynamic> metadata) {
+    final l10n = AppLocalizations.of(context)!;
     final sets = metadata['sets'] as List;
     final totalSets = metadata['totalSets'] as int;
     final completedSets = metadata['completedSets'] as int;
     final avgWeight = metadata['avgWeight'] as double;
     final totalReps = metadata['totalReps'] as int;
 
-    return SingleChildScrollView(
+    return Padding(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -218,50 +414,54 @@ class _TextCardDetailsContent extends StatelessWidget {
           ...sets.asMap().entries.map((entry) {
             final index = entry.key;
             final set = entry.value as Map<String, dynamic>;
-            final completed = set['completed'] as bool? ?? false;
-            final weight = set['weight'] as num?;
-            final reps = set['reps'] as int?;
-
-            return Container(
-              margin: const EdgeInsets.only(bottom: 8),
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: completed
-                    ? AppColors.primary.withOpacity(0.1)
-                    : AppColors.backgroundSecondary,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(
-                  color: completed ? AppColors.primary : AppColors.dividerLight,
-                  width: 1,
-                ),
-              ),
-              child: Row(
-                children: [
-                  Text(
-                    '${index + 1}',
-                    style: AppTextStyles.bodyMedium.copyWith(
-                      color: completed
-                          ? AppColors.primary
-                          : AppColors.textSecondary,
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Text(
-                      '${weight ?? '-'} kg × ${reps ?? '-'}',
-                      style: AppTextStyles.body,
-                    ),
-                  ),
-                  if (completed)
-                    Icon(
-                      CupertinoIcons.checkmark_circle_fill,
-                      size: 20,
-                      color: AppColors.primary,
-                    ),
-                ],
-              ),
-            );
+            return _buildSetItem(index, set);
           }),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSetItem(int index, Map<String, dynamic> set) {
+    final completed = set['completed'] as bool? ?? false;
+    final weight = num.tryParse(set['weight']?.toString() ?? '');
+    final reps = int.tryParse(set['reps']?.toString() ?? '');
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: completed
+            ? AppColors.primary.withOpacity(0.1)
+            : AppColors.backgroundSecondary,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: completed ? AppColors.primary : AppColors.dividerLight,
+          width: 1,
+        ),
+      ),
+      child: Row(
+        children: [
+          Text(
+            '${index + 1}',
+            style: AppTextStyles.bodyMedium.copyWith(
+              color: completed
+                  ? AppColors.primary
+                  : AppColors.textSecondary,
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Text(
+              '${weight ?? '-'} kg × ${reps ?? '-'}',
+              style: AppTextStyles.body,
+            ),
+          ),
+          if (completed)
+            Icon(
+              CupertinoIcons.checkmark_circle_fill,
+              size: 20,
+              color: AppColors.primary,
+            ),
         ],
       ),
     );

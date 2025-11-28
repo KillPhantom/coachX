@@ -17,6 +17,7 @@ class StudentExerciseModel {
   final List<KeyframeModel> keyframes; // 视频关键帧（带时间戳）
   final int? timeSpent; // 动作耗时（秒数），nullable
   final String? exerciseTemplateId; // 关联的动作模板 ID
+  final bool isReviewed; // 是否已批阅
 
   const StudentExerciseModel({
     required this.name,
@@ -28,6 +29,7 @@ class StudentExerciseModel {
     this.keyframes = const [],
     this.timeSpent,
     this.exerciseTemplateId,
+    this.isReviewed = false,
   });
 
   /// 创建空的 StudentExercise
@@ -41,6 +43,7 @@ class StudentExerciseModel {
       videos: const [],
       keyframes: const [],
       timeSpent: null,
+      isReviewed: false,
     );
   }
 
@@ -82,6 +85,7 @@ class StudentExerciseModel {
           [],
       timeSpent: json['timeSpent'] as int?,
       exerciseTemplateId: json['exerciseTemplateId'] as String?,
+      isReviewed: json['isReviewed'] as bool? ?? false,
     );
   }
 
@@ -100,6 +104,7 @@ class StudentExerciseModel {
       'keyframes': keyframes.map((kf) => kf.toJson()).toList(),
       'timeSpent': timeSpent,
       if (exerciseTemplateId != null) 'exerciseTemplateId': exerciseTemplateId,
+      'isReviewed': isReviewed,
     };
   }
 
@@ -114,6 +119,7 @@ class StudentExerciseModel {
     List<KeyframeModel>? keyframes,
     int? timeSpent,
     String? exerciseTemplateId,
+    bool? isReviewed,
   }) {
     return StudentExerciseModel(
       name: name ?? this.name,
@@ -125,6 +131,7 @@ class StudentExerciseModel {
       keyframes: keyframes ?? this.keyframes,
       timeSpent: timeSpent ?? this.timeSpent,
       exerciseTemplateId: exerciseTemplateId ?? this.exerciseTemplateId,
+      isReviewed: isReviewed ?? this.isReviewed,
     );
   }
 
@@ -248,14 +255,19 @@ class StudentExerciseModel {
           name == other.name &&
           note == other.note &&
           type == other.type &&
-          completed == other.completed;
+          completed == other.completed &&
+          isReviewed == other.isReviewed;
 
   @override
   int get hashCode =>
-      name.hashCode ^ note.hashCode ^ type.hashCode ^ completed.hashCode;
+      name.hashCode ^
+      note.hashCode ^
+      type.hashCode ^
+      completed.hashCode ^
+      isReviewed.hashCode;
 
   @override
   String toString() {
-    return 'StudentExerciseModel(name: $name, type: $type, sets: ${sets.length}, completed: $completed, videos: ${videos.length}, keyframes: ${keyframes.length}, timeSpent: $timeSpent)';
+    return 'StudentExerciseModel(name: $name, type: $type, sets: ${sets.length}, completed: $completed, videos: ${videos.length}, keyframes: ${keyframes.length}, timeSpent: $timeSpent, isReviewed: $isReviewed)';
   }
 }

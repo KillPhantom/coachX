@@ -279,14 +279,12 @@ StudentExercise
 | sets | TrainingSet[] |
 | completed | boolean |
 | videos | VideoRecord[] |
-| keyframes | string[] |
 | voiceFeedbacks | VoiceFeedback[] |
 | timeSpent | number (optional) |
 | exerciseTemplateId | string (optional) |
 
 **Notes**:
 - `exerciseTemplateId`: Links to an ExerciseTemplate. Copied from the Exercise in the training plan. Used to display exercise guidance (videos, images, text) in the student app.
-- `keyframes` field is automatically populated by backend when videos are uploaded. Contains URLs to 5 extracted keyframe images.
 - `timeSpent` is the duration in seconds for completing this specific exercise. Calculated from the time the user starts editing sets to when all sets are marked as completed.
 
 VideoRecord

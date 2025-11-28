@@ -17,7 +17,7 @@ class DailyTrainingModel {
   final String? completionStatus;
   final bool isReviewed;
   final int? totalDuration; // 训练总时长（秒数），从启动计时器到最后一个 exercise 完成
-  final Map<String, ExtractedKeyFrameModel> extractedKeyFrames; // 提取的关键帧数据
+  final Map<String, Map<String, ExtractedKeyFrameModel>> extractedKeyFrames; // 提取的关键帧数据（双层：exerciseIndex -> videoIndex -> keyframes）
 
   const DailyTrainingModel({
     required this.id,
@@ -77,23 +77,40 @@ class DailyTrainingModel {
       }
     }
 
-    // 解析 extractedKeyFrames
+    // 解析 extractedKeyFrames（双层结构：exerciseIndex -> videoIndex -> ExtractedKeyFrameModel）
     final extractedKeyFramesData = safeMapCast(
       json['extractedKeyFrames'],
       'extractedKeyFrames',
     );
-    Map<String, ExtractedKeyFrameModel> extractedKeyFrames = {};
+    Map<String, Map<String, ExtractedKeyFrameModel>> extractedKeyFrames = {};
 
     if (extractedKeyFramesData != null) {
-      extractedKeyFramesData.forEach((key, value) {
-        final data = safeMapCast(value, 'extractedKeyFrame_$key');
-        if (data != null) {
-          try {
-            extractedKeyFrames[key] = ExtractedKeyFrameModel.fromJson(data);
-          } catch (e) {
-            AppLogger.error(
-              'Failed to parse extractedKeyFrame for key $key: $e',
+      extractedKeyFramesData.forEach((exerciseKey, exerciseValue) {
+        final exerciseLevelData = safeMapCast(
+          exerciseValue,
+          'extractedKeyFrame_exercise_$exerciseKey',
+        );
+        if (exerciseLevelData != null) {
+          Map<String, ExtractedKeyFrameModel> videoLevelMap = {};
+
+          exerciseLevelData.forEach((videoKey, videoValue) {
+            final videoLevelData = safeMapCast(
+              videoValue,
+              'extractedKeyFrame_exercise_${exerciseKey}_video_$videoKey',
             );
+            if (videoLevelData != null) {
+              try {
+                videoLevelMap[videoKey] = ExtractedKeyFrameModel.fromJson(videoLevelData);
+              } catch (e) {
+                AppLogger.error(
+                  'Failed to parse extractedKeyFrame for exercise $exerciseKey video $videoKey: $e',
+                );
+              }
+            }
+          });
+
+          if (videoLevelMap.isNotEmpty) {
+            extractedKeyFrames[exerciseKey] = videoLevelMap;
           }
         }
       });
@@ -130,7 +147,12 @@ class DailyTrainingModel {
       'isReviewed': isReviewed,
       'totalDuration': totalDuration,
       'extractedKeyFrames': extractedKeyFrames.map(
-        (key, value) => MapEntry(key, value.toJson()),
+        (exerciseKey, exerciseValue) => MapEntry(
+          exerciseKey,
+          exerciseValue.map(
+            (videoKey, videoValue) => MapEntry(videoKey, videoValue.toJson()),
+          ),
+        ),
       ),
     };
   }

@@ -50,6 +50,10 @@ def get_single_day_tool() -> Dict[str, Any]:
                                 "type": "string",
                                 "description": "动作名称。**重要：如果用户提供了动作库列表，必须严格从列表中选择动作名称（完全匹配）；如果未提供动作库，可以自由命名。** 使用指定语言命名。中文示例：'深蹲'、'卧推'、'硬拉'；英文示例：'Squats'、'Bench Press'、'Deadlift'"
                             },
+                            "exerciseTemplateId": {
+                                "type": "string",
+                                "description": "动作模板ID。如果提供了动作库，必须从库中选择动作并使用对应的模板ID。"
+                            },
                             "sets": {
                                 "type": "array",
                                 "description": "训练组列表，每个动作至少1组",

@@ -12,6 +12,9 @@ enum FeedItemType {
 
 /// FeedItemType 扩展
 extension FeedItemTypeExtension on FeedItemType {
+  /// 是否是完成项
+  bool get isCompletion => this == FeedItemType.completion;
+
   /// 是否是内容项（排除 completion）
   bool get isContentItem =>
       this == FeedItemType.video || this == FeedItemType.textCard;

@@ -18,18 +18,90 @@ class TextFeedItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final metadata = feedItem.metadata!;
-    final totalSets = metadata['totalSets'] as int;
-    final completedSets = metadata['completedSets'] as int;
-    final avgWeight = metadata['avgWeight'] as double;
-    final totalReps = metadata['totalReps'] as int;
+    final isAggregated = metadata['isAggregated'] == true;
 
-    return Container(
-      color: CupertinoColors.black,
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
+    if (isAggregated) {
+      return _buildAggregatedView(context, metadata);
+    } else {
+      return _buildSingleView(context, metadata);
+    }
+  }
+
+  Widget _buildAggregatedView(BuildContext context, Map<String, dynamic> metadata) {
+    final exercises = metadata['exercises'] as List? ?? [];
+    final meals = metadata['meals'] as List? ?? [];
+
+    return Center(
+      child: SingleChildScrollView(
+        child: Container(
+          color: CupertinoColors.black,
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+          // 标题
+          Text(
+            feedItem.exerciseName ?? 'Daily Summary',
+            style: AppTextStyles.largeTitle.copyWith(
+              color: CupertinoColors.white,
+            ),
+          ),
+          const SizedBox(height: 8),
+
+          // 副标题
+          Text(
+            '训练与饮食 · 每日汇总',
+            style: AppTextStyles.callout.copyWith(
+              color: CupertinoColors.systemGrey,
+            ),
+          ),
+          const SizedBox(height: 32),
+
+          // 数据卡片
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: CupertinoColors.systemGrey6.darkColor,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Column(
+              children: [
+                _DataRow(label: '非视频动作', value: '${exercises.length} 个'),
+                const SizedBox(height: 16),
+                _DataRow(label: '饮食记录', value: '${meals.length} 餐'),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 32),
+
+          // 操作按钮
+          _buildActionButtons(),
+
+          // 批阅状态标记
+          if (feedItem.isReviewed)
+            _buildReviewedTag(),
+        ],
+      ),
+    )));
+  }
+
+  Widget _buildSingleView(BuildContext context, Map<String, dynamic> metadata) {
+    final totalSets = metadata['totalSets'] as int? ?? 0;
+    final completedSets = metadata['completedSets'] as int? ?? 0;
+    final avgWeight = metadata['avgWeight'] as double? ?? 0.0;
+    final totalReps = metadata['totalReps'] as int? ?? 0;
+
+    return Center(
+      child: SingleChildScrollView(
+        child: Container(
+          color: CupertinoColors.black,
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
           // 动作名称
           Text(
             feedItem.exerciseName ?? '',
@@ -72,67 +144,75 @@ class TextFeedItem extends StatelessWidget {
           const SizedBox(height: 32),
 
           // 操作按钮
-          Row(
-            children: [
-              Expanded(
-                child: CupertinoButton(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  color: AppColors.primary,
-                  borderRadius: BorderRadius.circular(12),
-                  onPressed: onCommentTap,
-                  child: Text(
-                    '批阅',
-                    style: AppTextStyles.buttonLarge.copyWith(
-                      color: CupertinoColors.black,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: CupertinoButton(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  color: CupertinoColors.systemGrey5.darkColor,
-                  borderRadius: BorderRadius.circular(12),
-                  onPressed: onDetailTap,
-                  child: Text(
-                    '详情',
-                    style: AppTextStyles.buttonLarge.copyWith(
-                      color: CupertinoColors.white,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
+          _buildActionButtons(),
 
           // 批阅状态标记
           if (feedItem.isReviewed)
-            Container(
-              margin: const EdgeInsets.only(top: 16),
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.9),
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(
-                    CupertinoIcons.checkmark_circle_fill,
-                    size: 16,
-                    color: CupertinoColors.black,
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    '已批阅',
-                    style: AppTextStyles.callout.copyWith(
-                      color: CupertinoColors.black,
-                    ),
-                  ),
-                ],
+            _buildReviewedTag(),
+        ],
+      ),
+    )));
+  }
+
+  Widget _buildActionButtons() {
+    return Row(
+      children: [
+        Expanded(
+          child: CupertinoButton(
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            color: AppColors.primary,
+            borderRadius: BorderRadius.circular(12),
+            onPressed: onCommentTap,
+            child: Text(
+              '批阅',
+              style: AppTextStyles.buttonLarge.copyWith(
+                color: CupertinoColors.black,
               ),
             ),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: CupertinoButton(
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            color: CupertinoColors.systemGrey5.darkColor,
+            borderRadius: BorderRadius.circular(12),
+            onPressed: onDetailTap,
+            child: Text(
+              '详情',
+              style: AppTextStyles.buttonLarge.copyWith(
+                color: CupertinoColors.white,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildReviewedTag() {
+    return Container(
+      margin: const EdgeInsets.only(top: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: BoxDecoration(
+        color: AppColors.primary.withOpacity(0.9),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(
+            CupertinoIcons.checkmark_circle_fill,
+            size: 16,
+            color: CupertinoColors.black,
+          ),
+          const SizedBox(width: 8),
+          Text(
+            '已批阅',
+            style: AppTextStyles.callout.copyWith(
+              color: CupertinoColors.black,
+            ),
+          ),
         ],
       ),
     );

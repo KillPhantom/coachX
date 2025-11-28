@@ -18,6 +18,8 @@ class ExerciseFeedbackHistorySection extends ConsumerWidget {
   final double maxHeight;
   final bool showLoadMoreButton;
   final bool showHeader;
+  final bool shrinkWrap;
+  final ScrollPhysics? physics;
 
   const ExerciseFeedbackHistorySection({
     super.key,
@@ -27,6 +29,8 @@ class ExerciseFeedbackHistorySection extends ConsumerWidget {
     this.maxHeight = 200,
     this.showLoadMoreButton = true,
     this.showHeader = true,
+    this.shrinkWrap = false,
+    this.physics,
   });
 
   @override
@@ -37,6 +41,11 @@ class ExerciseFeedbackHistorySection extends ConsumerWidget {
       exerciseTemplateId: exerciseTemplateId,
     );
     final feedbacksAsync = ref.watch(exerciseFeedbackHistoryProvider(params));
+
+    // Determine if we should expand the content.
+    // We should ONLY expand if shrinkWrap is false AND we have a finite maxHeight.
+    // If maxHeight is infinity (e.g. in a scroll view), we cannot use Expanded.
+    final shouldExpand = !shrinkWrap && maxHeight != double.infinity;
 
     return ConstrainedBox(
       constraints: BoxConstraints(maxHeight: maxHeight),
@@ -73,45 +82,60 @@ class ExerciseFeedbackHistorySection extends ConsumerWidget {
             ],
 
             // 反馈列表（可滚动）
-            Expanded(
-              child: feedbacksAsync.when(
-                data: (feedbacks) {
-                  if (feedbacks.isEmpty) {
-                    return const _EmptyState();
-                  }
-
-                  // 是否显示"加载更多"按钮
-                  final shouldShowLoadMore =
-                      showLoadMoreButton && feedbacks.length >= 10;
-
-                  return ListView.builder(
-                    controller: scrollController,
-                    padding: EdgeInsets.zero,
-                    itemCount: feedbacks.length + (shouldShowLoadMore ? 1 : 0),
-                    itemBuilder: (context, index) {
-                      // 加载更多按钮
-                      if (index == feedbacks.length) {
-                        return const _LoadMoreButton();
-                      }
-
-                      // 反馈卡片
-                      final feedback = feedbacks[index];
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 12),
-                        child: _ExerciseFeedbackCard(feedback: feedback),
-                      );
-                    },
-                  );
-                },
-                loading: () =>
-                    const Center(child: CupertinoActivityIndicator()),
-                error: (error, stackTrace) =>
-                    _ErrorState(error: error.toString()),
-              ),
-            ),
+            shouldExpand
+                ? Expanded(child: _buildContent(feedbacksAsync, shouldExpand))
+                : _buildContent(feedbacksAsync, shouldExpand),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildContent(
+    AsyncValue<List<TrainingFeedbackModel>> feedbacksAsync,
+    bool shouldExpand,
+  ) {
+    return feedbacksAsync.when(
+      data: (feedbacks) {
+        if (feedbacks.isEmpty) {
+          return shouldExpand
+              ? const _EmptyState()
+              : const SizedBox(height: 150, child: _EmptyState());
+        }
+
+        // 是否显示"加载更多"按钮
+        final shouldShowLoadMore = showLoadMoreButton && feedbacks.length >= 10;
+
+        return ListView.builder(
+          controller: scrollController,
+          padding: EdgeInsets.zero,
+          shrinkWrap: !shouldExpand,
+          physics: physics,
+          itemCount: feedbacks.length + (shouldShowLoadMore ? 1 : 0),
+          itemBuilder: (context, index) {
+            // 加载更多按钮
+            if (index == feedbacks.length) {
+              return const _LoadMoreButton();
+            }
+
+            // 反馈卡片
+            final feedback = feedbacks[index];
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: _ExerciseFeedbackCard(feedback: feedback),
+            );
+          },
+        );
+      },
+      loading: () => shouldExpand
+          ? const Center(child: CupertinoActivityIndicator())
+          : const SizedBox(
+              height: 100,
+              child: Center(child: CupertinoActivityIndicator()),
+            ),
+      error: (error, stackTrace) => shouldExpand
+          ? _ErrorState(error: error.toString())
+          : SizedBox(height: 100, child: _ErrorState(error: error.toString())),
     );
   }
 }

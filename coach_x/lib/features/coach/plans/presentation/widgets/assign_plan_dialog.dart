@@ -191,7 +191,7 @@ class _AssignPlanDialogState extends ConsumerState<AssignPlanDialog> {
     final result = await showCupertinoDialog<bool>(
       context: context,
       builder: (context) => CupertinoAlertDialog(
-        title: const Text('覆盖现有计划'),
+        title: Text('覆盖现有计划', style: AppTextStyles.bodyMedium),
         content: Text(
           '${conflicts.length}位学生已有同类计划，是否覆盖？\n\n'
           '${conflicts.map((item) => item.student.name).join(', ')}',
@@ -200,12 +200,12 @@ class _AssignPlanDialogState extends ConsumerState<AssignPlanDialog> {
           CupertinoDialogAction(
             isDefaultAction: true,
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('取消'),
+            child: const Text('取消', style: AppTextStyles.bodyMedium),
           ),
           CupertinoDialogAction(
             isDestructiveAction: true,
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('覆盖'),
+            child: const Text('覆盖', style: AppTextStyles.bodyMedium),
           ),
         ],
       ),
@@ -219,12 +219,12 @@ class _AssignPlanDialogState extends ConsumerState<AssignPlanDialog> {
     showCupertinoDialog(
       context: context,
       builder: (context) => CupertinoAlertDialog(
-        title: const Text('成功'),
-        content: const Text('计划分配成功'),
+        title: const Text('成功', style: AppTextStyles.bodyMedium),
+        content: const Text('计划分配成功', style: AppTextStyles.bodyMedium),
         actions: [
           CupertinoDialogAction(
             onPressed: () => Navigator.pop(context),
-            child: const Text('确定'),
+            child: const Text('确定', style: AppTextStyles.bodyMedium),
           ),
         ],
       ),
@@ -236,12 +236,12 @@ class _AssignPlanDialogState extends ConsumerState<AssignPlanDialog> {
     showCupertinoDialog(
       context: context,
       builder: (context) => CupertinoAlertDialog(
-        title: const Text('错误'),
+        title: const Text('错误', style: AppTextStyles.bodyMedium),
         content: Text(message),
         actions: [
           CupertinoDialogAction(
             onPressed: () => Navigator.pop(context),
-            child: const Text('确定'),
+            child: const Text('确定', style: AppTextStyles.bodyMedium),
           ),
         ],
       ),
@@ -255,15 +255,15 @@ class _AssignPlanDialogState extends ConsumerState<AssignPlanDialog> {
         leading: CupertinoButton(
           padding: EdgeInsets.zero,
           onPressed: _isSaving ? null : () => Navigator.pop(context),
-          child: const Text('取消'),
+          child: const Text('取消', style: AppTextStyles.bodyMedium),
         ),
-        middle: Text('分配 ${widget.plan.name}'),
+        middle: Text('分配 ${widget.plan.name}', style: AppTextStyles.bodyMedium),
         trailing: CupertinoButton(
           padding: EdgeInsets.zero,
           onPressed: _isSaving ? null : _handleSave,
           child: _isSaving
               ? const CupertinoActivityIndicator()
-              : const Text('完成'),
+              : const Text('完成', style: AppTextStyles.bodyMedium),
         ),
       ),
       child: SafeArea(

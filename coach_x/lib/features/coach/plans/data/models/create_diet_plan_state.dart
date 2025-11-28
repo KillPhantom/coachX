@@ -23,11 +23,7 @@ class CreateDietPlanState {
   });
 
   /// 计算属性 - 是否可以保存
-  bool get canSave =>
-      planName.isNotEmpty &&
-      days.isNotEmpty &&
-      validationErrors.isEmpty &&
-      !isLoading;
+  bool get canSave => planName.isNotEmpty && days.isNotEmpty && !isLoading;
 
   /// 计算属性 - 是否有未保存的更改
   bool get hasUnsavedChanges => true; // 简化实现，总是返回 true

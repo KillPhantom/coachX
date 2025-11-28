@@ -111,6 +111,11 @@
     "description": "Retry button text"
   },
 
+  "retryGeneration": "Retry",
+  "@retryGeneration": {
+    "description": "Retry generation button"
+  },
+
   "cancel": "Cancel",
   "@cancel": {
     "description": "Cancel button text"
@@ -564,6 +569,11 @@
   "generateFailed": "Generate failed",
   "@generateFailed": {
     "description": "Generate failed error"
+  },
+
+  "generationFailed": "Generation Failed",
+  "@generationFailed": {
+    "description": "AI generation failed title"
   },
 
   "invitationCodeGenerated": "Invitation code generated successfully",
@@ -1107,6 +1117,11 @@
   "noExercises": "No exercises",
   "@noExercises": {
     "description": "No exercises message"
+  },
+
+  "serverError": "Server error, please try again",
+  "@serverError": {
+    "description": "Server error message"
   },
 
   "sets": "sets",
@@ -3293,5 +3308,140 @@
   "pleaseReview": "Please review and adjust the plan as needed.",
   "@pleaseReview": {
     "description": "Import success message"
+  },
+
+  "aiStreamingTitle": "AI Training Plan Generator",
+  "@aiStreamingTitle": {
+    "description": "AI streaming page title"
+  },
+
+  "aiStreamingSubtitle": "Creating your personalized training plan",
+  "@aiStreamingSubtitle": {
+    "description": "AI streaming page subtitle"
+  },
+
+  "step1Title": "Analyzing Requirements",
+  "@step1Title": {
+    "description": "Step 1 title"
+  },
+
+  "step1Description": "Validating your training goals and parameters...",
+  "@step1Description": {
+    "description": "Step 1 description"
+  },
+
+  "step2Title": "Generating Training Plan",
+  "@step2Title": {
+    "description": "Step 2 title"
+  },
+
+  "step2Description": "AI is designing your workout routine...",
+  "@step2Description": {
+    "description": "Step 2 description"
+  },
+
+  "step3Title": "Matching Exercise Library",
+  "@step3Title": {
+    "description": "Step 3 title"
+  },
+
+  "step3Description": "Checking reusable exercises...",
+  "@step3Description": {
+    "description": "Step 3 description"
+  },
+
+  "step4Title": "Finalizing",
+  "@step4Title": {
+    "description": "Step 4 title"
+  },
+
+  "step4Description": "Final review and validation...",
+  "@step4Description": {
+    "description": "Step 4 description"
+  },
+
+  "summaryTitle": "Generation Complete!",
+  "@summaryTitle": {
+    "description": "Summary card title"
+  },
+
+  "statTotalDays": "Training Days",
+  "@statTotalDays": {
+    "description": "Total training days stat label"
+  },
+
+  "statTotalExercises": "Total Exercises",
+  "@statTotalExercises": {
+    "description": "Total exercises stat label"
+  },
+
+  "statReusedExercises": "Reused",
+  "@statReusedExercises": {
+    "description": "Reused exercises stat label"
+  },
+
+  "statNewExercises": "New",
+  "@statNewExercises": {
+    "description": "New exercises stat label"
+  },
+
+  "viewFullPlan": "View Full Plan",
+  "@viewFullPlan": {
+    "description": "View full plan button text"
+  },
+
+  "confirmCreateTemplatesTitle": "Create Exercise Templates",
+  "@confirmCreateTemplatesTitle": {
+    "description": "Confirm create templates dialog title"
+  },
+
+  "confirmCreateTemplates": "Will create {count} new exercise templates to your library",
+  "@confirmCreateTemplates": {
+    "description": "Confirm create templates message",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+
+  "confirmCreateButton": "Confirm Create",
+  "@confirmCreateButton": {
+    "description": "Confirm create button text"
+  },
+
+  "creatingTemplates": "Creating templates...",
+  "@creatingTemplates": {
+    "description": "Creating templates progress text"
+  },
+
+  "cancel": "Cancel",
+  "@cancel": {
+    "description": "Cancel button text"
+  },
+
+  "mealRecordExists": "Meal Record Exists",
+  "@mealRecordExists": {
+    "description": "Title when meal record already exists"
+  },
+
+  "confirmOverwriteMeal": "A record already exists for this meal. Continuing will overwrite the previous record. Do you want to continue?",
+  "@confirmOverwriteMeal": {
+    "description": "Confirmation message for overwriting existing meal record"
+  },
+
+  "overwrite": "Overwrite",
+  "@overwrite": {
+    "description": "Overwrite button text"
+  },
+
+  "mealNumberFormat": "Meal {number}",
+  "@mealNumberFormat": {
+    "description": "Auto-generated meal name format",
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
   }
 }

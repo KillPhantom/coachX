@@ -987,9 +987,9 @@ def _get_coach_id_from_plan(plan_id: str) -> str:
     if not plan_doc.exists:
         raise ValueError(f'Plan not found: {plan_id}')
 
-    coach_id = plan_doc.to_dict().get('coachId')
+    coach_id = plan_doc.to_dict().get('ownerId')
     if not coach_id:
-        raise ValueError(f'Plan {plan_id} missing coachId')
+        raise ValueError(f'Plan {plan_id} missing ownerId')
 
     return coach_id
 
@@ -999,7 +999,7 @@ def _fetch_coach_exercise_templates(coach_id: str) -> list:
     from firebase_admin import firestore
     db = firestore.client()
 
-    templates_ref = db.collection('exerciseTemplates').where('coachId', '==', coach_id)
+    templates_ref = db.collection('exerciseTemplates').where('ownerId', '==', coach_id)
     templates_docs = templates_ref.stream()
 
     templates = []
@@ -1040,7 +1040,7 @@ def _match_or_create_template(coach_id: str, exercise_name: str, existing_templa
     new_template_ref.set({
         'name': exercise_name,
         'tags': [],  # 默认空标签
-        'coachId': coach_id,
+        'ownerId': coach_id,
         'createdAt': firestore.SERVER_TIMESTAMP,
         'updatedAt': firestore.SERVER_TIMESTAMP,
     })

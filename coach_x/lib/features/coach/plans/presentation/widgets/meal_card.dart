@@ -102,86 +102,129 @@ class _MealCardState extends State<MealCard>
   @override
   Widget build(BuildContext context) {
     final macros = widget.meal.macros;
+    final isExpanded = widget.isExpanded;
 
     Widget cardWidget = Container(
-      margin: const EdgeInsets.only(bottom: 8),
+      margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
         color: widget.isHighlighted
             ? CupertinoColors.systemBackground.resolveFrom(context)
-            : CupertinoColors.systemGrey6.resolveFrom(context),
-        borderRadius: BorderRadius.circular(10),
+            : CupertinoColors.white,
+        borderRadius: BorderRadius.circular(16),
         border: widget.isHighlighted
             ? Border.all(color: AppColors.primary, width: 2.5)
-            : (widget.isExpanded
-                  ? Border.all(color: AppColors.primary, width: 1.5)
-                  : null),
+            : null,
         boxShadow: widget.isHighlighted
             ? [
                 BoxShadow(
-                  color: AppColors.primary.withValues(alpha: 0.3),
-                  blurRadius: 8,
+                  color: AppColors.primary.withValues(alpha: 0.35),
+                  blurRadius: 18,
+                  spreadRadius: 1,
+                  offset: const Offset(0, 0),
+                ),
+                BoxShadow(
+                  color: CupertinoColors.systemGrey.withValues(alpha: 0.15),
+                  blurRadius: 6,
                   offset: const Offset(0, 2),
                 ),
+                BoxShadow(
+                  color: CupertinoColors.systemGrey.withValues(alpha: 0.25),
+                  blurRadius: 18,
+                  offset: const Offset(0, 6),
+                ),
               ]
-            : null,
+            : [
+                BoxShadow(
+                  color: CupertinoColors.systemGrey.withValues(alpha: 0.12),
+                  blurRadius: 6,
+                  offset: const Offset(0, 2),
+                ),
+                BoxShadow(
+                  color: CupertinoColors.systemGrey.withValues(alpha: 0.18),
+                  blurRadius: 15,
+                  offset: const Offset(0, 5),
+                ),
+              ],
       ),
       child: Column(
         children: [
           // Header
           GestureDetector(
             onTap: widget.onTap,
+            behavior: HitTestBehavior.opaque,
             child: Container(
-              padding: const EdgeInsets.all(10),
+              padding: const EdgeInsets.fromLTRB(12, 12, 16, 12),
               child: Row(
                 children: [
-                  // 餐次信息
+                  // Drag Handle
+                  ReorderableDragStartListener(
+                    index: widget.index,
+                    child: Container(
+                      padding: const EdgeInsets.all(8),
+                      child: Icon(
+                        CupertinoIcons.bars,
+                        color: CupertinoColors.systemGrey3,
+                        size: 20,
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(width: 4),
+
+                  // Meal Info
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // 餐次名称
-                        Text(
-                          widget.meal.name.isEmpty ? '未命名餐次' : widget.meal.name,
-                          style: AppTextStyles.footnote.copyWith(
-                            fontWeight: FontWeight.w600,
-                            color: widget.meal.name.isEmpty
-                                ? CupertinoColors.placeholderText.resolveFrom(
-                                    context,
-                                  )
-                                : null,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-
-                        // 营养汇总
+                        // Meal Name and Kcal Badge Row
                         Row(
                           children: [
-                            _buildMacroChip(
+                            Flexible(
+                              child: Text(
+                                widget.meal.name.isEmpty
+                                    ? '未命名餐次'
+                                    : widget.meal.name,
+                                style: AppTextStyles.caption1.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 16,
+                                  color: widget.meal.name.isEmpty
+                                      ? CupertinoColors.placeholderText
+                                            .resolveFrom(context)
+                                      : null,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            // Kcal Badge (Inline next to name)
+                            _buildMacroBadge(
+                              context,
+                              '${macros.calories.toStringAsFixed(0)} Kcal',
+                              AppColors.secondaryPurple,
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 6),
+
+                        // Macro Summary Badges (Protein, Carbs, Fat)
+                        Wrap(
+                          spacing: 6,
+                          runSpacing: 4,
+                          children: [
+                            _buildMacroBadge(
                               context,
                               '${macros.protein.toStringAsFixed(0)}g 蛋白',
-                              CupertinoIcons.bolt_fill,
                               AppColors.secondaryBlue,
                             ),
-                            const SizedBox(width: 6),
-                            _buildMacroChip(
+                            _buildMacroBadge(
                               context,
                               '${macros.carbs.toStringAsFixed(0)}g 碳水',
-                              CupertinoIcons.flame_fill,
                               AppColors.secondaryOrange,
                             ),
-                            const SizedBox(width: 6),
-                            _buildMacroChip(
+                            _buildMacroBadge(
                               context,
                               '${macros.fat.toStringAsFixed(0)}g 脂肪',
-                              CupertinoIcons.drop_fill,
                               AppColors.secondaryRed,
-                            ),
-                            const SizedBox(width: 6),
-                            _buildMacroChip(
-                              context,
-                              '${macros.calories.toStringAsFixed(0)} 卡路里',
-                              CupertinoIcons.drop_fill,
-                              AppColors.secondaryPurple,
                             ),
                           ],
                         ),
@@ -189,26 +232,27 @@ class _MealCardState extends State<MealCard>
                     ),
                   ),
 
-                  // 删除按钮
-                  if (widget.onDelete != null)
-                    CupertinoButton(
-                      padding: EdgeInsets.zero,
-                      minimumSize: Size.zero,
-                      onPressed: widget.onDelete,
-                      child: Icon(
-                        CupertinoIcons.delete,
-                        color: CupertinoColors.systemRed.resolveFrom(context),
-                        size: 18,
-                      ),
-                    ),
+                  const SizedBox(width: 12),
 
-                  // 展开图标
-                  Icon(
-                    widget.isExpanded
-                        ? CupertinoIcons.chevron_up
-                        : CupertinoIcons.chevron_down,
-                    color: CupertinoColors.secondaryLabel.resolveFrom(context),
-                    size: 16,
+                  // Item Count & Expand Icon
+                  Row(
+                    children: [
+                      Text(
+                        '${widget.meal.items.length} Items',
+                        style: AppTextStyles.caption1.copyWith(
+                          color: CupertinoColors.secondaryLabel,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Icon(
+                        isExpanded
+                            ? CupertinoIcons.chevron_up
+                            : CupertinoIcons.chevron_down,
+                        color: CupertinoColors.systemGrey3,
+                        size: 16,
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -216,126 +260,151 @@ class _MealCardState extends State<MealCard>
           ),
 
           // Expanded Content
-          if (widget.isExpanded) ...[
-            Container(
-              height: 1,
-              color: CupertinoColors.separator.resolveFrom(context),
-            ),
+          if (isExpanded) ...[
+            Container(height: 1, color: CupertinoColors.systemGrey6),
 
             Padding(
-              padding: const EdgeInsets.all(10),
+              padding: const EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // 餐次名称输入
+                  // Meal Name Input
                   Text(
                     '餐次名称',
                     style: AppTextStyles.caption1.copyWith(
                       fontWeight: FontWeight.w500,
+                      color: CupertinoColors.secondaryLabel,
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 6),
                   CupertinoTextField(
                     controller: _nameController,
                     placeholder: '例如：早餐、午餐、晚餐',
                     onChanged: widget.onNameChanged,
-                    style: AppTextStyles.caption1,
+                    style: AppTextStyles.bodyMedium,
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 6,
+                      horizontal: 12,
+                      vertical: 10,
                     ),
                     decoration: BoxDecoration(
-                      color: CupertinoColors.systemBackground.resolveFrom(
-                        context,
-                      ),
-                      borderRadius: BorderRadius.circular(6),
+                      color: CupertinoColors.systemGrey6.withValues(alpha: 0.5),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: CupertinoColors.systemGrey5),
                     ),
                   ),
 
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 16),
 
-                  // 备注输入
+                  // Note Input
                   Text(
                     '备注',
                     style: AppTextStyles.caption1.copyWith(
                       fontWeight: FontWeight.w500,
+                      color: CupertinoColors.secondaryLabel,
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 6),
                   CupertinoTextField(
                     controller: _noteController,
                     placeholder: '例如：训练前、训练后',
                     onChanged: widget.onNoteChanged,
                     minLines: 1,
                     maxLines: 3,
-                    style: AppTextStyles.caption1,
+                    style: AppTextStyles.bodyMedium,
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 6,
+                      horizontal: 12,
+                      vertical: 10,
                     ),
                     decoration: BoxDecoration(
-                      color: CupertinoColors.systemBackground.resolveFrom(
-                        context,
-                      ),
-                      borderRadius: BorderRadius.circular(6),
+                      color: CupertinoColors.systemGrey6.withValues(alpha: 0.5),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: CupertinoColors.systemGrey5),
                     ),
                   ),
 
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 20),
 
-                  // 食物条目标题 & 添加按钮
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        '食物条目',
-                        style: AppTextStyles.callout.copyWith(
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      if (widget.onAddFoodItem != null)
-                        CupertinoButton(
-                          padding: EdgeInsets.zero,
-                          minimumSize: Size.zero,
-                          onPressed: widget.onAddFoodItem,
-                          child: Row(
-                            children: [
-                              Icon(
-                                CupertinoIcons.add_circled_solid,
-                                color: AppColors.primary,
-                                size: 16,
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                '添加',
-                                style: AppTextStyles.callout.copyWith(
-                                  color: AppColors.primary,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 6),
-
-                  // 食物条目列表
+                  // Food Items List
                   if (widget.foodItemsWidget != null)
                     widget.foodItemsWidget!
                   else
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 12),
-                      child: Text(
-                        '暂无食物条目，点击"添加"按钮添加',
-                        style: AppTextStyles.caption1.copyWith(
-                          color: CupertinoColors.secondaryLabel.resolveFrom(
-                            context,
+                      child: Center(
+                        child: Text(
+                          '暂无食物条目',
+                          style: AppTextStyles.caption1.copyWith(
+                            color: CupertinoColors.secondaryLabel,
                           ),
                         ),
-                        textAlign: TextAlign.center,
                       ),
                     ),
+
+                  const SizedBox(height: 12),
+
+                  // Actions Row
+                  Row(
+                    children: [
+                      // Add Food Button
+                      if (widget.onAddFoodItem != null)
+                        CupertinoButton(
+                          padding: EdgeInsets.zero,
+                          minimumSize: Size.zero,
+                          onPressed: widget.onAddFoodItem,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 8,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.primary.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  CupertinoIcons.add,
+                                  color: AppColors.primary,
+                                  size: 16,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  '添加食物',
+                                  style: AppTextStyles.caption1.copyWith(
+                                    color: AppColors.primary,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+
+                      const Spacer(),
+
+                      // Delete Meal Button
+                      if (widget.onDelete != null)
+                        CupertinoButton(
+                          padding: EdgeInsets.zero,
+                          minimumSize: Size.zero,
+                          onPressed: widget.onDelete,
+                          child: Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: CupertinoColors.systemRed.withValues(
+                                alpha: 0.1,
+                              ),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Icon(
+                              CupertinoIcons.delete,
+                              color: CupertinoColors.systemRed,
+                              size: 18,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
                 ],
               ),
             ),
@@ -344,7 +413,7 @@ class _MealCardState extends State<MealCard>
       ),
     );
 
-    // 应用脉冲动画（如果高亮）
+    // Apply pulse animation if highlighted
     if (widget.isHighlighted && _pulseAnimation != null) {
       cardWidget = AnimatedBuilder(
         animation: _pulseAnimation!,
@@ -358,24 +427,20 @@ class _MealCardState extends State<MealCard>
     return cardWidget;
   }
 
-  Widget _buildMacroChip(
-    BuildContext context,
-    String text,
-    IconData icon,
-    Color color,
-  ) {
+  Widget _buildMacroBadge(BuildContext context, String text, Color color) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(4),
+        borderRadius: BorderRadius.circular(12), // Pill shape
       ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const SizedBox(width: 2),
-          Text(text, style: AppTextStyles.tabLabel.copyWith(color: color)),
-        ],
+      child: Text(
+        text,
+        style: AppTextStyles.caption2.copyWith(
+          color: color,
+          fontWeight: FontWeight.w600,
+          fontSize: 10,
+        ),
       ),
     );
   }

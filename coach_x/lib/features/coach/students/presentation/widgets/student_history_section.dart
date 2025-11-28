@@ -9,11 +9,13 @@ import '../../data/models/student_detail_model.dart';
 class StudentHistorySection extends StatelessWidget {
   final List<RecentTraining> recentTrainings;
   final String studentId;
+  final String studentName;
 
   const StudentHistorySection({
     super.key,
     required this.recentTrainings,
     required this.studentId,
+    required this.studentName,
   });
 
   @override
@@ -108,7 +110,9 @@ class StudentHistorySection extends StatelessWidget {
     return CupertinoButton(
       padding: EdgeInsets.zero,
       onPressed: () {
-        context.push('/training-review/${training.id}');
+        context.push(
+          '/coach/training-feed/${training.id}?studentId=$studentId&studentName=$studentName',
+        );
       },
       child: Container(
         padding: const EdgeInsets.all(10),

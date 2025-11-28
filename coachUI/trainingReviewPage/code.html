@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Training Review Page - Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Segoe UI', sans-serif;
+            background: #F5F5F7;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .phone-frame {
+            width: 390px;
+            height: 844px;
+            background: white;
+            border-radius: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .app-screen {
+            width: 100%;
+            height: 100%;
+            background: #F5F5F7;
+            overflow-y: auto;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .scrollable-content {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        /* Summary Card */
+        .summary-card {
+            background: white;
+            margin: 8px 12px;
+            padding: 12px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+
+        .summary-header {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 10px;
+        }
+
+        .summary-icon {
+            font-size: 16px;
+        }
+
+        .summary-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1D1D1F;
+            flex: 1;
+        }
+
+        /* Nutrition Row */
+        .nutrition-row {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 12px;
+        }
+
+        .nutrition-card {
+            flex: 1;
+            background: #F5F5F7;
+            padding: 8px 6px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .nutrition-label {
+            font-size: 9px;
+            color: #86868B;
+            margin-bottom: 3px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .nutrition-value {
+            font-size: 11px;
+            font-weight: 600;
+            color: #1D1D1F;
+            line-height: 1.3;
+        }
+
+        .detail-btn {
+            background: #007AFF;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 500;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        /* Exercise Comparison Row */
+        .exercise-comparison {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .comparison-item {
+            background: #F9F9FB;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .comparison-item:hover {
+            background: #F0F0F5;
+            border-color: #007AFF;
+        }
+
+        .comparison-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 4px;
+        }
+
+        .exercise-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: #1D1D1F;
+        }
+
+        .set-count {
+            font-size: 11px;
+            color: #86868B;
+        }
+
+        .comparison-stats {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 11px;
+        }
+
+        .current-stats {
+            color: #1D1D1F;
+            font-weight: 500;
+        }
+
+        .arrow-icon {
+            color: #86868B;
+            font-size: 10px;
+        }
+
+        .previous-stats {
+            color: #86868B;
+        }
+
+        .improvement-badge {
+            background: #34C759;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 600;
+            margin-left: auto;
+        }
+
+        .improvement-badge.negative {
+            background: #FF3B30;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            padding: 8px 12px 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #E5E5EA;
+        }
+
+        .back-btn {
+            font-size: 15px;
+            color: #007AFF;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 6px;
+        }
+
+        .student-info {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: 8px;
+        }
+
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .student-details h3 {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1D1D1F;
+        }
+
+        .student-details p {
+            font-size: 11px;
+            color: #86868B;
+            margin-top: 1px;
+        }
+
+        .complete-btn {
+            background: #007AFF;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        /* Exercise Info */
+        .exercise-info {
+            background: white;
+            padding: 12px;
+            margin: 8px 12px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+
+        .exercise-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .exercise-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1D1D1F;
+        }
+
+        .exercise-stats {
+            font-size: 12px;
+            color: #86868B;
+        }
+
+        .set-navigation {
+            display: flex;
+            gap: 6px;
+            overflow-x: auto;
+            padding: 2px 0;
+        }
+
+        .set-btn {
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: 1px solid #E5E5EA;
+            background: white;
+            font-size: 12px;
+            color: #1D1D1F;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+
+        .set-btn.active {
+            background: #007AFF;
+            color: white;
+            border-color: #007AFF;
+        }
+
+        /* Main Content */
+        .content-area {
+            padding: 0 12px;
+        }
+
+        .split-view {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .video-section {
+            flex: 1.5;
+        }
+
+        .video-player {
+            position: relative;
+            background: #000;
+            border-radius: 10px;
+            overflow: hidden;
+            aspect-ratio: 9/16;
+            cursor: pointer;
+        }
+
+        .video-placeholder {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+        }
+
+        .play-button {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 48px;
+            height: 48px;
+            background: rgba(255,255,255,0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .play-button:hover {
+            background: white;
+            transform: translate(-50%, -50%) scale(1.1);
+        }
+
+        .video-controls {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 8px;
+            background: linear-gradient(transparent, rgba(0,0,0,0.6));
+        }
+
+        .progress-bar {
+            height: 2px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 2px;
+            margin-bottom: 6px;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 53%;
+            background: white;
+            border-radius: 2px;
+        }
+
+        .time-display {
+            color: white;
+            font-size: 10px;
+            text-align: center;
+        }
+
+        /* Keyframes Section */
+        .keyframes-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .keyframe-item {
+            position: relative;
+            border-radius: 6px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+        }
+
+        .keyframe-item:hover {
+            transform: scale(1.02);
+            border-color: #007AFF;
+        }
+
+        .keyframe-item.has-warning {
+            border-color: #FF3B30;
+        }
+
+        .keyframe-img {
+            width: 100%;
+            aspect-ratio: 4/3;
+            background: linear-gradient(135deg, #a8c0ff 0%, #3f2b96 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 9px;
+        }
+
+        .keyframe-timestamp {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-size: 9px;
+        }
+
+        .warning-icon {
+            position: absolute;
+            bottom: 4px;
+            left: 4px;
+            background: #FF3B30;
+            color: white;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+        }
+
+        .view-all-btn {
+            padding: 6px;
+            background: white;
+            border: 1px solid #E5E5EA;
+            border-radius: 6px;
+            font-size: 11px;
+            color: #007AFF;
+            cursor: pointer;
+        }
+
+        /* Feedback Section */
+        .feedback-section {
+            background: white;
+            border-radius: 10px;
+            padding: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            margin-bottom: 12px;
+        }
+
+        .feedback-input {
+            width: 100%;
+            min-height: 60px;
+            border: 1px solid #E5E5EA;
+            border-radius: 6px;
+            padding: 10px;
+            font-size: 13px;
+            font-family: inherit;
+            resize: vertical;
+        }
+
+        /* Annotation Mode */
+        .annotation-mode {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: black;
+            z-index: 1000;
+            display: none;
+            flex-direction: column;
+        }
+
+        .annotation-mode.active {
+            display: flex;
+        }
+
+        .annotation-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            background: rgba(0,0,0,0.9);
+        }
+
+        .close-btn {
+            color: white;
+            font-size: 24px;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .done-btn {
+            color: #007AFF;
+            font-size: 17px;
+            font-weight: 600;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .annotation-canvas-area {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .annotation-image {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .annotation-toolbar {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 24px;
+            padding: 20px;
+            background: rgba(0,0,0,0.9);
+        }
+
+        .tool-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tool-btn:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .tool-btn.active {
+            background: #007AFF;
+        }
+
+        .keyframe-switcher {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            padding: 16px;
+            background: rgba(0,0,0,0.9);
+        }
+
+        .keyframe-dot {
+            width: 60px;
+            height: 4px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 2px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .keyframe-dot.active {
+            background: white;
+        }
+
+        @media (max-width: 400px) {
+            .phone-frame {
+                width: 100%;
+                height: 100vh;
+                border-radius: 0;
+            }
+        }
+
+        /* Modal for Detail Views */
+        .detail-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .detail-modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            max-width: 350px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1D1D1F;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #86868B;
+            cursor: pointer;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+        }
+
+        .meal-item {
+            padding: 12px;
+            background: #F9F9FB;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        .meal-time {
+            font-size: 13px;
+            font-weight: 600;
+            color: #1D1D1F;
+            margin-bottom: 6px;
+        }
+
+        .meal-foods {
+            font-size: 12px;
+            color: #86868B;
+            line-height: 1.5;
+        }
+
+        .meal-macros {
+            display: flex;
+            gap: 12px;
+            margin-top: 6px;
+            font-size: 11px;
+            color: #1D1D1F;
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-frame">
+        <div class="app-screen">
+            <div class="scrollable-content">
+                <!-- Header -->
+                <div class="header">
+                    <button class="back-btn">‹</button>
+                    <div class="student-info">
+                        <div class="avatar">AC</div>
+                        <div class="student-details">
+                            <h3>Alex Chen</h3>
+                            <p>Nov 11, 2025</p>
+                        </div>
+                    </div>
+                    <button class="complete-btn">Complete</button>
+                </div>
+
+                <!-- Today's Summary Card -->
+                <div class="summary-card">
+                    <div class="summary-header">
+                        <span class="summary-icon">📊</span>
+                        <span class="summary-title">Today's Summary</span>
+                        <button class="detail-btn" onclick="showNutritionDetail()">Details</button>
+                    </div>
+                    
+                    <!-- Nutrition Row -->
+                    <div class="nutrition-row">
+                        <div class="nutrition-card">
+                            <div class="nutrition-label">Calories</div>
+                            <div class="nutrition-value">2,150/<br>2,500</div>
+                        </div>
+                        <div class="nutrition-card">
+                            <div class="nutrition-label">Protein</div>
+                            <div class="nutrition-value">125/<br>150g</div>
+                        </div>
+                        <div class="nutrition-card">
+                            <div class="nutrition-label">Carbs</div>
+                            <div class="nutrition-value">200/<br>250g</div>
+                        </div>
+                        <div class="nutrition-card">
+                            <div class="nutrition-label">Fats</div>
+                            <div class="nutrition-value">15/<br>15g</div>
+                        </div>
+                    </div>
+
+                    <!-- Exercise Comparison -->
+                    <div class="exercise-comparison">
+                        <div class="comparison-item" onclick="showExerciseDetail('bench')">
+                            <div class="comparison-header">
+                                <span class="exercise-name">Bench Press</span>
+                                <span class="set-count">5 sets</span>
+                            </div>
+                            <div class="comparison-stats">
+                                <span class="current-stats">120 lbs × 5 reps</span>
+                                <span class="arrow-icon">→</span>
+                                <span class="previous-stats">was 100 lbs × 4 reps on 10/26</span>
+                                <span class="improvement-badge">+20%</span>
+                            </div>
+                        </div>
+
+                        <div class="comparison-item" onclick="showExerciseDetail('incline')">
+                            <div class="comparison-header">
+                                <span class="exercise-name">Incline Bench Press</span>
+                                <span class="set-count">4 sets</span>
+                            </div>
+                            <div class="comparison-stats">
+                                <span class="current-stats">100 lbs × 6 reps</span>
+                                <span class="arrow-icon">→</span>
+                                <span class="previous-stats">was 95 lbs × 6 reps on 10/26</span>
+                                <span class="improvement-badge">+5%</span>
+                            </div>
+                        </div>
+
+                        <div class="comparison-item" onclick="showExerciseDetail('squat')">
+                            <div class="comparison-header">
+                                <span class="exercise-name">Barbell Squat</span>
+                                <span class="set-count">5 sets</span>
+                            </div>
+                            <div class="comparison-stats">
+                                <span class="current-stats">225 lbs × 5 reps</span>
+                                <span class="arrow-icon">→</span>
+                                <span class="previous-stats">was 225 lbs × 6 reps on 10/26</span>
+                                <span class="improvement-badge negative">-17%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Exercise Info -->
+                <div class="exercise-info">
+                    <div class="exercise-header">
+                        <div>
+                            <div class="exercise-title">Exercise Record Video</div>
+                            <div class="exercise-stats">Squat - 2 • 100kg × 7 reps</div>
+                        </div>
+                    </div>
+                    <div class="set-navigation">
+                        <button class="set-btn">Squat - 1</button>
+                        <button class="set-btn active">Squat - 2</button>
+                        <button class="set-btn">Squat - 3</button>
+                        <button class="set-btn">Pushup - 1</button>
+                        <button class="set-btn">Pushup - 2</button>
+                        <button class="set-btn">Deadlift - 1</button>
+                    </div>
+                </div>
+
+                <!-- Main Content -->
+                <div class="content-area">
+                    <div class="split-view">
+                        <!-- Video Section -->
+                        <div class="video-section">
+                            <div class="video-player">
+                                <div class="video-placeholder">
+                                    Training Video
+                                </div>
+                                <div class="play-button">▶</div>
+                                <div class="video-controls">
+                                    <div class="progress-bar">
+                                        <div class="progress-fill"></div>
+                                    </div>
+                                    <div class="time-display">0:08 / 0:15</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Keyframes Section -->
+                        <div class="keyframes-section">
+                            <div class="keyframe-item" onclick="openAnnotation(0)">
+                                <div class="keyframe-img">Starting Position</div>
+                                <div class="keyframe-timestamp">00:02</div>
+                            </div>
+                            <div class="keyframe-item has-warning" onclick="openAnnotation(1)">
+                                <div class="keyframe-img">Bottom Position</div>
+                                <div class="keyframe-timestamp">00:06</div>
+                                <div class="warning-icon">⚠</div>
+                            </div>
+                            <div class="keyframe-item" onclick="openAnnotation(2)">
+                                <div class="keyframe-img">Top Lock</div>
+                                <div class="keyframe-timestamp">00:09</div>
+                            </div>
+                            <button class="view-all-btn">View All</button>
+                        </div>
+                    </div>
+
+                    <!-- Feedback Section -->
+                    <div class="feedback-section">
+                        <textarea class="feedback-input" placeholder="Add feedback for this set..."></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Annotation Mode -->
+    <div class="annotation-mode" id="annotationMode">
+        <div class="annotation-header">
+            <button class="close-btn" onclick="closeAnnotation()">✕</button>
+            <button class="done-btn" onclick="closeAnnotation()">Done</button>
+        </div>
+
+        <div class="annotation-canvas-area">
+            <div class="annotation-image">
+                <div style="width: 300px; height: 400px; background: linear-gradient(135deg, #a8c0ff 0%, #3f2b96 100%); display: flex; align-items: center; justify-content: center; color: white; border-radius: 8px;">
+                    Keyframe Image<br><small>Tap tools below to annotate</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="annotation-toolbar">
+            <button class="tool-btn" title="Pen">🖊️</button>
+            <button class="tool-btn" title="Arrow">➡️</button>
+            <button class="tool-btn" title="Text">💬</button>
+            <button class="tool-btn" title="Undo">↩️</button>
+            <button class="tool-btn" title="Clear">🗑️</button>
+        </div>
+
+        <div class="keyframe-switcher">
+            <div class="keyframe-dot active"></div>
+            <div class="keyframe-dot"></div>
+            <div class="keyframe-dot"></div>
+        </div>
+    </div>
+
+    <!-- Detail Modal -->
+    <div class="detail-modal" id="detailModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">Details</h2>
+                <button class="modal-close" onclick="closeDetailModal()">×</button>
+            </div>
+            <div id="modalBody">
+                <!-- Content will be inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openAnnotation(index) {
+            document.getElementById('annotationMode').classList.add('active');
+            
+            // Update active keyframe indicator
+            const dots = document.querySelectorAll('.keyframe-dot');
+            dots.forEach((dot, i) => {
+                dot.classList.toggle('active', i === index);
+            });
+        }
+
+        function closeAnnotation() {
+            document.getElementById('annotationMode').classList.remove('active');
+        }
+
+        function showNutritionDetail() {
+            const modalTitle = document.getElementById('modalTitle');
+            const modalBody = document.getElementById('modalBody');
+            
+            modalTitle.textContent = 'Nutrition Details';
+            modalBody.innerHTML = `
+                <div class="meal-item">
+                    <div class="meal-time">🍳 Breakfast - 8:00 AM</div>
+                    <div class="meal-foods">3 eggs, 2 whole wheat toast, 1 banana, protein shake</div>
+                    <div class="meal-macros">
+                        <span>680 kcal</span>
+                        <span>45g P</span>
+                        <span>70g C</span>
+                        <span>18g F</span>
+                    </div>
+                </div>
+                <div class="meal-item">
+                    <div class="meal-time">🥗 Lunch - 12:30 PM</div>
+                    <div class="meal-foods">Grilled chicken breast, brown rice, mixed vegetables, olive oil</div>
+                    <div class="meal-macros">
+                        <span>720 kcal</span>
+                        <span>50g P</span>
+                        <span>80g C</span>
+                        <span>12g F</span>
+                    </div>
+                </div>
+                <div class="meal-item">
+                    <div class="meal-time">🍎 Snack - 3:30 PM</div>
+                    <div class="meal-foods">Greek yogurt, almonds, apple</div>
+                    <div class="meal-macros">
+                        <span>350 kcal</span>
+                        <span>20g P</span>
+                        <span>35g C</span>
+                        <span>8g F</span>
+                    </div>
+                </div>
+                <div class="meal-item">
+                    <div class="meal-time">🍝 Dinner - 7:00 PM</div>
+                    <div class="meal-foods">Salmon, sweet potato, broccoli, avocado</div>
+                    <div class="meal-macros">
+                        <span>400 kcal</span>
+                        <span>10g P</span>
+                        <span>15g C</span>
+                        <span>7g F</span>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('detailModal').classList.add('active');
+        }
+
+        function showExerciseDetail(exercise) {
+            const modalTitle = document.getElementById('modalTitle');
+            const modalBody = document.getElementById('modalBody');
+            
+            const exerciseData = {
+                bench: {
+                    name: 'Bench Press',
+                    sets: [
+                        { set: 1, weight: 120, reps: 5 },
+                        { set: 2, weight: 120, reps: 5 },
+                        { set: 3, weight: 120, reps: 5 },
+                        { set: 4, weight: 115, reps: 6 },
+                        { set: 5, weight: 115, reps: 5 }
+                    ]
+                },
+                incline: {
+                    name: 'Incline Bench Press',
+                    sets: [
+                        { set: 1, weight: 100, reps: 6 },
+                        { set: 2, weight: 100, reps: 6 },
+                        { set: 3, weight: 100, reps: 6 },
+                        { set: 4, weight: 95, reps: 7 }
+                    ]
+                },
+                squat: {
+                    name: 'Barbell Squat',
+                    sets: [
+                        { set: 1, weight: 225, reps: 5 },
+                        { set: 2, weight: 225, reps: 5 },
+                        { set: 3, weight: 225, reps: 5 },
+                        { set: 4, weight: 225, reps: 5 },
+                        { set: 5, weight: 225, reps: 4 }
+                    ]
+                }
+            };
+            
+            const data = exerciseData[exercise];
+            modalTitle.textContent = data.name;
+            
+            let setsHTML = '';
+            data.sets.forEach(set => {
+                setsHTML += `
+                    <div class="meal-item">
+                        <div class="meal-time">Set ${set.set}</div>
+                        <div class="meal-macros">
+                            <span>${set.weight} lbs × ${set.reps} reps</span>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            modalBody.innerHTML = setsHTML;
+            document.getElementById('detailModal').classList.add('active');
+        }
+
+        function closeDetailModal() {
+            document.getElementById('detailModal').classList.remove('active');
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('detailModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeDetailModal();
+            }
+        });
+
+        // Tool button interaction
+        document.querySelectorAll('.tool-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // Keyframe switcher in annotation mode
+        document.querySelectorAll('.keyframe-dot').forEach((dot, index) => {
+            dot.addEventListener('click', function() {
+                document.querySelectorAll('.keyframe-dot').forEach(d => d.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>

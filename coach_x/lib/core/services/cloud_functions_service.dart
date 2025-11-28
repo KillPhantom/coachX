@@ -1,5 +1,7 @@
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:coach_x/core/utils/logger.dart';
+import 'package:coach_x/core/utils/json_utils.dart';
+import 'package:coach_x/core/services/auth_service.dart';
 
 /// Cloud Functions服务
 ///
@@ -367,6 +369,52 @@ class CloudFunctionsService {
         '${now.day.toString().padLeft(2, '0')}';
 
     return await call('fetch_weekly_home_stats', {'current_date': currentDate});
+  }
+
+  // ==================== 动作库管理 ====================
+
+  /// 批量创建动作模板
+  ///
+  /// [exerciseNames] 动作名称列表
+  ///
+  /// 返回 Map<exerciseName, templateId>
+  static Future<Map<String, String>> createExerciseTemplatesBatch(
+    List<String> exerciseNames,
+  ) async {
+    try {
+      AppLogger.info('🔧 调用批量创建模板 API: ${exerciseNames.length} 个');
+
+      final response = await call(
+        'create_exercise_templates_batch',
+        {
+          'coach_id': AuthService.currentUserId,
+          'exercise_names': exerciseNames,
+        },
+      );
+
+      if (response['status'] == 'success') {
+        // 使用 safeMapCast 安全处理 Firebase 返回的嵌套数据
+        final data = safeMapCast(response['data'], 'data');
+        if (data == null) {
+          throw Exception('Response data is null or invalid');
+        }
+
+        final templateIdMapData = safeMapCast(data['template_id_map'], 'template_id_map');
+        if (templateIdMapData == null) {
+          throw Exception('template_id_map is null or invalid');
+        }
+
+        final templateIdMap = Map<String, String>.from(templateIdMapData);
+
+        AppLogger.info('✅ 批量创建成功: ${templateIdMap.length} 个模板');
+        return templateIdMap;
+      } else {
+        throw Exception(response['error'] ?? 'Unknown error');
+      }
+    } catch (e) {
+      AppLogger.error('❌ 批量创建模板 API 调用失败', e);
+      rethrow;
+    }
   }
 
   // ==================== 异常处理 ====================

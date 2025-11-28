@@ -6,6 +6,7 @@ import '../models/exercise_tag_model.dart';
 import 'exercise_library_repository.dart';
 import '../../../../../core/utils/logger.dart';
 import '../../../../../core/services/auth_service.dart';
+import '../../../../../core/services/cloud_functions_service.dart';
 import '../../../../../core/exceptions/template_in_use_exception.dart';
 import '../../../plans/data/models/exercise_plan_model.dart';
 
@@ -91,6 +92,25 @@ class ExerciseLibraryRepositoryImpl implements ExerciseLibraryRepository {
       return docRef.id;
     } catch (e, stackTrace) {
       AppLogger.error('快捷创建动作模板失败', e, stackTrace);
+      rethrow;
+    }
+  }
+
+  @override
+  Future<Map<String, String>> batchCreateTemplates(
+    List<String> exerciseNames,
+  ) async {
+    try {
+      AppLogger.info('📦 Repository: 批量创建 ${exerciseNames.length} 个模板');
+
+      final templateIdMap = await CloudFunctionsService.createExerciseTemplatesBatch(
+        exerciseNames,
+      );
+
+      AppLogger.info('✅ Repository: 批量创建完成');
+      return templateIdMap;
+    } catch (e) {
+      AppLogger.error('❌ Repository: 批量创建失败', e);
       rethrow;
     }
   }

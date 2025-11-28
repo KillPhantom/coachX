@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:coach_x/core/theme/app_colors.dart';
@@ -10,13 +11,11 @@ import 'package:coach_x/core/services/ocr_service.dart';
 import 'package:coach_x/core/services/ai_service.dart';
 import 'package:coach_x/core/utils/logger.dart';
 
-/// 创建训练计划 - 文本导入视图
+/// 创建训练计划 - 智能文本导入视图
 ///
-/// 支持两种方式：
-/// 1. 扫描图片 → OCR 提取文字 → 填充文本框
-/// 2. 直接粘贴文本
-///
-/// 然后调用 AI 解析文本为训练计划
+/// 设计理念: Extension of Mind
+/// 一个类似备忘录的无限画布，用户可以随意粘贴文本或连续扫描图片，
+/// 所有内容都会汇聚在这个编辑器中，最后统一解析。
 class TextImportView extends ConsumerStatefulWidget {
   final Function(ImportResult) onImportSuccess;
 
@@ -31,26 +30,25 @@ class TextImportView extends ConsumerStatefulWidget {
 
 class _TextImportViewState extends ConsumerState<TextImportView> {
   final TextEditingController _textController = TextEditingController();
-  File? _selectedImage;
+  final FocusNode _focusNode = FocusNode();
   bool _isExtracting = false; // OCR 提取中
   bool _isParsing = false; // AI 解析中
   String? _errorMessage;
-  int _currentTab = 0; // 0: 扫描图片, 1: 粘贴文本
 
   @override
   void dispose() {
     _textController.dispose();
+    _focusNode.dispose();
     super.dispose();
   }
 
-  Future<void> _pickAndExtractText() async {
+  Future<void> _pickAndExtractText({required ImageSource source}) async {
     final picker = ImagePicker();
-    final image = await picker.pickImage(source: ImageSource.gallery);
+    final image = await picker.pickImage(source: source);
 
     if (image == null) return;
 
     setState(() {
-      _selectedImage = File(image.path);
       _isExtracting = true;
       _errorMessage = null;
     });
@@ -60,12 +58,29 @@ class _TextImportViewState extends ConsumerState<TextImportView> {
         File(image.path),
       );
 
-      setState(() {
-        _textController.text = extractedText;
-        _isExtracting = false;
-      });
+      if (extractedText.isNotEmpty) {
+        setState(() {
+          // 如果已有内容，先换行
+          if (_textController.text.isNotEmpty) {
+            _textController.text += "\n\n";
+          }
+          _textController.text += extractedText;
+          _isExtracting = false;
+        });
 
-      _showExtractionSuccessHint();
+        // 移动光标到末尾
+        _textController.selection = TextSelection.fromPosition(
+          TextPosition(offset: _textController.text.length),
+        );
+
+        // 震动反馈
+        HapticFeedback.mediumImpact();
+      } else {
+        setState(() {
+          _isExtracting = false;
+          _errorMessage = 'No text found in image';
+        });
+      }
     } catch (e) {
       AppLogger.error('OCR 提取失败', e);
       setState(() {
@@ -75,17 +90,78 @@ class _TextImportViewState extends ConsumerState<TextImportView> {
     }
   }
 
-  void _showExtractionSuccessHint() {
+  void _showScanOptions() {
     final l10n = AppLocalizations.of(context)!;
+    showCupertinoModalPopup(
+      context: context,
+      builder: (context) => CupertinoActionSheet(
+        actions: [
+          CupertinoActionSheetAction(
+            onPressed: () {
+              Navigator.pop(context);
+              _pickAndExtractText(source: ImageSource.camera);
+            },
+            child: Text(l10n.takePhoto, style: AppTextStyles.buttonMedium),
+          ),
+          CupertinoActionSheetAction(
+            onPressed: () {
+              Navigator.pop(context);
+              _pickAndExtractText(source: ImageSource.gallery);
+            },
+            child: Text(l10n.selectFromGallery, style: AppTextStyles.buttonMedium),
+          ),
+        ],
+        cancelButton: CupertinoActionSheetAction(
+          onPressed: () => Navigator.pop(context),
+          isDestructiveAction: true,
+          child: Text(l10n.cancel, style: AppTextStyles.buttonMedium),
+        ),
+      ),
+    );
+  }
+
+  void _showExampleFormat() {
+    final l10n = AppLocalizations.of(context)!;
+    showCupertinoModalPopup(
+      context: context,
+      builder: (context) => CupertinoActionSheet(
+        title: Text(l10n.exampleFormat),
+        message: Text(
+          l10n.exampleFormatContent,
+          style: AppTextStyles.body.copyWith(fontSize: 14),
+          textAlign: TextAlign.left,
+        ),
+        cancelButton: CupertinoActionSheetAction(
+          onPressed: () => Navigator.pop(context),
+          child: Text(l10n.know, style: AppTextStyles.buttonMedium),
+        ),
+      ),
+    );
+  }
+
+  void _clearText() {
+    final l10n = AppLocalizations.of(context)!;
+    if (_textController.text.isEmpty) return;
+
     showCupertinoDialog(
       context: context,
       builder: (context) => CupertinoAlertDialog(
-        title: Text(l10n.success),
-        content: Text(l10n.extractionSuccess),
+        title: Text(l10n.confirmDelete),
         actions: [
           CupertinoDialogAction(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text(l10n.ok),
+            onPressed: () => Navigator.pop(context),
+            child: Text(l10n.cancel, style: AppTextStyles.buttonMedium),
+          ),
+          CupertinoDialogAction(
+            onPressed: () {
+              setState(() {
+                _textController.clear();
+                _errorMessage = null;
+              });
+              Navigator.pop(context);
+            },
+            isDestructiveAction: true,
+            child: Text(l10n.delete, style: AppTextStyles.buttonMedium),
           ),
         ],
       ),
@@ -95,12 +171,10 @@ class _TextImportViewState extends ConsumerState<TextImportView> {
   Future<void> _parseText() async {
     final textContent = _textController.text.trim();
 
-    if (textContent.isEmpty) {
-      setState(() {
-        _errorMessage = 'Please enter or scan text first';
-      });
-      return;
-    }
+    if (textContent.isEmpty) return;
+
+    // 收起键盘
+    _focusNode.unfocus();
 
     setState(() {
       _isParsing = true;
@@ -136,247 +210,215 @@ class _TextImportViewState extends ConsumerState<TextImportView> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final isLoading = _isExtracting || _isParsing;
+    final hasText = _textController.text.isNotEmpty;
 
     return Column(
       children: [
-        // Content Area
+        // 1. Editor Area (Canvas)
         Expanded(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+          child: Container(
+            color: AppColors.cardBackground,
+            child: Stack(
               children: [
-                // Title
-                Text(
-                  l10n.textImportTitle,
-                  style: AppTextStyles.title2,
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  l10n.textImportSubtitle,
-                  style: AppTextStyles.subhead.copyWith(
-                    color: AppColors.textSecondary,
+                CupertinoTextField(
+                  controller: _textController,
+                  focusNode: _focusNode,
+                  placeholder: l10n.pasteOrTypeHere,
+                  placeholderStyle: AppTextStyles.body.copyWith(
+                    color: AppColors.textTertiary,
+                    height: 1.5,
                   ),
-                ),
-                const SizedBox(height: 24),
-
-                // Tab Selector
-                SizedBox(
-                  width: double.infinity,
-                  child: CupertinoSegmentedControl<int>(
-                    children: {
-                      0: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        child: Text(
-                          l10n.scanImage,
-                          style: AppTextStyles.callout,
-                        ),
-                      ),
-                      1: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        child: Text(
-                          l10n.pasteText,
-                          style: AppTextStyles.callout,
-                        ),
-                      ),
-                    },
-                    groupValue: _currentTab,
-                    onValueChanged: (value) {
-                      setState(() {
-                        _currentTab = value;
-                        _errorMessage = null;
-                      });
-                    },
-                    selectedColor: AppColors.primary,
-                    unselectedColor: AppColors.cardBackground,
-                    borderColor: AppColors.divider,
-                  ),
-                ),
-                const SizedBox(height: 24),
-
-                // Content based on tab
-                if (_currentTab == 0) ...[
-                  // Scan Image Tab
-                  if (_selectedImage != null) ...[
-                    // Image Preview
-                    Container(
-                      width: double.infinity,
-                      height: 200,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: AppColors.divider),
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: Image.file(
-                          _selectedImage!,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                  ],
-
-                  // Pick Image Button
-                  SizedBox(
-                    width: double.infinity,
-                    child: CupertinoButton(
-                      onPressed: isLoading ? null : _pickAndExtractText,
-                      color: AppColors.secondaryBlue,
-                      borderRadius: BorderRadius.circular(12),
-                      child: Text(
-                        _selectedImage == null
-                            ? l10n.selectImageToScan
-                            : l10n.selectAnotherImage,
-                        style: AppTextStyles.buttonMedium.copyWith(
-                          color: CupertinoColors.white,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                ],
-
-                // Text Input (always visible)
-                Text(
-                  l10n.extractedOrPastedText,
-                  style: AppTextStyles.bodyMedium,
-                ),
-                const SizedBox(height: 8),
-                Container(
-                  decoration: BoxDecoration(
-                    color: AppColors.cardBackground,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: AppColors.divider),
-                  ),
-                  child: CupertinoTextField(
-                    controller: _textController,
-                    placeholder: l10n.pasteOrTypeHere,
-                    placeholderStyle: AppTextStyles.body.copyWith(
-                      color: AppColors.textSecondary,
-                    ),
-                    style: AppTextStyles.body,
-                    maxLines: 10,
-                    minLines: 8,
-                    padding: const EdgeInsets.all(16),
-                    decoration: const BoxDecoration(),
-                    enabled: !isLoading,
-                  ),
-                ),
-                const SizedBox(height: 16),
-
-                // Example Format
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: AppColors.cardBackground,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: AppColors.divider),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        l10n.exampleFormat,
-                        style: AppTextStyles.callout.copyWith(
-                          color: AppColors.textSecondary,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        l10n.exampleFormatContent,
-                        style: AppTextStyles.footnote.copyWith(
-                          color: AppColors.textTertiary,
-                        ),
-                      ),
-                    ],
-                  ),
+                  style: AppTextStyles.body.copyWith(height: 1.5),
+                  padding: const EdgeInsets.all(20),
+                  decoration: null, // No border
+                  maxLines: null, // Infinite lines
+                  expands: true, // Fill parent
+                  textAlignVertical: TextAlignVertical.top,
+                  enabled: !isLoading,
+                  textCapitalization: TextCapitalization.sentences,
                 ),
 
-                // Error Message
-                if (_errorMessage != null) ...[
-                  const SizedBox(height: 16),
+                // Loading Overlay
+                if (isLoading)
                   Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: CupertinoColors.systemRed.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(
-                        color: CupertinoColors.systemRed.withValues(alpha: 0.3),
+                    color: AppColors.background.withValues(alpha: 0.5),
+                    child: Center(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 16,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.cardBackground,
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.shadowColor.withValues(alpha: 0.1),
+                              blurRadius: 20,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const CupertinoActivityIndicator(),
+                            const SizedBox(width: 12),
+                            Text(
+                              _isExtracting
+                                  ? l10n.extractingText
+                                  : l10n.parsingPlan,
+                              style: AppTextStyles.callout,
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                    child: Row(
-                      children: [
-                        const Icon(
-                          CupertinoIcons.exclamationmark_circle_fill,
-                          color: CupertinoColors.systemRed,
-                          size: 20,
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            _errorMessage!,
-                            style: AppTextStyles.footnote.copyWith(
-                              color: CupertinoColors.systemRed,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
                   ),
-                ],
               ],
             ),
           ),
         ),
 
-        // Bottom Button
+        // 2. Error Message (if any)
+        if (_errorMessage != null)
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+            color: CupertinoColors.systemRed.withValues(alpha: 0.1),
+            child: Row(
+              children: [
+                const Icon(
+                  CupertinoIcons.exclamationmark_circle_fill,
+                  color: CupertinoColors.systemRed,
+                  size: 16,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    _errorMessage!,
+                    style: AppTextStyles.footnote.copyWith(
+                      color: CupertinoColors.systemRed,
+                    ),
+                  ),
+                ),
+                CupertinoButton(
+                  padding: EdgeInsets.zero,
+                  minSize: 0,
+                  child: const Icon(
+                    CupertinoIcons.xmark,
+                    color: CupertinoColors.systemRed,
+                    size: 16,
+                  ),
+                  onPressed: () => setState(() => _errorMessage = null),
+                ),
+              ],
+            ),
+          ),
+
+        // 3. Toolbar & Action Area
         Container(
-          padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
             color: AppColors.background,
             border: Border(
-              top: BorderSide(color: AppColors.divider, width: 1),
+              top: BorderSide(color: AppColors.divider, width: 0.5),
             ),
           ),
           child: SafeArea(
+            top: false,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Loading Indicator
-                if (isLoading) ...[
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                // Toolbar
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
+                  child: Row(
                     children: [
-                      const CupertinoActivityIndicator(),
-                      const SizedBox(width: 12),
-                      Text(
-                        _isExtracting
-                            ? l10n.extractingText
-                            : l10n.parsingPlan,
-                        style: AppTextStyles.callout.copyWith(
+                      // Scan Button
+                      CupertinoButton(
+                        padding: EdgeInsets.zero,
+                        onPressed: isLoading ? null : _showScanOptions,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 8,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.backgroundSecondary,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(
+                                CupertinoIcons.camera_viewfinder,
+                                size: 20,
+                                color: AppColors.primary,
+                              ),
+                              const SizedBox(width: 6),
+                              Text(
+                                l10n.scanImage,
+                                style: AppTextStyles.footnote.copyWith(
+                                  color: AppColors.primary,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+
+                      const Spacer(),
+
+                      // Example Hint
+                      CupertinoButton(
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        onPressed: _showExampleFormat,
+                        child: const Icon(
+                          CupertinoIcons.lightbulb,
                           color: AppColors.textSecondary,
+                          size: 24,
+                        ),
+                      ),
+
+                      // Clear Button
+                      CupertinoButton(
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        onPressed: hasText ? _clearText : null,
+                        child: Icon(
+                          CupertinoIcons.trash,
+                          color: hasText
+                              ? CupertinoColors.systemRed
+                              : AppColors.textTertiary,
+                          size: 22,
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 16),
-                ],
+                ),
 
-                // Parse Button
-                SizedBox(
-                  width: double.infinity,
-                  child: CupertinoButton(
-                    onPressed: isLoading ? null : _parseText,
-                    color: AppColors.primary,
-                    borderRadius: BorderRadius.circular(12),
-                    disabledColor: AppColors.divider,
-                    child: Text(
-                      l10n.startParsing,
-                      style: AppTextStyles.buttonLarge.copyWith(
-                        color: CupertinoColors.white,
+                // Main Action Button
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: CupertinoButton(
+                      onPressed:
+                          (isLoading || !hasText)
+                              ? null
+                              : () {
+                                // 震动反馈
+                                HapticFeedback.mediumImpact();
+                                _parseText();
+                              },
+                      color: AppColors.primary,
+                      borderRadius: BorderRadius.circular(12),
+                      disabledColor: AppColors.primary.withValues(alpha: 0.3),
+                      child: Text(
+                        l10n.startParsing,
+                        style: AppTextStyles.buttonMedium
                       ),
                     ),
                   ),

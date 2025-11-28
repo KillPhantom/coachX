@@ -214,21 +214,27 @@ class AIFoodScannerNotifier extends StateNotifier<AIFoodAnalysisState> {
           orElse: () => plans.dietPlan!.days.first,
         );
 
-        final targetMeal = dietDay.meals.firstWhere(
+        // 尝试查找 meal，如果找不到（自动命名模式）则跳过
+        final targetMeal = dietDay.meals.cast<dynamic>().firstWhere(
           (meal) => meal.name == mealName,
+          orElse: () => null,
         );
 
-        // 使用计划值初始化输入框
-        state = state.copyWith(
-          currentCalories: targetMeal.macros.calories,
-          currentProtein: targetMeal.macros.protein,
-          currentCarbs: targetMeal.macros.carbs,
-          currentFat: targetMeal.macros.fat,
-        );
+        if (targetMeal != null) {
+          // 使用计划值初始化输入框
+          state = state.copyWith(
+            currentCalories: targetMeal.macros.calories,
+            currentProtein: targetMeal.macros.protein,
+            currentCarbs: targetMeal.macros.carbs,
+            currentFat: targetMeal.macros.fat,
+          );
 
-        AppLogger.info(
-          '✅ 初始化本餐进度为计划值: [${targetMeal.macros.calories}, ${targetMeal.macros.protein}, ${targetMeal.macros.carbs}, ${targetMeal.macros.fat}]',
-        );
+          AppLogger.info(
+            '✅ 初始化本餐进度为计划值: [${targetMeal.macros.calories}, ${targetMeal.macros.protein}, ${targetMeal.macros.carbs}, ${targetMeal.macros.fat}]',
+          );
+        } else {
+          AppLogger.info('⚠️ 自动命名模式，跳过营养值填充: $mealName');
+        }
       } catch (e) {
         AppLogger.warning('⚠️ 未找到meal: $mealName');
       }
@@ -333,7 +339,7 @@ class AIFoodScannerNotifier extends StateNotifier<AIFoodAnalysisState> {
       );
 
       if (existingMealIndex != -1) {
-        // ✅ Meal 已存在，追加 FoodItem
+        // ✅ Meal 已存在，覆盖 FoodItem
         targetMeal = currentDiet.meals[existingMealIndex];
         AppLogger.info('找到已存在的 meal: ${state.selectedMealName}');
       } else {
@@ -353,19 +359,30 @@ class AIFoodScannerNotifier extends StateNotifier<AIFoodAnalysisState> {
           orElse: () => plans.dietPlan!.days.first,
         );
 
-        final planMeal = dietDay.meals.firstWhere(
+        // 尝试从计划中查找 meal
+        final planMeal = dietDay.meals.cast<dynamic>().firstWhere(
           (meal) => meal.name == state.selectedMealName,
-          orElse: () =>
-              throw Exception('计划中未找到指定的餐次: ${state.selectedMealName}'),
+          orElse: () => null,
         );
 
-        // 创建新 Meal（保留 name 和 note，items 为空）
-        targetMeal = Meal(
-          name: planMeal.name,
-          note: planMeal.note,
-          items: [],
-          images: [],
-        );
+        if (planMeal != null) {
+          // 创建新 Meal（保留 name 和 note，items 为空）
+          targetMeal = Meal(
+            name: planMeal.name,
+            note: planMeal.note,
+            items: [],
+            images: [],
+          );
+        } else {
+          // 计划中没有找到（dietDay.meals 为空或未匹配），使用自动生成的名称
+          AppLogger.info('计划中未找到餐次，使用自动生成名称: ${state.selectedMealName}');
+          targetMeal = Meal(
+            name: state.selectedMealName!, // 使用已经自动生成的名称
+            note: '',
+            items: [],
+            images: [],
+          );
+        }
       }
 
       // 7. 创建 FoodItem 保存用户输入的营养值
@@ -379,12 +396,12 @@ class AIFoodScannerNotifier extends StateNotifier<AIFoodAnalysisState> {
         isCustomInput: true,
       );
 
-      // 8. 更新 Meal
+      // 8. 更新 Meal（覆盖模式）
       final updatedMeal = targetMeal.copyWith(
-        items: [...targetMeal.items, foodItem],
+        items: [foodItem], // 覆盖模式：只保留新的 foodItem
         images: state.imageUrl != null
-            ? [...targetMeal.images, state.imageUrl!]
-            : targetMeal.images,
+            ? [state.imageUrl!] // 覆盖模式：只保留新的图片
+            : [],
       );
 
       // 9. 更新 meals 列表

@@ -93,6 +93,24 @@ service firebase.storage {
       allow write: if isAuthenticated() && isValidImage();
     }
 
+    // ==================== 训练反馈图片 ====================
+    // Path: feedback_images/{dailyTrainingId}/{fileName}
+    match /feedback_images/{dailyTrainingId}/{fileName} {
+      // 允许已认证用户上传反馈图片（教练和学生都可以）
+      allow write: if isAuthenticated() && isValidImage();
+      // 允许已认证用户读取反馈图片
+      allow read: if isAuthenticated();
+    }
+
+    // ==================== 训练反馈语音 ====================
+    // Path: feedback_voices/{dailyTrainingId}/{fileName}
+    match /feedback_voices/{dailyTrainingId}/{fileName} {
+      // 允许已认证用户上传反馈语音（教练和学生都可以）
+      allow write: if isAuthenticated();
+      // 允许已认证用户读取反馈语音
+      allow read: if isAuthenticated();
+    }
+
     // ==================== 学生训练视频和缩略图 ====================
     // Path: students/trainings/{userId}/{fileName}
     match /students/trainings/{userId}/{fileName} {

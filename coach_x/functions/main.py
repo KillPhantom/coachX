@@ -99,6 +99,9 @@ from body_stats.handlers import (
 from exercise_library.handlers import (
     delete_exercise_template
 )
+from exercise_library.batch_handlers import (
+    create_exercise_templates_batch
+)
 
 # ==================== 导出所有函数 ====================
 __all__ = [
@@ -164,4 +167,5 @@ __all__ = [
 
     # 动作库
     'delete_exercise_template',
+    'create_exercise_templates_batch',
 ]

@@ -342,7 +342,10 @@ class _CoachProfilePageState extends ConsumerState<CoachProfilePage> {
         content: Text(l10n.confirmLogOutMessage),
         actions: [
           CupertinoDialogAction(
-            child: Text(l10n.cancel),
+            child: Text(
+              l10n.cancel,
+              style: AppTextStyles.bodyMedium,
+            ),
             onPressed: () => Navigator.of(context).pop(),
           ),
           CupertinoDialogAction(

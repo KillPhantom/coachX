@@ -11,12 +11,16 @@ class TagSelector extends StatelessWidget {
   final List<String> selectedTags;
   final List<ExerciseTagModel> availableTags;
   final ValueChanged<List<String>> onTagsChanged;
+  final bool allowAdd;
+  final bool showTitle;
 
   const TagSelector({
     super.key,
     required this.selectedTags,
     required this.availableTags,
     required this.onTagsChanged,
+    this.allowAdd = true,
+    this.showTitle = true,
   });
 
   void _toggleTag(String tagName) {
@@ -43,16 +47,18 @@ class TagSelector extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(l10n.selectTags, style: AppTextStyles.bodyMedium),
-        const SizedBox(height: AppDimensions.spacingS),
+        if (showTitle) ...[
+          Text(l10n.selectTags, style: AppTextStyles.bodyMedium),
+          const SizedBox(height: AppDimensions.spacingS),
+        ],
         SizedBox(
-          height: 40,
+          height: 32,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
-            itemCount: availableTags.length + 1, // +1 for add button
+            itemCount: availableTags.length + (allowAdd ? 1 : 0),
             itemBuilder: (context, index) {
               // 最后一个是添加按钮
-              if (index == availableTags.length) {
+              if (allowAdd && index == availableTags.length) {
                 return Padding(
                   padding: const EdgeInsets.only(right: AppDimensions.spacingS),
                   child: CupertinoButton(
@@ -60,6 +66,7 @@ class TagSelector extends StatelessWidget {
                       horizontal: AppDimensions.spacingM,
                     ),
                     color: AppColors.dividerLight,
+                    borderRadius: BorderRadius.circular(16),
                     minimumSize: Size.zero,
                     onPressed: () => _showAddTagDialog(context),
                     child: Row(
@@ -67,13 +74,13 @@ class TagSelector extends StatelessWidget {
                       children: [
                         const Icon(
                           CupertinoIcons.add,
-                          size: 16,
+                          size: 14,
                           color: AppColors.primaryText,
                         ),
                         const SizedBox(width: 4),
                         Text(
                           l10n.addTag,
-                          style: AppTextStyles.footnote.copyWith(
+                          style: AppTextStyles.caption1.copyWith(
                             color: AppColors.primaryText,
                           ),
                         ),
@@ -95,11 +102,12 @@ class TagSelector extends StatelessWidget {
                   color: isSelected
                       ? AppColors.primaryColor
                       : AppColors.dividerLight,
+                  borderRadius: BorderRadius.circular(16),
                   minimumSize: Size.zero,
                   onPressed: () => _toggleTag(tag.name),
                   child: Text(
                     tag.name,
-                    style: AppTextStyles.footnote.copyWith(
+                    style: AppTextStyles.caption1.copyWith(
                       color: isSelected
                           ? AppColors.primaryText
                           : AppColors.textSecondary,
@@ -111,7 +119,7 @@ class TagSelector extends StatelessWidget {
           ),
         ),
         // 验证提示
-        if (selectedTags.isEmpty)
+        if (selectedTags.isEmpty && showTitle)
           Padding(
             padding: const EdgeInsets.only(top: AppDimensions.spacingS),
             child: Text(

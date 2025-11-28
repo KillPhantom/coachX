@@ -18,6 +18,7 @@ import 'package:coach_x/features/coach/plans/presentation/providers/edit_convers
 import 'package:coach_x/features/coach/plans/presentation/widgets/create_plan/initial_view.dart';
 import 'package:coach_x/features/coach/plans/presentation/widgets/create_plan/ai_guided_view.dart';
 import 'package:coach_x/features/coach/plans/presentation/widgets/create_plan/text_import_view.dart';
+import 'package:coach_x/features/coach/plans/presentation/widgets/create_plan/ai_streaming_view.dart';
 import 'package:coach_x/features/coach/plans/presentation/widgets/create_plan/editing_view.dart';
 import 'package:coach_x/features/coach/plans/presentation/widgets/ai_edit_chat_panel.dart';
 import 'package:coach_x/features/coach/plans/presentation/widgets/review_mode_overlay.dart';
@@ -36,9 +37,6 @@ class CreateTrainingPlanPage extends ConsumerStatefulWidget {
 
 class _CreateTrainingPlanPageState
     extends ConsumerState<CreateTrainingPlanPage> {
-  // 页面状态
-  CreatePlanPageState _pageState = CreatePlanPageState.initial;
-
   // 当前选中的训练日索引
   int? _selectedDayIndex;
 
@@ -52,9 +50,8 @@ class _CreateTrainingPlanPageState
         await _loadPlan();
       } else {
         // 创建模式：显示初始选择页面
-        setState(() {
-          _pageState = CreatePlanPageState.initial;
-        });
+        ref.read(createPlanPageStateProvider.notifier).state =
+            CreatePlanPageState.initial;
       }
     });
   }
@@ -70,8 +67,9 @@ class _CreateTrainingPlanPageState
       final state = ref.read(createTrainingPlanNotifierProvider);
       AppLogger.info('✅ 计划加载成功 - 训练日数量: ${state.days.length}');
 
+      ref.read(createPlanPageStateProvider.notifier).state =
+          CreatePlanPageState.editing;
       setState(() {
-        _pageState = CreatePlanPageState.editing;
         _selectedDayIndex = state.days.isNotEmpty ? 0 : null;
       });
     } else if (mounted) {
@@ -96,22 +94,45 @@ class _CreateTrainingPlanPageState
     final isReviewMode = ref.watch(isReviewModeProvider);
     final reviewState = ref.watch(suggestionReviewNotifierProvider);
 
-    // 监听 AI 生成状态变化（自动切换到编辑模式）
+    // 监听页面状态变化（用于自动切换）
+    final pageState = ref.watch(createPlanPageStateProvider);
+
+    // 监听 AI 生成状态变化（已在 generateFromParamsStreaming 中处理）
     ref.listen<CreateTrainingPlanState>(createTrainingPlanNotifierProvider, (
       previous,
       next,
     ) {
       if (!mounted) return;
 
-      // AI 生成完成 → 自动切换到编辑模式
+      // 流式生成完成后，updatePageState 会自动切换到 editing
+      // 这里处理普通 AI 生成（非流式）的情况
       if (previous?.aiStatus == AIGenerationStatus.generating &&
           next.aiStatus == AIGenerationStatus.success &&
-          _pageState == CreatePlanPageState.aiGuided) {
+          pageState == CreatePlanPageState.aiGuided) {
+        ref.read(createPlanPageStateProvider.notifier).state =
+            CreatePlanPageState.editing;
         setState(() {
-          _pageState = CreatePlanPageState.editing;
           _selectedDayIndex = next.days.isNotEmpty ? 0 : null;
         });
         AppLogger.info('✅ AI 生成完成，切换到编辑模式');
+      }
+    });
+
+    // 监听页面状态变化（处理 AI Streaming 完成）
+    ref.listen<CreatePlanPageState>(createPlanPageStateProvider, (
+      previous,
+      next,
+    ) {
+      if (!mounted) return;
+
+      // 当从 aiStreaming 切换到 editing 时，默认选中第一天
+      if (previous == CreatePlanPageState.aiStreaming &&
+          next == CreatePlanPageState.editing) {
+        final state = ref.read(createTrainingPlanNotifierProvider);
+        setState(() {
+          _selectedDayIndex = state.days.isNotEmpty ? 0 : null;
+        });
+        AppLogger.info('✅ AI Streaming 完成，默认选中第一天');
       }
     });
 
@@ -140,7 +161,13 @@ class _CreateTrainingPlanPageState
 
     return CupertinoPageScaffold(
       backgroundColor: CupertinoColors.systemGroupedBackground,
-      navigationBar: _buildNavigationBar(context, l10n, state, notifier),
+      navigationBar: _buildNavigationBar(
+        context,
+        l10n,
+        state,
+        notifier,
+        pageState,
+      ),
       child: Stack(
         children: [
           // Main Content
@@ -174,16 +201,20 @@ class _CreateTrainingPlanPageState
     AppLocalizations l10n,
     CreateTrainingPlanState state,
     notifier,
+    CreatePlanPageState pageState,
   ) {
     return CupertinoNavigationBar(
       backgroundColor: CupertinoColors.systemBackground.resolveFrom(context),
-      middle: Text(_getTitle(l10n, state), style: AppTextStyles.navTitle),
+      middle: Text(
+        _getTitle(l10n, state, pageState),
+        style: AppTextStyles.navTitle,
+      ),
       leading: CupertinoButton(
         padding: EdgeInsets.zero,
         onPressed: () => _onBack(context, notifier),
         child: const Icon(CupertinoIcons.back, color: AppColors.primaryText),
       ),
-      trailing: _pageState == CreatePlanPageState.editing && state.isEditMode
+      trailing: pageState == CreatePlanPageState.editing && state.isEditMode
           ? CupertinoButton(
               padding: EdgeInsets.zero,
               onPressed: () => _showAIEditChatPanel(context, notifier),
@@ -197,8 +228,12 @@ class _CreateTrainingPlanPageState
   }
 
   /// 获取页面标题
-  String _getTitle(AppLocalizations l10n, CreateTrainingPlanState state) {
-    if (_pageState == CreatePlanPageState.editing && state.isEditMode) {
+  String _getTitle(
+    AppLocalizations l10n,
+    CreateTrainingPlanState state,
+    CreatePlanPageState pageState,
+  ) {
+    if (pageState == CreatePlanPageState.editing && state.isEditMode) {
       return l10n.editPlan;
     }
     return l10n.createPlanTitle;
@@ -210,7 +245,9 @@ class _CreateTrainingPlanPageState
     CreateTrainingPlanState state,
     notifier,
   ) {
-    switch (_pageState) {
+    final pageState = ref.watch(createPlanPageStateProvider);
+
+    switch (pageState) {
       case CreatePlanPageState.initial:
         return InitialView(
           onAIGuidedTap: _onAIGuidedTap,
@@ -229,6 +266,9 @@ class _CreateTrainingPlanPageState
 
       case CreatePlanPageState.textImport:
         return TextImportView(onImportSuccess: _onImportSuccess);
+
+      case CreatePlanPageState.aiStreaming:
+        return const AIStreamingView();
 
       case CreatePlanPageState.editing:
         return EditingView(
@@ -263,9 +303,8 @@ class _CreateTrainingPlanPageState
   void _onAIGuidedTap() {
     final notifier = ref.read(createTrainingPlanNotifierProvider.notifier);
     notifier.reset();
-    setState(() {
-      _pageState = CreatePlanPageState.aiGuided;
-    });
+    ref.read(createPlanPageStateProvider.notifier).state =
+        CreatePlanPageState.aiGuided;
     AppLogger.info('🤖 AI 引导创建模式 - 已重置状态');
   }
 
@@ -273,9 +312,8 @@ class _CreateTrainingPlanPageState
   void _onTextImportTap() {
     final notifier = ref.read(createTrainingPlanNotifierProvider.notifier);
     notifier.reset();
-    setState(() {
-      _pageState = CreatePlanPageState.textImport;
-    });
+    ref.read(createPlanPageStateProvider.notifier).state =
+        CreatePlanPageState.textImport;
     AppLogger.info('📄 文本导入模式 - 已重置状态');
   }
 
@@ -284,8 +322,9 @@ class _CreateTrainingPlanPageState
     final notifier = ref.read(createTrainingPlanNotifierProvider.notifier);
     notifier.reset();
     notifier.addDay(name: 'Day 1');
+    ref.read(createPlanPageStateProvider.notifier).state =
+        CreatePlanPageState.editing;
     setState(() {
-      _pageState = CreatePlanPageState.editing;
       _selectedDayIndex = 0;
     });
     AppLogger.info('✍️ 手动创建模式 - 已重置状态并添加第一天');
@@ -300,8 +339,9 @@ class _CreateTrainingPlanPageState
       // 加载导入的计划到状态中
       notifier.loadFromImportResult(result);
 
+      ref.read(createPlanPageStateProvider.notifier).state =
+          CreatePlanPageState.editing;
       setState(() {
-        _pageState = CreatePlanPageState.editing;
         _selectedDayIndex = 0;
       });
 
@@ -407,8 +447,10 @@ class _CreateTrainingPlanPageState
 
   /// 返回（支持多层级返回）
   void _onBack(BuildContext context, notifier) {
+    final pageState = ref.read(createPlanPageStateProvider);
+
     // 场景 1: 在编辑模式且有未保存的更改 → 显示确认对话框
-    if (_pageState == CreatePlanPageState.editing &&
+    if (pageState == CreatePlanPageState.editing &&
         notifier.state.hasUnsavedChanges) {
       showCupertinoDialog(
         context: context,
@@ -446,7 +488,8 @@ class _CreateTrainingPlanPageState
                 // 判断是否回到 initial 或完全退出
                 if (widget.planId == null) {
                   // 创建模式：返回到 initial
-                  setState(() => _pageState = CreatePlanPageState.initial);
+                  ref.read(createPlanPageStateProvider.notifier).state =
+                      CreatePlanPageState.initial;
                 } else {
                   // 编辑模式：清除对话历史并退出
                   ref
@@ -462,10 +505,32 @@ class _CreateTrainingPlanPageState
       return;
     }
 
-    // 场景 2: 在 editing/aiGuided/textImport 状态且为创建模式 → 返回到 initial
-    if (_pageState != CreatePlanPageState.initial && widget.planId == null) {
-      setState(() => _pageState = CreatePlanPageState.initial);
+    // 场景 2a: aiGuided 或 textImport 状态 → 总是返回到 initial
+    if ((pageState == CreatePlanPageState.aiGuided ||
+            pageState == CreatePlanPageState.textImport) &&
+        widget.planId == null) {
+      ref.read(createPlanPageStateProvider.notifier).state =
+          CreatePlanPageState.initial;
       AppLogger.info('🔙 返回到创建方式选择页面');
+      return;
+    }
+
+    // 场景 2b: editing/aiStreaming 状态且为创建模式 → 返回到前一个状态
+    if (pageState != CreatePlanPageState.initial && widget.planId == null) {
+      // 检查是否有前一个页面状态
+      final previousState = notifier.previousPageState;
+
+      if (previousState != null &&
+          previousState != CreatePlanPageState.editing) {
+        // 返回到前一个状态（如 aiGuided, textImport, 或 aiStreaming）
+        ref.read(createPlanPageStateProvider.notifier).state = previousState;
+        AppLogger.info('🔙 返回到前一个页面: $previousState');
+      } else {
+        // 没有前一个状态或前一个状态也是 editing，返回到 initial
+        ref.read(createPlanPageStateProvider.notifier).state =
+            CreatePlanPageState.initial;
+        AppLogger.info('🔙 返回到创建方式选择页面');
+      }
       return;
     }
 

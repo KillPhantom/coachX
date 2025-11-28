@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>训能矩阵 - Exercise Library</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', sans-serif;
+            background: #F2F2F7;
+            color: #000000;
+            overscroll-behavior: none;
+            max-width: 428px;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        /* iOS Status Bar */
+        .status-bar {
+            height: 44px;
+            background: #F2F2F7;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            font-size: 15px;
+            font-weight: 600;
+        }
+        
+        .status-time {
+            font-weight: 600;
+        }
+        
+        .status-icons {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+        }
+
+        /* iOS Navigation Bar */
+        .nav-bar {
+            background: rgba(242, 242, 247, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 8px 20px 12px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 0.5px solid rgba(0,0,0,0.1);
+        }
+
+        .nav-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .nav-title {
+            font-size: 34px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .btn-add {
+            background: #007AFF;
+            color: white;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 16px;
+            font-size: 20px;
+            font-weight: 300;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s;
+            box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
+        }
+
+        .btn-add:active {
+            transform: scale(0.95);
+        }
+
+        .search-bar {
+            width: 100%;
+            padding: 10px 12px;
+            border: none;
+            border-radius: 10px;
+            font-size: 17px;
+            background: rgba(120, 120, 128, 0.12);
+            margin-bottom: 16px;
+            color: #000;
+        }
+        
+        .search-bar::placeholder {
+            color: rgba(60, 60, 67, 0.6);
+        }
+
+        .filters {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+        
+        .filters::-webkit-scrollbar {
+            display: none;
+        }
+
+        .filter-chip {
+            padding: 7px 16px;
+            border: none;
+            border-radius: 18px;
+            background: rgba(120, 120, 128, 0.12);
+            font-size: 15px;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 400;
+        }
+
+        .filter-chip:active {
+            transform: scale(0.96);
+        }
+
+        .filter-chip.active {
+            background: #007AFF;
+            color: white;
+        }
+
+        /* Exercise Grid */
+        .exercise-grid {
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .exercise-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.2s;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            display: flex;
+            flex-direction: row;
+        }
+
+        .exercise-card:active {
+            transform: scale(0.98);
+        }
+
+        .card-image {
+            width: 120px;
+            min-height: 120px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 44px;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .card-content {
+            padding: 16px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .card-title {
+            font-size: 17px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #000;
+        }
+
+        .card-tags {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            background: rgba(120, 120, 128, 0.12);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            color: rgba(60, 60, 67, 0.6);
+            font-weight: 500;
+        }
+
+        /* iOS Sheet Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.4);
+            display: none;
+            z-index: 1000;
+            animation: fadeIn 0.3s;
+        }
+
+        .modal-overlay.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { 
+                transform: translateY(100%);
+                opacity: 0;
+            }
+            to { 
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .bottom-sheet {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            max-width: 428px;
+            margin: 0 auto;
+            background: #F2F2F7;
+            border-radius: 12px 12px 0 0;
+            max-height: 92vh;
+            overflow-y: auto;
+            z-index: 1001;
+            animation: slideUp 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .modal-header {
+            padding: 16px 20px;
+            background: #F2F2F7;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            border-bottom: 0.5px solid rgba(60, 60, 67, 0.12);
+        }
+
+        .modal-handle {
+            width: 36px;
+            height: 5px;
+            background: rgba(60, 60, 67, 0.3);
+            border-radius: 3px;
+            margin: 0 auto 12px;
+        }
+
+        .modal-header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            letter-spacing: -0.3px;
+        }
+
+        .btn-close {
+            background: transparent;
+            border: none;
+            color: #007AFF;
+            font-size: 17px;
+            font-weight: 400;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .btn-close:active {
+            opacity: 0.3;
+        }
+
+        .modal-body {
+            padding: 20px 0;
+        }
+
+        .form-section {
+            margin-bottom: 32px;
+            padding: 0 20px;
+        }
+
+        .section-title {
+            font-size: 13px;
+            font-weight: 400;
+            margin-bottom: 8px;
+            color: rgba(60, 60, 67, 0.6);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding-left: 4px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 10px;
+            font-size: 17px;
+            font-family: inherit;
+            background: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+
+        .form-input:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+        }
+        
+        .form-input::placeholder {
+            color: rgba(60, 60, 67, 0.3);
+        }
+
+        /* Video Upload Zone */
+        .video-upload-zone {
+            border: 2px dashed rgba(120, 120, 128, 0.3);
+            border-radius: 12px;
+            padding: 48px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: white;
+        }
+
+        .video-upload-zone:active {
+            transform: scale(0.98);
+            background: rgba(0, 122, 255, 0.05);
+        }
+
+        .upload-icon {
+            font-size: 52px;
+            margin-bottom: 12px;
+        }
+
+        .upload-text {
+            font-size: 17px;
+            color: #000;
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+
+        .upload-hint {
+            font-size: 13px;
+            color: rgba(60, 60, 67, 0.6);
+        }
+
+        /* Image Upload Grid */
+        .image-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .image-upload-box {
+            aspect-ratio: 1;
+            border: 2px dashed rgba(120, 120, 128, 0.3);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: white;
+            font-size: 28px;
+            color: rgba(120, 120, 128, 0.5);
+        }
+
+        .image-upload-box:active {
+            transform: scale(0.95);
+            background: rgba(0, 122, 255, 0.05);
+        }
+
+        /* Text Editor */
+        .text-editor {
+            min-height: 120px;
+            resize: vertical;
+            line-height: 1.5;
+        }
+
+        .editor-hint {
+            font-size: 13px;
+            color: rgba(60, 60, 67, 0.6);
+            margin-top: 8px;
+            padding-left: 4px;
+        }
+
+        /* Category Tags */
+        .category-selector {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .category-tag {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 20px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 15px;
+            font-weight: 400;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+
+        .category-tag:active {
+            transform: scale(0.96);
+        }
+
+        .category-tag.selected {
+            background: #007AFF;
+            color: white;
+        }
+
+        /* Modal Actions */
+        .modal-actions {
+            padding: 12px 20px 32px;
+            border-top: 0.5px solid rgba(60, 60, 67, 0.12);
+            display: flex;
+            gap: 12px;
+            position: sticky;
+            bottom: 0;
+            background: #F2F2F7;
+        }
+
+        .btn-secondary {
+            flex: 1;
+            padding: 16px;
+            border: none;
+            background: white;
+            border-radius: 12px;
+            font-size: 17px;
+            font-weight: 500;
+            cursor: pointer;
+            color: #007AFF;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+        
+        .btn-secondary:active {
+            transform: scale(0.98);
+            opacity: 0.7;
+        }
+
+        .btn-save {
+            flex: 2;
+            padding: 16px;
+            background: #007AFF;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
+        }
+        
+        .btn-save:active {
+            transform: scale(0.98);
+            opacity: 0.8;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: rgba(60, 60, 67, 0.6);
+        }
+
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+        }
+        
+        /* iOS Home Indicator */
+        .home-indicator {
+            height: 34px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #F2F2F7;
+        }
+        
+        .home-indicator-bar {
+            width: 134px;
+            height: 5px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 3px;
+        }
+    
+    </style>
+</head>
+<body>
+    <!-- iOS Status Bar -->
+    <div class="status-bar">
+        <span class="status-time">9:41</span>
+        <div class="status-icons">
+            <span>📶</span>
+            <span>📡</span>
+            <span>🔋</span>
+        </div>
+    </div>
+
+    <!-- iOS Navigation Bar -->
+    <div class="nav-bar">
+        <div class="nav-header">
+            <h1 class="nav-title">训能矩阵</h1>
+            <button class="btn-add" onclick="openModal('new')">+</button>
+        </div>
+        <input type="text" class="search-bar" placeholder="Search">
+        <div class="filters">
+            <div class="filter-chip active">All</div>
+            <div class="filter-chip">Upper Body</div>
+            <div class="filter-chip">Lower Body</div>
+            <div class="filter-chip">Core</div>
+            <div class="filter-chip">Cardio</div>
+            <div class="filter-chip">Bodyweight</div>
+            <div class="filter-chip">Equipment</div>
+        </div>
+    </div>
+
+    <!-- Exercise Grid -->
+    <div class="exercise-grid" id="exerciseGrid">
+        <!-- Sample Exercise Cards -->
+        <div class="exercise-card" onclick="openModal('edit')">
+            <div class="card-image" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                🏋️
+            </div>
+            <div class="card-content">
+                <div class="card-title">Barbell Squat</div>
+                <div class="card-tags">
+                    <span class="tag">Lower Body</span>
+                    <span class="tag">Barbell</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="exercise-card" onclick="openModal('edit')">
+            <div class="card-image" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                💪
+            </div>
+            <div class="card-content">
+                <div class="card-title">Push-ups</div>
+                <div class="card-tags">
+                    <span class="tag">Upper Body</span>
+                    <span class="tag">Bodyweight</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="exercise-card" onclick="openModal('edit')">
+            <div class="card-image" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                🏃
+            </div>
+            <div class="card-content">
+                <div class="card-title">Treadmill Sprint</div>
+                <div class="card-tags">
+                    <span class="tag">Cardio</span>
+                    <span class="tag">Treadmill</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="exercise-card" onclick="openModal('edit')">
+            <div class="card-image" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+                🧘
+            </div>
+            <div class="card-content">
+                <div class="card-title">Plank</div>
+                <div class="card-tags">
+                    <span class="tag">Core</span>
+                    <span class="tag">Bodyweight</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="exercise-card" onclick="openModal('edit')">
+            <div class="card-image" style="background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);">
+                🎯
+            </div>
+            <div class="card-content">
+                <div class="card-title">Deadlift</div>
+                <div class="card-tags">
+                    <span class="tag">Lower Body</span>
+                    <span class="tag">Barbell</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="exercise-card" onclick="openModal('edit')">
+            <div class="card-image" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);">
+                🤸
+            </div>
+            <div class="card-content">
+                <div class="card-title">Burpees</div>
+                <div class="card-tags">
+                    <span class="tag">Full Body</span>
+                    <span class="tag">Bodyweight</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- iOS Home Indicator -->
+    <div class="home-indicator">
+        <div class="home-indicator-bar"></div>
+    </div>
+
+    <!-- Bottom Sheet Modal -->
+    <div class="modal-overlay" id="modalOverlay" onclick="closeModal()"></div>
+    <div class="bottom-sheet" id="bottomSheet" style="display: none;">
+        <div class="modal-header">
+            <div class="modal-handle"></div>
+            <div class="modal-header-content">
+                <h2 class="modal-title" id="modalTitle">New Exercise</h2>
+                <button class="btn-close" onclick="closeModal()">Done</button>
+            </div>
+        </div>
+
+        <div class="modal-body">
+            <!-- Basic Info -->
+            <div class="form-section">
+                <label class="section-title">Exercise Name</label>
+                <input type="text" class="form-input" placeholder="e.g., Barbell Back Squat">
+            </div>
+
+            <!-- Categories -->
+            <div class="form-section">
+                <label class="section-title">Category</label>
+                <div class="category-selector">
+                    <div class="category-tag">Upper Body</div>
+                    <div class="category-tag selected">Lower Body</div>
+                    <div class="category-tag">Core</div>
+                    <div class="category-tag">Full Body</div>
+                    <div class="category-tag">Cardio</div>
+                </div>
+            </div>
+
+            <!-- Equipment -->
+            <div class="form-section">
+                <label class="section-title">Equipment</label>
+                <div class="category-selector">
+                    <div class="category-tag selected">Barbell</div>
+                    <div class="category-tag">Dumbbell</div>
+                    <div class="category-tag">Kettlebell</div>
+                    <div class="category-tag">Bodyweight</div>
+                    <div class="category-tag">Machine</div>
+                    <div class="category-tag">Resistance Band</div>
+                </div>
+            </div>
+
+            <!-- Video Upload (PRIMARY) -->
+            <div class="form-section">
+                <label class="section-title">Guidance Video (Primary) ⭐</label>
+                <div class="video-upload-zone">
+                    <div class="upload-icon">📹</div>
+                    <div class="upload-text">Click to upload or record video</div>
+                    <div class="upload-hint">MP4, MOV up to 100MB</div>
+                </div>
+            </div>
+
+            <!-- Text Guidance -->
+            <div class="form-section">
+                <label class="section-title">Text Guidance</label>
+                <textarea 
+                    class="form-input text-editor" 
+                    placeholder="Describe the proper form and execution...&#10;&#10;Example:&#10;Setup: Stand with feet shoulder-width apart...&#10;Execution: Lower your body by bending at hips and knees...&#10;Common Mistakes: Knees caving inward, rounding the back..."
+                ></textarea>
+                <div class="editor-hint">💡 Tip: Structure as Setup → Execution → Common Mistakes</div>
+            </div>
+
+            <!-- Supporting Images -->
+            <div class="form-section">
+                <label class="section-title">Supporting Images (Optional)</label>
+                <div class="image-grid">
+                    <div class="image-upload-box">+</div>
+                    <div class="image-upload-box">+</div>
+                    <div class="image-upload-box">+</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="modal-actions">
+            <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+            <button class="btn-save" onclick="saveExercise()">Save Exercise</button>
+        </div>
+    </div>
+
+    <script>
+        function openModal(mode) {
+            const modal = document.getElementById('bottomSheet');
+            const overlay = document.getElementById('modalOverlay');
+            const title = document.getElementById('modalTitle');
+            
+            title.textContent = mode === 'new' ? 'New Exercise' : 'Edit Exercise';
+            
+            overlay.classList.add('active');
+            modal.style.display = 'block';
+            
+            // Prevent body scroll
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('bottomSheet');
+            const overlay = document.getElementById('modalOverlay');
+            
+            overlay.classList.remove('active');
+            modal.style.display = 'none';
+            
+            // Restore body scroll
+            document.body.style.overflow = 'auto';
+        }
+
+        function saveExercise() {
+            // Simulate save
+            alert('Exercise saved! 💪');
+            closeModal();
+        }
+
+        // Filter chip interaction
+        document.querySelectorAll('.filter-chip').forEach(chip => {
+            chip.addEventListener('click', function() {
+                document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // Category tag interaction
+        document.querySelectorAll('.category-tag').forEach(tag => {
+            tag.addEventListener('click', function() {
+                this.classList.toggle('selected');
+            });
+        });
+
+        // Close modal on escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>

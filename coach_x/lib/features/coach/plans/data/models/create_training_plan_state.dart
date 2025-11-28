@@ -3,7 +3,9 @@ import 'package:coach_x/core/enums/ai_status.dart';
 import 'package:coach_x/features/coach/plans/data/models/exercise_training_day.dart';
 import 'package:coach_x/features/coach/plans/data/models/ai/ai_suggestion.dart';
 import 'package:coach_x/core/utils/plan_validator.dart';
+import 'ai_streaming_stats.dart';
 import 'exercise_plan_model.dart';
+import 'plan_generation_params.dart';
 
 /// 创建训练计划页面状态模型
 class CreateTrainingPlanState {
@@ -26,6 +28,18 @@ class CreateTrainingPlanState {
   /// 当前正在生成的天数
   final int? currentDayNumber;
 
+  /// AI 流式生成统计
+  final AIStreamingStats? aiStreamingStats;
+
+  /// 当前执行步骤 (1-4)
+  final int currentStep;
+
+  /// 当前步骤进度 (0-100)
+  final double currentStepProgress;
+
+  /// 上一次 AI 生成使用的参数（用于重试）
+  final PlanGenerationParams? lastGenerationParams;
+
   const CreateTrainingPlanState({
     this.planId,
     this.planName = '',
@@ -41,6 +55,10 @@ class CreateTrainingPlanState {
     this.isEditMode = false,
     this.currentDayInProgress,
     this.currentDayNumber,
+    this.aiStreamingStats,
+    this.currentStep = 0,
+    this.currentStepProgress = 0.0,
+    this.lastGenerationParams,
   });
 
   /// 复制并修改部分字段
@@ -59,6 +77,10 @@ class CreateTrainingPlanState {
     bool? isEditMode,
     ExerciseTrainingDay? currentDayInProgress,
     int? currentDayNumber,
+    AIStreamingStats? aiStreamingStats,
+    int? currentStep,
+    double? currentStepProgress,
+    PlanGenerationParams? lastGenerationParams,
   }) {
     return CreateTrainingPlanState(
       planId: planId ?? this.planId,
@@ -76,6 +98,10 @@ class CreateTrainingPlanState {
       isEditMode: isEditMode ?? this.isEditMode,
       currentDayInProgress: currentDayInProgress ?? this.currentDayInProgress,
       currentDayNumber: currentDayNumber ?? this.currentDayNumber,
+      aiStreamingStats: aiStreamingStats ?? this.aiStreamingStats,
+      currentStep: currentStep ?? this.currentStep,
+      currentStepProgress: currentStepProgress ?? this.currentStepProgress,
+      lastGenerationParams: lastGenerationParams ?? this.lastGenerationParams,
     );
   }
 

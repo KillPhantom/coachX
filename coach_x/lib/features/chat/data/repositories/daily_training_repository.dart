@@ -33,4 +33,21 @@ abstract class DailyTrainingRepository {
     String newUrl,
     String? newLocalPath,
   );
+
+  /// 添加新的关键帧
+  ///
+  /// [dailyTrainingId] 训练记录ID
+  /// [exerciseTemplateId] 动作模版ID
+  /// [videoIndex] 视频索引
+  /// [imageUrl] 图片 URL
+  /// [localPath] 本地路径（可选）
+  /// [timestamp] 时间戳
+  Future<void> addKeyframe(
+    String dailyTrainingId,
+    String exerciseTemplateId,
+    int videoIndex,
+    String imageUrl,
+    String? localPath,
+    double timestamp,
+  );
 }

@@ -13,7 +13,6 @@ import '../features/coach/plans/presentation/pages/create_training_plan_page.dar
 import '../features/coach/plans/presentation/pages/create_diet_plan_page.dart';
 import '../features/coach/plans/presentation/pages/create_supplement_plan_page.dart';
 import '../features/chat/presentation/pages/chat_detail_page.dart';
-import '../features/chat/presentation/pages/daily_training_review_page.dart';
 import '../features/chat/presentation/pages/training_feed_page.dart';
 import '../features/shared/profile/presentation/pages/language_selection_page.dart';
 import '../features/student/diet/presentation/pages/ai_food_scanner_page.dart';
@@ -261,18 +260,6 @@ GoRouter getAppRouter(String initialRoute) {
           return CupertinoPage(
             key: state.pageKey,
             child: ChatDetailPage(conversationId: conversationId),
-          );
-        },
-      ),
-
-      // 训练详情查看页面（Placeholder）
-      GoRoute(
-        path: '/training-review/:dailyTrainingId',
-        pageBuilder: (context, state) {
-          final dailyTrainingId = state.pathParameters['dailyTrainingId']!;
-          return CupertinoPage(
-            key: state.pageKey,
-            child: DailyTrainingReviewPage(dailyTrainingId: dailyTrainingId),
           );
         },
       ),

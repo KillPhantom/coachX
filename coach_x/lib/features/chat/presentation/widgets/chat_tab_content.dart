@@ -1,9 +1,12 @@
+import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:coach_x/core/theme/app_theme.dart';
 import 'package:coach_x/core/widgets/dismiss_keyboard_on_scroll.dart';
+import 'package:coach_x/core/utils/logger.dart';
 import 'package:coach_x/app/providers.dart';
 import 'package:coach_x/features/chat/presentation/providers/chat_detail_providers.dart';
+import 'package:coach_x/features/chat/presentation/providers/chat_providers.dart';
 import 'package:logger/web.dart';
 import 'message_bubble.dart';
 
@@ -20,6 +23,7 @@ class ChatTabContent extends ConsumerStatefulWidget {
 
 class _ChatTabContentState extends ConsumerState<ChatTabContent> {
   final ScrollController _scrollController = ScrollController();
+  Timer? _markAsReadTimer;
 
   @override
   void initState() {
@@ -30,6 +34,7 @@ class _ChatTabContentState extends ConsumerState<ChatTabContent> {
 
   @override
   void dispose() {
+    _markAsReadTimer?.cancel();
     _scrollController.removeListener(_onScroll);
     _scrollController.dispose();
     super.dispose();
@@ -72,6 +77,25 @@ class _ChatTabContentState extends ConsumerState<ChatTabContent> {
     }
   }
 
+  /// 标记消息为已读
+  Future<void> _markMessagesAsRead() async {
+    try {
+      final currentUser = ref.read(currentUserProvider).value;
+      if (currentUser == null) return;
+
+      final chatRepository = ref.read(chatRepositoryProvider);
+      await chatRepository.markMessagesAsRead(
+        widget.conversationId,
+        currentUser.id,
+      );
+
+      AppLogger.info('标记消息已读成功: ${widget.conversationId}');
+    } catch (e, stackTrace) {
+      // 静默失败，仅记录日志
+      AppLogger.error('标记消息已读失败', e, stackTrace);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final currentUser = ref.watch(currentUserProvider).value;
@@ -91,6 +115,15 @@ class _ChatTabContentState extends ConsumerState<ChatTabContent> {
         // 自动滚动到底部（当有新消息时）
         WidgetsBinding.instance.addPostFrameCallback((_) {
           _scrollToBottom();
+
+          // 标记消息为已读（带防抖）
+          if (messages.isNotEmpty) {
+            _markAsReadTimer?.cancel();
+            _markAsReadTimer = Timer(
+              const Duration(milliseconds: 300),
+              () => _markMessagesAsRead(),
+            );
+          }
         });
 
         if (messages.isEmpty) {

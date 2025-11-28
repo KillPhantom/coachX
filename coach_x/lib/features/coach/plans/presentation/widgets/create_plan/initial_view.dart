@@ -33,14 +33,6 @@ class InitialView extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // 欢迎标题
-              Text(
-                l10n.createPlanTitle,
-                style: AppTextStyles.largeTitle.copyWith(
-                  color: AppColors.textPrimary,
-                ),
-              ),
-              const SizedBox(height: 12),
 
               // 副标题
               Text(
@@ -70,7 +62,7 @@ class InitialView extends StatelessWidget {
                 icon: CupertinoIcons.doc_text,
                 title: l10n.scanOrPasteText,
                 description: l10n.scanOrPasteDesc,
-                color: AppColors.secondaryBlue,
+                color: AppColors.primary,
                 onTap: onTextImportTap,
               ),
 

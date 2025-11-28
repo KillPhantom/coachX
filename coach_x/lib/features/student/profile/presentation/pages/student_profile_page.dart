@@ -367,11 +367,11 @@ class _StudentProfilePageState extends ConsumerState<StudentProfilePage> {
     showCupertinoDialog(
       context: context,
       builder: (context) => CupertinoAlertDialog(
-        title: Text(l10n.confirmLogOut),
+        title: Text(l10n.confirmLogOut, style: AppTextStyles.bodyMedium),
         content: Text(l10n.confirmLogOutMessage),
         actions: [
           CupertinoDialogAction(
-            child: Text(l10n.cancel),
+            child: Text(l10n.cancel, style: AppTextStyles.bodyMedium),
             onPressed: () => Navigator.of(context).pop(),
           ),
           CupertinoDialogAction(

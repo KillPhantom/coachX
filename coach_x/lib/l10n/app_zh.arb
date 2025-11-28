@@ -23,6 +23,10 @@
   "student": "学生",
   "errorOccurred": "出错了",
   "retry": "重试",
+  "retryGeneration": "重新生成",
+  "@retryGeneration": {
+    "description": "Retry generation button"
+  },
   "cancel": "取消",
   "confirm": "确定",
   "loading": "加载中...",
@@ -108,6 +112,10 @@
   "pleaseEnterContractDuration": "请输入签约时长",
   "contractDurationRangeError": "签约时长必须在1-365天之间",
   "generateFailed": "生成失败",
+  "generationFailed": "生成失败",
+  "@generationFailed": {
+    "description": "AI generation failed title"
+  },
   "invitationCodeGenerated": "邀请码生成成功",
   "invitationCodeCopied": "邀请码已复制",
   "selectAction": "选择操作",
@@ -247,6 +255,10 @@
     }
   },
   "noExercises": "暂无动作",
+  "serverError": "服务器错误，请重试",
+  "@serverError": {
+    "description": "Server error message"
+  },
   "sets": "组",
   "@sets": {
     "description": "Sets label"
@@ -736,5 +748,32 @@
   "editPlan": "编辑计划",
   "importSuccess": "导入成功",
   "importWarnings": "发现 {count} 个警告",
-  "pleaseReview": "请检查并根据需要调整计划。"
+  "pleaseReview": "请检查并根据需要调整计划。",
+
+  "aiStreamingTitle": "AI 训练计划生成器",
+  "aiStreamingSubtitle": "正在为您定制专属训练方案",
+  "step1Title": "分析训练要求",
+  "step1Description": "正在验证您的训练目标和参数...",
+  "step2Title": "生成训练计划",
+  "step2Description": "AI 正在为您设计训练动作...",
+  "step3Title": "匹配动作库",
+  "step3Description": "正在检查可复用的动作...",
+  "step4Title": "完成生成",
+  "step4Description": "最后检查和验证...",
+  "summaryTitle": "生成完成！",
+  "statTotalDays": "训练天数",
+  "statTotalExercises": "训练动作",
+  "statReusedExercises": "复用",
+  "statNewExercises": "新建",
+  "viewFullPlan": "查看完整计划",
+  "confirmCreateTemplatesTitle": "创建动作模板",
+  "confirmCreateTemplates": "将创建 {count} 个新动作模板到您的动作库",
+  "confirmCreateButton": "确认创建",
+  "creatingTemplates": "正在创建模板...",
+  "cancel": "取消",
+
+  "mealRecordExists": "该餐次已有记录",
+  "confirmOverwriteMeal": "该餐次已有记录，继续保存将覆盖之前的记录，是否继续？",
+  "overwrite": "覆盖",
+  "mealNumberFormat": "第{number}顿"
 }

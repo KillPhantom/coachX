@@ -1,6 +1,7 @@
 import 'feed_item_type.dart';
 import '../../../student/training/data/models/student_exercise_model.dart';
 import '../../../../core/models/video_model.dart';
+import '../../../student/diet/data/models/student_diet_record_model.dart';
 
 /// Feed 流的基本单元
 class TrainingFeedItem {
@@ -25,6 +26,7 @@ class TrainingFeedItem {
   /// 额外数据
   /// - video: {videoUrl, thumbnailUrl, videoIndex, duration}
   /// - textCard: {sets, totalSets, completedSets, avgWeight, totalReps}
+  /// - aggregated textCard: {exercises: [], meals: [], isAggregated: true}
   final Map<String, dynamic>? metadata;
 
   const TrainingFeedItem({
@@ -63,7 +65,7 @@ class TrainingFeedItem {
     );
   }
 
-  /// 从无视频 Exercise 创建图文 Feed Item
+  /// 从无视频 Exercise 创建图文 Feed Item (Deprecated: Use aggregated instead)
   factory TrainingFeedItem.fromExerciseModel({
     required String dailyTrainingId,
     required StudentExerciseModel exercise,
@@ -88,13 +90,34 @@ class TrainingFeedItem {
       dailyTrainingId: dailyTrainingId,
       exerciseTemplateId: exercise.exerciseTemplateId,
       exerciseName: exercise.name,
-      isReviewed: false, // 图文项初始未批阅
+      isReviewed: exercise.isReviewed,
       metadata: {
         'sets': exercise.sets.map((s) => s.toJson()).toList(),
         'totalSets': totalSets,
         'completedSets': completedSets,
         'avgWeight': avgWeight,
         'totalReps': totalReps,
+      },
+    );
+  }
+
+  /// 创建聚合的图文 Feed Item
+  factory TrainingFeedItem.aggregated({
+    required String dailyTrainingId,
+    required List<StudentExerciseModel> exercises,
+    required StudentDietRecordModel? diet,
+    required bool isReviewed,
+  }) {
+    return TrainingFeedItem(
+      id: '${dailyTrainingId}_aggregated',
+      type: FeedItemType.textCard,
+      dailyTrainingId: dailyTrainingId,
+      exerciseName: 'Daily Summary', // Display name for the card
+      isReviewed: isReviewed,
+      metadata: {
+        'isAggregated': true,
+        'exercises': exercises.map((e) => e.toJson()).toList(),
+        'meals': diet?.meals.map((m) => m.toJson()).toList() ?? [],
       },
     );
   }

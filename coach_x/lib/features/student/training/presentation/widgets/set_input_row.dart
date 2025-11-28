@@ -197,7 +197,7 @@ class _SetInputRowState extends State<SetInputRow> {
             placeholder: placeholder,
             keyboardType: TextInputType.text,
             textAlign: TextAlign.center,
-            style: AppTextStyles.body,
+            style: AppTextStyles.callout,
             padding: const EdgeInsets.symmetric(
               horizontal: AppDimensions.spacingS,
               vertical: 8,
@@ -232,7 +232,7 @@ class _SetInputRowState extends State<SetInputRow> {
       keyboardType: TextInputType.text,
       textAlign: TextAlign.center,
       maxLength: 10,
-      style: AppTextStyles.body,
+      style: AppTextStyles.callout,
       padding: const EdgeInsets.symmetric(
         horizontal: AppDimensions.spacingS,
         vertical: 8,
