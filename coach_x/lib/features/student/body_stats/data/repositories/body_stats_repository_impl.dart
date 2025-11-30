@@ -171,7 +171,10 @@ class BodyStatsRepositoryImpl implements BodyStatsRepository {
       final storagePath = 'body_stats/$userId/$fileName';
 
       // 上传到Firebase Storage
-      final downloadUrl = await StorageService.uploadFile(file, storagePath);
+      final downloadUrl = await StorageService.uploadFile(
+        file: file,
+        storagePath: storagePath,
+      );
 
       AppLogger.info('✅ 身体照片上传成功: $downloadUrl');
       return downloadUrl;

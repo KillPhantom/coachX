@@ -1,6 +1,7 @@
 import 'package:coach_x/core/services/firestore_service.dart';
 import 'package:coach_x/core/utils/logger.dart';
 import 'package:coach_x/features/student/home/data/models/daily_training_model.dart';
+import 'package:intl/intl.dart';
 import 'daily_training_repository.dart';
 
 /// Daily Training Repository 实现类
@@ -230,6 +231,42 @@ class DailyTrainingRepositoryImpl implements DailyTrainingRepository {
       AppLogger.info('关键帧添加成功: $dailyTrainingId');
     } catch (e, stackTrace) {
       AppLogger.error('添加关键帧失败: $dailyTrainingId', e, stackTrace);
+      rethrow;
+    }
+  }
+
+  @override
+  Future<List<DailyTrainingModel>> getTrainingsInRange({
+    required String studentId,
+    required DateTime startDate,
+    required DateTime endDate,
+  }) async {
+    try {
+      final formatter = DateFormat('yyyy-MM-dd');
+      final startString = formatter.format(startDate);
+      final endString = formatter.format(endDate);
+
+      final docs = await FirestoreService.queryDocuments(
+        'dailyTrainings',
+        where: [
+          ['studentID', '==', studentId],
+          ['date', '>=', startString],
+          ['date', '<=', endString],
+        ],
+        orderBy: 'date',
+      );
+
+      return docs.map((doc) {
+        final data = doc.data() as Map<String, dynamic>;
+        data['id'] = doc.id;
+        return DailyTrainingModel.fromJson(data);
+      }).toList();
+    } catch (e, stackTrace) {
+      AppLogger.error(
+        '获取训练记录范围失败: student=$studentId, $startDate-$endDate',
+        e,
+        stackTrace,
+      );
       rethrow;
     }
   }

@@ -2,10 +2,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:coach_x/core/theme/app_colors.dart';
 import 'package:coach_x/core/theme/app_text_styles.dart';
 import 'package:coach_x/l10n/app_localizations.dart';
-import 'package:coach_x/features/coach/plans/data/models/ai_streaming_stats.dart';
+import 'package:coach_x/features/coach/plans/data/models/plan_import_stats.dart';
 
 class SummaryCard extends StatefulWidget {
-  final AIStreamingStats stats;
+  final PlanImportStats stats;
   final VoidCallback onViewPlan;
 
   const SummaryCard({

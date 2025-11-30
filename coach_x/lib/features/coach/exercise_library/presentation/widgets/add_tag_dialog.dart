@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:coach_x/core/theme/app_text_styles.dart';
 import '../../../../../l10n/app_localizations.dart';
 import '../providers/exercise_library_providers.dart';
 
@@ -63,7 +64,7 @@ class _AddTagDialogState extends ConsumerState<AddTagDialog> {
         content: Text(message),
         actions: [
           CupertinoDialogAction(
-            child: const Text('确定'),
+            child: const Text('确定', style: AppTextStyles.body),
             onPressed: () => Navigator.of(context).pop(),
           ),
         ],
@@ -89,7 +90,7 @@ class _AddTagDialogState extends ConsumerState<AddTagDialog> {
       actions: [
         CupertinoDialogAction(
           onPressed: _isCreating ? null : () => Navigator.of(context).pop(),
-          child: Text(l10n.cancel),
+          child: Text(l10n.cancel, style: AppTextStyles.body),
         ),
         CupertinoDialogAction(
           onPressed: _isCreating ? null : _createTag,

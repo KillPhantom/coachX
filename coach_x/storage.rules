@@ -25,6 +25,12 @@ service firebase.storage {
       return request.resource.contentType.matches('video/.*');
     }
 
+    // Helper function to validate voice file
+    function isValidVoice() {
+      return request.resource.size < 10 * 1024 * 1024 // Max 10MB
+             && request.resource.contentType.matches('audio/.*');
+    }
+
     // ==================== 训练计划图片 ====================
     // Path: training_plan_images/{userId}/{fileName}
     match /training_plan_images/{userId}/{fileName} {
@@ -61,6 +67,15 @@ service firebase.storage {
       allow read: if isOwner(userId);
     }
 
+    // ==================== 饮食记录图片 ====================
+    // Path: diet_images/{userId}/{fileName}
+    match /diet_images/{userId}/{fileName} {
+      // 允许用户上传自己的饮食记录图片
+      allow write: if isOwner(userId) && isValidImage();
+      // 允许用户读取自己的饮食记录图片
+      allow read: if isOwner(userId);
+    }
+
     // ==================== 身体数据图片 ====================
     // Path: body_stats/{userId}/{fileName}
     match /body_stats/{userId}/{fileName} {
@@ -77,9 +92,23 @@ service firebase.storage {
       allow read: if isAuthenticated();
     }
 
+    // ==================== 聊天媒体文件 ====================
+    // Path: chat_media/{conversationId}/{mediaType}/{fileName}
+    // mediaType: image | video | voice
+    match /chat_media/{conversationId}/{mediaType}/{fileName} {
+      // 允许认证用户上传聊天媒体（根据类型验证）
+      allow write: if isAuthenticated() && (
+        (mediaType == 'image' && isValidImage()) ||
+        (mediaType == 'video' && isValidVideo()) ||
+        (mediaType == 'voice' && isValidVoice())
+      );
+      // 允许认证用户读取聊天媒体
+      allow read: if isAuthenticated();
+    }
+
     // ==================== 用户头像 ====================
-    // Path: avatars/{userId}
-    match /avatars/{userId} {
+    // Path: avatars/{userId}/{fileName}
+    match /avatars/{userId}/{fileName} {
       allow write: if isOwner(userId) && isValidImage();
       allow read: if isAuthenticated();
     }
@@ -143,6 +172,15 @@ service firebase.storage {
     match /exercise_images/{userId}/{fileName} {
       // 允许教练本人上传动作库辅助图片
       allow write: if isOwner(userId) && isValidImage();
+      // 允许任何已认证用户读取
+      allow read: if isAuthenticated();
+    }
+
+    // ==================== 教练动作库统一媒体 (新) ====================
+    // Path: exercise_library/{userId}/{fileName}
+    match /exercise_library/{userId}/{fileName} {
+      // 允许教练本人上传视频或图片
+      allow write: if isOwner(userId) && (isValidVideo() || isValidImage());
       // 允许任何已认证用户读取
       allow read: if isAuthenticated();
     }

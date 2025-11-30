@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:coach_x/l10n/app_localizations.dart';
 import 'package:coach_x/core/theme/app_theme.dart';
 import 'package:coach_x/features/coach/plans/data/models/macros.dart';
+import 'package:coach_x/features/coach/plans/data/models/meal.dart';
 import '../../data/models/student_plans_model.dart';
 import '../../data/models/daily_training_model.dart';
 import '../../../diet/data/models/student_diet_record_model.dart';
@@ -32,6 +33,11 @@ class TodayRecordSection extends ConsumerWidget {
           return const SizedBox.shrink();
         }
 
+        // 处理 dayNumbers 加载中的情况
+        // 如果 dayNumbers 尚未加载完成，提供默认值 { 'diet': 1 }
+        // dayNumbersAsync 已经是 Map<String, int> 类型，不是 AsyncValue
+        final dayNumbers = dayNumbersAsync;
+
         return Container(
           decoration: BoxDecoration(
             color: AppColors.backgroundWhite,
@@ -57,10 +63,10 @@ class TodayRecordSection extends ConsumerWidget {
               _buildRecordCards(
                 context,
                 plans,
-                dayNumbersAsync,
+                dayNumbers,
                 progress,
                 actualMacros,
-                todayTrainingAsync.value,
+                todayTrainingAsync.valueOrNull, // 使用 valueOrNull 安全访问
               ),
             ],
           ),
@@ -116,21 +122,51 @@ class _DietPlanWithIndicatorState extends State<_DietPlanWithIndicator> {
   int _currentPage = 0;
   int _totalPages = 0;
 
+  /// 合并计划餐次和学生自行添加的餐次
+  List<Meal> _getMergedMeals(List<Meal> planMeals, List<Meal>? recordedMeals) {
+    if (recordedMeals == null || recordedMeals.isEmpty) {
+      return planMeals;
+    }
+
+    // 获取计划餐次的名称集合
+    final planMealNames = planMeals.map((m) => m.name).toSet();
+
+    // 找出学生自行添加的餐次（不在计划中的）
+    final extraMeals =
+        recordedMeals.where((m) => !planMealNames.contains(m.name)).toList();
+
+    // 合并：计划餐次 + 额外餐次
+    return [...planMeals, ...extraMeals];
+  }
+
   @override
   Widget build(BuildContext context) {
+    // 处理 dayNumbers 为空的情况
     final dayNum = widget.dayNumbers['diet'] ?? 1;
-    final dietDay = widget.plans.dietPlan!.days.firstWhere(
-      (day) => day.day == dayNum,
-      orElse: () => widget.plans.dietPlan!.days.first,
-    );
 
-    _totalPages = dietDay.meals.length + 1;
+    // 获取当天的饮食计划，处理空列表情况
+    final dietDay = widget.plans.dietPlan!.days.isNotEmpty
+        ? widget.plans.dietPlan!.days.firstWhere(
+            (day) => day.day == dayNum,
+            orElse: () => widget.plans.dietPlan!.days.first,
+          )
+        : null;
+
+    // 获取计划餐次和学生记录餐次
+    final planMeals = dietDay?.meals ?? <Meal>[];
+    final recordedMeals = widget.todayDietRecord?.meals;
+
+    // 合并餐次列表
+    final mergedMeals = _getMergedMeals(planMeals, recordedMeals);
+
+    _totalPages = mergedMeals.length + 1;
 
     return Column(
       children: [
         // 饮食计划卡片
         DietPlanCard(
           dietDay: dietDay,
+          mergedMeals: mergedMeals,
           actualMacros: widget.actualMacros,
           todayDietRecord: widget.todayDietRecord,
           progress: widget.progress,

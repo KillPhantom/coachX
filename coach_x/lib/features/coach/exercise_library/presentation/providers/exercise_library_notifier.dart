@@ -44,6 +44,7 @@ class ExerciseLibraryNotifier extends StateNotifier<ExerciseLibraryState> {
         AppLogger.info('从缓存加载动作库数据');
 
         // 3. 检查缓存是否过期
+        // Force reload if we suspect cache is stale (or rely on isCacheExpired)
         if (!state.isCacheExpired) {
           return; // 缓存未过期，直接返回
         }
@@ -166,7 +167,11 @@ class ExerciseLibraryNotifier extends StateNotifier<ExerciseLibraryState> {
         final newTemplates = [...state.templates];
         newTemplates[index] = updatedTemplate;
 
-        state = state.copyWith(templates: newTemplates);
+        state = state.copyWith(
+          templates: newTemplates,
+          // Force cache update timestamp to now so it's not considered expired immediately
+          lastSyncTime: DateTime.now(), 
+        );
         await _updateTemplatesCache();
       }
 
@@ -313,8 +318,8 @@ class ExerciseLibraryNotifier extends StateNotifier<ExerciseLibraryState> {
 
   /// 加载更多数据（分页）
   Future<void> loadMore() async {
-    // 防止重复加载
-    if (state.isLoadingMore || !state.hasMoreData) return;
+    // 防止重复加载，或没有分页游标时跳过
+    if (state.isLoadingMore || !state.hasMoreData || _lastDocument == null) return;
 
     try {
       state = state.copyWith(isLoadingMore: true);

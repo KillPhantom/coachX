@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:coach_x/core/theme/app_theme.dart';
 import 'package:coach_x/l10n/app_localizations.dart';
 import 'package:coach_x/routes/route_names.dart';
@@ -101,11 +102,11 @@ class StudentProfileSection extends ConsumerWidget {
           ),
           child: basicInfo.avatarUrl != null && basicInfo.avatarUrl!.isNotEmpty
               ? ClipOval(
-                  child: Image.network(
-                    basicInfo.avatarUrl!,
+                  child: CachedNetworkImage(
+                    imageUrl: basicInfo.avatarUrl!,
                     fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) =>
-                        _buildInitialAvatar(),
+                    placeholder: (context, url) => _buildInitialAvatar(),
+                    errorWidget: (context, url, error) => _buildInitialAvatar(),
                   ),
                 )
               : _buildInitialAvatar(),
@@ -240,7 +241,7 @@ class StudentProfileSection extends ConsumerWidget {
             content: Text(l10n.aiSummaryFailedMessage),
             actions: [
               CupertinoDialogAction(
-                child: Text(l10n.ok),
+                child: Text(l10n.ok, style: AppTextStyles.body),
                 onPressed: () => Navigator.pop(context),
               ),
             ],
@@ -306,7 +307,7 @@ class StudentProfileSection extends ConsumerWidget {
                 content: Text('Failed to create conversation: $e'),
                 actions: [
                   CupertinoDialogAction(
-                    child: Text(l10n.ok),
+                    child: Text(l10n.ok, style: AppTextStyles.body),
                     onPressed: () => Navigator.pop(context),
                   ),
                 ],

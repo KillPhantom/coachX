@@ -81,7 +81,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get cancel => '取消';
 
   @override
-  String get confirm => '确定';
+  String get confirm => '确认';
 
   @override
   String get loading => '加载中...';
@@ -94,6 +94,30 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get avatarEditInDevelopment => '头像编辑功能开发中';
+
+  @override
+  String get selectAvatarSource => '选择头像来源';
+
+  @override
+  String get chooseFromGallery => '从相册选择';
+
+  @override
+  String get uploadingAvatar => '正在上传头像...';
+
+  @override
+  String get processingImage => '处理图片中...';
+
+  @override
+  String get uploadSuccess => '上传成功';
+
+  @override
+  String get uploadFailed => '上传失败';
+
+  @override
+  String get retryUpload => '重试';
+
+  @override
+  String get cropCircular => '裁剪为圆形';
 
   @override
   String get accountSettingsInDevelopment => '账户设置功能开发中';
@@ -1047,6 +1071,24 @@ class AppLocalizationsZh extends AppLocalizations {
   String get timeSpentLabel => '用时';
 
   @override
+  String get feedbackHistoryTitle => '历史记录';
+
+  @override
+  String get feedbackSortAscLabel => '升序';
+
+  @override
+  String get feedbackSortDescLabel => '降序';
+
+  @override
+  String get trainingCalendarTitle => '训练历史';
+
+  @override
+  String get trainingCalendarEmptyDay => '该日期没有训练记录';
+
+  @override
+  String get trainingCalendarViewSummary => '查看总结';
+
+  @override
   String get addCustomExerciseHint => '点击右上角\"+\"添加自定义动作';
 
   @override
@@ -1082,7 +1124,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get coachPlan => '教练计划';
 
   @override
-  String get feedbackSearchPlaceholder => '搜索反馈...';
+  String get feedbackSearchPlaceholder => '搜索动作或反馈内容';
 
   @override
   String get feedbackStartDate => '开始日期';
@@ -1199,9 +1241,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get videoUploadFailed => '上传失败';
 
   @override
-  String get retryUpload => '重试';
-
-  @override
   String get processing => '处理中...';
 
   @override
@@ -1220,7 +1259,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get exercises => '个动作';
 
   @override
-  String get newExercise => '新建动作';
+  String get newExercise => '新动作';
 
   @override
   String get noExercisesYet => '还没有动作';
@@ -1298,7 +1337,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get createSuccess => '动作创建成功';
 
   @override
-  String get updateSuccess => '动作更新成功';
+  String get updateSuccess => '更新成功';
 
   @override
   String get waitingForUpload => '等待上传完成...';
@@ -1780,6 +1819,18 @@ class AppLocalizationsZh extends AppLocalizations {
   String get startParsing => '开始解析';
 
   @override
+  String get textImportSummaryTitle => '文本解析完成';
+
+  @override
+  String get textImportSummarySubtitle => '成功从文本中提取训练计划';
+
+  @override
+  String get exerciseFromLibrary => '动作库中的动作';
+
+  @override
+  String get createGuidance => '创建指导';
+
+  @override
   String get extractionSuccess => '文字提取成功！请检查并根据需要编辑。';
 
   @override
@@ -1901,4 +1952,100 @@ class AppLocalizationsZh extends AppLocalizations {
   String mealNumberFormat(int number) {
     return '第$number顿';
   }
+
+  @override
+  String get imageUploadFailed => '图片上传失败';
+
+  @override
+  String get unknownError => '未知错误';
+
+  @override
+  String get thisWeekIntake => '本周';
+
+  @override
+  String get noLastWeekData => '上周暂无数据';
+
+  @override
+  String get today => '今天';
+
+  @override
+  String get nickname => '昵称';
+
+  @override
+  String get nicknamePlaceholder => '请输入昵称';
+
+  @override
+  String get nicknameRequired => '昵称不能为空';
+
+  @override
+  String get editNickname => '编辑昵称';
+
+  @override
+  String get gender => '性别';
+
+  @override
+  String get male => '男';
+
+  @override
+  String get female => '女';
+
+  @override
+  String get selectGender => '选择性别';
+
+  @override
+  String get editGender => '编辑性别';
+
+  @override
+  String get bornDate => '出生日期';
+
+  @override
+  String get selectBornDate => '选择出生日期';
+
+  @override
+  String get editBornDate => '编辑出生日期';
+
+  @override
+  String get dateFormat => 'yyyy-MM-dd';
+
+  @override
+  String get editHeight => '编辑身高';
+
+  @override
+  String get heightPlaceholder => '请输入身高';
+
+  @override
+  String get heightInvalid => '身高格式不正确';
+
+  @override
+  String get heightInCm => '身高 (cm)';
+
+  @override
+  String get heightInFeet => '身高 (ft)';
+
+  @override
+  String get heightInInches => '英寸';
+
+  @override
+  String get feet => '英尺';
+
+  @override
+  String get inches => '英寸';
+
+  @override
+  String get aiAssistant => 'AI 助手';
+
+  @override
+  String get aiWelcomeMessage => '你好！我能帮你调整这个训练计划吗？';
+
+  @override
+  String get aiWelcomeHint => '试试让我修改动作、调整强度或添加新的训练日。';
+
+  @override
+  String get aiQuickActionAnalyzePlan => '分析一下计划的优缺点';
+
+  @override
+  String get aiQuickActionReduceWeight => '降低所有重量 10%';
+
+  @override
+  String get aiInputPlaceholder => '向 AI 提问或提出修改建议...';
 }

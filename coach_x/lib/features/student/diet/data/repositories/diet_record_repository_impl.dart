@@ -70,7 +70,10 @@ class DietRecordRepositoryImpl implements DietRecordRepository {
       final extension = image.path.split('.').last;
       final path = 'diet_images/$userId/$timestamp.$extension';
 
-      final url = await StorageService.uploadFile(image, path);
+      final url = await StorageService.uploadFile(
+        file: image,
+        storagePath: path,
+      );
 
       AppLogger.info('上传饮食图片成功: $url');
       return url;

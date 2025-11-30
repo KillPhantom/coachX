@@ -9,11 +9,12 @@ import '../providers/ai_food_scanner_providers.dart';
 
 /// 餐次营养进度输入卡片
 ///
-/// 左侧显示计划营养（只读），右侧显示本餐进度（可编辑输入框）
+/// - 有计划meal时：左侧显示计划营养（只读），右侧显示本餐进度（可编辑输入框）
+/// - 无计划meal时（自动命名模式）：仅显示营养输入框
 class MealProgressInputCard extends ConsumerWidget {
-  final Meal planMeal; // 计划中的meal（包含目标值）
+  final Meal? planMeal; // 计划中的meal（包含目标值），可选
 
-  const MealProgressInputCard({super.key, required this.planMeal});
+  const MealProgressInputCard({super.key, this.planMeal});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -28,23 +29,35 @@ class MealProgressInputCard extends ConsumerWidget {
       ),
       child: Column(
         children: [
-          // 标题行
+          // 标题行（根据是否有计划meal显示单列或双列）
           Padding(
             padding: const EdgeInsets.all(AppDimensions.spacingM),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    l10n.plannedNutrition,
-                    style: AppTextStyles.callout.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.primaryText,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-                Expanded(
-                  child: Text(
+            child: planMeal != null
+                ? Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          l10n.plannedNutrition,
+                          style: AppTextStyles.callout.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.primaryText,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      Expanded(
+                        child: Text(
+                          l10n.mealProgress,
+                          style: AppTextStyles.callout.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.primaryText,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ],
+                  )
+                : Text(
                     l10n.mealProgress,
                     style: AppTextStyles.callout.copyWith(
                       fontWeight: FontWeight.w600,
@@ -52,9 +65,6 @@ class MealProgressInputCard extends ConsumerWidget {
                     ),
                     textAlign: TextAlign.center,
                   ),
-                ),
-              ],
-            ),
           ),
 
           const Divider(height: 1, color: AppColors.dividerLight),
@@ -65,7 +75,7 @@ class MealProgressInputCard extends ConsumerWidget {
             ref,
             icon: l10n.calories,
             label: l10n.caloriesInput,
-            planValue: planMeal.macros.calories,
+            planValue: planMeal?.macros.calories, // ✅ 可选
             currentValue: state.currentCalories,
             onChanged: (value) {
               final calories = double.tryParse(value);
@@ -82,7 +92,7 @@ class MealProgressInputCard extends ConsumerWidget {
             ref,
             icon: l10n.protein,
             label: l10n.proteinInput,
-            planValue: planMeal.macros.protein,
+            planValue: planMeal?.macros.protein, // ✅ 可选
             currentValue: state.currentProtein,
             onChanged: (value) {
               final protein = double.tryParse(value);
@@ -99,7 +109,7 @@ class MealProgressInputCard extends ConsumerWidget {
             ref,
             icon: l10n.carbohydrates,
             label: l10n.carbsInput,
-            planValue: planMeal.macros.carbs,
+            planValue: planMeal?.macros.carbs, // ✅ 可选
             currentValue: state.currentCarbs,
             onChanged: (value) {
               final carbs = double.tryParse(value);
@@ -116,7 +126,7 @@ class MealProgressInputCard extends ConsumerWidget {
             ref,
             icon: l10n.fat,
             label: l10n.fatInput,
-            planValue: planMeal.macros.fat,
+            planValue: planMeal?.macros.fat, // ✅ 可选
             currentValue: state.currentFat,
             onChanged: (value) {
               final fat = double.tryParse(value);
@@ -138,13 +148,15 @@ class MealProgressInputCard extends ConsumerWidget {
     );
   }
 
-  /// 构建单行营养数据（左侧计划值 + 右侧输入框）
+  /// 构建单行营养数据
+  /// - 有计划值时：左侧计划值 + 右侧输入框（双列）
+  /// - 无计划值时：仅显示输入框（单列居中）
   Widget _buildNutritionRow(
     BuildContext context,
     WidgetRef ref, {
     required String icon,
     required String label,
-    required double planValue,
+    double? planValue, // ✅ 改为可选
     required double? currentValue,
     required Function(String) onChanged,
     bool isLast = false,
@@ -158,13 +170,92 @@ class MealProgressInputCard extends ConsumerWidget {
             horizontal: AppDimensions.spacingM,
             vertical: AppDimensions.spacingS,
           ),
-          child: Row(
-            children: [
-              // 左侧：计划值（只读）
-              Expanded(
-                child: Row(
+          child: planValue != null
+              ? Row(
+                  children: [
+                    // 左侧：计划值（只读）
+                    Expanded(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            icon,
+                            style: AppTextStyles.caption1.copyWith(
+                              color: AppColors.textSecondary,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            '${planValue.toStringAsFixed(0)} ${_getUnit(label)}',
+                            style: AppTextStyles.body.copyWith(
+                              color: AppColors.primaryText,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    // 右侧：可编辑输入框
+                    Expanded(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SizedBox(
+                            width: 80,
+                            child: CupertinoTextField(
+                              placeholder: '0',
+                              controller: TextEditingController(
+                                text: currentValue?.toStringAsFixed(0) ?? '',
+                              ),
+                              keyboardType:
+                                  const TextInputType.numberWithOptions(
+                                decimal: true,
+                              ),
+                              inputFormatters: [
+                                FilteringTextInputFormatter.allow(
+                                  RegExp(r'^\d+\.?\d{0,1}'),
+                                ),
+                              ],
+                              textAlign: TextAlign.center,
+                              style: AppTextStyles.body,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: AppDimensions.spacingS,
+                                vertical: AppDimensions.spacingS,
+                              ),
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: hasAIValue
+                                      ? AppColors.primaryColor
+                                      : AppColors.dividerLight,
+                                ),
+                                borderRadius: BorderRadius.circular(
+                                  AppDimensions.radiusM,
+                                ),
+                              ),
+                              onChanged: onChanged,
+                            ),
+                          ),
+                          if (hasAIValue)
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                left: AppDimensions.spacingS,
+                              ),
+                              child: Text(
+                                '✓',
+                                style: AppTextStyles.body.copyWith(
+                                  color: AppColors.primaryColor,
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                  ],
+                )
+              : Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
+                    // 单列布局：标签 + 输入框
                     Text(
                       icon,
                       style: AppTextStyles.caption1.copyWith(
@@ -172,23 +263,8 @@ class MealProgressInputCard extends ConsumerWidget {
                       ),
                     ),
                     const SizedBox(width: 8),
-                    Text(
-                      '${planValue.toStringAsFixed(0)} ${_getUnit(label)}',
-                      style: AppTextStyles.body.copyWith(
-                        color: AppColors.primaryText,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              // 右侧：可编辑输入框
-              Expanded(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
                     SizedBox(
-                      width: 80,
+                      width: 100,
                       child: CupertinoTextField(
                         placeholder: '0',
                         controller: TextEditingController(
@@ -221,6 +297,13 @@ class MealProgressInputCard extends ConsumerWidget {
                         onChanged: onChanged,
                       ),
                     ),
+                    const SizedBox(width: 4),
+                    Text(
+                      _getUnit(label),
+                      style: AppTextStyles.caption1.copyWith(
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
                     if (hasAIValue)
                       Padding(
                         padding: const EdgeInsets.only(
@@ -235,9 +318,6 @@ class MealProgressInputCard extends ConsumerWidget {
                       ),
                   ],
                 ),
-              ),
-            ],
-          ),
         ),
         if (!isLast) const Divider(height: 1, color: AppColors.dividerLight),
       ],

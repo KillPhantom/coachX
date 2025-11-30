@@ -22,15 +22,27 @@ class MacroProgressBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final hasTarget = targetValue > 0;
+
     // 计算颜色 (3色逻辑)
     Color progressColor;
-    if (progress >= 0.95 && progress <= 1.05) {
+    if (!hasTarget) {
+      // 没有目标值时使用默认颜色
+      progressColor = color;
+    } else if (progress >= 0.95 && progress <= 1.05) {
       progressColor = AppColors.successGreen;
     } else if (progress > 1.05) {
       progressColor = AppColors.errorRed;
     } else {
       progressColor = color;
     }
+
+    // 没有目标值时，根据实际值显示进度（假设100g为满）
+    final displayProgress = hasTarget ? progress : actualValue / 100;
+
+    // 显示文本：有目标时显示 "实际/目标g"，无目标时只显示 "实际g"
+    final valueText =
+        hasTarget ? '${actualValue.toInt()}/${targetValue}g' : '${actualValue.toInt()}g';
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -46,7 +58,7 @@ class MacroProgressBar extends StatelessWidget {
               ),
             ),
             Text(
-              '${actualValue.toInt()}/${targetValue}g',
+              valueText,
               style: AppTextStyles.caption1.copyWith(
                 color: AppColors.primaryText,
                 fontWeight: FontWeight.w600,
@@ -71,7 +83,7 @@ class MacroProgressBar extends StatelessWidget {
 
               // 进度
               FractionallySizedBox(
-                widthFactor: progress.clamp(0.0, 1.0),
+                widthFactor: displayProgress.clamp(0.0, 1.0),
                 child: Container(
                   decoration: BoxDecoration(
                     color: progressColor,

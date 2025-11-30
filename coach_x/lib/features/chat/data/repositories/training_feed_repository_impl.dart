@@ -23,6 +23,10 @@ class TrainingFeedRepositoryImpl implements TrainingFeedRepository {
     }
 
     final data = docSnapshot.data()!;
+
+    // 读取 isReviewed 状态，用于判断是否为二次编辑模式
+    final isReviewed = data['isReviewed'] as bool? ?? false;
+
     final exercises =
         (data['exercises'] as List<dynamic>?)
             ?.map(
@@ -30,7 +34,7 @@ class TrainingFeedRepositoryImpl implements TrainingFeedRepository {
             )
             .toList() ??
         [];
-    
+
     final dietData = data['diet'] as Map<String, dynamic>?;
     final diet = dietData != null ? StudentDietRecordModel.fromJson(dietData) : null;
 
@@ -42,23 +46,24 @@ class TrainingFeedRepositoryImpl implements TrainingFeedRepository {
       // 跳过没有 exerciseTemplateId 的动作
       if (exercise.exerciseTemplateId == null) continue;
 
-      if (exercise.videos.isNotEmpty) {
-        // 有视频：每个视频生成一个 Feed Item
-        for (var i = 0; i < exercise.videos.length; i++) {
-          final video = VideoModel.fromVideoUploadState(exercise.videos[i]);
+      // 使用 media 字段 (原 videos)
+      if (exercise.media.isNotEmpty) {
+        // 有媒体：每个媒体生成一个 Feed Item
+        for (var i = 0; i < exercise.media.length; i++) {
+          final mediaItem = VideoModel.fromMediaUploadState(exercise.media[i]);
           feedItems.add(
             TrainingFeedItem.fromVideoModel(
               dailyTrainingId: dailyTrainingId,
               exerciseTemplateId: exercise.exerciseTemplateId!,
               exerciseName: exercise.name,
-              video: video,
+              video: mediaItem,
               videoIndex: i,
-              totalVideos: exercise.videos.length,
+              totalVideos: exercise.media.length,
             ),
           );
         }
       } else {
-        // 无视频：收集到聚合列表
+        // 无媒体：收集到聚合列表
         nonVideoExercises.add(exercise);
       }
     }
@@ -78,8 +83,10 @@ class TrainingFeedRepositoryImpl implements TrainingFeedRepository {
       );
     }
 
-    // 添加完成占位符
-    feedItems.add(TrainingFeedItem.completion(dailyTrainingId));
+    // 仅在首次批阅时添加完成占位符（二次编辑时不显示）
+    if (!isReviewed) {
+      feedItems.add(TrainingFeedItem.completion(dailyTrainingId));
+    }
 
     return feedItems;
   }

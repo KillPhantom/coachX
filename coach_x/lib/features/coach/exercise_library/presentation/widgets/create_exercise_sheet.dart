@@ -44,7 +44,9 @@ class _CreateExerciseSheetState extends ConsumerState<CreateExerciseSheet> {
   List<String> _imageUrls = [];
   bool _isSaving = false;
 
-  bool get _isEditMode => widget.template != null;
+  /// 判断是否为编辑模式（template 存在且 ID 不为空）
+  bool get _isEditMode =>
+      widget.template != null && widget.template!.id.isNotEmpty;
 
   @override
   void initState() {
@@ -63,6 +65,11 @@ class _CreateExerciseSheetState extends ConsumerState<CreateExerciseSheet> {
       _thumbnailUrls = List.from(widget.template!.thumbnailUrls);
       _imageUrls = List.from(widget.template!.imageUrls);
     }
+    
+    // 确保数据已加载
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(exerciseLibraryNotifierProvider.notifier).loadData();
+    });
   }
 
   @override
@@ -75,7 +82,30 @@ class _CreateExerciseSheetState extends ConsumerState<CreateExerciseSheet> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final tags = ref.watch(exerciseTagsProvider);
+    // 获取完整的动作库状态，以便获取所有模板中的标签
+    final exerciseState = ref.watch(exerciseLibraryNotifierProvider);
+    final predefinedTags = exerciseState.tags;
+    
+    // 收集所有已使用的标签（从所有模板中）+ 当前选中的标签
+    final allUsedTags = <String>{};
+    for (final template in exerciseState.templates) {
+      allUsedTags.addAll(template.tags);
+    }
+    allUsedTags.addAll(_selectedTags);
+    
+    // 构建可用标签列表：预设标签 + 额外使用的标签
+    final availableTags = [...predefinedTags];
+    
+    // 添加不在预设列表中的标签
+    for (final tagName in allUsedTags) {
+      if (!predefinedTags.any((t) => t.name == tagName)) {
+        availableTags.add(ExerciseTagModel(
+          id: tagName, // 临时使用名称作为ID
+          name: tagName,
+          createdAt: DateTime.now(),
+        ));
+      }
+    }
 
     return KeyboardAdaptivePadding(
       child: Container(
@@ -165,17 +195,7 @@ class _CreateExerciseSheetState extends ConsumerState<CreateExerciseSheet> {
                       // 标签选择（Dynamic + Allow Add）
                       TagSelector(
                         selectedTags: _selectedTags,
-                        availableTags: [
-                          ...tags,
-                          // Ensure selected tags are visible even if not in availableTags
-                          ..._selectedTags
-                              .where((tag) => !tags.any((t) => t.name == tag))
-                              .map((name) => ExerciseTagModel(
-                                    id: name, // Use name as ID for temp tags
-                                    name: name,
-                                    createdAt: DateTime.now(),
-                                  )),
-                        ],
+                        availableTags: availableTags,
                         allowAdd: true,
                         showTitle: false,
                         onTagsChanged: (newTags) {
@@ -326,7 +346,7 @@ class _CreateExerciseSheetState extends ConsumerState<CreateExerciseSheet> {
         content: Text(message),
         actions: [
           CupertinoDialogAction(
-            child: Text(AppLocalizations.of(context)!.cancel),
+            child: Text(AppLocalizations.of(context)!.cancel, style: AppTextStyles.body),
             onPressed: () => Navigator.pop(context),
           ),
         ],
@@ -341,7 +361,7 @@ class _CreateExerciseSheetState extends ConsumerState<CreateExerciseSheet> {
         content: Text(message),
         actions: [
           CupertinoDialogAction(
-            child: Text(AppLocalizations.of(context)!.cancel),
+            child: Text(AppLocalizations.of(context)!.confirm, style: AppTextStyles.body),
             onPressed: () => Navigator.pop(context),
           ),
         ],

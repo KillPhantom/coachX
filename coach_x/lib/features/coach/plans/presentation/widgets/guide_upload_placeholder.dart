@@ -67,7 +67,7 @@ class GuideUploadPlaceholder extends StatelessWidget {
         content: const Text('图片和视频上传功能已预留接口，将在后续版本中实现。'),
         actions: [
           CupertinoDialogAction(
-            child: const Text('知道了'),
+            child: const Text('知道了', style: AppTextStyles.body),
             onPressed: () => Navigator.of(context).pop(),
           ),
         ],

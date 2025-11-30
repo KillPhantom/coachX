@@ -45,6 +45,38 @@ class UnitConverter {
     return inchesToCm(totalInches);
   }
 
+  /// 解析身高输入
+  ///
+  /// [input] 输入字符串
+  /// [isMetric] 是否为公制单位
+  ///
+  /// 返回身高（厘米），解析失败返回 null
+  static double? parseHeight(String input, {bool isMetric = true}) {
+    if (input.trim().isEmpty) return null;
+
+    try {
+      if (isMetric) {
+        // 公制：直接解析数字（cm）
+        final value = double.parse(input.trim());
+        return value > 0 && value < 300 ? value : null;
+      } else {
+        // 英制：解析 feet 和 inches
+        // 这个方法主要用于验证，实际输入会通过两个独立的输入框
+        final parts = input.trim().split(RegExp(r"['\x22\s]+"));
+        if (parts.isEmpty) return null;
+
+        final feet = int.tryParse(parts[0]) ?? 0;
+        final inches = parts.length > 1 ? (int.tryParse(parts[1]) ?? 0) : 0;
+
+        if (feet < 0 || feet > 9 || inches < 0 || inches >= 12) return null;
+
+        return feetAndInchesToCm(feet, inches);
+      }
+    } catch (e) {
+      return null;
+    }
+  }
+
   // ==================== 体重转换 ====================
 
   /// 格式化体重
@@ -107,6 +139,19 @@ class UnitConverter {
   static String formatAge(DateTime? bornDate) {
     final age = calculateAge(bornDate);
     return age != null ? age.toString() : '--';
+  }
+
+  /// 格式化出生日期
+  ///
+  /// [bornDate] 出生日期
+  ///
+  /// 返回格式: "1990-05-15" 或 "--"
+  static String formatBornDate(DateTime? bornDate) {
+    if (bornDate == null) return '--';
+
+    return '${bornDate.year.toString().padLeft(4, '0')}-'
+        '${bornDate.month.toString().padLeft(2, '0')}-'
+        '${bornDate.day.toString().padLeft(2, '0')}';
   }
 
   // ==================== 单位偏好判断 ====================

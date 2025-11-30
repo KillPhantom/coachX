@@ -157,7 +157,7 @@ def _import_from_text(
         logger.info(f"解析到 {len(plan_data['days'])} 个训练日")
         if warnings:
             logger.info(f'⚠️ 警告信息: {", ".join(warnings)}')
-
+        logger.info(f"result: {result}")
         return result
 
     except Exception as e:

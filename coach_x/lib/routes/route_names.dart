@@ -43,6 +43,10 @@ class RouteNames {
   /// 训练记录页
   static const String studentExerciseRecord = '/student/exercise-record';
 
+  /// 学生训练日历页
+  static const String studentTrainingCalendar =
+      '/students/:studentId/training-calendar';
+
   // ==================== 教练端路由 ====================
 
   /// 教练首页
@@ -83,6 +87,10 @@ class RouteNames {
   /// 对话详情页（带参数）
   static const String chatDetail = '/chat/:conversationId';
 
+  /// 每日训练总结页（带参数）
+  static const String dailyTrainingSummary =
+      '/daily-training-summary/:dailyTrainingId';
+
   // ==================== 工具方法 ====================
 
   /// 获取计划详情路由（替换参数）
@@ -107,5 +115,23 @@ class RouteNames {
     required String studentName,
   }) {
     return '/coach/training-feed/$dailyTrainingId?studentId=$studentId&studentName=$studentName';
+  }
+
+  /// 获取每日训练总结路由（替换参数）
+  static String getDailyTrainingSummaryRoute(String dailyTrainingId) {
+    return '/daily-training-summary/$dailyTrainingId';
+  }
+
+  /// 获取训练日历页面路由
+  static String getTrainingCalendarRoute(
+    String studentId, {
+    String? focusDate,
+  }) {
+    final base = '/students/$studentId/training-calendar';
+    if (focusDate == null || focusDate.isEmpty) {
+      return base;
+    }
+    final encodedDate = Uri.encodeComponent(focusDate);
+    return '$base?date=$encodedDate';
   }
 }

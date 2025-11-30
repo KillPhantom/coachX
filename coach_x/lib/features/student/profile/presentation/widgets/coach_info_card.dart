@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:coach_x/core/theme/app_theme.dart';
 import 'package:coach_x/features/auth/data/models/user_model.dart';
 import 'package:coach_x/features/shared/profile/presentation/widgets/badge_chip.dart';
@@ -80,14 +81,14 @@ class CoachInfoCard extends StatelessWidget {
       ),
       child: coach.avatarUrl != null && coach.avatarUrl!.isNotEmpty
           ? ClipOval(
-              child: Image.network(
-                coach.avatarUrl!,
+              child: CachedNetworkImage(
+                imageUrl: coach.avatarUrl!,
                 width: 64,
                 height: 64,
                 fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  return _buildDefaultAvatar();
-                },
+                placeholder: (context, url) =>
+                    const Center(child: CupertinoActivityIndicator()),
+                errorWidget: (context, url, error) => _buildDefaultAvatar(),
               ),
             )
           : _buildDefaultAvatar(),

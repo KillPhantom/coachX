@@ -169,18 +169,25 @@ final Future<void> Function(Meal) onUpdate;       // 更新回调
 
 #### 功能改进：
 
-- ✅ **新增参数**
+- ✅ **参数定义**
   ```dart
+  final DietDay? dietDay;                         // 教练设置的饮食日（可为空）
+  final List<Meal> mergedMeals;                   // 合并后的餐次列表（必填）
   final Macros? actualMacros;                     // 实际营养数据
   final StudentDietRecordModel? todayDietRecord;  // 今日饮食记录
   ```
 
+- ✅ **合并餐次展示**：使用 `mergedMeals` 而非 `dietDay.meals` 计算页数和展示餐次
+  ```dart
+  final totalPages = widget.mergedMeals.length + 1;
+  final displayMeal = widget.mergedMeals[mealIndex];
+  ```
+
 - ✅ **查找匹配餐次**
   ```dart
-  final recordedMeal = todayDietRecord?.meals.cast().firstWhere(
-    (m) => m.name == planMeal.name,
-    orElse: () => null,
-  );
+  final recordedMeal = todayDietRecord?.meals
+      .cast<Meal?>()
+      .firstWhere((m) => m?.name == displayMeal.name, orElse: () => null);
   ```
 
 - ✅ **显示 Bottom Sheet**
@@ -219,10 +226,26 @@ final Future<void> Function(Meal) onUpdate;       // 更新回调
   final todayTrainingAsync = ref.watch(optimizedTodayTrainingProvider);
   ```
 
+- ✅ **合并餐次逻辑**
+  ```dart
+  /// 合并计划餐次和学生自行添加的餐次
+  List<Meal> _getMergedMeals(List<Meal> planMeals, List<Meal>? recordedMeals) {
+    if (recordedMeals == null || recordedMeals.isEmpty) {
+      return planMeals;
+    }
+    final planMealNames = planMeals.map((m) => m.name).toSet();
+    final extraMeals = recordedMeals
+        .where((m) => !planMealNames.contains(m.name))
+        .toList();
+    return [...planMeals, ...extraMeals];
+  }
+  ```
+
 - ✅ **传递数据到子组件**
   ```dart
   DietPlanCard(
-    dietDay: dietDay,
+    dietDay: dietDay,           // 可为 null
+    mergedMeals: mergedMeals,   // 合并后的餐次列表
     actualMacros: actualMacros,
     todayDietRecord: todayTraining?.diet,
     progress: progress,
@@ -448,7 +471,10 @@ functions/
 所有进度条（环形和横向）使用相同的颜色判断逻辑：
 
 ```dart
-Color getProgressColor(double progress) {
+Color getProgressColor(double progress, bool hasTarget) {
+  if (!hasTarget) {
+    return AppColors.primaryColor; // 无目标值时使用主题色
+  }
   if (progress >= 0.95 && progress <= 1.05) {
     return AppColors.successGreen;
   } else if (progress > 1.05) {
@@ -459,16 +485,45 @@ Color getProgressColor(double progress) {
 }
 ```
 
-### 2. 餐次匹配逻辑
+### 1.1 无目标值时的显示逻辑
 
-通过餐名进行精确匹配：
+当教练未设置目标营养值时：
+- **环形进度条**: 显示实际摄入值，进度按 2000kcal 为满计算
+- **宏营养素进度条**: 只显示 `Xg`（不显示目标），进度按 100g 为满计算
+- **颜色**: 统一使用主题色，不进行完成度判断
+
+### 2. 餐次匹配与合并逻辑
+
+**合并策略**：当教练未设置餐次时，学生自行添加的记录也需要展示。
 
 ```dart
-final recordedMeal = todayDietRecord?.meals.firstWhere(
-  (m) => m.name == planMeal.name,
-  orElse: () => null,
-);
+/// 合并计划餐次和学生自行添加的餐次
+List<Meal> _getMergedMeals(List<Meal> planMeals, List<Meal>? recordedMeals) {
+  if (recordedMeals == null || recordedMeals.isEmpty) {
+    return planMeals;
+  }
+
+  // 获取计划餐次的名称集合
+  final planMealNames = planMeals.map((m) => m.name).toSet();
+
+  // 找出学生自行添加的餐次（不在计划中的）
+  final extraMeals =
+      recordedMeals.where((m) => !planMealNames.contains(m.name)).toList();
+
+  // 合并：计划餐次 + 额外餐次
+  return [...planMeals, ...extraMeals];
+}
 ```
+
+**匹配场景**：
+
+| 场景 | planMeals | recordedMeals | 结果 |
+|------|-----------|---------------|------|
+| 教练设置餐次，学生未记录 | [早餐,午餐,晚餐] | [] | 显示3餐 |
+| 教练设置餐次，学生已记录 | [早餐,午餐,晚餐] | [早餐] | 显示3餐，早餐有绿色边框 |
+| 教练未设置，学生已记录 | [] | [第1餐,第2餐] | 显示2餐 |
+| 教练未设置，学生未记录 | [] | [] | 只显示总营养卡片 |
+| 混合场景 | [早餐,午餐] | [早餐,第3餐] | 显示3餐：早餐,午餐,第3餐 |
 
 ### 3. Provider 刷新策略
 
@@ -651,6 +706,8 @@ firebase functions:shell
 | 日期 | 版本 | 变更内容 | 作者 |
 |------|------|----------|------|
 | 2025-11-17 | 1.0 | 初始版本，完成所有功能实现 | Claude |
+| 2025-11-28 | 1.1 | 修复教练未设置 meals 时学生端无法展示自行添加的餐次记录 | Claude |
+| 2025-11-28 | 1.2 | 修复 Summary Card 在无目标值时的显示逻辑 | Claude |
 
 ---
 
@@ -712,5 +769,5 @@ optimizedTodayTrainingProvider
 ---
 
 **文档状态**: ✅ 完成
-**最后更新**: 2025-11-17
+**最后更新**: 2025-11-28
 **维护者**: Development Team

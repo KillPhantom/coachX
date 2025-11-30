@@ -26,20 +26,20 @@ class PendingReviewsSection extends ConsumerWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(l10n.pendingReviewsTitle, style: AppTextStyles.bodyMedium),
-            if (pendingReviews.isNotEmpty)
-              CupertinoButton(
-                padding: EdgeInsets.zero,
-                onPressed: () {
-                  context.push(RouteNames.coachTrainingReviews);
-                }, minimumSize: Size(0, 0),
-                child: Text(
-                  l10n.viewAll,
-                  style: AppTextStyles.callout.copyWith(
-                    color: AppColors.primaryText,
-                    fontWeight: FontWeight.w500,
-                  ),
+            CupertinoButton(
+              padding: EdgeInsets.zero,
+              onPressed: () {
+                context.push(RouteNames.coachTrainingReviews);
+              },
+              minimumSize: const Size(0, 0),
+              child: Text(
+                l10n.viewAll,
+                style: AppTextStyles.callout.copyWith(
+                  color: AppColors.primaryText,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
+            ),
           ],
         ),
         const SizedBox(height: AppDimensions.spacingL),

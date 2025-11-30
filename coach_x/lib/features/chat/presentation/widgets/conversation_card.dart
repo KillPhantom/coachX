@@ -293,7 +293,7 @@ class ConversationCard extends ConsumerWidget {
         content: Text(message),
         actions: [
           CupertinoDialogAction(
-            child: const Text('确定'),
+            child: const Text('确定', style: AppTextStyles.body),
             onPressed: () => Navigator.of(context).pop(),
           ),
         ],

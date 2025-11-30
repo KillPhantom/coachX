@@ -268,7 +268,7 @@ class _StudentsPageState extends ConsumerState<StudentsPage>
             content: const Text('学生已删除'),
             actions: [
               CupertinoDialogAction(
-                child: const Text('确定'),
+                child: const Text('确定', style: AppTextStyles.body),
                 onPressed: () => Navigator.pop(context),
               ),
             ],
@@ -285,7 +285,7 @@ class _StudentsPageState extends ConsumerState<StudentsPage>
             content: Text('删除失败: $e'),
             actions: [
               CupertinoDialogAction(
-                child: const Text('确定'),
+                child: const Text('确定', style: AppTextStyles.body),
                 onPressed: () => Navigator.pop(context),
               ),
             ],

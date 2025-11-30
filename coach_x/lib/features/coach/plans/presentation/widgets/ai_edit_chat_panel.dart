@@ -7,6 +7,7 @@ import 'package:coach_x/features/coach/plans/data/models/exercise_plan_model.dar
 import 'package:coach_x/features/coach/plans/data/models/plan_edit_suggestion.dart';
 import 'package:coach_x/features/coach/plans/presentation/providers/edit_conversation_providers.dart';
 import 'package:coach_x/features/coach/plans/presentation/widgets/chat_message_bubble.dart';
+import 'package:coach_x/l10n/app_localizations.dart';
 
 /// AI 编辑对话面板
 class AIEditChatPanel extends ConsumerStatefulWidget {
@@ -201,7 +202,7 @@ class _AIEditChatPanelState extends ConsumerState<AIEditChatPanel> {
           // 标题
           Expanded(
             child: Text(
-              'AI Assistant',
+              AppLocalizations.of(context)!.aiAssistant,
               style: AppTextStyles.title3.copyWith(
                 color: CupertinoColors.label.resolveFrom(context),
                 fontWeight: FontWeight.w600,
@@ -233,6 +234,8 @@ class _AIEditChatPanelState extends ConsumerState<AIEditChatPanel> {
 
   /// 构建欢迎界面
   Widget _buildWelcomeView(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(24),
@@ -247,7 +250,7 @@ class _AIEditChatPanelState extends ConsumerState<AIEditChatPanel> {
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
-                'Hello! How can I assist you with this training plan today?',
+                l10n.aiWelcomeMessage,
                 style: AppTextStyles.subhead.copyWith(
                   color: CupertinoColors.label.resolveFrom(context),
                   height: 1.4,
@@ -258,7 +261,7 @@ class _AIEditChatPanelState extends ConsumerState<AIEditChatPanel> {
             const SizedBox(height: 24),
             // 提示文本
             Text(
-              'Try asking me to modify exercises, adjust intensity, or add new training days.',
+              l10n.aiWelcomeHint,
               style: AppTextStyles.caption1.copyWith(
                 color: CupertinoColors.secondaryLabel.resolveFrom(context),
               ),
@@ -272,7 +275,11 @@ class _AIEditChatPanelState extends ConsumerState<AIEditChatPanel> {
 
   /// 构建快捷操作按钮
   Widget _buildQuickActions(BuildContext context) {
-    final quickActions = ['分析一下计划的优缺点', '降低所有重量 10%'];
+    final l10n = AppLocalizations.of(context)!;
+    final quickActions = [
+      l10n.aiQuickActionAnalyzePlan,
+      l10n.aiQuickActionReduceWeight,
+    ];
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -338,7 +345,7 @@ class _AIEditChatPanelState extends ConsumerState<AIEditChatPanel> {
                     Expanded(
                       child: CupertinoTextField(
                         controller: _messageController,
-                        placeholder: 'Ask AI for suggestions...',
+                        placeholder: AppLocalizations.of(context)!.aiInputPlaceholder,
                         placeholderStyle: AppTextStyles.subhead.copyWith(
                           color: CupertinoColors.secondaryLabel.resolveFrom(
                             context,

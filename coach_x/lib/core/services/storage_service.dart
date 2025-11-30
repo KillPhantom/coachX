@@ -1,8 +1,11 @@
 import 'dart:io';
+import 'dart:typed_data';
+import 'dart:async';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:coach_x/core/utils/logger.dart';
 import 'package:coach_x/core/services/auth_service.dart';
+import 'package:coach_x/core/constants/media_compression_config.dart';
 
 /// Firebase Storage服务
 ///
@@ -17,18 +20,23 @@ class StorageService {
   ///
   /// [file] 要上传的文件
   /// [path] Storage中的路径
+  /// [metadata] 自定义元数据
   /// [onProgress] 上传进度回调
   /// 返回文件的下载URL
-  static Future<String> uploadFile(
-    File file,
-    String path, {
+  static Future<String> uploadFile({
+    required File file,
+    required String storagePath,
+    Map<String, String>? metadata,
     Function(double)? onProgress,
   }) async {
     try {
-      AppLogger.info('开始上传文件: $path');
+      AppLogger.info('开始上传文件: $storagePath');
 
-      final ref = _storage.ref().child(path);
-      final uploadTask = ref.putFile(file);
+      final ref = _storage.ref().child(storagePath);
+      final settableMetadata =
+          metadata != null ? SettableMetadata(customMetadata: metadata) : null;
+
+      final uploadTask = ref.putFile(file, settableMetadata);
 
       // 监听上传进度
       if (onProgress != null) {
@@ -42,20 +50,192 @@ class StorageService {
       final snapshot = await uploadTask;
       final downloadUrl = await snapshot.ref.getDownloadURL();
 
-      AppLogger.info('文件上传成功: $path');
+      AppLogger.info('文件上传成功: $storagePath');
       return downloadUrl;
     } catch (e, stackTrace) {
-      AppLogger.error('文件上传失败: $path', e, stackTrace);
+      AppLogger.error('文件上传失败: $storagePath', e, stackTrace);
+      rethrow;
+    }
+  }
+
+  /// 上传数据到Storage
+  ///
+  /// [data] 要上传的二进制数据
+  /// [storagePath] Storage中的路径
+  /// [metadata] 自定义元数据
+  /// [onProgress] 上传进度回调
+  /// 返回文件的下载URL
+  static Future<String> uploadData({
+    required Uint8List data,
+    required String storagePath,
+    Map<String, String>? metadata,
+    Function(double)? onProgress,
+  }) async {
+    try {
+      AppLogger.info('开始上传数据: $storagePath');
+
+      final ref = _storage.ref().child(storagePath);
+      final settableMetadata =
+          metadata != null ? SettableMetadata(customMetadata: metadata) : null;
+
+      final uploadTask = ref.putData(data, settableMetadata);
+
+      // 监听上传进度
+      if (onProgress != null) {
+        uploadTask.snapshotEvents.listen((snapshot) {
+          final progress = snapshot.bytesTransferred / snapshot.totalBytes;
+          onProgress(progress);
+        });
+      }
+
+      // 等待上传完成
+      final snapshot = await uploadTask;
+      final downloadUrl = await snapshot.ref.getDownloadURL();
+
+      AppLogger.info('数据上传成功: $storagePath');
+      return downloadUrl;
+    } catch (e, stackTrace) {
+      AppLogger.error('数据上传失败: $storagePath', e, stackTrace);
+      rethrow;
+    }
+  }
+
+  /// 上传文件到Storage（带重试和超时检测）
+  ///
+  /// [file] 要上传的文件
+  /// [path] Storage中的路径
+  /// [onProgress] 上传进度回调
+  /// [maxRetries] 最大重试次数，默认使用配置值
+  /// 返回文件的下载URL
+  static Future<String> uploadFileWithRetry(
+    File file,
+    String path, {
+    Function(double)? onProgress,
+    int? maxRetries,
+  }) async {
+    final retries = maxRetries ?? MediaCompressionConfig.maxUploadRetries;
+    int attempt = 0;
+    Exception? lastException;
+
+    while (attempt < retries) {
+      try {
+        attempt++;
+        AppLogger.info('上传文件 (尝试 $attempt/$retries): $path');
+
+        return await _uploadWithProgressMonitoring(
+          file,
+          path,
+          onProgress: onProgress,
+        );
+      } on TimeoutException catch (e) {
+        lastException = e;
+        AppLogger.warning('⚠️ 上传超时，准备重试 (尝试 $attempt/$retries)');
+
+        if (attempt >= retries) {
+          AppLogger.error('❌ 上传失败，已达最大重试次数', e);
+          rethrow;
+        }
+
+        // 指数退避：等待 2^(attempt-1) 秒
+        final delaySeconds =
+            MediaCompressionConfig.retryDelayBase << (attempt - 1);
+        await Future.delayed(Duration(seconds: delaySeconds));
+      } catch (e, stackTrace) {
+        AppLogger.error(
+          '文件上传失败: $path (尝试 $attempt/$retries)',
+          e,
+          stackTrace,
+        );
+
+        if (attempt >= retries) {
+          rethrow;
+        }
+
+        lastException = e as Exception;
+        final delaySeconds =
+            MediaCompressionConfig.retryDelayBase << (attempt - 1);
+        await Future.delayed(Duration(seconds: delaySeconds));
+      }
+    }
+
+    throw lastException ?? Exception('Upload failed after $retries attempts');
+  }
+
+  /// 上传文件并监控进度停滞（私有方法）
+  static Future<String> _uploadWithProgressMonitoring(
+    File file,
+    String path, {
+    Function(double)? onProgress,
+  }) async {
+    final ref = _storage.ref().child(path);
+    final uploadTask = ref.putFile(file);
+
+    double lastProgress = 0;
+    DateTime lastProgressTime = DateTime.now();
+    Timer? progressTimer;
+    StreamSubscription? progressSubscription;
+
+    try {
+      // 监听进度
+      progressSubscription = uploadTask.snapshotEvents.listen((snapshot) {
+        if (snapshot.totalBytes == 0) {
+          return;
+        }
+
+        final progress = snapshot.bytesTransferred / snapshot.totalBytes;
+
+        // 只有进度增加时才更新
+        if (progress > lastProgress) {
+          lastProgress = progress;
+          lastProgressTime = DateTime.now();
+          onProgress?.call(progress);
+        }
+      });
+
+      // 启动进度停滞检测定时器
+      progressTimer = Timer.periodic(
+        MediaCompressionConfig.progressStaleTimeout,
+        (timer) {
+          final timeSinceLastProgress =
+              DateTime.now().difference(lastProgressTime);
+
+          if (timeSinceLastProgress >=
+              MediaCompressionConfig.progressStaleTimeout) {
+            AppLogger.warning(
+              '⚠️ 进度停滞超过 ${MediaCompressionConfig.progressStaleTimeout.inSeconds}s，取消上传',
+            );
+            timer.cancel();
+            uploadTask.cancel();
+            throw TimeoutException('Upload progress stalled');
+          }
+        },
+      );
+
+      // 等待上传完成（带总超时）
+      final snapshot = await uploadTask.timeout(
+        MediaCompressionConfig.uploadTimeout,
+        onTimeout: () {
+          AppLogger.warning('⚠️ 上传总超时，取消任务');
+          uploadTask.cancel();
+          throw TimeoutException('Upload timeout');
+        },
+      );
+
+      progressTimer.cancel();
+      await progressSubscription.cancel();
+
+      final downloadUrl = await snapshot.ref.getDownloadURL();
+      AppLogger.info('✅ 文件上传成功: $path');
+
+      return downloadUrl;
+    } catch (e) {
+      progressTimer?.cancel();
+      await progressSubscription?.cancel();
       rethrow;
     }
   }
 
   /// 上传图片（从相机或相册选择）
-  ///
-  /// [source] 图片来源（相机或相册）
-  /// [folder] 存储文件夹
-  /// [onProgress] 上传进度回调
-  /// 返回图片的下载URL
   static Future<String?> uploadImage({
     required ImageSource source,
     required String folder,
@@ -88,7 +268,7 @@ class StorageService {
       final path = '$folder/$userId/$timestamp.$extension';
 
       // 上传文件
-      return await uploadFile(file, path, onProgress: onProgress);
+      return await uploadFile(file: file, storagePath: path, onProgress: onProgress);
     } catch (e, stackTrace) {
       AppLogger.error('上传图片失败', e, stackTrace);
       rethrow;
@@ -96,10 +276,6 @@ class StorageService {
   }
 
   /// 上传头像
-  ///
-  /// [source] 图片来源
-  /// [onProgress] 上传进度回调
-  /// 返回头像URL
   static Future<String?> uploadAvatar({
     required ImageSource source,
     Function(double)? onProgress,
@@ -112,10 +288,6 @@ class StorageService {
   }
 
   /// 上传训练图片
-  ///
-  /// [source] 图片来源
-  /// [onProgress] 上传进度回调
-  /// 返回图片URL
   static Future<String?> uploadTrainingImage({
     required ImageSource source,
     Function(double)? onProgress,
@@ -128,10 +300,6 @@ class StorageService {
   }
 
   /// 上传饮食图片
-  ///
-  /// [source] 图片来源
-  /// [onProgress] 上传进度回调
-  /// 返回图片URL
   static Future<String?> uploadDietImage({
     required ImageSource source,
     Function(double)? onProgress,
@@ -144,10 +312,6 @@ class StorageService {
   }
 
   /// 上传训练计划图片
-  ///
-  /// [source] 图片来源
-  /// [onProgress] 上传进度回调
-  /// 返回图片URL
   static Future<String?> uploadTrainingPlanImage({
     required ImageSource source,
     Function(double)? onProgress,
@@ -160,10 +324,6 @@ class StorageService {
   }
 
   /// 上传训练计划文件（通用）
-  ///
-  /// [file] 要上传的文件
-  /// [onProgress] 上传进度回调
-  /// 返回文件URL
   static Future<String> uploadTrainingPlanFile({
     required File file,
     Function(double)? onProgress,
@@ -178,7 +338,7 @@ class StorageService {
       final extension = file.path.split('.').last;
       final path = 'training_plan_images/$userId/$timestamp.$extension';
 
-      return await uploadFile(file, path, onProgress: onProgress);
+      return await uploadFile(file: file, storagePath: path, onProgress: onProgress);
     } catch (e, stackTrace) {
       AppLogger.error('上传训练计划文件失败', e, stackTrace);
       rethrow;
@@ -186,10 +346,6 @@ class StorageService {
   }
 
   /// 上传补剂计划文件
-  ///
-  /// [file] 图片文件
-  /// [onProgress] 上传进度回调
-  /// 返回文件URL
   static Future<String> uploadSupplementPlanFile({
     required File file,
     Function(double)? onProgress,
@@ -204,7 +360,7 @@ class StorageService {
       final extension = file.path.split('.').last;
       final path = 'supplement_plan_images/$userId/$timestamp.$extension';
 
-      return await uploadFile(file, path, onProgress: onProgress);
+      return await uploadFile(file: file, storagePath: path, onProgress: onProgress);
     } catch (e, stackTrace) {
       AppLogger.error('上传补剂计划文件失败', e, stackTrace);
       rethrow;
@@ -212,10 +368,6 @@ class StorageService {
   }
 
   /// 上传身体测量图片
-  ///
-  /// [source] 图片来源
-  /// [onProgress] 上传进度回调
-  /// 返回图片URL
   static Future<String?> uploadBodyStatsImage({
     required ImageSource source,
     Function(double)? onProgress,
@@ -228,11 +380,6 @@ class StorageService {
   }
 
   /// 上传聊天图片
-  ///
-  /// [file] 图片文件
-  /// [conversationId] 对话ID
-  /// [onProgress] 上传进度回调
-  /// 返回图片URL
   static Future<String> uploadChatImage({
     required File file,
     required String conversationId,
@@ -250,7 +397,7 @@ class StorageService {
       final path =
           'chat_images/$userId/$conversationId/${timestamp}_$randomId.$extension';
 
-      return await uploadFile(file, path, onProgress: onProgress);
+      return await uploadFile(file: file, storagePath: path, onProgress: onProgress);
     } catch (e, stackTrace) {
       AppLogger.error('上传聊天图片失败', e, stackTrace);
       rethrow;
@@ -258,11 +405,6 @@ class StorageService {
   }
 
   /// 上传聊天视频
-  ///
-  /// [file] 视频文件
-  /// [conversationId] 对话ID
-  /// [onProgress] 上传进度回调
-  /// 返回视频URL
   static Future<String> uploadChatVideo({
     required File file,
     required String conversationId,
@@ -280,7 +422,7 @@ class StorageService {
       final path =
           'chat_videos/$userId/$conversationId/${timestamp}_$randomId.$extension';
 
-      return await uploadFile(file, path, onProgress: onProgress);
+      return await uploadFile(file: file, storagePath: path, onProgress: onProgress);
     } catch (e, stackTrace) {
       AppLogger.error('上传聊天视频失败', e, stackTrace);
       rethrow;
@@ -288,11 +430,6 @@ class StorageService {
   }
 
   /// 上传聊天语音
-  ///
-  /// [file] 语音文件
-  /// [conversationId] 对话ID
-  /// [onProgress] 上传进度回调
-  /// 返回语音URL
   static Future<String> uploadChatVoice({
     required File file,
     required String conversationId,
@@ -310,7 +447,7 @@ class StorageService {
       final path =
           'chat_voices/$userId/$conversationId/${timestamp}_$randomId.$extension';
 
-      return await uploadFile(file, path, onProgress: onProgress);
+      return await uploadFile(file: file, storagePath: path, onProgress: onProgress);
     } catch (e, stackTrace) {
       AppLogger.error('上传聊天语音失败', e, stackTrace);
       rethrow;
@@ -318,8 +455,6 @@ class StorageService {
   }
 
   /// 删除文件
-  ///
-  /// [path] Storage中的文件路径
   static Future<void> deleteFile(String path) async {
     try {
       AppLogger.info('删除文件: $path');
@@ -332,8 +467,6 @@ class StorageService {
   }
 
   /// 从URL删除文件
-  ///
-  /// [url] 文件的下载URL
   static Future<void> deleteFileByUrl(String url) async {
     try {
       final ref = _storage.refFromURL(url);
@@ -346,9 +479,6 @@ class StorageService {
   }
 
   /// 获取文件元数据
-  ///
-  /// [path] Storage中的文件路径
-  /// 返回文件元数据
   static Future<FullMetadata> getMetadata(String path) async {
     try {
       return await _storage.ref().child(path).getMetadata();
@@ -359,9 +489,6 @@ class StorageService {
   }
 
   /// 获取下载URL
-  ///
-  /// [path] Storage中的文件路径
-  /// 返回下载URL
   static Future<String> getDownloadUrl(String path) async {
     try {
       return await _storage.ref().child(path).getDownloadURL();
@@ -372,10 +499,6 @@ class StorageService {
   }
 
   /// 列出文件夹中的文件
-  ///
-  /// [path] 文件夹路径
-  /// [maxResults] 最大结果数
-  /// 返回文件引用列表
   static Future<ListResult> listFiles(String path, {int? maxResults}) async {
     try {
       final ref = _storage.ref().child(path);

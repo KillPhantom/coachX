@@ -146,6 +146,46 @@
     "description": "Avatar edit feature message"
   },
 
+  "selectAvatarSource": "Select Avatar Source",
+  "@selectAvatarSource": {
+    "description": "Title for avatar source selection sheet"
+  },
+
+  "chooseFromGallery": "Choose from Gallery",
+  "@chooseFromGallery": {
+    "description": "Option to choose avatar from gallery"
+  },
+
+  "uploadingAvatar": "Uploading Avatar...",
+  "@uploadingAvatar": {
+    "description": "Avatar uploading status text"
+  },
+
+  "processingImage": "Processing Image...",
+  "@processingImage": {
+    "description": "Image processing status text"
+  },
+
+  "uploadSuccess": "Upload Successful",
+  "@uploadSuccess": {
+    "description": "Avatar upload success message"
+  },
+
+  "uploadFailed": "Upload Failed",
+  "@uploadFailed": {
+    "description": "Avatar upload failed message"
+  },
+
+  "retryUpload": "Retry",
+  "@retryUpload": {
+    "description": "Retry upload button text"
+  },
+
+  "cropCircular": "Crop to Circle",
+  "@cropCircular": {
+    "description": "Circular crop instruction"
+  },
+
   "accountSettingsInDevelopment": "Account Settings is under development",
   "@accountSettingsInDevelopment": {
     "description": "Account settings feature message"
@@ -1804,6 +1844,36 @@
     "description": "Training record page title"
   },
 
+  "feedbackHistoryTitle": "Training History",
+  "@feedbackHistoryTitle": {
+    "description": "Feedback tab title showing training history"
+  },
+
+  "feedbackSortAscLabel": "Asc",
+  "@feedbackSortAscLabel": {
+    "description": "Ascending sort label for feedback list"
+  },
+
+  "feedbackSortDescLabel": "Desc",
+  "@feedbackSortDescLabel": {
+    "description": "Descending sort label for feedback list"
+  },
+
+  "trainingCalendarTitle": "Training History",
+  "@trainingCalendarTitle": {
+    "description": "Title for the training calendar page"
+  },
+
+  "trainingCalendarEmptyDay": "No training record for this date.",
+  "@trainingCalendarEmptyDay": {
+    "description": "Empty state message when the selected day has no training record"
+  },
+
+  "trainingCalendarViewSummary": "View summary",
+  "@trainingCalendarViewSummary": {
+    "description": "CTA to open the training summary from the calendar"
+  },
+
   "loadFailed": "Load Failed",
   "@loadFailed": {
     "description": "Load failed error title"
@@ -1879,9 +1949,9 @@
     "description": "Label for coach-assigned plans"
   },
 
-  "feedbackSearchPlaceholder": "Search feedback...",
+  "feedbackSearchPlaceholder": "Search exercises or feedback",
   "@feedbackSearchPlaceholder": {
-    "description": "Placeholder text for feedback search bar"
+    "description": "Placeholder text for the feedback search bar"
   },
 
   "feedbackStartDate": "Start Date",
@@ -3225,6 +3295,41 @@
     "description": "Button to start parsing text"
   },
 
+  "textImportSummaryTitle": "Text Import Complete",
+  "@textImportSummaryTitle": {
+    "description": "Text import summary page title"
+  },
+
+  "textImportSummarySubtitle": "Successfully extracted training plan from text",
+  "@textImportSummarySubtitle": {
+    "description": "Text import summary page subtitle"
+  },
+
+  "exerciseFromLibrary": "Exercise From Library",
+  "@exerciseFromLibrary": {
+    "description": "Section title for exercises from library"
+  },
+
+  "newExercise": "New Exercise",
+  "@newExercise": {
+    "description": "Section title for new exercises"
+  },
+
+  "viewGuidance": "view guidance",
+  "@viewGuidance": {
+    "description": "Button to view exercise guidance"
+  },
+
+  "createGuidance": "create guidance",
+  "@createGuidance": {
+    "description": "Button to create exercise guidance"
+  },
+
+  "confirm": "Confirm",
+  "@confirm": {
+    "description": "Confirm button"
+  },
+
   "extractionSuccess": "Text extracted successfully! Please review and edit if needed.",
   "@extractionSuccess": {
     "description": "OCR extraction success message"
@@ -3443,5 +3548,175 @@
         "type": "int"
       }
     }
+  },
+
+  "imageUploadFailed": "Image upload failed",
+  "@imageUploadFailed": {
+    "description": "Error message when image upload fails"
+  },
+
+  "unknownError": "Unknown error",
+  "@unknownError": {
+    "description": "Unknown error message"
+  },
+
+  "thisWeekIntake": "This week",
+  "@thisWeekIntake": {
+    "description": "Label for this week's calorie intake"
+  },
+
+  "noLastWeekData": "No last week data",
+  "@noLastWeekData": {
+    "description": "Note when there is no last week data for comparison"
+  },
+
+  "today": "today",
+  "@today": {
+    "description": "Label for today"
+  },
+
+  "nickname": "Nickname",
+  "@nickname": {
+    "description": "Nickname field label"
+  },
+
+  "nicknamePlaceholder": "Enter nickname",
+  "@nicknamePlaceholder": {
+    "description": "Nickname input placeholder"
+  },
+
+  "nicknameRequired": "Nickname cannot be empty",
+  "@nicknameRequired": {
+    "description": "Nickname validation error message"
+  },
+
+  "editNickname": "Edit Nickname",
+  "@editNickname": {
+    "description": "Edit nickname dialog title"
+  },
+
+  "gender": "Gender",
+  "@gender": {
+    "description": "Gender field label"
+  },
+
+  "male": "Male",
+  "@male": {
+    "description": "Male gender option"
+  },
+
+  "female": "Female",
+  "@female": {
+    "description": "Female gender option"
+  },
+
+  "selectGender": "Select Gender",
+  "@selectGender": {
+    "description": "Gender selection prompt"
+  },
+
+  "editGender": "Edit Gender",
+  "@editGender": {
+    "description": "Edit gender dialog title"
+  },
+
+  "bornDate": "Birth Date",
+  "@bornDate": {
+    "description": "Birth date field label"
+  },
+
+  "selectBornDate": "Select Birth Date",
+  "@selectBornDate": {
+    "description": "Birth date selection prompt"
+  },
+
+  "editBornDate": "Edit Birth Date",
+  "@editBornDate": {
+    "description": "Edit birth date dialog title"
+  },
+
+  "dateFormat": "yyyy-MM-dd",
+  "@dateFormat": {
+    "description": "Date format pattern"
+  },
+
+  "editHeight": "Edit Height",
+  "@editHeight": {
+    "description": "Edit height dialog title"
+  },
+
+  "heightPlaceholder": "Enter height",
+  "@heightPlaceholder": {
+    "description": "Height input placeholder"
+  },
+
+  "heightInvalid": "Invalid height value",
+  "@heightInvalid": {
+    "description": "Height validation error message"
+  },
+
+  "heightInCm": "Height (cm)",
+  "@heightInCm": {
+    "description": "Height label in centimeters"
+  },
+
+  "heightInFeet": "Height (ft)",
+  "@heightInFeet": {
+    "description": "Height label in feet"
+  },
+
+  "heightInInches": "inches",
+  "@heightInInches": {
+    "description": "Inches unit label"
+  },
+
+  "feet": "ft",
+  "@feet": {
+    "description": "Feet unit abbreviation"
+  },
+
+  "inches": "in",
+  "@inches": {
+    "description": "Inches unit abbreviation"
+  },
+
+  "updateSuccess": "Updated successfully",
+  "@updateSuccess": {
+    "description": "Success message for profile update"
+  },
+
+  "updateFailed": "Update failed",
+  "@updateFailed": {
+    "description": "Error message for profile update failure"
+  },
+
+  "aiAssistant": "AI Assistant",
+  "@aiAssistant": {
+    "description": "AI assistant title in edit chat panel"
+  },
+
+  "aiWelcomeMessage": "Hello! How can I assist you with this training plan today?",
+  "@aiWelcomeMessage": {
+    "description": "Welcome message in AI edit chat panel"
+  },
+
+  "aiWelcomeHint": "Try asking me to modify exercises, adjust intensity, or add new training days.",
+  "@aiWelcomeHint": {
+    "description": "Hint text in AI edit chat panel welcome view"
+  },
+
+  "aiQuickActionAnalyzePlan": "Analyze the plan's pros and cons",
+  "@aiQuickActionAnalyzePlan": {
+    "description": "Quick action button to analyze plan"
+  },
+
+  "aiQuickActionReduceWeight": "Reduce all weights by 10%",
+  "@aiQuickActionReduceWeight": {
+    "description": "Quick action button to reduce weights"
+  },
+
+  "aiInputPlaceholder": "Ask AI for suggestions...",
+  "@aiInputPlaceholder": {
+    "description": "Input placeholder in AI edit chat panel"
   }
 }

@@ -312,7 +312,10 @@ class LocalKeyframeExtractor {
           final storagePath =
               'training_keyframes/$trainingId/ex${exerciseIndex}_frame$i.jpg';
           final file = File(localPath);
-          final url = await StorageService.uploadFile(file, storagePath);
+          final url = await StorageService.uploadFile(
+            file: file,
+            storagePath: storagePath,
+          );
 
           uploadedKeyframes.add({
             'url': url,

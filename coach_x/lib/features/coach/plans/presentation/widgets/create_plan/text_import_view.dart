@@ -212,8 +212,11 @@ class _TextImportViewState extends ConsumerState<TextImportView> {
     final isLoading = _isExtracting || _isParsing;
     final hasText = _textController.text.isNotEmpty;
 
-    return Column(
-      children: [
+    return GestureDetector(
+      behavior: HitTestBehavior.translucent,
+      onTap: () => _focusNode.unfocus(),
+      child: Column(
+        children: [
         // 1. Editor Area (Canvas)
         Expanded(
           child: Container(
@@ -427,7 +430,8 @@ class _TextImportViewState extends ConsumerState<TextImportView> {
             ),
           ),
         ),
-      ],
+        ],
+      ),
     );
   }
 }

@@ -1,10 +1,17 @@
+import 'dart:io';
+import 'dart:typed_data';
+
 import 'package:coach_x/core/enums/user_role.dart';
 import 'package:coach_x/core/services/firestore_service.dart';
 import 'package:coach_x/core/services/cloud_functions_service.dart';
 import 'package:coach_x/core/services/auth_service.dart';
+import 'package:coach_x/core/services/storage_service.dart';
 import 'package:coach_x/core/utils/logger.dart';
+import 'package:coach_x/core/utils/json_utils.dart';
 import 'package:coach_x/features/chat/data/models/conversation_model.dart';
 import 'package:coach_x/features/chat/data/models/message_model.dart';
+import 'package:path/path.dart' as path;
+import 'package:uuid/uuid.dart';
 import 'chat_repository.dart';
 
 /// Chat Repository 实现类
@@ -108,6 +115,10 @@ class ChatRepositoryImpl implements ChatRepository {
     required String content,
     String? mediaUrl,
     MessageMetadata? mediaMetadata,
+    String? quotedMessageId,
+    String? quotedMessageContent,
+    String? quotedMessageSenderId,
+    String? quotedMessageSenderName,
   }) async {
     try {
       final currentUserId = AuthService.currentUserId;
@@ -122,14 +133,61 @@ class ChatRepositoryImpl implements ChatRepository {
         'content': content,
         if (mediaUrl != null) 'mediaUrl': mediaUrl,
         if (mediaMetadata != null) 'mediaMetadata': mediaMetadata.toJson(),
+        if (quotedMessageId != null) 'quotedMessageId': quotedMessageId,
+        if (quotedMessageContent != null)
+          'quotedMessageContent': quotedMessageContent,
+        if (quotedMessageSenderId != null)
+          'quotedMessageSenderId': quotedMessageSenderId,
+        if (quotedMessageSenderName != null)
+          'quotedMessageSenderName': quotedMessageSenderName,
       });
 
+      // 临时调试日志
+      AppLogger.info('=== send_message 响应 ===');
+      AppLogger.info('result: ${result.toString()}');
+      AppLogger.info('result[\'data\']: ${result['data'].toString()}');
+      AppLogger.info('result[\'data\'] type: ${result['data'].runtimeType}');
+
       // 返回已发送的消息模型
-      final data = Map<String, dynamic>.from(result['data'] as Map);
+      // 使用 safeMapCast 处理嵌套 Map
+      final data = safeMapCast(result['data'], 'send_message.data');
+      if (data == null) {
+        throw Exception('send_message 返回数据格式错误');
+      }
+
       final messageId = data['messageId'] as String;
-      final createdAt = DateTime.fromMillisecondsSinceEpoch(
-        data['createdAt'] as int,
-      );
+
+      // 使用 safeIntCast 处理时间戳
+      final createdAtTimestamp =
+          safeIntCast(data['createdAt'], 0, 'createdAt') ?? 0;
+      if (createdAtTimestamp == 0) {
+        AppLogger.warning('⚠️ createdAt 解析失败，使用当前时间');
+      }
+      final createdAt = DateTime.fromMillisecondsSinceEpoch(createdAtTimestamp);
+
+      // Patch: 确保引用字段被保存到Firestore
+      // 如果云函数没有保存这些字段（可能是因为 schema 限制），我们需要手动更新
+      if (quotedMessageId != null) {
+        try {
+          await FirestoreService.updateDocument(
+            'messages',
+            messageId,
+            {
+              'quotedMessageId': quotedMessageId,
+              if (quotedMessageContent != null)
+                'quotedMessageContent': quotedMessageContent,
+              if (quotedMessageSenderId != null)
+                'quotedMessageSenderId': quotedMessageSenderId,
+              if (quotedMessageSenderName != null)
+                'quotedMessageSenderName': quotedMessageSenderName,
+            },
+          );
+          AppLogger.info('手动更新引用消息字段成功: $messageId');
+        } catch (e) {
+          AppLogger.error('手动更新引用消息字段失败: $messageId', e);
+          // 不抛出异常，以免影响发送流程
+        }
+      }
 
       return MessageModel(
         id: messageId,
@@ -142,9 +200,31 @@ class ChatRepositoryImpl implements ChatRepository {
         mediaMetadata: mediaMetadata,
         status: MessageStatus.sent,
         createdAt: createdAt,
+        quotedMessageId: quotedMessageId,
+        quotedMessageContent: quotedMessageContent,
+        quotedMessageSenderId: quotedMessageSenderId,
+        quotedMessageSenderName: quotedMessageSenderName,
       );
     } catch (e, stackTrace) {
       AppLogger.error('发送消息失败', e, stackTrace);
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> deleteMessage({
+    required String conversationId,
+    required String messageId,
+  }) async {
+    try {
+      await CloudFunctionsService.call('delete_message', {
+        'conversationId': conversationId,
+        'messageId': messageId,
+      });
+
+      AppLogger.info('删除消息成功: $messageId');
+    } catch (e, stackTrace) {
+      AppLogger.error('删除消息失败: $messageId', e, stackTrace);
       rethrow;
     }
   }
@@ -202,6 +282,69 @@ class ChatRepositoryImpl implements ChatRepository {
       }).toList();
     } catch (e, stackTrace) {
       AppLogger.error('加载更多消息失败: $conversationId', e, stackTrace);
+      rethrow;
+    }
+  }
+
+  @override
+  Future<String> uploadMediaFile({
+    required String filePath,
+    required String conversationId,
+    required String mediaType,
+  }) async {
+    try {
+      final currentUserId = AuthService.currentUserId;
+      if (currentUserId == null) throw Exception('用户未登录');
+
+      final file = File(filePath);
+      if (!file.existsSync()) throw Exception('文件不存在');
+
+      final extension = path.extension(filePath);
+      final fileName = '${const Uuid().v4()}$extension';
+      final storagePath =
+          'chat_media/$conversationId/$mediaType/${DateTime.now().millisecondsSinceEpoch}_$fileName';
+
+      return await StorageService.uploadFile(
+        file: file,
+        storagePath: storagePath,
+        metadata: {
+          'senderId': currentUserId,
+          'mediaType': mediaType,
+          'conversationId': conversationId,
+        },
+      );
+    } catch (e, stackTrace) {
+      AppLogger.error('上传媒体文件失败: $filePath', e, stackTrace);
+      rethrow;
+    }
+  }
+
+  @override
+  Future<String> uploadMediaBytes({
+    required Uint8List bytes,
+    required String conversationId,
+    required String mediaType,
+  }) async {
+    try {
+      final currentUserId = AuthService.currentUserId;
+      if (currentUserId == null) throw Exception('用户未登录');
+
+      final fileName = '${const Uuid().v4()}.jpg'; // 假设图片是jpg
+      final storagePath =
+          'chat_media/$conversationId/$mediaType/${DateTime.now().millisecondsSinceEpoch}_$fileName';
+
+      return await StorageService.uploadData(
+        data: bytes,
+        storagePath: storagePath,
+        metadata: {
+          'senderId': currentUserId,
+          'mediaType': mediaType,
+          'conversationId': conversationId,
+          'contentType': 'image/jpeg',
+        },
+      );
+    } catch (e, stackTrace) {
+      AppLogger.error('上传媒体数据失败', e, stackTrace);
       rethrow;
     }
   }

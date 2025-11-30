@@ -7,6 +7,7 @@ import 'package:coach_x/l10n/app_localizations.dart';
 /// 用于显示各类统计数据：体重、卡路里、Volume PR等
 class StatCard extends StatelessWidget {
   final String title;
+  final String? subtitle;
   final String? currentValue;
   final String? previousValue;
   final String? changeText;
@@ -17,6 +18,7 @@ class StatCard extends StatelessWidget {
   const StatCard({
     super.key,
     required this.title,
+    this.subtitle,
     this.currentValue,
     this.previousValue,
     this.changeText,
@@ -111,7 +113,16 @@ class StatCard extends StatelessWidget {
                 ),
               ],
             ),
-          ] else if (hasOnlyPreviousData)
+          ] else if (subtitle != null)
+            // 显示说明文字
+            Text(
+              subtitle!,
+              style: const TextStyle(
+                fontSize: 9,
+                color: AppColors.textTertiary,
+              ),
+            )
+          else if (hasOnlyPreviousData)
             // 本周无数据时的提示
             Text(
               l10n.lastWeekData,

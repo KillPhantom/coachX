@@ -39,8 +39,7 @@ class _TrainingFeedPageState extends ConsumerState<TrainingFeedPage>
   _ActiveSheet _activeSheet = _ActiveSheet.none;
   dynamic _selectedFeedItem;
   double _sheetHeight = 0.0;
-  final DraggableScrollableController _sheetController =
-      DraggableScrollableController();
+  final ScrollController _contentScrollController = ScrollController();
 
   @override
   void initState() {
@@ -56,7 +55,7 @@ class _TrainingFeedPageState extends ConsumerState<TrainingFeedPage>
   @override
   void dispose() {
     _pageController.dispose();
-    _sheetController.dispose();
+    _contentScrollController.dispose();
     _sheetAnimationController.dispose();
     super.dispose();
   }
@@ -69,6 +68,9 @@ class _TrainingFeedPageState extends ConsumerState<TrainingFeedPage>
           _sheetHeight = 0.0;
           _selectedFeedItem = null;
         });
+        if (_contentScrollController.hasClients) {
+          _contentScrollController.jumpTo(0);
+        }
       }
     });
   }
@@ -76,7 +78,9 @@ class _TrainingFeedPageState extends ConsumerState<TrainingFeedPage>
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final feedItemsState = ref.watch(feedItemsNotifierProvider(widget.dailyTrainingId));
+    final feedItemsState = ref.watch(
+      feedItemsNotifierProvider(widget.dailyTrainingId),
+    );
     final feedItems = feedItemsState.items;
     final currentIndex = ref.watch(currentFeedIndexProvider);
 
@@ -151,76 +155,82 @@ class _TrainingFeedPageState extends ConsumerState<TrainingFeedPage>
                           ),
                         )
                       : feedItemsState.error != null
-                          ? Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    l10n.error,
-                                    style: AppTextStyles.title3.copyWith(
-                                      color: CupertinoColors.white,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 12),
-                                  Text(
-                                    feedItemsState.error!,
-                                    style: AppTextStyles.body.copyWith(
-                                      color: CupertinoColors.white,
-                                    ),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                  const SizedBox(height: 24),
-                                  CupertinoButton.filled(
-                                    onPressed: () {
-                                      ref
-                                          .read(feedItemsNotifierProvider(
-                                                  widget.dailyTrainingId)
-                                              .notifier)
-                                          .refresh();
-                                    },
-                                    child: Text(l10n.retry),
-                                  ),
-                                ],
-                              ),
-                            )
-                          : feedItems.isEmpty
-                              ? Center(
-                                  child: Text(
-                                    l10n.noTrainingRecords,
-                                    style: AppTextStyles.body.copyWith(
-                                      color: CupertinoColors.white,
-                                    ),
-                                  ),
-                                )
-                              : PageView.builder(
-                                  controller: _pageController,
-                                  scrollDirection: Axis.vertical,
-                                  itemCount: feedItems.length,
-                                  onPageChanged: (index) {
-                                    // 更新当前索引
-                                    final previousIndex = ref.read(currentFeedIndexProvider);
-                                    ref
-                                        .read(currentFeedIndexProvider.notifier)
-                                        .state = index;
-
-                                    // 上滑时，标记前一个 Feed Item 为已批阅
-                                    if (index > previousIndex && previousIndex < feedItems.length) {
-                                      final previousItem = feedItems[previousIndex];
-                                      // 只标记内容项（排除 Completion Item）
-                                      if (previousItem.type.isContentItem) {
-                                        ref
-                                            .read(feedItemsNotifierProvider(
-                                                    widget.dailyTrainingId)
-                                                .notifier)
-                                            .markItemReviewed(previousItem.id);
-                                      }
-                                    }
-                                  },
-                                  itemBuilder: (context, index) {
-                                    final feedItem = feedItems[index];
-                                    return _buildFeedItem(feedItem);
-                                  },
+                      ? Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                l10n.error,
+                                style: AppTextStyles.title3.copyWith(
+                                  color: CupertinoColors.white,
                                 ),
+                              ),
+                              const SizedBox(height: 12),
+                              Text(
+                                feedItemsState.error!,
+                                style: AppTextStyles.body.copyWith(
+                                  color: CupertinoColors.white,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                              const SizedBox(height: 24),
+                              CupertinoButton.filled(
+                                onPressed: () {
+                                  ref
+                                      .read(
+                                        feedItemsNotifierProvider(
+                                          widget.dailyTrainingId,
+                                        ).notifier,
+                                      )
+                                      .refresh();
+                                },
+                                child: Text(l10n.retry),
+                              ),
+                            ],
+                          ),
+                        )
+                      : feedItems.isEmpty
+                      ? Center(
+                          child: Text(
+                            l10n.noTrainingRecords,
+                            style: AppTextStyles.body.copyWith(
+                              color: CupertinoColors.white,
+                            ),
+                          ),
+                        )
+                      : PageView.builder(
+                          controller: _pageController,
+                          scrollDirection: Axis.vertical,
+                          itemCount: feedItems.length,
+                          onPageChanged: (index) {
+                            // 更新当前索引
+                            final previousIndex = ref.read(
+                              currentFeedIndexProvider,
+                            );
+                            ref.read(currentFeedIndexProvider.notifier).state =
+                                index;
+
+                            // 上滑时，标记前一个 Feed Item 为已批阅
+                            if (index > previousIndex &&
+                                previousIndex < feedItems.length) {
+                              final previousItem = feedItems[previousIndex];
+                              // 只标记内容项（排除 Completion Item）
+                              if (previousItem.type.isContentItem) {
+                                ref
+                                    .read(
+                                      feedItemsNotifierProvider(
+                                        widget.dailyTrainingId,
+                                      ).notifier,
+                                    )
+                                    .markItemReviewed(previousItem.id);
+                              }
+                            }
+                          },
+                          itemBuilder: (context, index) {
+                            final feedItem = feedItems[index];
+                            return _buildFeedItem(feedItem);
+                          },
+                        ),
                 ),
 
                 // Layer 1.5: Barrier (Disable video interaction)
@@ -236,62 +246,36 @@ class _TrainingFeedPageState extends ConsumerState<TrainingFeedPage>
                 // Layer 2: Bottom Sheet
                 if (_activeSheet != _ActiveSheet.none &&
                     _selectedFeedItem != null)
-                  NotificationListener<DraggableScrollableNotification>(
-                    onNotification: (notification) {
-                      // Update sheet height for video resizing
-                      setState(() {
-                        _sheetHeight = notification.extent;
-                      });
-
-                      // Auto-close if dragged down significantly
-                      if (notification.extent <= 0.05) {
-                        _closeSheet();
-                      }
-                      return true;
-                    },
-                    child: SlideTransition(
-                      position:
-                          Tween<Offset>(
-                            begin: const Offset(0, 1),
-                            end: Offset.zero,
-                          ).animate(
-                            CurvedAnimation(
-                              parent: _sheetAnimationController,
-                              curve: Curves.easeOutCubic,
-                            ),
+                  SlideTransition(
+                    position:
+                        Tween<Offset>(
+                          begin: const Offset(0, 1),
+                          end: Offset.zero,
+                        ).animate(
+                          CurvedAnimation(
+                            parent: _sheetAnimationController,
+                            curve: Curves.easeOutCubic,
                           ),
-                      child: DraggableScrollableSheet(
-                        controller: _sheetController,
-                        snap: true,
-                        snapSizes: _activeSheet == _ActiveSheet.detail
-                            ? [0.0, 0.5, 0.65]
-                            : [0.0, 0.7, 0.95],
-                        initialChildSize: _activeSheet == _ActiveSheet.detail
-                            ? 0.5
-                            : 0.7,
-                        minChildSize: 0.0,
-                        maxChildSize: _activeSheet == _ActiveSheet.detail
-                            ? 0.65
-                            : 0.95,
-                        builder: (context, scrollController) {
-                          if (_activeSheet == _ActiveSheet.detail) {
-                            return FeedDetailSheet(
-                              feedItem: _selectedFeedItem,
-                              scrollController: scrollController,
-                              onClose: _closeSheet,
-                            );
-                          } else {
-                            return FeedCommentSheetWidget(
-                              dailyTrainingId: widget.dailyTrainingId,
-                              studentId: widget.studentId,
-                              exerciseTemplateId:
-                                  _selectedFeedItem.exerciseTemplateId,
-                              exerciseName: _selectedFeedItem.exerciseName,
-                              scrollController: scrollController,
-                              onClose: _closeSheet,
-                            );
-                          }
-                        },
+                        ),
+                    child: Align(
+                      alignment: Alignment.bottomCenter,
+                      child: SizedBox(
+                        height: availableHeight * 0.7,
+                        child: _activeSheet == _ActiveSheet.detail
+                            ? FeedDetailSheet(
+                                feedItem: _selectedFeedItem,
+                                scrollController: _contentScrollController,
+                                onClose: _closeSheet,
+                              )
+                            : FeedCommentSheetWidget(
+                                dailyTrainingId: widget.dailyTrainingId,
+                                studentId: widget.studentId,
+                                exerciseTemplateId:
+                                    _selectedFeedItem.exerciseTemplateId,
+                                exerciseName: _selectedFeedItem.exerciseName,
+                                scrollController: _contentScrollController,
+                                onClose: _closeSheet,
+                              ),
                       ),
                     ),
                   ),
@@ -309,7 +293,6 @@ class _TrainingFeedPageState extends ConsumerState<TrainingFeedPage>
         return VideoFeedItem(
           feedItem: feedItem,
           onCommentTap: () => _showCommentSheet(feedItem),
-          onDetailTap: () => _showDetailSheet(feedItem),
           isSheetOpen: _activeSheet != _ActiveSheet.none,
         );
 
@@ -335,26 +318,14 @@ class _TrainingFeedPageState extends ConsumerState<TrainingFeedPage>
       _sheetHeight = 0.7; // Set initial target height
     });
     _sheetAnimationController.forward();
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_sheetController.isAttached) {
-        _sheetController.jumpTo(0.7);
-      }
-    });
   }
 
   void _showDetailSheet(feedItem) {
     setState(() {
       _activeSheet = _ActiveSheet.detail;
       _selectedFeedItem = feedItem;
-      _sheetHeight = 0.5; // Set initial target height
+      _sheetHeight = 0.7; // Set initial target height
     });
     _sheetAnimationController.forward();
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_sheetController.isAttached) {
-        _sheetController.jumpTo(0.5);
-      }
-    });
   }
 }

@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:coach_x/core/enums/user_role.dart';
+import 'package:coach_x/core/utils/json_utils.dart';
 import 'last_message.dart';
 
 /// 对话模型
@@ -50,18 +51,20 @@ class ConversationModel {
       coachId: data['coachId'] as String? ?? '',
       studentId: data['studentId'] as String? ?? '',
       lastMessage: data['lastMessage'] != null
-          ? LastMessage.fromJson(data['lastMessage'] as Map<String, dynamic>)
+          ? LastMessage.fromJson(
+              safeMapCast(data['lastMessage'], 'lastMessage') ?? {},
+            )
           : null,
       lastMessageTime: _parseTimestamp(data['lastMessageTime']),
-      coachUnreadCount: data['coachUnreadCount'] as int? ?? 0,
-      studentUnreadCount: data['studentUnreadCount'] as int? ?? 0,
+      coachUnreadCount: safeIntCast(data['coachUnreadCount'], 0) ?? 0,
+      studentUnreadCount: safeIntCast(data['studentUnreadCount'], 0) ?? 0,
       coachLastReadTime: _parseTimestamp(data['coachLastReadTime']),
       studentLastReadTime: _parseTimestamp(data['studentLastReadTime']),
       participantNames: Map<String, String>.from(
-        data['participantNames'] as Map? ?? {},
+        safeMapCast(data['participantNames'], 'participantNames') ?? {},
       ),
       participantAvatars: Map<String, String>.from(
-        data['participantAvatars'] as Map? ?? {},
+        safeMapCast(data['participantAvatars'], 'participantAvatars') ?? {},
       ),
       isArchived: data['isArchived'] as bool? ?? false,
       isPinned: data['isPinned'] as bool? ?? false,

@@ -4,10 +4,10 @@ import 'package:go_router/go_router.dart';
 import 'package:coach_x/l10n/app_localizations.dart';
 import 'package:coach_x/core/theme/app_theme.dart';
 import 'package:coach_x/core/widgets/loading_indicator.dart';
+import 'package:coach_x/core/services/auth_service.dart';
 import 'package:coach_x/routes/route_names.dart';
-import '../../data/models/weight_comparison_model.dart';
+import '../../data/models/weekly_stats_model.dart';
 import '../providers/student_home_providers.dart';
-import '../providers/weight_comparison_provider.dart';
 import 'stat_card.dart';
 
 /// 周状态区块
@@ -78,6 +78,8 @@ class WeeklyStatusSection extends ConsumerWidget {
     final trainings = stats.currentWeek.trainings;
     final completedCount = stats.currentWeek.completedCount;
     final todayIndex = stats.currentWeek.todayIndex;
+    final studentId = AuthService.currentUserId;
+    final startDate = DateTime.tryParse(stats.currentWeek.startDate);
 
     return Container(
       padding: const EdgeInsets.all(AppDimensions.spacingM),
@@ -123,21 +125,39 @@ class WeeklyStatusSection extends ConsumerWidget {
                   ? weekDaysCN[index]
                   : weekDays[index];
 
+              // 计算该天的日期
+              final dayDate = startDate?.add(Duration(days: index));
+              final dayDateString = dayDate != null
+                  ? '${dayDate.year}-${dayDate.month.toString().padLeft(2, '0')}-${dayDate.day.toString().padLeft(2, '0')}'
+                  : null;
+
               return Expanded(
-                child: Column(
-                  children: [
-                    Text(
-                      dayLabel,
-                      style: AppTextStyles.caption1.copyWith(
-                        color: isToday
-                            ? AppColors.primaryText
-                            : AppColors.textSecondary,
-                        fontWeight: isToday ? FontWeight.w600 : FontWeight.w400,
+                child: GestureDetector(
+                  onTap: () {
+                    if (studentId != null) {
+                      context.push(
+                        RouteNames.getTrainingCalendarRoute(
+                          studentId,
+                          focusDate: dayDateString,
+                        ),
+                      );
+                    }
+                  },
+                  child: Column(
+                    children: [
+                      Text(
+                        dayLabel,
+                        style: AppTextStyles.caption1.copyWith(
+                          color: isToday
+                              ? AppColors.primaryText
+                              : AppColors.textSecondary,
+                          fontWeight: isToday ? FontWeight.w600 : FontWeight.w400,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 4),
-                    _buildDayIndicator(isCompleted, isToday),
-                  ],
+                      const SizedBox(height: 4),
+                      _buildDayIndicator(isCompleted, isToday),
+                    ],
+                  ),
                 ),
               );
             }),
@@ -150,89 +170,21 @@ class WeeklyStatusSection extends ConsumerWidget {
             children: [
               // Weight Change
               Expanded(
-                child: Consumer(
-                  builder: (context, ref, _) {
-                    final weightComparisonAsync = ref.watch(
-                      weightComparisonProvider,
-                    );
-
-                    return weightComparisonAsync.when(
-                      loading: () => StatCard(
-                        title: l10n.weightChange,
-                        hasData: false,
-                        onTap: () =>
-                            context.push(RouteNames.studentBodyStatsHistory),
-                      ),
-                      error: (_, __) => StatCard(
-                        title: l10n.weightChange,
-                        currentValue:
-                            stats.weightChange.hasData &&
-                                stats.weightChange.currentWeekAvg != null
-                            ? '${stats.weightChange.currentWeekAvg}${stats.weightChange.unit}'
-                            : null,
-                        previousValue:
-                            stats.weightChange.hasData &&
-                                stats.weightChange.lastWeekAvg != null
-                            ? '${stats.weightChange.lastWeekAvg}${stats.weightChange.unit}'
-                            : null,
-                        changeText: _buildWeeklyChangeText(stats.weightChange),
-                        isPositiveChange:
-                            stats.weightChange.change != null &&
-                            stats.weightChange.change! >= 0,
-                        hasData: stats.weightChange.hasData,
-                        onTap: () =>
-                            context.push(RouteNames.studentBodyStatsHistory),
-                      ),
-                      data: (comparison) {
-                        // 决定显示模式：相对天数 or 周对比
-                        final useRelativeMode =
-                            comparison.hasData &&
-                            comparison.daysSince != null &&
-                            comparison.daysSince! < 7;
-
-                        // 构建显示值
-                        final currentValue =
-                            comparison.hasData &&
-                                comparison.currentWeight != null
-                            ? '${comparison.currentWeight!.toStringAsFixed(1)}${stats.weightChange.unit}'
-                            : (stats.weightChange.hasData &&
-                                      stats.weightChange.currentWeekAvg != null
-                                  ? '${stats.weightChange.currentWeekAvg}${stats.weightChange.unit}'
-                                  : null);
-
-                        final previousValue =
-                            comparison.hasData &&
-                                comparison.previousWeight != null
-                            ? '${comparison.previousWeight!.toStringAsFixed(1)}${stats.weightChange.unit}'
-                            : (stats.weightChange.hasData &&
-                                      stats.weightChange.lastWeekAvg != null
-                                  ? '${stats.weightChange.lastWeekAvg}${stats.weightChange.unit}'
-                                  : null);
-
-                        final changeText = useRelativeMode
-                            ? _buildRelativeChangeText(comparison, l10n)
-                            : _buildWeeklyChangeText(stats.weightChange);
-
-                        final isPositive =
-                            comparison.hasData && comparison.change != null
-                            ? comparison.change! >= 0
-                            : (stats.weightChange.change != null &&
-                                  stats.weightChange.change! >= 0);
-
-                        return StatCard(
-                          title: l10n.weightChange,
-                          currentValue: currentValue,
-                          previousValue: previousValue,
-                          changeText: changeText,
-                          isPositiveChange: isPositive,
-                          hasData:
-                              comparison.hasData || stats.weightChange.hasData,
-                          onTap: () =>
-                              context.push(RouteNames.studentBodyStatsHistory),
-                        );
-                      },
-                    );
-                  },
+                child: StatCard(
+                  title: l10n.weightChange,
+                  currentValue: stats.weightChange.hasData &&
+                          stats.weightChange.currentWeight != null
+                      ? '${stats.weightChange.currentWeight}${stats.weightChange.unit}'
+                      : null,
+                  previousValue: stats.weightChange.hasData &&
+                          stats.weightChange.previousWeight != null
+                      ? '${stats.weightChange.previousWeight}${stats.weightChange.unit}'
+                      : null,
+                  changeText: _buildWeightChangeText(stats.weightChange, l10n),
+                  isPositiveChange: stats.weightChange.change != null &&
+                      stats.weightChange.change! >= 0,
+                  hasData: stats.weightChange.hasData,
+                  onTap: () => context.push(RouteNames.studentBodyStatsHistory),
                 ),
               ),
               const SizedBox(width: AppDimensions.spacingS),
@@ -258,43 +210,15 @@ class WeeklyStatusSection extends ConsumerWidget {
                             ? '+${stats.caloriesChange.change!.toInt()}'
                             : '${stats.caloriesChange.change!.toInt()}')
                       : null,
+                  subtitle:
+                      stats.caloriesChange.hasData &&
+                          stats.caloriesChange.change == null
+                      ? '${l10n.thisWeekIntake} · ${l10n.noLastWeekData}'
+                      : null,
                   isPositiveChange:
                       stats.caloriesChange.change != null &&
                       stats.caloriesChange.change! >= 0,
                   hasData: stats.caloriesChange.hasData,
-                ),
-              ),
-              const SizedBox(width: AppDimensions.spacingS),
-
-              // Volume PR
-              Expanded(
-                child: StatCard(
-                  title:
-                      stats.volumePR.hasData &&
-                          stats.volumePR.exerciseName != null
-                      ? stats.volumePR.exerciseName!
-                      : l10n.volumePR,
-                  currentValue:
-                      stats.volumePR.hasData &&
-                          stats.volumePR.currentWeekVolume != null
-                      ? '${stats.volumePR.currentWeekVolume!.toInt()}${stats.volumePR.unit}'
-                      : null,
-                  previousValue:
-                      stats.volumePR.hasData &&
-                          stats.volumePR.lastWeekVolume != null
-                      ? '${stats.volumePR.lastWeekVolume!.toInt()}${stats.volumePR.unit}'
-                      : null,
-                  changeText:
-                      stats.volumePR.hasData &&
-                          stats.volumePR.improvement != null
-                      ? (stats.volumePR.improvement! >= 0
-                            ? '+${stats.volumePR.improvement!.toInt()}'
-                            : '${stats.volumePR.improvement!.toInt()}')
-                      : null,
-                  isPositiveChange:
-                      stats.volumePR.improvement != null &&
-                      stats.volumePR.improvement! >= 0,
-                  hasData: stats.volumePR.hasData,
                 ),
               ),
             ],
@@ -356,34 +280,36 @@ class WeeklyStatusSection extends ConsumerWidget {
     }
   }
 
-  /// 构建相对天数的变化文本
-  String? _buildRelativeChangeText(
-    WeightComparisonResult comparison,
+  /// 构建体重变化文本
+  ///
+  /// 显示规则：
+  /// - 0 天: "today"
+  /// - 1 天: "yesterday"
+  /// - 2+ 天: "X days ago"
+  String? _buildWeightChangeText(
+    WeightChangeStats weightChange,
     AppLocalizations l10n,
   ) {
-    if (comparison.change == null || comparison.daysSince == null) {
-      return null;
-    }
-
-    final changeStr = comparison.change! >= 0
-        ? '+${comparison.change!.toStringAsFixed(1)}'
-        : comparison.change!.toStringAsFixed(1);
-
-    final daysText = comparison.daysSince == 1
-        ? l10n.yesterday
-        : l10n.daysAgo(comparison.daysSince!);
-
-    return '$changeStr $daysText';
-  }
-
-  /// 构建周对比的变化文本
-  String? _buildWeeklyChangeText(dynamic weightChange) {
     if (weightChange.change == null) {
       return null;
     }
 
-    return weightChange.change! >= 0
-        ? '+${weightChange.change}'
-        : '${weightChange.change}';
+    final changeStr = weightChange.change! >= 0
+        ? '+${weightChange.change!.toStringAsFixed(1)}'
+        : weightChange.change!.toStringAsFixed(1);
+
+    // 如果没有天数信息，只显示变化量
+    if (weightChange.daysSince == null) {
+      return changeStr;
+    }
+
+    // 根据天数选择显示文本
+    final daysText = switch (weightChange.daysSince!) {
+      0 => l10n.today,
+      1 => l10n.yesterday,
+      _ => l10n.daysAgo(weightChange.daysSince!),
+    };
+
+    return '$changeStr $daysText';
   }
 }

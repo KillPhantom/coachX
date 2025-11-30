@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import '../../../../../core/theme/app_text_styles.dart';
 import '../../../../../l10n/app_localizations.dart';
 
 /// 删除模板错误对话框
@@ -16,7 +17,7 @@ class DeleteTemplateErrorDialog {
         content: Text(l10n.templateInUse(planCount)),
         actions: [
           CupertinoDialogAction(
-            child: Text(l10n.ok),
+            child: Text(l10n.ok, style: AppTextStyles.body),
             onPressed: () => Navigator.pop(context),
           ),
         ],

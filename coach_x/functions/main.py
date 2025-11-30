@@ -103,6 +103,13 @@ from exercise_library.batch_handlers import (
     create_exercise_templates_batch
 )
 
+# ==================== 导入通知模块 ====================
+from notifications.triggers import (
+    on_message_created,
+    on_training_created,
+    on_training_updated
+)
+
 # ==================== 导出所有函数 ====================
 __all__ = [
     # 用户管理
@@ -168,4 +175,9 @@ __all__ = [
     # 动作库
     'delete_exercise_template',
     'create_exercise_templates_batch',
+
+    # 通知触发器
+    'on_message_created',
+    'on_training_created',
+    'on_training_updated',
 ]

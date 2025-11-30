@@ -99,7 +99,7 @@ class LanguageSelectionPage extends ConsumerWidget {
             content: Text(e.toString()),
             actions: [
               CupertinoDialogAction(
-                child: Text(AppLocalizations.of(context)!.confirm),
+                child: Text(AppLocalizations.of(context)!.confirm, style: AppTextStyles.body),
                 onPressed: () => Navigator.of(context).pop(),
               ),
             ],

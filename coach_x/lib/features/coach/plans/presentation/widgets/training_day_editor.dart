@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:coach_x/core/services/auth_service.dart';
 import 'package:coach_x/core/utils/logger.dart';
 import 'package:coach_x/features/coach/exercise_library/presentation/providers/exercise_library_providers.dart';
+import 'package:coach_x/core/theme/app_text_styles.dart';
 import '../providers/create_training_plan_providers.dart';
 import './exercise_search_bar.dart';
 
@@ -115,7 +116,7 @@ class TrainingDayEditor extends ConsumerWidget {
             content: Text('无法创建动作模板：$e'),
             actions: [
               CupertinoDialogAction(
-                child: const Text('确定'),
+                child: const Text('确定', style: AppTextStyles.bodyMedium),
                 onPressed: () => Navigator.of(context).pop(),
               ),
             ],

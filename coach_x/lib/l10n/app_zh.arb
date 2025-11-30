@@ -33,6 +33,14 @@
   "alert": "提示",
   "featureInDevelopment": "功能开发中",
   "avatarEditInDevelopment": "头像编辑功能开发中",
+  "selectAvatarSource": "选择头像来源",
+  "chooseFromGallery": "从相册选择",
+  "uploadingAvatar": "正在上传头像...",
+  "processingImage": "处理图片中...",
+  "uploadSuccess": "上传成功",
+  "uploadFailed": "上传失败",
+  "retryUpload": "重试",
+  "cropCircular": "裁剪为圆形",
   "accountSettingsInDevelopment": "账户设置功能开发中",
   "helpCenterInDevelopment": "帮助中心功能开发中",
   "selectUnitPreference": "选择单位偏好",
@@ -440,6 +448,35 @@
   "retry": "重试",
   "noExercises": "暂无训练动作",
   "addCustomExerciseHint": "点击右上角\"+\"添加自定义动作",
+
+  "feedbackHistoryTitle": "历史记录",
+  "@feedbackHistoryTitle": {
+    "description": "反馈Tab标题，显示历史记录"
+  },
+  "feedbackSortAscLabel": "升序",
+  "@feedbackSortAscLabel": {
+    "description": "按时间升序排序标签"
+  },
+
+  "feedbackSortDescLabel": "降序",
+  "@feedbackSortDescLabel": {
+    "description": "按时间降序排序标签"
+  },
+
+  "trainingCalendarTitle": "训练历史",
+  "@trainingCalendarTitle": {
+    "description": "训练日历页面标题"
+  },
+
+  "trainingCalendarEmptyDay": "该日期没有训练记录",
+  "@trainingCalendarEmptyDay": {
+    "description": "当选中的日期没有训练记录时的提示"
+  },
+
+  "trainingCalendarViewSummary": "查看总结",
+  "@trainingCalendarViewSummary": {
+    "description": "训练日历跳转到训练总结的按钮"
+  },
   "completedCount": "{count} 已完成",
   "currentExercise": "当前动作",
   "totalDuration": "总时长",
@@ -450,7 +487,10 @@
   "selectPlan": "选择计划",
   "myPlans": "我的计划",
   "coachPlan": "教练计划",
-  "feedbackSearchPlaceholder": "搜索反馈...",
+  "feedbackSearchPlaceholder": "搜索动作或反馈内容",
+  "@feedbackSearchPlaceholder": {
+    "description": "反馈搜索框占位提示语"
+  },
   "feedbackStartDate": "开始日期",
   "feedbackEndDate": "结束日期",
   "feedbackToday": "今天",
@@ -734,6 +774,13 @@
   "extractingText": "正在提取文字...",
   "parsingPlan": "正在解析计划...",
   "startParsing": "开始解析",
+  "textImportSummaryTitle": "文本解析完成",
+  "textImportSummarySubtitle": "成功从文本中提取训练计划",
+  "exerciseFromLibrary": "动作库中的动作",
+  "newExercise": "新动作",
+  "viewGuidance": "查看指导",
+  "createGuidance": "创建指导",
+  "confirm": "确认",
   "extractionSuccess": "文字提取成功！请检查并根据需要编辑。",
 
   "addDay": "添加天",
@@ -775,5 +822,45 @@
   "mealRecordExists": "该餐次已有记录",
   "confirmOverwriteMeal": "该餐次已有记录，继续保存将覆盖之前的记录，是否继续？",
   "overwrite": "覆盖",
-  "mealNumberFormat": "第{number}顿"
+  "mealNumberFormat": "第{number}顿",
+  "imageUploadFailed": "图片上传失败",
+  "unknownError": "未知错误",
+  "thisWeekIntake": "本周",
+  "noLastWeekData": "上周暂无数据",
+  "today": "今天",
+
+  "nickname": "昵称",
+  "nicknamePlaceholder": "请输入昵称",
+  "nicknameRequired": "昵称不能为空",
+  "editNickname": "编辑昵称",
+
+  "gender": "性别",
+  "male": "男",
+  "female": "女",
+  "selectGender": "选择性别",
+  "editGender": "编辑性别",
+
+  "bornDate": "出生日期",
+  "selectBornDate": "选择出生日期",
+  "editBornDate": "编辑出生日期",
+  "dateFormat": "yyyy-MM-dd",
+
+  "editHeight": "编辑身高",
+  "heightPlaceholder": "请输入身高",
+  "heightInvalid": "身高格式不正确",
+  "heightInCm": "身高 (cm)",
+  "heightInFeet": "身高 (ft)",
+  "heightInInches": "英寸",
+  "feet": "英尺",
+  "inches": "英寸",
+
+  "updateSuccess": "更新成功",
+  "updateFailed": "更新失败",
+
+  "aiAssistant": "AI 助手",
+  "aiWelcomeMessage": "你好！我能帮你调整这个训练计划吗？",
+  "aiWelcomeHint": "试试让我修改动作、调整强度或添加新的训练日。",
+  "aiQuickActionAnalyzePlan": "分析一下计划的优缺点",
+  "aiQuickActionReduceWeight": "降低所有重量 10%",
+  "aiInputPlaceholder": "向 AI 提问或提出修改建议..."
 }

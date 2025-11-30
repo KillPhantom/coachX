@@ -103,7 +103,7 @@ class AppConstants {
   ///
   /// 💻 iOS 模拟器调试时：
   /// - 使用 '127.0.0.1' 即可
-  static const String firebaseEmulatorHost = '127.0.0.1';
+  static const String firebaseEmulatorHost = '192.168.1.114';
 
   /// Firebase Functions Emulator 端口
   static const int firebaseFunctionsEmulatorPort = 5001;

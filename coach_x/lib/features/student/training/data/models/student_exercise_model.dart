@@ -1,7 +1,7 @@
 import 'package:coach_x/core/enums/exercise_type.dart';
 import 'package:coach_x/core/utils/json_utils.dart';
 import 'package:coach_x/features/coach/plans/data/models/training_set.dart';
-import 'package:coach_x/core/models/video_upload_state.dart';
+import 'package:coach_x/core/models/media_upload_state.dart';
 import 'keyframe_model.dart';
 
 /// 学生训练动作模型
@@ -13,7 +13,7 @@ class StudentExerciseModel {
   final ExerciseType type;
   final List<TrainingSet> sets;
   final bool completed;
-  final List<VideoUploadState> videos; // 学生上传的视频状态
+  final List<MediaUploadState> media; // 学生上传的媒体（视频/图片）
   final List<KeyframeModel> keyframes; // 视频关键帧（带时间戳）
   final int? timeSpent; // 动作耗时（秒数），nullable
   final String? exerciseTemplateId; // 关联的动作模板 ID
@@ -25,7 +25,7 @@ class StudentExerciseModel {
     this.type = ExerciseType.strength,
     required this.sets,
     this.completed = false,
-    this.videos = const [],
+    this.media = const [],
     this.keyframes = const [],
     this.timeSpent,
     this.exerciseTemplateId,
@@ -40,7 +40,7 @@ class StudentExerciseModel {
       type: ExerciseType.strength,
       sets: [TrainingSet.empty()],
       completed: false,
-      videos: const [],
+      media: const [],
       keyframes: const [],
       timeSpent: null,
       isReviewed: false,
@@ -60,12 +60,18 @@ class StudentExerciseModel {
       type: exerciseTypeFromString(json['type'] as String? ?? 'strength'),
       sets: sets.isNotEmpty ? sets : [TrainingSet.empty()],
       completed: json['completed'] as bool? ?? false,
-      videos:
-          (json['videos'] as List<dynamic>?)?.map((data) {
-            final videoData = safeMapCast(data, 'video');
-            return videoData != null
-                ? VideoUploadState.fromJson(videoData)
-                : VideoUploadState.completed(''); // 降级处理
+      media:
+          ((json['medias']) as List<dynamic>?)?.map((data) {
+            final mapData = safeMapCast(data);
+            
+            if (mapData != null) {
+              // 尝试获取嵌套的 media 
+              final innerData = safeMapCast(mapData['media']);
+              // 如果有嵌套对象则使用嵌套对象
+              return MediaUploadState.fromJson(innerData ?? mapData);
+            }
+            
+            return MediaUploadState.completed(downloadUrl: ''); // 降级处理
           }).toList() ??
           [],
       keyframes:
@@ -97,10 +103,7 @@ class StudentExerciseModel {
       'type': type.toJsonString(),
       'sets': sets.map((set) => set.toJson()).toList(),
       'completed': completed,
-      'videos': videos
-          .map((v) => v.toJson())
-          .where((url) => url != null) // 只保存已完成的
-          .toList(),
+      'medias': media.map((m) => {'media': m.toJson()}).toList(),
       'keyframes': keyframes.map((kf) => kf.toJson()).toList(),
       'timeSpent': timeSpent,
       if (exerciseTemplateId != null) 'exerciseTemplateId': exerciseTemplateId,
@@ -115,7 +118,7 @@ class StudentExerciseModel {
     ExerciseType? type,
     List<TrainingSet>? sets,
     bool? completed,
-    List<VideoUploadState>? videos,
+    List<MediaUploadState>? media,
     List<KeyframeModel>? keyframes,
     int? timeSpent,
     String? exerciseTemplateId,
@@ -127,7 +130,7 @@ class StudentExerciseModel {
       type: type ?? this.type,
       sets: sets ?? this.sets,
       completed: completed ?? this.completed,
-      videos: videos ?? this.videos,
+      media: media ?? this.media,
       keyframes: keyframes ?? this.keyframes,
       timeSpent: timeSpent ?? this.timeSpent,
       exerciseTemplateId: exerciseTemplateId ?? this.exerciseTemplateId,
@@ -135,80 +138,85 @@ class StudentExerciseModel {
     );
   }
 
-  /// 添加待上传视频
-  StudentExerciseModel addPendingVideo(
+  /// 添加待上传媒体
+  StudentExerciseModel addPendingMedia(
     String localPath,
+    MediaType type, {
     String? thumbnailPath,
-  ) {
-    final newVideo = VideoUploadState.pending(localPath, thumbnailPath);
-    return copyWith(videos: [...videos, newVideo]);
+  }) {
+    final newMedia = MediaUploadState.pending(
+        localPath: localPath, 
+        thumbnailPath: thumbnailPath,
+        type: type,
+    );
+    return copyWith(media: [...media, newMedia]);
   }
 
-  /// 更新视频上传进度
-  StudentExerciseModel updateVideoProgress(int index, double progress) {
-    if (index < 0 || index >= videos.length) return this;
+  /// 更新媒体上传进度
+  StudentExerciseModel updateMediaProgress(int index, double progress) {
+    if (index < 0 || index >= media.length) return this;
 
-    final updatedVideos = List<VideoUploadState>.from(videos);
-    updatedVideos[index] = videos[index].copyWith(
-      status: VideoUploadStatus.uploading,
+    final updatedMedia = List<MediaUploadState>.from(media);
+    updatedMedia[index] = media[index].copyWith(
+      status: MediaUploadStatus.uploading,
       progress: progress,
     );
-    return copyWith(videos: updatedVideos);
+    return copyWith(media: updatedMedia);
   }
 
-  /// 完成视频上传
-  StudentExerciseModel completeVideoUpload(
+  /// 完成媒体上传
+  StudentExerciseModel completeMediaUpload(
     int index,
     String downloadUrl, {
     String? thumbnailUrl,
   }) {
-    if (index < 0 || index >= videos.length) return this;
+    if (index < 0 || index >= media.length) return this;
 
-    final updatedVideos = List<VideoUploadState>.from(videos);
-    updatedVideos[index] = videos[index].copyWith(
-      status: VideoUploadStatus.completed,
+    final updatedMedia = List<MediaUploadState>.from(media);
+    updatedMedia[index] = media[index].copyWith(
+      status: MediaUploadStatus.completed,
       downloadUrl: downloadUrl,
       thumbnailUrl: thumbnailUrl,
       progress: 1.0,
     );
-    return copyWith(videos: updatedVideos);
+    return copyWith(media: updatedMedia);
   }
 
-  /// 标记视频上传失败
-  StudentExerciseModel failVideoUpload(int index, String error) {
-    if (index < 0 || index >= videos.length) return this;
+  /// 标记媒体上传失败
+  StudentExerciseModel failMediaUpload(int index, String error) {
+    if (index < 0 || index >= media.length) return this;
 
-    final updatedVideos = List<VideoUploadState>.from(videos);
-    updatedVideos[index] = videos[index].copyWith(
-      status: VideoUploadStatus.error,
+    final updatedMedia = List<MediaUploadState>.from(media);
+    updatedMedia[index] = media[index].copyWith(
+      status: MediaUploadStatus.error,
       error: error,
     );
-    return copyWith(videos: updatedVideos);
+    return copyWith(media: updatedMedia);
   }
 
-  /// 删除视频
-  StudentExerciseModel removeVideo(int index) {
-    if (index < 0 || index >= videos.length) return this;
+  /// 删除媒体
+  StudentExerciseModel removeMedia(int index) {
+    if (index < 0 || index >= media.length) return this;
 
-    final updatedVideos = List<VideoUploadState>.from(videos);
-    updatedVideos.removeAt(index);
-    return copyWith(videos: updatedVideos);
+    final updatedMedia = List<MediaUploadState>.from(media);
+    updatedMedia.removeAt(index);
+    return copyWith(media: updatedMedia);
   }
 
   /// 重试失败的上传
-  StudentExerciseModel retryVideoUpload(int index) {
-    if (index < 0 || index >= videos.length) return this;
+  StudentExerciseModel retryMediaUpload(int index) {
+    if (index < 0 || index >= media.length) return this;
 
-    final video = videos[index];
-    if (video.status != VideoUploadStatus.error) return this;
+    final item = media[index];
+    if (item.status != MediaUploadStatus.error) return this;
 
-    final updatedVideos = List<VideoUploadState>.from(videos);
-    updatedVideos[index] = video.copyWith(
-      status: VideoUploadStatus.pending,
+    final updatedMedia = List<MediaUploadState>.from(media);
+    updatedMedia[index] = item.copyWith(
+      status: MediaUploadStatus.pending,
       progress: 0.0,
       error: null,
     );
-    return copyWith(videos: updatedVideos);
+    return copyWith(media: updatedMedia);
   }
 
   /// 切换完成状态
@@ -268,6 +276,6 @@ class StudentExerciseModel {
 
   @override
   String toString() {
-    return 'StudentExerciseModel(name: $name, type: $type, sets: ${sets.length}, completed: $completed, videos: ${videos.length}, keyframes: ${keyframes.length}, timeSpent: $timeSpent, isReviewed: $isReviewed)';
+    return 'StudentExerciseModel(name: $name, type: $type, sets: ${sets.length}, completed: $completed, media: ${media.length}, keyframes: ${keyframes.length}, timeSpent: $timeSpent, isReviewed: $isReviewed)';
   }
 }

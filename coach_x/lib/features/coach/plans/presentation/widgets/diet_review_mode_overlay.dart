@@ -626,7 +626,7 @@ class DietReviewModeOverlay extends ConsumerWidget {
           CupertinoDialogAction(
             isDestructiveAction: true,
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('取消'),
+            child: const Text('取消', style: AppTextStyles.body),
           ),
           CupertinoDialogAction(
             onPressed: () {
@@ -636,7 +636,7 @@ class DietReviewModeOverlay extends ConsumerWidget {
                   .acceptAll();
               _finishReview(context, ref);
             },
-            child: const Text('确定'),
+            child: const Text('确定', style: AppTextStyles.body),
           ),
         ],
       ),

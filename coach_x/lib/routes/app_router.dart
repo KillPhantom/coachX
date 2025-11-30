@@ -14,6 +14,8 @@ import '../features/coach/plans/presentation/pages/create_diet_plan_page.dart';
 import '../features/coach/plans/presentation/pages/create_supplement_plan_page.dart';
 import '../features/chat/presentation/pages/chat_detail_page.dart';
 import '../features/chat/presentation/pages/training_feed_page.dart';
+import '../features/chat/presentation/pages/daily_training_summary_page.dart';
+import '../features/chat/presentation/pages/training_calendar_page.dart';
 import '../features/shared/profile/presentation/pages/language_selection_page.dart';
 import '../features/student/diet/presentation/pages/ai_food_scanner_page.dart';
 import '../features/student/body_stats/presentation/pages/body_stats_record_page.dart';
@@ -277,6 +279,38 @@ GoRouter getAppRouter(String initialRoute) {
               dailyTrainingId: dailyTrainingId,
               studentId: studentId,
               studentName: studentName,
+            ),
+          );
+        },
+      ),
+
+      // 每日训练总结页
+      GoRoute(
+        path: '/daily-training-summary/:dailyTrainingId',
+        pageBuilder: (context, state) {
+          final dailyTrainingId = state.pathParameters['dailyTrainingId']!;
+          return CupertinoPage(
+            key: state.pageKey,
+            child: DailyTrainingSummaryPage(dailyTrainingId: dailyTrainingId),
+          );
+        },
+      ),
+
+      // 训练记录日历页
+      GoRoute(
+        path: '/students/:studentId/training-calendar',
+        pageBuilder: (context, state) {
+          final studentId = state.pathParameters['studentId']!;
+          final focusDateString = state.uri.queryParameters['date'];
+          final focusDate = focusDateString != null
+              ? DateTime.tryParse(focusDateString)
+              : null;
+
+          return CupertinoPage(
+            key: state.pageKey,
+            child: TrainingCalendarPage(
+              studentId: studentId,
+              initialDate: focusDate,
             ),
           );
         },

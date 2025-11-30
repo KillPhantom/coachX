@@ -32,6 +32,11 @@
 	<string>需要使用麦克风录制训练视频音频</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>需要访问相册以选择食物图片和训练视频</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+		<string>remote-notification</string>
+	</array>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>

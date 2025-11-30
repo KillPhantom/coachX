@@ -11,6 +11,7 @@ import 'core/services/cache/cache_helper.dart';
 import 'core/services/cache/cache_metadata.dart';
 import 'core/models/video_cache_metadata.dart';
 import 'core/services/video_cache_service.dart';
+import 'core/services/notification_service.dart';
 import 'features/coach/exercise_library/data/models/exercise_template_model.dart';
 import 'features/coach/exercise_library/data/models/exercise_tag_model.dart';
 import 'features/coach/students/data/models/student_list_item_model.dart';
@@ -26,6 +27,8 @@ void main() async {
   // 初始化Firebase
   try {
     await FirebaseInitService.initialize();
+    // 初始化通知服务
+    await NotificationService.instance.initialize();
   } catch (e, stackTrace) {
     AppLogger.error('Firebase初始化失败', e, stackTrace);
     // 继续运行应用，以便看到错误信息

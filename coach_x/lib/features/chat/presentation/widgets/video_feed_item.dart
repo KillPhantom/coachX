@@ -15,14 +15,12 @@ import '../../../student/training/data/models/keyframe_model.dart';
 class VideoFeedItem extends ConsumerStatefulWidget {
   final TrainingFeedItem feedItem;
   final VoidCallback onCommentTap;
-  final VoidCallback onDetailTap;
   final bool isSheetOpen;
 
   const VideoFeedItem({
     super.key,
     required this.feedItem,
     required this.onCommentTap,
-    required this.onDetailTap,
     this.isSheetOpen = false,
   });
 
@@ -98,14 +96,6 @@ class _VideoFeedItemState extends ConsumerState<VideoFeedItem> {
                 icon: CupertinoIcons.chat_bubble,
                 label: '批阅',
                 onTap: widget.onCommentTap,
-              ),
-              const SizedBox(height: 24),
-
-              // 详情按钮
-              _ActionButton(
-                icon: CupertinoIcons.info_circle,
-                label: '详情',
-                onTap: widget.onDetailTap,
               ),
               const SizedBox(height: 24),
 

@@ -1,3 +1,5 @@
+import 'package:coach_x/core/utils/json_utils.dart';
+
 /// 最后一条消息模型（嵌套在Conversation中）
 class LastMessage {
   final String id;
@@ -23,7 +25,7 @@ class LastMessage {
       content: json['content'] as String? ?? '',
       type: json['type'] as String? ?? 'text',
       senderId: json['senderId'] as String? ?? '',
-      timestamp: json['timestamp'] as int? ?? 0,
+      timestamp: safeIntCast(json['timestamp'], 0) ?? 0,
       mediaUrl: json['mediaUrl'] as String?,
     );
   }

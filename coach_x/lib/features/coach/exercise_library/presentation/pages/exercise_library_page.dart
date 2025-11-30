@@ -105,8 +105,8 @@ class _ExerciseLibraryPageState extends ConsumerState<ExerciseLibraryPage> {
       );
     }
 
-    // 空状态
-    if (templates.isEmpty && state.searchQuery.isEmpty) {
+    // 空状态（没有搜索、没有标签筛选、且真的没有动作）
+    if (templates.isEmpty && state.searchQuery.isEmpty && state.selectedTags.isEmpty) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -243,7 +243,7 @@ class _ExerciseLibraryPageState extends ConsumerState<ExerciseLibraryPage> {
         content: Text(l10n.confirmDeleteExercise),
         actions: [
           CupertinoDialogAction(
-            child: Text(l10n.cancel),
+            child: Text(l10n.cancel, style: AppTextStyles.body),
             onPressed: () => Navigator.pop(context),
           ),
           CupertinoDialogAction(
@@ -269,7 +269,7 @@ class _ExerciseLibraryPageState extends ConsumerState<ExerciseLibraryPage> {
                       content: Text(e.toString()),
                       actions: [
                         CupertinoDialogAction(
-                          child: Text(l10n.ok),
+                          child: Text(l10n.ok, style: AppTextStyles.body),
                           onPressed: () => Navigator.pop(context),
                         ),
                       ],
@@ -278,7 +278,7 @@ class _ExerciseLibraryPageState extends ConsumerState<ExerciseLibraryPage> {
                 }
               }
             },
-            child: Text(l10n.delete),
+            child: Text(l10n.delete, style: AppTextStyles.body),
           ),
         ],
       ),

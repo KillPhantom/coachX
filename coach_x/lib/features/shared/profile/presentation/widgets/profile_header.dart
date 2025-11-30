@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:coach_x/core/theme/app_theme.dart';
 import 'badge_chip.dart';
 
@@ -74,14 +75,15 @@ class ProfileHeader extends StatelessWidget {
           ),
           child: avatarUrl != null && avatarUrl!.isNotEmpty
               ? ClipOval(
-                  child: Image.network(
-                    avatarUrl!,
+                  child: CachedNetworkImage(
+                    imageUrl: avatarUrl!,
                     width: 128,
                     height: 128,
                     fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      return _buildDefaultAvatar();
-                    },
+                    placeholder: (context, url) => const Center(
+                      child: CupertinoActivityIndicator(),
+                    ),
+                    errorWidget: (context, url, error) => _buildDefaultAvatar(),
                   ),
                 )
               : _buildDefaultAvatar(),

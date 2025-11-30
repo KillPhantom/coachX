@@ -98,16 +98,24 @@ class TotalNutritionCard extends StatelessWidget {
 
   Widget _buildCircularProgress(AppLocalizations l10n) {
     final calorieProgress = progress['calories'] ?? 0.0;
+    final hasTarget = macros.calories > 0;
 
     // 计算颜色 (3色逻辑)
     Color progressColor;
-    if (calorieProgress >= 0.95 && calorieProgress <= 1.05) {
+    if (!hasTarget) {
+      // 没有目标值时使用主题色
+      progressColor = AppColors.primaryColor;
+    } else if (calorieProgress >= 0.95 && calorieProgress <= 1.05) {
       progressColor = AppColors.successGreen;
     } else if (calorieProgress > 1.05) {
       progressColor = AppColors.errorRed;
     } else {
       progressColor = AppColors.primaryColor;
     }
+
+    // 没有目标值时，根据实际摄入显示进度（假设2000kcal为满）
+    final displayProgress =
+        hasTarget ? calorieProgress : (actualMacros?.calories ?? 0) / 2000;
 
     return SizedBox(
       width: 100,
@@ -118,7 +126,7 @@ class TotalNutritionCard extends StatelessWidget {
           CustomPaint(
             size: const Size(100, 100),
             painter: _CircularProgressPainter(
-              progress: calorieProgress,
+              progress: displayProgress,
               progressColor: progressColor,
               backgroundColor: AppColors.dividerLight,
             ),
@@ -129,7 +137,7 @@ class TotalNutritionCard extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // 实际值（上方）
+                // 实际值（上方）- 有记录时显示
                 if (actualMacros != null)
                   Text(
                     '${actualMacros!.calories.toInt()}',
@@ -138,21 +146,40 @@ class TotalNutritionCard extends StatelessWidget {
                       fontWeight: FontWeight.w700,
                     ),
                   ),
-                // 目标值 + 单位（下方）
-                Text(
-                  actualMacros != null
-                      ? '${macros.calories.toInt()} ${l10n.kcal}'
-                      : '${macros.calories.toInt()}',
-                  style: actualMacros != null
-                      ? AppTextStyles.caption1.copyWith(
-                          color: AppColors.textSecondary,
-                        )
-                      : AppTextStyles.title3.copyWith(
-                          color: AppColors.primaryText,
-                          fontWeight: FontWeight.w700,
-                        ),
-                ),
-                if (actualMacros == null)
+                // 目标值 + 单位（下方）- 有目标值时显示
+                if (hasTarget)
+                  Text(
+                    actualMacros != null
+                        ? '/${macros.calories.toInt()} ${l10n.kcal}'
+                        : '${macros.calories.toInt()}',
+                    style: actualMacros != null
+                        ? AppTextStyles.caption1.copyWith(
+                            color: AppColors.textSecondary,
+                          )
+                        : AppTextStyles.title3.copyWith(
+                            color: AppColors.primaryText,
+                            fontWeight: FontWeight.w700,
+                          ),
+                  ),
+                // 无目标值但有实际值时，只显示单位
+                if (!hasTarget && actualMacros != null)
+                  Text(
+                    l10n.kcal,
+                    style: AppTextStyles.caption1.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                // 无目标值且无实际值时，显示占位
+                if (!hasTarget && actualMacros == null)
+                  Text(
+                    '-- ${l10n.kcal}',
+                    style: AppTextStyles.title3.copyWith(
+                      color: AppColors.textSecondary,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                // 有目标值但无实际值时，显示单位
+                if (hasTarget && actualMacros == null)
                   Text(
                     l10n.kcal,
                     style: AppTextStyles.caption1.copyWith(

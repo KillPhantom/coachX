@@ -40,13 +40,8 @@ class AIFoodScannerNotifier extends StateNotifier<AIFoodAnalysisState> {
       state = state.copyWith(isUploading: true);
       AppLogger.info('📤 开始后台上传图片: $imagePath');
 
-      // ✅ 压缩图片
-      compressedPath = await ImageCompressor.compressImage(
-        imagePath,
-        quality: 85, // 压缩质量 85%
-        maxWidth: 1920, // 最大宽度
-        maxHeight: 1920, // 最大高度
-      );
+      // ✅ 压缩图片（使用 AI 识别优化配置）
+      compressedPath = await ImageCompressor.compressImageForAI(imagePath);
 
       // 获取用户信息
       final user = FirebaseAuth.instance.currentUser;
@@ -57,14 +52,25 @@ class AIFoodScannerNotifier extends StateNotifier<AIFoodAnalysisState> {
       final fileName = 'food_${DateTime.now().millisecondsSinceEpoch}.jpg';
       final storagePath = 'food_images/${user.uid}/$fileName';
 
-      // ✅ 使用压缩后的图片上传
+      // ✅ 使用压缩后的图片上传（带 Retry 和进度监控）
       final imageFile = File(compressedPath);
-      final imageUrl = await StorageService.uploadFile(imageFile, storagePath);
+      final imageUrl = await StorageService.uploadFileWithRetry(
+        imageFile,
+        storagePath,
+        onProgress: (progress) {
+          // 更新上传进度
+          state = state.copyWith(uploadProgress: progress);
+        },
+      );
 
       AppLogger.info('✅ 图片上传成功: $imageUrl');
 
       // 更新状态：保存图片URL并重置上传状态
-      state = state.copyWith(imageUrl: imageUrl, isUploading: false);
+      state = state.copyWith(
+        imageUrl: imageUrl,
+        isUploading: false,
+        uploadProgress: 1.0,
+      );
 
       // ✅ 清理临时压缩文件
       if (compressedPath != imagePath) {
@@ -209,6 +215,12 @@ class AIFoodScannerNotifier extends StateNotifier<AIFoodAnalysisState> {
       final dayNum = dayNumbers['diet'] ?? 1;
 
       try {
+        // 检查 days 是否为空
+        if (plans.dietPlan!.days.isEmpty) {
+          AppLogger.warning('⚠️ 饮食计划 days 为空，跳过营养值填充');
+          return;
+        }
+
         final dietDay = plans.dietPlan!.days.firstWhere(
           (day) => day.day == dayNum,
           orElse: () => plans.dietPlan!.days.first,
@@ -354,34 +366,47 @@ class AIFoodScannerNotifier extends StateNotifier<AIFoodAnalysisState> {
 
         final dayNumbers = ref.read(currentDayNumbersProvider);
         final dayNum = dayNumbers['diet'] ?? 1;
-        final dietDay = plans.dietPlan!.days.firstWhere(
-          (day) => day.day == dayNum,
-          orElse: () => plans.dietPlan!.days.first,
-        );
 
-        // 尝试从计划中查找 meal
-        final planMeal = dietDay.meals.cast<dynamic>().firstWhere(
-          (meal) => meal.name == state.selectedMealName,
-          orElse: () => null,
-        );
-
-        if (planMeal != null) {
-          // 创建新 Meal（保留 name 和 note，items 为空）
+        // 检查 days 是否为空
+        if (plans.dietPlan!.days.isEmpty) {
+          // 自动命名模式：不需要从计划中获取 meal，直接创建新 Meal
+          AppLogger.warning('⚠️ 饮食计划 days 为空，使用自动命名模式');
           targetMeal = Meal(
-            name: planMeal.name,
-            note: planMeal.note,
-            items: [],
-            images: [],
-          );
-        } else {
-          // 计划中没有找到（dietDay.meals 为空或未匹配），使用自动生成的名称
-          AppLogger.info('计划中未找到餐次，使用自动生成名称: ${state.selectedMealName}');
-          targetMeal = Meal(
-            name: state.selectedMealName!, // 使用已经自动生成的名称
+            name: state.selectedMealName!,
             note: '',
             items: [],
             images: [],
           );
+        } else {
+          final dietDay = plans.dietPlan!.days.firstWhere(
+            (day) => day.day == dayNum,
+            orElse: () => plans.dietPlan!.days.first,
+          );
+
+          // 尝试从计划中查找 meal
+          final planMeal = dietDay.meals.cast<dynamic>().firstWhere(
+            (meal) => meal.name == state.selectedMealName,
+            orElse: () => null,
+          );
+
+          if (planMeal != null) {
+            // 创建新 Meal（保留 name 和 note，items 为空）
+            targetMeal = Meal(
+              name: planMeal.name,
+              note: planMeal.note,
+              items: [],
+              images: [],
+            );
+          } else {
+            // 计划中没有找到（dietDay.meals 为空或未匹配），使用自动生成的名称
+            AppLogger.info('计划中未找到餐次，使用自动生成名称: ${state.selectedMealName}');
+            targetMeal = Meal(
+              name: state.selectedMealName!, // 使用已经自动生成的名称
+              note: '',
+              items: [],
+              images: [],
+            );
+          }
         }
       }
 

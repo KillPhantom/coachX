@@ -30,9 +30,9 @@ class DayPill extends StatelessWidget {
         margin: const EdgeInsets.only(right: 8),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary : AppColors.primaryLight,
+          color: isSelected ? AppColors.primary : AppColors.primaryText.withValues(alpha: 0.2),
           borderRadius: BorderRadius.circular(20),
-          border:  Border.all(color: AppColors.primaryAction),
+          border:  Border.all(color: AppColors.primaryText.withValues(alpha: 0.3)),
         ), 
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -42,7 +42,7 @@ class DayPill extends StatelessWidget {
               width: 18,
               height: 18,
               decoration: BoxDecoration(
-                color: CupertinoColors.white.withOpacity(0.2),
+                color: CupertinoColors.white.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(12),
               ),
               alignment: Alignment.center,
@@ -51,7 +51,7 @@ class DayPill extends StatelessWidget {
                 style: AppTextStyles.caption1.copyWith(
                   color: isSelected
                       ? CupertinoColors.white
-                      : AppColors.primaryAction,
+                      : AppColors.primaryText,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -63,7 +63,7 @@ class DayPill extends StatelessWidget {
               style: AppTextStyles.footnote.copyWith(
                 color: isSelected
                     ? CupertinoColors.white
-                    : AppColors.primaryAction,
+                    : CupertinoColors.secondaryLabel,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
               ),
             ),

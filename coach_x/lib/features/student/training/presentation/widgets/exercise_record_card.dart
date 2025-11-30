@@ -5,25 +5,37 @@ import 'package:coach_x/l10n/app_localizations.dart';
 import 'package:coach_x/core/theme/app_theme.dart';
 import 'package:coach_x/features/student/training/data/models/student_exercise_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:coach_x/core/enums/video_source.dart';
-import 'package:coach_x/core/widgets/video_upload_section.dart';
+import 'package:coach_x/core/models/media_upload_state.dart';
+import 'package:coach_x/core/widgets/media_upload_section.dart';
 import 'set_input_row.dart';
 import 'exercise_time_header.dart';
+import 'exercise_guidance_sheet.dart';
 
 /// 动作记录卡片（增强版）
 ///
-/// 集成 Set 编辑、教练备注、视频录制功能
+/// 集成 Set 编辑、教练备注、媒体录制功能
 class ExerciseRecordCard extends StatelessWidget {
   final StudentExerciseModel exercise;
   final int exerciseIndex;
   final Function(int setIndex, String reps, String weight) onSetComplete;
   final Function(int setIndex) onToggleSetEdit;
   final VoidCallback onQuickComplete;
-  final Function(File) onVideoUploaded;
-  final Function(int) onVideoDeleted;
-  final Function(int)? onVideoRetry;
-  final Function(int videoIndex, String downloadUrl, String? thumbnailUrl)?
-  onVideoUploadCompleted;
+
+  /// 媒体选择回调
+  final Function(File file, MediaType type) onMediaSelected;
+
+  /// 媒体删除回调
+  final Function(int index) onMediaDeleted;
+
+  /// 媒体上传完成回调
+  final Function(
+    int mediaIndex,
+    String downloadUrl,
+    String? thumbnailUrl,
+    MediaType type,
+  )?
+  onMediaUploadCompleted;
+
   final bool isSaving;
 
   const ExerciseRecordCard({
@@ -33,10 +45,9 @@ class ExerciseRecordCard extends StatelessWidget {
     required this.onSetComplete,
     required this.onToggleSetEdit,
     required this.onQuickComplete,
-    required this.onVideoUploaded,
-    required this.onVideoDeleted,
-    this.onVideoRetry,
-    this.onVideoUploadCompleted,
+    required this.onMediaSelected,
+    required this.onMediaDeleted,
+    this.onMediaUploadCompleted,
     this.isSaving = false,
   });
 
@@ -88,6 +99,26 @@ class ExerciseRecordCard extends StatelessWidget {
                   ),
                 ),
               ),
+              CupertinoButton(
+                padding: EdgeInsets.zero,
+                onPressed: () {
+                  if (exercise.exerciseTemplateId != null &&
+                      exercise.exerciseTemplateId!.isNotEmpty) {
+                    ExerciseGuidanceSheet.show(
+                      context,
+                      exercise.exerciseTemplateId!,
+                    );
+                  } else {
+                    ExerciseGuidanceSheet.show(context, '');
+                  }
+                },
+                child: const Icon(
+                  CupertinoIcons.info_circle,
+                  size: 20,
+                  color: AppColors.primaryAction,
+                ),
+              ),
+              const SizedBox(width: 8),
               CupertinoButton(
                 padding: EdgeInsets.zero,
                 onPressed: isSaving ? null : onQuickComplete,
@@ -162,26 +193,25 @@ class ExerciseRecordCard extends StatelessWidget {
             );
           }),
 
-          // My Recordings
+          // My Recordings (Media)
           const SizedBox(height: AppDimensions.spacingM),
-          VideoUploadSection(
+          MediaUploadSection(
             storagePathPrefix:
                 'students/trainings/${FirebaseAuth.instance.currentUser!.uid}/',
-            maxVideos: 3,
-            maxSeconds: 60,
-            videoSource: VideoSource.both,
-            initialVideos: exercise.videos,
-            onVideoSelected: (index, file) {
-              // 添加 pending 状态视频到 notifier（不启动上传）
-              // 上传由 VideoUploadSection 负责
-              onVideoUploaded(file);
+            maxCount: 3,
+            maxVideoSeconds: 60,
+            initialMedia: exercise.media,
+            onMediaSelected: (index, file, type) {
+              // 添加 pending 状态媒体到 notifier（不启动上传）
+              // 上传由 MediaUploadSection 负责
+              onMediaSelected(file, type);
             },
-            onUploadCompleted: (index, videoUrl, thumbnailUrl) {
-              // 视频上传完成，同步状态到 notifier 并保存
-              onVideoUploadCompleted?.call(index, videoUrl, thumbnailUrl);
+            onUploadCompleted: (index, url, thumbnailUrl, type) {
+              // 媒体上传完成，同步状态到 notifier 并保存
+              onMediaUploadCompleted?.call(index, url, thumbnailUrl, type);
             },
-            onVideoDeleted: (index) {
-              onVideoDeleted(index);
+            onMediaDeleted: (index) {
+              onMediaDeleted(index);
             },
           ),
         ],

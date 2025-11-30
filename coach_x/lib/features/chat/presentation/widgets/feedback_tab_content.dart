@@ -1,53 +1,124 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:coach_x/l10n/app_localizations.dart';
 import 'package:coach_x/core/theme/app_colors.dart';
 import 'package:coach_x/core/theme/app_text_styles.dart';
+import 'package:coach_x/features/chat/presentation/widgets/daily_summary_tile.dart';
+import 'package:coach_x/features/chat/presentation/widgets/feedback_sort_button.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:coach_x/features/chat/presentation/providers/feedback_providers.dart';
-import 'package:coach_x/features/chat/presentation/widgets/feedback_card.dart';
-import 'package:coach_x/features/chat/presentation/widgets/feedback_date_filter.dart';
-import 'package:coach_x/features/chat/presentation/widgets/feedback_group_header.dart';
-import 'package:coach_x/features/chat/presentation/widgets/feedback_search_bar.dart';
 
 /// 训练反馈 Tab 内容
 ///
 /// 完整的反馈列表页面，包含：
-/// - 搜索栏
-/// - 日期筛选
-/// - 按日期分组的反馈列表
-class FeedbackTabContent extends ConsumerWidget {
+/// - 搜索框与排序切换
+/// - 按日期分组的反馈列表 (Daily Summaries)
+class FeedbackTabContent extends ConsumerStatefulWidget {
   final String conversationId;
 
   const FeedbackTabContent({super.key, required this.conversationId});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<FeedbackTabContent> createState() => _FeedbackTabContentState();
+}
+
+class _FeedbackTabContentState extends ConsumerState<FeedbackTabContent> {
+  late final TextEditingController _searchController;
+  Timer? _searchDebounce;
+
+  @override
+  void initState() {
+    super.initState();
+    final initialQuery =
+        ref.read(feedbackSearchQueryProvider(widget.conversationId));
+    _searchController = TextEditingController(text: initialQuery);
+  }
+
+  @override
+  void dispose() {
+    _searchDebounce?.cancel();
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     // 监听反馈流
-    final feedbacksAsync = ref.watch(feedbacksStreamProvider(conversationId));
+    final feedbacksAsync =
+        ref.watch(feedbacksStreamProvider(widget.conversationId));
 
     return Column(
       children: [
-        // 搜索栏
-        const FeedbackSearchBar(),
-
-        // 日期筛选器
-        const FeedbackDateFilter(),
+        // 搜索与排序
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: Row(
+            children: [
+              Expanded(
+                child: CupertinoSearchTextField(
+                  controller: _searchController,
+                  placeholder: l10n.feedbackSearchPlaceholder,
+                  placeholderStyle: AppTextStyles.body
+                      .copyWith(color: AppColors.textSecondary),
+                  style: AppTextStyles.body,
+                  backgroundColor: AppColors.backgroundSecondary,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                  onChanged: _onSearchChanged,
+                  onSuffixTap: _clearSearch,
+                ),
+              ),
+              const SizedBox(width: 12),
+              const FeedbackSortButton(),
+            ],
+          ),
+        ),
 
         // 反馈列表
         Expanded(
           child: feedbacksAsync.when(
-            data: (feedbacks) => _buildFeedbackList(context, ref),
-            loading: () => _buildLoadingState(),
-            error: (error, stack) => _buildErrorState(context, ref, error),
+            data: (_) => _buildFeedbackList(context),
+            loading: _buildLoadingState,
+            error: (error, _) => _buildErrorState(context, error),
           ),
         ),
       ],
     );
   }
 
+  void _onSearchChanged(String value) {
+    _searchDebounce?.cancel();
+    final query = value;
+    _searchDebounce = Timer(const Duration(milliseconds: 300), () {
+      if (!mounted) return;
+      ref
+          .read(
+            feedbackSearchQueryProvider(widget.conversationId).notifier,
+          )
+          .state = query;
+    });
+  }
+
+  void _clearSearch() {
+    if (_searchController.text.isEmpty) {
+      return;
+    }
+    _searchDebounce?.cancel();
+    _searchController.clear();
+    ref
+        .read(
+          feedbackSearchQueryProvider(widget.conversationId).notifier,
+        )
+        .state = '';
+  }
+
   /// 构建反馈列表
-  Widget _buildFeedbackList(BuildContext context, WidgetRef ref) {
+  Widget _buildFeedbackList(BuildContext context) {
     final groupedFeedbacks = ref.watch(
-      groupedFeedbacksProvider(conversationId),
+      groupedFeedbacksProvider(widget.conversationId),
     );
 
     // 检查是否为空
@@ -57,19 +128,20 @@ class FeedbackTabContent extends ConsumerWidget {
 
     return CustomScrollView(
       slivers: [
-        // 遍历每个日期分组
-        for (final entry in groupedFeedbacks.entries) ...[
-          // 日期分组标题
-          SliverToBoxAdapter(child: FeedbackGroupHeader(dateLabel: entry.key)),
-
-          // 该日期下的所有反馈卡片
-          SliverList(
-            delegate: SliverChildBuilderDelegate((context, index) {
-              final feedback = entry.value[index];
-              return FeedbackCard(feedback: feedback);
-            }, childCount: entry.value.length),
+        const SliverToBoxAdapter(child: SizedBox(height: 16)),
+        
+        SliverList(
+          delegate: SliverChildBuilderDelegate(
+            (context, index) {
+              final entry = groupedFeedbacks.entries.elementAt(index);
+              return DailySummaryTile(
+                dateLabel: entry.key,
+                feedbacks: entry.value,
+              );
+            },
+            childCount: groupedFeedbacks.length,
           ),
-        ],
+        ),
 
         // 底部间距
         const SliverToBoxAdapter(child: SizedBox(height: 16)),
@@ -79,92 +151,21 @@ class FeedbackTabContent extends ConsumerWidget {
 
   /// 构建加载状态
   Widget _buildLoadingState() {
-    return const Center(child: CupertinoActivityIndicator(radius: 16));
+    // Fixed const expression error
+    return Center(child: CupertinoActivityIndicator(radius: 16));
   }
 
   /// 构建错误状态
-  Widget _buildErrorState(BuildContext context, WidgetRef ref, Object error) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(
-              CupertinoIcons.exclamationmark_triangle,
-              size: 48,
-              color: AppColors.errorRed,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Failed to load feedback',
-              style: AppTextStyles.body.copyWith(
-                color: AppColors.textPrimary,
-                fontWeight: FontWeight.w500,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              error.toString(),
-              style: AppTextStyles.footnote.copyWith(
-                color: AppColors.textSecondary,
-              ),
-              textAlign: TextAlign.center,
-              maxLines: 3,
-              overflow: TextOverflow.ellipsis,
-            ),
-            const SizedBox(height: 24),
-            CupertinoButton.filled(
-              onPressed: () {
-                // 重新加载
-                ref.invalidate(feedbacksStreamProvider(conversationId));
-              },
-              child: Text(
-                'Retry',
-                style: AppTextStyles.buttonMedium.copyWith(
-                  color: AppColors.textWhite,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
+  Widget _buildErrorState(BuildContext context, Object error) {
+     return Center(
+      child: Text('Error loading feedbacks: $error'),
+     );
   }
 
   /// 构建空状态
   Widget _buildEmptyState() {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(
-              CupertinoIcons.tray,
-              size: 64,
-              color: AppColors.textTertiary,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'No feedback yet',
-              style: AppTextStyles.body.copyWith(
-                color: AppColors.textPrimary,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Training feedback will appear here',
-              style: AppTextStyles.footnote.copyWith(
-                color: AppColors.textSecondary,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      ),
-    );
+     return const Center(
+      child: Text('No feedback yet'),
+     );
   }
 }

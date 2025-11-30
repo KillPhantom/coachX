@@ -707,7 +707,7 @@ def _get_recent_trainings(db, student_id: str, limit: int = 3):
             # 计算视频数量
             video_count = 0
             for exercise in exercises:
-                videos = exercise.get('videos', [])
+                videos = exercise.get('medias', exercise.get('videos', []))
                 video_count += len(videos)
 
             # 获取训练标题（从planSelection获取）

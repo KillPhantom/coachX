@@ -64,7 +64,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
               content: Text(l10n.getUserInfoFailed),
               actions: [
                 CupertinoDialogAction(
-                  child: Text(l10n.confirm),
+                  child: Text(l10n.confirm, style: AppTextStyles.body),
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
@@ -133,7 +133,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
             content: Text('${l10n.getUserInfoFailed}: ${e.toString()}'),
             actions: [
               CupertinoDialogAction(
-                child: Text(l10n.confirm),
+                child: Text(l10n.confirm, style: AppTextStyles.body),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
@@ -164,7 +164,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
             content: Text(next.errorMessage ?? l10n.errorOccurred),
             actions: [
               CupertinoDialogAction(
-                child: Text(l10n.confirm),
+                child: Text(l10n.confirm, style: AppTextStyles.body),
                 onPressed: () => Navigator.of(context).pop(),
               ),
             ],
@@ -271,7 +271,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                   ),
                                   actions: [
                                     CupertinoDialogAction(
-                                      child: Text(l10n.confirm),
+                                      child: Text(l10n.confirm, style: AppTextStyles.body),
                                       onPressed: () => Navigator.of(ctx).pop(),
                                     ),
                                   ],

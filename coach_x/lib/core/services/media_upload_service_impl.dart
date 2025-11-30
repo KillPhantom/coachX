@@ -1,18 +1,23 @@
 import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:coach_x/core/services/storage_service.dart';
-import 'package:coach_x/core/services/video_upload_service.dart';
+import 'package:coach_x/core/services/media_upload_service.dart';
 import 'package:coach_x/core/utils/logger.dart';
 
-/// 视频上传服务实现
+/// 媒体上传服务实现
 ///
-/// 使用 Firebase Storage 上传视频和缩略图
-class VideoUploadServiceImpl implements VideoUploadService {
+/// 使用 Firebase Storage 上传视频和图片
+class MediaUploadServiceImpl implements MediaUploadService {
   @override
-  Stream<double> uploadVideoWithProgress(File videoFile, String path) {
+  Stream<double> uploadFileWithProgress(File file, String path, {String? contentType}) {
     final storage = FirebaseStorage.instance;
     final ref = storage.ref(path);
-    final uploadTask = ref.putFile(videoFile);
+    
+    final metadata = contentType != null 
+        ? SettableMetadata(contentType: contentType)
+        : null;
+
+    final uploadTask = ref.putFile(file, metadata);
 
     return uploadTask.snapshotEvents.map((snapshot) {
       if (snapshot.state == TaskState.running) {
@@ -49,16 +54,20 @@ class VideoUploadServiceImpl implements VideoUploadService {
   @override
   Future<String> uploadThumbnail(File thumbnailFile, String path) async {
     try {
-      AppLogger.info('上传视频缩略图: $path');
+      AppLogger.info('上传缩略图: $path');
 
-      final downloadUrl = await StorageService.uploadFile(thumbnailFile, path);
+      final downloadUrl = await StorageService.uploadFile(
+        file: thumbnailFile,
+        storagePath: path,
+      );
 
-      AppLogger.info('上传视频缩略图成功: $downloadUrl');
+      AppLogger.info('上传缩略图成功: $downloadUrl');
 
       return downloadUrl;
     } catch (e, stackTrace) {
-      AppLogger.error('上传视频缩略图失败', e, stackTrace);
+      AppLogger.error('上传缩略图失败', e, stackTrace);
       rethrow;
     }
   }
 }
+

@@ -258,7 +258,7 @@ class _MeasurementRecordCardState extends ConsumerState<MeasurementRecordCard> {
         content: Text(l10n.confirmDelete),
         actions: [
           CupertinoDialogAction(
-            child: Text(l10n.cancel),
+            child: Text(l10n.cancel, style: AppTextStyles.body),
             onPressed: () => Navigator.of(context).pop(),
           ),
           CupertinoDialogAction(
@@ -267,7 +267,7 @@ class _MeasurementRecordCardState extends ConsumerState<MeasurementRecordCard> {
               Navigator.of(context).pop();
               await _deleteRecord();
             },
-            child: Text(l10n.delete),
+            child: Text(l10n.delete, style: AppTextStyles.body),
           ),
         ],
       ),
@@ -290,7 +290,7 @@ class _MeasurementRecordCardState extends ConsumerState<MeasurementRecordCard> {
           title: Text(l10n.recordDeleted),
           actions: [
             CupertinoDialogAction(
-              child: Text(l10n.ok),
+              child: Text(l10n.ok, style: AppTextStyles.body),
               onPressed: () => Navigator.of(context).pop(),
             ),
           ],

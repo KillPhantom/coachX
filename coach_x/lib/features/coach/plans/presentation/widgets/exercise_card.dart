@@ -583,59 +583,13 @@ class _ExerciseCardState extends ConsumerState<ExerciseCard>
     );
   }
 
-  /// 构建"添加指导"按钮
-  Widget _buildAddGuidanceButton(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-
-    return CupertinoButton(
-      padding: EdgeInsets.zero,
-      onPressed: () => _showGuidanceSheet(context),
-      child: Container(
-        padding: const EdgeInsets.all(7),
-        decoration: BoxDecoration(
-          color: AppColors.primary.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(4),
-          border: Border.all(
-            color: AppColors.primaryText,
-            width: 1,
-          ),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              CupertinoIcons.book,
-              color: AppColors.primaryText,
-              size: 14,
-            ),
-            const SizedBox(width: 5),
-            Text(
-              l10n.addGuidance,
-              style: AppTextStyles.caption1.copyWith(
-                color: AppColors.primaryText,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   /// 显示指导编辑 Sheet
   Future<void> _showGuidanceSheet(BuildContext context) async {
     final templateId = widget.exercise.exerciseTemplateId;
     if (templateId == null || templateId.isEmpty) return;
 
-    // 先加载模板
-    final templateAsync = ref.read(exerciseTemplateProvider(templateId));
-
-    // 等待加载完成
-    final template = await templateAsync.when(
-      data: (t) async => t,
-      loading: () async => null,
-      error: (_, __) async => null,
-    );
+    // 先加载模板 (使用 future 确保等待加载完成)
+    final template = await ref.read(exerciseTemplateProvider(templateId).future);
 
     if (!mounted) return;
 
