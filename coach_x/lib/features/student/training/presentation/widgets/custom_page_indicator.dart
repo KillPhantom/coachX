@@ -1,15 +1,19 @@
 import 'package:flutter/cupertino.dart';
 import 'package:coach_x/core/theme/app_theme.dart';
+import 'exercise_tile.dart';
 
 /// 自定义页面指示器
 ///
-/// 显示 "1 / 3" 页码 + 左右箭头按钮 + 绿色进度条
+/// 显示 ExerciseTile 横向列表 + "1 / 3" 页码 + 左右箭头按钮 + 绿色进度条
 class CustomPageIndicator extends StatelessWidget {
   final int currentPage;
   final int totalPages;
   final int completedCount;
   final VoidCallback? onPreviousPage;
   final VoidCallback? onNextPage;
+  final List<String> exerciseNames;
+  final Function(int index)? onExerciseTap;
+  final ScrollController? tileScrollController;
 
   const CustomPageIndicator({
     super.key,
@@ -18,6 +22,9 @@ class CustomPageIndicator extends StatelessWidget {
     required this.completedCount,
     this.onPreviousPage,
     this.onNextPage,
+    required this.exerciseNames,
+    this.onExerciseTap,
+    this.tileScrollController,
   });
 
   @override
@@ -33,6 +40,27 @@ class CustomPageIndicator extends StatelessWidget {
       ),
       child: Column(
         children: [
+          // ExerciseTile 横向列表
+          if (exerciseNames.isNotEmpty) ...[
+            SizedBox(
+              height: 44,
+              child: ListView.separated(
+                controller: tileScrollController,
+                scrollDirection: Axis.horizontal,
+                itemCount: exerciseNames.length,
+                separatorBuilder: (context, index) => const SizedBox(width: 8),
+                itemBuilder: (context, index) {
+                  return ExerciseTile(
+                    name: exerciseNames[index],
+                    isSelected: index == currentPage,
+                    onTap: () => onExerciseTap?.call(index),
+                  );
+                },
+              ),
+            ),
+            const SizedBox(height: AppDimensions.spacingM),
+          ],
+
           // 箭头导航行
           Row(
             mainAxisAlignment: MainAxisAlignment.center,

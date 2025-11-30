@@ -53,11 +53,14 @@ abstract class FeedbackRepository {
   /// [trainingDate] 训练日期 "yyyy-MM-dd"
   /// [exerciseTemplateId] 教练动作库 Exercise ID（可选）视频项填写，图文项不填
   /// [exerciseName] exercise名称（可选）用于历史查询
-  /// [feedbackType] 反馈类型："text"/"voice"/"image"
+  /// [feedbackType] 反馈类型："text"/"voice"/"image"/"video"
   /// [textContent] 文字内容（feedbackType为text时使用）
   /// [voiceUrl] 语音文件URL（feedbackType为voice时使用）
   /// [voiceDuration] 语音时长，单位：秒（feedbackType为voice时使用）
   /// [imageUrl] 图片URL（feedbackType为image时使用）
+  /// [videoUrl] 视频URL（feedbackType为video时使用）
+  /// [videoThumbnailUrl] 视频缩略图URL（feedbackType为video时使用）
+  /// [videoDuration] 视频时长，单位：秒（feedbackType为video时使用）
   Future<void> addFeedback({
     required String dailyTrainingId,
     required String studentId,
@@ -70,6 +73,9 @@ abstract class FeedbackRepository {
     String? voiceUrl,
     int? voiceDuration,
     String? imageUrl,
+    String? videoUrl,
+    String? videoThumbnailUrl,
+    int? videoDuration,
   });
 
   /// 查询某个动作的历史反馈（跨多个 dailyTraining）
@@ -108,6 +114,20 @@ abstract class FeedbackRepository {
   /// 返回上传后的下载URL
   Future<String> uploadImageFile(String filePath, String dailyTrainingId);
 
+  /// 上传视频文件到 Firebase Storage
+  ///
+  /// [filePath] 本地文件路径
+  /// [dailyTrainingId] 训练记录ID（用于构建存储路径）
+  /// 返回上传后的下载URL
+  Future<String> uploadVideoFile(String filePath, String dailyTrainingId);
+
+  /// 上传视频缩略图文件到 Firebase Storage
+  ///
+  /// [filePath] 本地文件路径
+  /// [dailyTrainingId] 训练记录ID（用于构建存储路径）
+  /// 返回上传后的下载URL
+  Future<String> uploadVideoThumbnail(String filePath, String dailyTrainingId);
+
   /// 上传编辑后的图片字节数据到 Firebase Storage
   ///
   /// [bytes] 编辑后的图片字节数据（JPG格式）
@@ -141,4 +161,10 @@ abstract class FeedbackRepository {
   /// [storageUrl] Storage 文件的完整 URL
   /// 如果文件不存在，忽略错误
   Future<void> deleteStorageFile(String storageUrl);
+
+  /// 删除反馈
+  ///
+  /// [feedbackId] 反馈ID
+  /// [feedback] 反馈对象 (用于删除关联文件)
+  Future<void> deleteFeedback(String feedbackId, TrainingFeedbackModel feedback);
 }

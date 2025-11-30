@@ -137,6 +137,20 @@
       ]
     },
     {
+      "collectionGroup": "dailyTrainingFeedback",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "dailyTrainingId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
       "collectionGroup": "dailyTrainings",
       "queryScope": "COLLECTION",
       "fields": [

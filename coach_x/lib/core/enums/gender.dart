@@ -9,16 +9,6 @@ enum Gender {
 
 /// Gender 扩展方法
 extension GenderExtension on Gender {
-  /// 获取显示名称（中文）
-  String get displayName {
-    switch (this) {
-      case Gender.male:
-        return '男';
-      case Gender.female:
-        return '女';
-    }
-  }
-
   /// 获取英文名称
   String get value {
     switch (this) {

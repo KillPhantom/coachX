@@ -242,7 +242,7 @@ abstract class AppLocalizations {
   /// **'Cancel'**
   String get cancel;
 
-  /// Confirm button text
+  /// Confirm button
   ///
   /// In en, this message translates to:
   /// **'Confirm'**
@@ -271,6 +271,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Avatar editing is under development'**
   String get avatarEditInDevelopment;
+
+  /// Title for avatar source selection sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Select Avatar Source'**
+  String get selectAvatarSource;
+
+  /// Option to choose avatar from gallery
+  ///
+  /// In en, this message translates to:
+  /// **'Choose from Gallery'**
+  String get chooseFromGallery;
+
+  /// Avatar uploading status text
+  ///
+  /// In en, this message translates to:
+  /// **'Uploading Avatar...'**
+  String get uploadingAvatar;
+
+  /// Image processing status text
+  ///
+  /// In en, this message translates to:
+  /// **'Processing Image...'**
+  String get processingImage;
+
+  /// Avatar upload success message
+  ///
+  /// In en, this message translates to:
+  /// **'Upload Successful'**
+  String get uploadSuccess;
+
+  /// Avatar upload failed message
+  ///
+  /// In en, this message translates to:
+  /// **'Upload Failed'**
+  String get uploadFailed;
+
+  /// Retry upload button
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get retryUpload;
+
+  /// Circular crop instruction
+  ///
+  /// In en, this message translates to:
+  /// **'Crop to Circle'**
+  String get cropCircular;
 
   /// Account settings feature message
   ///
@@ -968,7 +1016,7 @@ abstract class AppLocalizations {
   /// **'Metric (cm, kg)'**
   String get metricUnit;
 
-  /// Update failed error
+  /// Error message for profile update failure
   ///
   /// In en, this message translates to:
   /// **'Update failed'**
@@ -2078,6 +2126,42 @@ abstract class AppLocalizations {
   /// **'Time Spent'**
   String get timeSpentLabel;
 
+  /// Feedback tab title showing training history
+  ///
+  /// In en, this message translates to:
+  /// **'Training History'**
+  String get feedbackHistoryTitle;
+
+  /// Ascending sort label for feedback list
+  ///
+  /// In en, this message translates to:
+  /// **'Asc'**
+  String get feedbackSortAscLabel;
+
+  /// Descending sort label for feedback list
+  ///
+  /// In en, this message translates to:
+  /// **'Desc'**
+  String get feedbackSortDescLabel;
+
+  /// Title for the training calendar page
+  ///
+  /// In en, this message translates to:
+  /// **'Training History'**
+  String get trainingCalendarTitle;
+
+  /// Empty state message when the selected day has no training record
+  ///
+  /// In en, this message translates to:
+  /// **'No training record for this date.'**
+  String get trainingCalendarEmptyDay;
+
+  /// CTA to open the training summary from the calendar
+  ///
+  /// In en, this message translates to:
+  /// **'View summary'**
+  String get trainingCalendarViewSummary;
+
   /// Add custom exercise hint
   ///
   /// In en, this message translates to:
@@ -2144,10 +2228,10 @@ abstract class AppLocalizations {
   /// **'Coach\'s Plan'**
   String get coachPlan;
 
-  /// Placeholder text for feedback search bar
+  /// Placeholder text for the feedback search bar
   ///
   /// In en, this message translates to:
-  /// **'Search feedback...'**
+  /// **'Search exercises or feedback'**
   String get feedbackSearchPlaceholder;
 
   /// Label for start date filter
@@ -2378,12 +2462,6 @@ abstract class AppLocalizations {
   /// **'Upload failed'**
   String get videoUploadFailed;
 
-  /// Retry upload button
-  ///
-  /// In en, this message translates to:
-  /// **'Retry'**
-  String get retryUpload;
-
   /// Processing indicator text
   ///
   /// In en, this message translates to:
@@ -2420,7 +2498,7 @@ abstract class AppLocalizations {
   /// **'exercises'**
   String get exercises;
 
-  /// New exercise button
+  /// Section title for new exercises
   ///
   /// In en, this message translates to:
   /// **'New Exercise'**
@@ -2576,10 +2654,10 @@ abstract class AppLocalizations {
   /// **'Exercise created successfully'**
   String get createSuccess;
 
-  /// Update success message
+  /// Success message for profile update
   ///
   /// In en, this message translates to:
-  /// **'Exercise updated successfully'**
+  /// **'Updated successfully'**
   String get updateSuccess;
 
   /// Waiting for upload message
@@ -3230,10 +3308,10 @@ abstract class AppLocalizations {
   /// **'Exercise Guidance'**
   String get exerciseGuidance;
 
-  /// Button text to view exercise guidance
+  /// Button to view exercise guidance
   ///
   /// In en, this message translates to:
-  /// **'View Guidance'**
+  /// **'view guidance'**
   String get viewGuidance;
 
   /// Message when no guidance content is available
@@ -3518,6 +3596,30 @@ abstract class AppLocalizations {
   /// **'Start Parsing'**
   String get startParsing;
 
+  /// Text import summary page title
+  ///
+  /// In en, this message translates to:
+  /// **'Text Import Complete'**
+  String get textImportSummaryTitle;
+
+  /// Text import summary page subtitle
+  ///
+  /// In en, this message translates to:
+  /// **'Successfully extracted training plan from text'**
+  String get textImportSummarySubtitle;
+
+  /// Section title for exercises from library
+  ///
+  /// In en, this message translates to:
+  /// **'Exercise From Library'**
+  String get exerciseFromLibrary;
+
+  /// Button to create exercise guidance
+  ///
+  /// In en, this message translates to:
+  /// **'create guidance'**
+  String get createGuidance;
+
   /// OCR extraction success message
   ///
   /// In en, this message translates to:
@@ -3739,6 +3841,198 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Meal {number}'**
   String mealNumberFormat(int number);
+
+  /// Error message when image upload fails
+  ///
+  /// In en, this message translates to:
+  /// **'Image upload failed'**
+  String get imageUploadFailed;
+
+  /// Unknown error message
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown error'**
+  String get unknownError;
+
+  /// Label for this week's calorie intake
+  ///
+  /// In en, this message translates to:
+  /// **'This week'**
+  String get thisWeekIntake;
+
+  /// Note when there is no last week data for comparison
+  ///
+  /// In en, this message translates to:
+  /// **'No last week data'**
+  String get noLastWeekData;
+
+  /// Label for today
+  ///
+  /// In en, this message translates to:
+  /// **'today'**
+  String get today;
+
+  /// Nickname field label
+  ///
+  /// In en, this message translates to:
+  /// **'Nickname'**
+  String get nickname;
+
+  /// Nickname input placeholder
+  ///
+  /// In en, this message translates to:
+  /// **'Enter nickname'**
+  String get nicknamePlaceholder;
+
+  /// Nickname validation error message
+  ///
+  /// In en, this message translates to:
+  /// **'Nickname cannot be empty'**
+  String get nicknameRequired;
+
+  /// Edit nickname dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Nickname'**
+  String get editNickname;
+
+  /// Gender field label
+  ///
+  /// In en, this message translates to:
+  /// **'Gender'**
+  String get gender;
+
+  /// Male gender option
+  ///
+  /// In en, this message translates to:
+  /// **'Male'**
+  String get male;
+
+  /// Female gender option
+  ///
+  /// In en, this message translates to:
+  /// **'Female'**
+  String get female;
+
+  /// Gender selection prompt
+  ///
+  /// In en, this message translates to:
+  /// **'Select Gender'**
+  String get selectGender;
+
+  /// Edit gender dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Gender'**
+  String get editGender;
+
+  /// Birth date field label
+  ///
+  /// In en, this message translates to:
+  /// **'Birth Date'**
+  String get bornDate;
+
+  /// Birth date selection prompt
+  ///
+  /// In en, this message translates to:
+  /// **'Select Birth Date'**
+  String get selectBornDate;
+
+  /// Edit birth date dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Birth Date'**
+  String get editBornDate;
+
+  /// Date format pattern
+  ///
+  /// In en, this message translates to:
+  /// **'yyyy-MM-dd'**
+  String get dateFormat;
+
+  /// Edit height dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Height'**
+  String get editHeight;
+
+  /// Height input placeholder
+  ///
+  /// In en, this message translates to:
+  /// **'Enter height'**
+  String get heightPlaceholder;
+
+  /// Height validation error message
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid height value'**
+  String get heightInvalid;
+
+  /// Height label in centimeters
+  ///
+  /// In en, this message translates to:
+  /// **'Height (cm)'**
+  String get heightInCm;
+
+  /// Height label in feet
+  ///
+  /// In en, this message translates to:
+  /// **'Height (ft)'**
+  String get heightInFeet;
+
+  /// Inches unit label
+  ///
+  /// In en, this message translates to:
+  /// **'inches'**
+  String get heightInInches;
+
+  /// Feet unit abbreviation
+  ///
+  /// In en, this message translates to:
+  /// **'ft'**
+  String get feet;
+
+  /// Inches unit abbreviation
+  ///
+  /// In en, this message translates to:
+  /// **'in'**
+  String get inches;
+
+  /// AI assistant title in edit chat panel
+  ///
+  /// In en, this message translates to:
+  /// **'AI Assistant'**
+  String get aiAssistant;
+
+  /// Welcome message in AI edit chat panel
+  ///
+  /// In en, this message translates to:
+  /// **'Hello! How can I assist you with this training plan today?'**
+  String get aiWelcomeMessage;
+
+  /// Hint text in AI edit chat panel welcome view
+  ///
+  /// In en, this message translates to:
+  /// **'Try asking me to modify exercises, adjust intensity, or add new training days.'**
+  String get aiWelcomeHint;
+
+  /// Quick action button to analyze plan
+  ///
+  /// In en, this message translates to:
+  /// **'Analyze the plan\'s pros and cons'**
+  String get aiQuickActionAnalyzePlan;
+
+  /// Quick action button to reduce weights
+  ///
+  /// In en, this message translates to:
+  /// **'Reduce all weights by 10%'**
+  String get aiQuickActionReduceWeight;
+
+  /// Input placeholder in AI edit chat panel
+  ///
+  /// In en, this message translates to:
+  /// **'Ask AI for suggestions...'**
+  String get aiInputPlaceholder;
 }
 
 class _AppLocalizationsDelegate

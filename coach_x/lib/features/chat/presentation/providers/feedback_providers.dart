@@ -1,17 +1,18 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:coach_x/app/providers.dart';
 import 'package:coach_x/features/chat/data/models/training_feedback_model.dart';
 import 'package:coach_x/features/chat/presentation/providers/chat_detail_providers.dart';
 
-// ==================== Search & Filter Providers ====================
+// ==================== Sort Provider ====================
 
-/// 搜索关键词 Provider
-final feedbackSearchQueryProvider = StateProvider<String>((ref) => '');
+/// 排序顺序 Provider
+/// true = 降序（最新的在前）, false = 升序（最旧的在前）
+final feedbackSortOrderProvider = StateProvider<bool>((ref) => true);
 
-/// 日期范围筛选 Provider
-final feedbackDateRangeProvider = StateProvider<DateTimeRange?>((ref) => null);
+/// 搜索关键字 Provider（按会话隔离）
+final feedbackSearchQueryProvider =
+    StateProvider.family<String, String>((ref, conversationId) => '');
 
 // ==================== Data Providers ====================
 
@@ -43,7 +44,7 @@ final feedbacksStreamProvider =
       yield* repository.watchFeedbacks(studentId: studentId, coachId: coachId);
     });
 
-/// 筛选后的 Feedback List Provider
+/// 排序后的 Feedback List Provider
 final filteredFeedbacksProvider =
     Provider.family<
       List<TrainingFeedbackModel>,
@@ -58,58 +59,29 @@ final filteredFeedbacksProvider =
         error: (_, __) => <TrainingFeedbackModel>[],
       );
 
-      // 2. 获取搜索关键词
-      final searchQuery = ref
-          .watch(feedbackSearchQueryProvider)
-          .trim()
-          .toLowerCase();
+      // 2. 获取排序顺序
+      final isDescending = ref.watch(feedbackSortOrderProvider);
+      final searchQuery =
+          ref.watch(feedbackSearchQueryProvider(conversationId)).trim().toLowerCase();
 
-      // 3. 获取日期范围
-      final dateRange = ref.watch(feedbackDateRangeProvider);
+      // 3. 复制列表并排序
+      final sorted = List<TrainingFeedbackModel>.from(feedbacks);
+      sorted.sort((a, b) {
+        return isDescending
+            ? b.trainingDate.compareTo(a.trainingDate)
+            : a.trainingDate.compareTo(b.trainingDate);
+      });
 
-      // 4. 应用过滤
-      var filtered = feedbacks;
-
-      // 4.1 搜索过滤（按 feedback 内容）
-      if (searchQuery.isNotEmpty) {
-        filtered = filtered.where((feedback) {
-          final textContent = (feedback.textContent ?? '').toLowerCase();
-          final exerciseName = (feedback.exerciseName ?? '').toLowerCase();
-
-          return textContent.contains(searchQuery) ||
-              exerciseName.contains(searchQuery);
-        }).toList();
+      if (searchQuery.isEmpty) {
+        return sorted;
       }
 
-      // 4.2 日期范围过滤
-      if (dateRange != null) {
-        filtered = filtered.where((feedback) {
-          final feedbackDate = DateTime.parse(feedback.trainingDate);
-          final startDate = DateTime(
-            dateRange.start.year,
-            dateRange.start.month,
-            dateRange.start.day,
-          );
-          final endDate = DateTime(
-            dateRange.end.year,
-            dateRange.end.month,
-            dateRange.end.day,
-            23,
-            59,
-            59,
-          );
-
-          return feedbackDate.isAfter(
-                startDate.subtract(const Duration(seconds: 1)),
-              ) &&
-              feedbackDate.isBefore(endDate.add(const Duration(seconds: 1)));
-        }).toList();
-      }
-
-      // 5. 按日期降序排序（最新的在前）
-      filtered.sort((a, b) => b.trainingDate.compareTo(a.trainingDate));
-
-      return filtered;
+      return sorted.where((feedback) {
+        final exerciseName = feedback.exerciseName?.toLowerCase() ?? '';
+        final textContent = feedback.textContent?.toLowerCase() ?? '';
+        return exerciseName.contains(searchQuery) ||
+            textContent.contains(searchQuery);
+      }).toList();
     });
 
 /// 按日期分组的 Provider

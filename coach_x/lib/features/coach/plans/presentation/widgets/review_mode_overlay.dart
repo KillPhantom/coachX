@@ -1051,7 +1051,7 @@ class ReviewModeOverlay extends ConsumerWidget {
           CupertinoDialogAction(
             isDestructiveAction: true,
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('取消'),
+            child: const Text('取消', style: AppTextStyles.body),
           ),
           CupertinoDialogAction(
             onPressed: () {
@@ -1059,7 +1059,7 @@ class ReviewModeOverlay extends ConsumerWidget {
               ref.read(suggestionReviewNotifierProvider.notifier).acceptAll();
               _finishReview(context, ref);
             },
-            child: const Text('确定'),
+            child: const Text('确定', style: AppTextStyles.body),
           ),
         ],
       ),

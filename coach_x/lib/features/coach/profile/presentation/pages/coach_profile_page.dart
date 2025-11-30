@@ -9,6 +9,7 @@ import 'package:coach_x/routes/route_names.dart';
 import 'package:coach_x/features/shared/profile/presentation/widgets/profile_header.dart';
 import 'package:coach_x/features/shared/profile/presentation/widgets/info_card.dart';
 import 'package:coach_x/features/shared/profile/presentation/widgets/settings_row.dart';
+import 'package:coach_x/features/shared/profile/presentation/widgets/avatar_upload_sheet.dart';
 import 'package:coach_x/features/coach/profile/presentation/widgets/subscription_card.dart';
 import 'package:coach_x/features/coach/profile/presentation/providers/coach_profile_providers.dart';
 import 'package:coach_x/features/auth/data/providers/user_providers.dart';
@@ -56,22 +57,7 @@ class _CoachProfilePageState extends ConsumerState<CoachProfilePage> {
                 avatarUrl: currentUser.avatarUrl,
                 name: currentUser.name,
                 tags: currentUser.tags,
-                onEditTap: () {
-                  // TODO: 实现头像编辑功能
-                  showCupertinoDialog(
-                    context: context,
-                    builder: (context) => CupertinoAlertDialog(
-                      title: const Text('提示'),
-                      content: const Text('头像编辑功能开发中'),
-                      actions: [
-                        CupertinoDialogAction(
-                          child: const Text('确定'),
-                          onPressed: () => Navigator.of(context).pop(),
-                        ),
-                      ],
-                    ),
-                  );
-                },
+                onEditTap: _showAvatarUploadSheet,
               ),
             ),
 
@@ -160,7 +146,7 @@ class _CoachProfilePageState extends ConsumerState<CoachProfilePage> {
                                 ),
                                 actions: [
                                   CupertinoDialogAction(
-                                    child: Text(l10n.confirm),
+                                    child: Text(l10n.confirm, style: AppTextStyles.body),
                                     onPressed: () =>
                                         Navigator.of(dialogContext).pop(),
                                   ),
@@ -182,7 +168,7 @@ class _CoachProfilePageState extends ConsumerState<CoachProfilePage> {
                                 content: Text(l10n.helpCenterInDevelopment),
                                 actions: [
                                   CupertinoDialogAction(
-                                    child: Text(l10n.confirm),
+                                    child: Text(l10n.confirm, style: AppTextStyles.body),
                                     onPressed: () =>
                                         Navigator.of(dialogContext).pop(),
                                   ),
@@ -258,7 +244,7 @@ class _CoachProfilePageState extends ConsumerState<CoachProfilePage> {
             content: Text('${l10n.updateFailed}: $e'),
             actions: [
               CupertinoDialogAction(
-                child: Text(l10n.confirm),
+                child: Text(l10n.confirm, style: AppTextStyles.body),
                 onPressed: () => Navigator.of(context).pop(),
               ),
             ],
@@ -329,6 +315,17 @@ class _CoachProfilePageState extends ConsumerState<CoachProfilePage> {
         );
       }
     }
+  }
+
+  /// 显示头像上传弹窗
+  void _showAvatarUploadSheet() {
+    final currentUser = ref.read(currentCoachProvider);
+    if (currentUser == null) return;
+
+    showCupertinoModalPopup(
+      context: context,
+      builder: (context) => AvatarUploadSheet(userId: currentUser.id),
+    );
   }
 
   /// 处理登出

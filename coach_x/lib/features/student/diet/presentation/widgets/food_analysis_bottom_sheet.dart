@@ -328,15 +328,20 @@ class _FoodAnalysisBottomSheetState
     final dayNumbers = ref.watch(currentDayNumbersProvider);
     final dayNum = dayNumbers['diet'] ?? 1;
 
-    // 查找当前天数的dietDay
-    final dietDayIndex = plans.dietPlan!.days.indexWhere(
-      (day) => day.day == dayNum,
-    );
-    final dietDay = dietDayIndex != -1
-        ? plans.dietPlan!.days[dietDayIndex]
-        : plans.dietPlan!.days.first;
-
-    final availableMeals = dietDay.meals;
+    // 查找当前天数的dietDay，处理空列表情况
+    List availableMeals;
+    if (plans.dietPlan!.days.isEmpty) {
+      // 自动命名模式：没有可用的 meals
+      availableMeals = [];
+    } else {
+      final dietDayIndex = plans.dietPlan!.days.indexWhere(
+        (day) => day.day == dayNum,
+      );
+      final dietDay = dietDayIndex != -1
+          ? plans.dietPlan!.days[dietDayIndex]
+          : plans.dietPlan!.days.first;
+      availableMeals = dietDay.meals;
+    }
 
     return ListView(
       padding: const EdgeInsets.all(AppDimensions.spacingL),
@@ -396,21 +401,26 @@ class _FoodAnalysisBottomSheetState
     final dayNumbers = ref.watch(currentDayNumbersProvider);
     final dayNum = dayNumbers['diet'] ?? 1;
 
-    // 查找当前天数的dietDay
-    final dietDayIndex = plans.dietPlan!.days.indexWhere(
-      (day) => day.day == dayNum,
-    );
-    final dietDay = dietDayIndex != -1
-        ? plans.dietPlan!.days[dietDayIndex]
-        : plans.dietPlan!.days.first;
+    // 查找当前天数的dietDay，处理空列表情况
+    List availableMeals;
+    if (plans.dietPlan!.days.isEmpty) {
+      // 自动命名模式：没有可用的 meals
+      availableMeals = [];
+    } else {
+      final dietDayIndex = plans.dietPlan!.days.indexWhere(
+        (day) => day.day == dayNum,
+      );
+      final dietDay = dietDayIndex != -1
+          ? plans.dietPlan!.days[dietDayIndex]
+          : plans.dietPlan!.days.first;
+      availableMeals = dietDay.meals;
+    }
 
-    final availableMeals = dietDay.meals;
-
-    // 查找选中的meal
-    final selectedMeal = state.selectedMealName != null
+    // 查找选中的meal，处理 availableMeals 为空的情况
+    final selectedMeal = state.selectedMealName != null && availableMeals.isNotEmpty
         ? availableMeals.cast<dynamic>().firstWhere(
             (meal) => meal.name == state.selectedMealName,
-            orElse: () => availableMeals.first,
+            orElse: () => null,
           )
         : null;
 
@@ -447,10 +457,12 @@ class _FoodAnalysisBottomSheetState
             return _buildAutoMealNameHint(l10n, mealNumber);
           }(),
 
-        // 营养输入卡片（仅在有计划 meal 时显示）
-        if (selectedMeal != null && availableMeals.isNotEmpty) ...[
+        // 营养输入卡片（选择餐次后显示）
+        if (state.selectedMealName != null) ...[
           const SizedBox(height: AppDimensions.spacingL),
-          MealProgressInputCard(planMeal: selectedMeal),
+          MealProgressInputCard(
+            planMeal: selectedMeal, // 可能为 null（自动命名模式）
+          ),
         ],
 
         const SizedBox(height: AppDimensions.spacingXL),

@@ -158,8 +158,9 @@ service cloud.firestore {
          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['isRead', 'updatedAt']))
       );
 
-      // 不允许删除反馈
-      allow delete: if false;
+      // 允许教练删除反馈
+      allow delete: if isSignedIn() &&
+        resource.data.coachId == request.auth.uid;
     }
 
     // ==================== Body Measure Collection ====================

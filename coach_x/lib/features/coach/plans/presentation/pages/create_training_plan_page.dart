@@ -18,6 +18,7 @@ import 'package:coach_x/features/coach/plans/presentation/providers/edit_convers
 import 'package:coach_x/features/coach/plans/presentation/widgets/create_plan/initial_view.dart';
 import 'package:coach_x/features/coach/plans/presentation/widgets/create_plan/ai_guided_view.dart';
 import 'package:coach_x/features/coach/plans/presentation/widgets/create_plan/text_import_view.dart';
+import 'package:coach_x/features/coach/plans/presentation/widgets/create_plan/text_import_summary_view.dart';
 import 'package:coach_x/features/coach/plans/presentation/widgets/create_plan/ai_streaming_view.dart';
 import 'package:coach_x/features/coach/plans/presentation/widgets/create_plan/editing_view.dart';
 import 'package:coach_x/features/coach/plans/presentation/widgets/ai_edit_chat_panel.dart';
@@ -118,7 +119,7 @@ class _CreateTrainingPlanPageState
       }
     });
 
-    // 监听页面状态变化（处理 AI Streaming 完成）
+    // 监听页面状态变化（处理 AI Streaming 完成和文本导入完成）
     ref.listen<CreatePlanPageState>(createPlanPageStateProvider, (
       previous,
       next,
@@ -133,6 +134,16 @@ class _CreateTrainingPlanPageState
           _selectedDayIndex = state.days.isNotEmpty ? 0 : null;
         });
         AppLogger.info('✅ AI Streaming 完成，默认选中第一天');
+      }
+
+      // 当从 textImportSummary 切换到 editing 时，默认选中第一天
+      if (previous == CreatePlanPageState.textImportSummary &&
+          next == CreatePlanPageState.editing) {
+        final state = ref.read(createTrainingPlanNotifierProvider);
+        setState(() {
+          _selectedDayIndex = state.days.isNotEmpty ? 0 : null;
+        });
+        AppLogger.info('✅ 文本导入完成，默认选中第一天');
       }
     });
 
@@ -267,6 +278,9 @@ class _CreateTrainingPlanPageState
       case CreatePlanPageState.textImport:
         return TextImportView(onImportSuccess: _onImportSuccess);
 
+      case CreatePlanPageState.textImportSummary:
+        return const TextImportSummaryView();
+
       case CreatePlanPageState.aiStreaming:
         return const AIStreamingView();
 
@@ -332,41 +346,15 @@ class _CreateTrainingPlanPageState
 
   /// 导入成功
   void _onImportSuccess(ImportResult result) {
-    final l10n = AppLocalizations.of(context)!;
     final notifier = ref.read(createTrainingPlanNotifierProvider.notifier);
 
     if (result.plan != null) {
-      // 加载导入的计划到状态中
+      // 加载导入的计划到状态中（内部会自动计算统计）
       notifier.loadFromImportResult(result);
 
+      // 切换到文本导入总结页面
       ref.read(createPlanPageStateProvider.notifier).state =
-          CreatePlanPageState.editing;
-      setState(() {
-        _selectedDayIndex = 0;
-      });
-
-      // 显示成功提示
-      showCupertinoDialog(
-        context: context,
-        builder: (context) => CupertinoAlertDialog(
-          title: Text(l10n.importSuccess),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (result.warnings.isNotEmpty)
-                Text(l10n.importWarnings(result.warnings.length)),
-              const SizedBox(height: 8),
-              Text(l10n.pleaseReview),
-            ],
-          ),
-          actions: [
-            CupertinoDialogAction(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text(l10n.ok),
-            ),
-          ],
-        ),
-      );
+          CreatePlanPageState.textImportSummary;
     }
   }
 
@@ -432,7 +420,7 @@ class _CreateTrainingPlanPageState
               content: Text('已成功应用 ${reviewState.acceptedCount} 处修改'),
               actions: [
                 CupertinoDialogAction(
-                  child: const Text('确定'),
+                  child: const Text('确定', style: AppTextStyles.body),
                   onPressed: () => Navigator.of(context).pop(),
                 ),
               ],
@@ -505,9 +493,10 @@ class _CreateTrainingPlanPageState
       return;
     }
 
-    // 场景 2a: aiGuided 或 textImport 状态 → 总是返回到 initial
+    // 场景 2a: aiGuided 或 textImport 或 textImportSummary 状态 → 总是返回到 initial
     if ((pageState == CreatePlanPageState.aiGuided ||
-            pageState == CreatePlanPageState.textImport) &&
+            pageState == CreatePlanPageState.textImport ||
+            pageState == CreatePlanPageState.textImportSummary) &&
         widget.planId == null) {
       ref.read(createPlanPageStateProvider.notifier).state =
           CreatePlanPageState.initial;
@@ -562,12 +551,12 @@ class _CreateTrainingPlanPageState
         ),
         actions: [
           CupertinoDialogAction(
-            child: const Text('Cancel'),
+            child: const Text('Cancel', style: AppTextStyles.body),
             onPressed: () => Navigator.of(context).pop(),
           ),
           CupertinoDialogAction(
             isDestructiveAction: true,
-            child: const Text('Delete'),
+            child: const Text('Delete', style: AppTextStyles.body),
             onPressed: () {
               Navigator.of(context).pop();
               notifier.removeDay(index);
@@ -597,12 +586,12 @@ class _CreateTrainingPlanPageState
         content: const Text('Are you sure you want to delete this movement?'),
         actions: [
           CupertinoDialogAction(
-            child: const Text('Cancel'),
+            child: const Text('Cancel', style: AppTextStyles.body),
             onPressed: () => Navigator.of(context).pop(),
           ),
           CupertinoDialogAction(
             isDestructiveAction: true,
-            child: const Text('Delete'),
+            child: const Text('Delete', style: AppTextStyles.body),
             onPressed: () {
               Navigator.of(context).pop();
               notifier.removeExercise(dayIndex, exerciseIndex);
@@ -682,7 +671,7 @@ class _CreateTrainingPlanPageState
         content: Text(message),
         actions: [
           CupertinoDialogAction(
-            child: const Text('OK'),
+            child: const Text('OK', style: AppTextStyles.body),
             onPressed: () => Navigator.of(context).pop(),
           ),
         ],

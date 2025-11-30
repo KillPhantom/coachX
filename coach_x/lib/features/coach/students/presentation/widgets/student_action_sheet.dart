@@ -19,8 +19,6 @@ class StudentActionSheet {
     showCupertinoModalPopup(
       context: context,
       builder: (context) => CupertinoActionSheet(
-        title: Text(student.name),
-        message: Text(l10n.selectAction),
         actions: [
           CupertinoActionSheetAction(
             onPressed: () {
@@ -82,7 +80,7 @@ class StudentActionSheet {
         content: Text(l10n.confirmDeleteStudent(student.name)),
         actions: [
           CupertinoDialogAction(
-            child: Text(l10n.cancel),
+            child: Text(l10n.cancel, style: AppTextStyles.body),
             onPressed: () => Navigator.pop(context),
           ),
           CupertinoDialogAction(
@@ -91,7 +89,7 @@ class StudentActionSheet {
               Navigator.pop(context);
               onConfirm();
             },
-            child: Text(l10n.delete),
+            child: Text(l10n.delete, style: AppTextStyles.body),
           ),
         ],
       ),

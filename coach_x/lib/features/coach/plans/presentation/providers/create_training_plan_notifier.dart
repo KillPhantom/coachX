@@ -7,7 +7,7 @@ import 'package:coach_x/core/utils/logger.dart';
 import 'package:coach_x/core/utils/plan_validator.dart';
 import 'package:coach_x/features/coach/plans/data/models/create_training_plan_state.dart';
 import 'package:coach_x/features/coach/plans/data/models/create_plan_page_state.dart';
-import 'package:coach_x/features/coach/plans/data/models/ai_streaming_stats.dart';
+import 'package:coach_x/features/coach/plans/data/models/plan_import_stats.dart';
 import 'package:coach_x/features/coach/plans/data/models/exercise_training_day.dart';
 import 'package:coach_x/features/coach/plans/data/models/exercise.dart';
 import 'package:coach_x/features/coach/plans/data/models/training_set.dart';
@@ -75,7 +75,7 @@ class CreateTrainingPlanNotifier
   /// 重置流式统计
   void _resetStreamingStats() {
     state = state.copyWith(
-      aiStreamingStats: const AIStreamingStats(),
+      aiStreamingStats: const PlanImportStats(),
       currentStep: 0,
       currentStepProgress: 0.0,
     );
@@ -84,7 +84,7 @@ class CreateTrainingPlanNotifier
   /// 计算动作统计
   ///
   /// 对比生成的动作和动作库，统计复用和新建的数量
-  AIStreamingStats _calculateExerciseStats() {
+  PlanImportStats _calculateExerciseStats() {
     final exerciseTemplates = _ref.read(exerciseTemplatesProvider);
     final allExercises = <String>[];
     final reusedExercises = <String>[];
@@ -114,11 +114,12 @@ class CreateTrainingPlanNotifier
       }
     }
 
-    final stats = AIStreamingStats(
+    final stats = PlanImportStats(
       totalDays: state.days.length,
       totalExercises: allExercises.toSet().length,
       reusedExercises: reusedExercises.length,
       newExercises: newExercises.length,
+      reusedExerciseNames: reusedExercises,
       newExerciseNames: newExercises,
       totalSets: totalSets,
     );
@@ -634,14 +635,9 @@ class CreateTrainingPlanNotifier
     final plan = result.plan!;
     AppLogger.info('📥 从导入结果加载计划: ${plan.name}');
 
-    // 验证计划数据
-    final errors = PlanValidator.getValidationErrors(plan);
-
-    if (errors.isNotEmpty) {
-      AppLogger.warning('导入的计划存在验证错误: ${errors.join(", ")}');
-      state = state.copyWith(errorMessage: '导入的计划数据不完整：${errors.first}');
-      return;
-    }
+    // 注意：不在此阶段验证 exerciseTemplateId
+    // 文本导入的计划在这个阶段没有 templateId 是正常的
+    // templateId 会在用户确认后批量创建并注入
 
     // 加载计划数据到状态
     state = state.copyWith(
@@ -651,7 +647,11 @@ class CreateTrainingPlanNotifier
       errorMessage: '',
     );
 
-    AppLogger.info('✅ 计划加载成功 - ${plan.totalDays} 个训练日');
+    // 计算动作统计
+    final stats = _calculateExerciseStats();
+    state = state.copyWith(aiStreamingStats: stats);
+
+    AppLogger.info('✅ 计划加载成功 - ${plan.totalDays} 个训练日，统计: $stats');
   }
 
   /// 从参数生成计划
@@ -939,6 +939,53 @@ class CreateTrainingPlanNotifier
       );
       rethrow;
     }
+  }
+
+  /// 记录手动创建的动作模板
+  ///
+  /// [exerciseName] 动作名称
+  /// [templateId] 模板 ID
+  void recordManuallyCreatedTemplate(String exerciseName, String templateId) {
+    final updated = {...state.manuallyCreatedTemplates, exerciseName: templateId};
+    state = state.copyWith(manuallyCreatedTemplates: updated);
+    AppLogger.info('📝 记录手动创建的模板: $exerciseName → $templateId');
+  }
+
+  /// 应用动作名称修改
+  ///
+  /// [nameChanges] 旧名称 → 新名称 的映射
+  void applyExerciseNameChanges(Map<String, String> nameChanges) {
+    if (nameChanges.isEmpty) return;
+
+    AppLogger.info('📝 应用动作名称修改: $nameChanges');
+
+    final updatedDays = state.days.map((day) {
+      final updatedExercises = day.exercises.map((exercise) {
+        final newName = nameChanges[exercise.name];
+        if (newName != null && newName != exercise.name) {
+          AppLogger.debug('  ${exercise.name} → $newName');
+          return exercise.copyWith(name: newName);
+        }
+        return exercise;
+      }).toList();
+
+      return day.copyWith(exercises: updatedExercises);
+    }).toList();
+
+    state = state.copyWith(days: updatedDays);
+
+    // 同时更新统计数据中的名称
+    if (state.aiStreamingStats != null) {
+      final stats = state.aiStreamingStats!;
+      final updatedNewNames = stats.newExerciseNames.map((name) {
+        return nameChanges[name] ?? name;
+      }).toList();
+
+      final updatedStats = stats.copyWith(newExerciseNames: updatedNewNames);
+      state = state.copyWith(aiStreamingStats: updatedStats);
+    }
+
+    AppLogger.info('✅ 名称修改完成');
   }
 
   /// 注入 exerciseTemplateId 到计划中

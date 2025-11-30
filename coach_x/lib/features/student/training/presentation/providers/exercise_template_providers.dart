@@ -4,20 +4,20 @@ import 'package:coach_x/features/coach/exercise_library/data/models/exercise_tem
 
 /// 根据 templateId 加载 ExerciseTemplate
 final exerciseTemplateProvider =
-    FutureProvider.family<ExerciseTemplateModel?, String>((
+    StreamProvider.family<ExerciseTemplateModel?, String>((
       ref,
       templateId,
-    ) async {
-      try {
-        final doc = await FirebaseFirestore.instance
-            .collection('exerciseTemplates')
-            .doc(templateId)
-            .get();
-
-        if (!doc.exists) return null;
-        return ExerciseTemplateModel.fromFirestore(doc);
-      } catch (e) {
-        // 加载失败时返回 null
-        return null;
-      }
+    ) {
+      return FirebaseFirestore.instance
+          .collection('exerciseTemplates')
+          .doc(templateId)
+          .snapshots()
+          .map((doc) {
+            if (!doc.exists) return null;
+            return ExerciseTemplateModel.fromFirestore(doc);
+          })
+          .handleError((e) {
+            // 加载失败时返回 null
+            return null;
+          });
     });

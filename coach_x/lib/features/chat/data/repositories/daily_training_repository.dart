@@ -50,4 +50,15 @@ abstract class DailyTrainingRepository {
     String? localPath,
     double timestamp,
   );
+
+  /// 获取指定学生在日期范围内的训练记录
+  ///
+  /// [studentId] 学生ID
+  /// [startDate] 开始日期（包含），使用本地日期
+  /// [endDate] 结束日期（包含），使用本地日期
+  Future<List<DailyTrainingModel>> getTrainingsInRange({
+    required String studentId,
+    required DateTime startDate,
+    required DateTime endDate,
+  });
 }

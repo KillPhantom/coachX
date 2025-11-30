@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:coach_x/l10n/app_localizations.dart';
 import 'package:coach_x/core/theme/app_theme.dart';
 import 'package:coach_x/routes/route_names.dart';
+import 'package:coach_x/features/coach/plans/data/models/exercise.dart';
+import 'package:coach_x/features/student/training/presentation/widgets/exercise_guidance_sheet.dart';
 import '../providers/student_home_providers.dart';
 
 /// 今日训练计划区块
@@ -104,7 +106,7 @@ class TodayTrainingPlanSection extends ConsumerWidget {
 
   /// 构建动作列表
   Widget _buildExercisesList(
-    List exercises,
+    List<Exercise> exercises,
     AppLocalizations l10n,
     BuildContext context,
   ) {
@@ -132,7 +134,7 @@ class TodayTrainingPlanSection extends ConsumerWidget {
 
   /// 构建单个动作卡片
   Widget _buildExerciseCard(
-    dynamic exercise,
+    Exercise exercise,
     AppLocalizations l10n,
     BuildContext context,
   ) {
@@ -201,15 +203,16 @@ class TodayTrainingPlanSection extends ConsumerWidget {
   /// 显示视频或 placeholder
   void _showVideoOrPlaceholder(
     BuildContext context,
-    dynamic exercise,
+    Exercise exercise,
     AppLocalizations l10n,
   ) {
-    // 检查是否有视频
-    if (exercise.demoVideos == null || exercise.demoVideos.isEmpty) {
+    final templateId = exercise.exerciseTemplateId;
+    if (templateId == null || templateId.isEmpty) {
+      // 无关联动作模板，显示 Coming Soon
       _showComingSoonDialog(context, l10n);
     } else {
-      // TODO: 未来实现视频播放功能
-      _showComingSoonDialog(context, l10n);
+      // 显示动作指导弹窗
+      ExerciseGuidanceSheet.show(context, templateId);
     }
   }
 
@@ -226,7 +229,7 @@ class TodayTrainingPlanSection extends ConsumerWidget {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: Text(l10n.ok),
+              child: Text(l10n.ok, style: AppTextStyles.body),
             ),
           ],
         );

@@ -52,7 +52,7 @@ def _should_extract_keyframes(data: Dict[str, Any]) -> bool:
 
         # 检查是否有需要处理的视频
         for exercise in exercises:
-            videos = exercise.get('videos', [])
+            videos = exercise.get('medias', exercise.get('videos', []))
             keyframes = exercise.get('keyframes', [])
 
             # 如果有视频但没有关键帧，需要提取
@@ -84,7 +84,7 @@ def _process_training_videos(training_id: str, exercises: List[Dict[str, Any]]) 
     try:
         # 遍历每个 exercise
         for exercise_index, exercise in enumerate(exercises):
-            videos = exercise.get('videos', [])
+            videos = exercise.get('medias', exercise.get('videos', []))
             keyframes = exercise.get('keyframes', [])
 
             # 跳过已有关键帧或无视频的 exercise
@@ -95,7 +95,19 @@ def _process_training_videos(training_id: str, exercises: List[Dict[str, Any]]) 
             logger.info(f'🎬 处理动作视频: {exercise_name} (索引 {exercise_index})')
 
             # 只处理第一个视频（如果有多个视频，可以遍历）
-            video_url = videos[0]
+            video_data = videos[0]
+            video_url = None
+            
+            if isinstance(video_data, str):
+                video_url = video_data
+            elif isinstance(video_data, dict):
+                # Handle wrapper {'media': ...} or {'video': ...} or direct object
+                inner = video_data.get('media') or video_data.get('video') or video_data
+                video_url = inner.get('downloadUrl')
+            
+            if not video_url:
+                logger.warning(f'⚠️ 无法获取视频URL: {exercise_name}')
+                continue
 
             try:
                 # 1. 下载视频

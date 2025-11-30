@@ -7,6 +7,8 @@ import 'package:coach_x/core/utils/logger.dart';
 import 'package:coach_x/app/providers.dart';
 import 'package:coach_x/features/chat/presentation/providers/chat_detail_providers.dart';
 import 'package:coach_x/features/chat/presentation/providers/chat_providers.dart';
+import 'package:coach_x/features/chat/data/models/message_model.dart';
+import 'package:coach_x/features/auth/data/models/user_model.dart';
 import 'package:logger/web.dart';
 import 'message_bubble.dart';
 
@@ -41,9 +43,10 @@ class _ChatTabContentState extends ConsumerState<ChatTabContent> {
   }
 
   void _onScroll() {
-    // 当滚动到顶部时加载更多历史消息
-    if (_scrollController.position.pixels <=
-        _scrollController.position.minScrollExtent + 100) {
+    // 当滚动到视觉顶部时加载更多历史消息
+    // 注意：ListView 使用 reverse: true，所以 maxScrollExtent 是视觉顶部（最早消息）
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 100) {
       _loadMoreMessages();
     }
   }
@@ -67,10 +70,11 @@ class _ChatTabContentState extends ConsumerState<ChatTabContent> {
   }
 
   /// 滚动到底部
+  /// 注意：ListView 使用 reverse: true，所以 minScrollExtent 是视觉底部（最新消息）
   void _scrollToBottom() {
     if (_scrollController.hasClients) {
       _scrollController.animateTo(
-        _scrollController.position.maxScrollExtent,
+        _scrollController.position.minScrollExtent,
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeOut,
       );
@@ -96,12 +100,33 @@ class _ChatTabContentState extends ConsumerState<ChatTabContent> {
     }
   }
 
+  /// 获取用户头像URL
+  String? _getAvatarUrl(
+    String senderId,
+    UserModel? currentUser,
+    UserModel? otherUser,
+  ) {
+    // 1. 如果是当前用户，直接使用当前用户的最新头像
+    if (currentUser != null && senderId == currentUser.id) {
+      return currentUser.avatarUrl;
+    }
+
+    // 2. 如果是对方，使用对方的最新头像
+    if (otherUser != null && senderId == otherUser.id) {
+      return otherUser.avatarUrl;
+    }
+
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
     final currentUser = ref.watch(currentUserProvider).value;
     final messagesAsync = ref.watch(
       messagesStreamProvider(widget.conversationId),
     );
+    final otherUser =
+        ref.watch(otherUserProvider(widget.conversationId)).value;
 
     if (currentUser == null) {
       return const Center(child: Text('用户未登录'));
@@ -118,11 +143,21 @@ class _ChatTabContentState extends ConsumerState<ChatTabContent> {
 
           // 标记消息为已读（带防抖）
           if (messages.isNotEmpty) {
-            _markAsReadTimer?.cancel();
-            _markAsReadTimer = Timer(
-              const Duration(milliseconds: 300),
-              () => _markMessagesAsRead(),
-            );
+            // 检查是否有未读消息（当前用户是接收者且状态不是已读）
+            final hasUnread = messages.any((msg) =>
+                msg.receiverId == currentUser.id &&
+                msg.status != MessageStatus.read);
+
+            if (hasUnread) {
+              AppLogger.info('📨 检测到未读消息，准备标记为已读');
+              _markAsReadTimer?.cancel();
+              _markAsReadTimer = Timer(
+                const Duration(milliseconds: 300),
+                () => _markMessagesAsRead(),
+              );
+            } else {
+              AppLogger.info('✅ 无未读消息，跳过标记已读调用（优化）');
+            }
           }
         });
 
@@ -139,9 +174,35 @@ class _ChatTabContentState extends ConsumerState<ChatTabContent> {
             itemCount: messages.length,
             itemBuilder: (context, index) {
               final message = messages[index];
-              return MessageBubble(
+
+              // 计算是否显示时间戳
+              // 注意：列表是反转的 (index 0 是最新消息)
+              bool showTimestamp = false;
+              if (index == messages.length - 1) {
+                // 最早的一条消息总是显示时间戳
+                showTimestamp = true;
+              } else {
+                // 与上一条消息（列表中的下一个元素）比较
+                final previousMessage = messages[index + 1];
+                final diff =
+                    message.createdAt.difference(previousMessage.createdAt);
+                // 超过5分钟显示时间戳
+                if (diff.abs().inMinutes > 5) {
+                  showTimestamp = true;
+                }
+              }
+
+                final avatarUrl = _getAvatarUrl(
+                  message.senderId,
+                  currentUser,
+                  otherUser,
+                );
+
+                return MessageBubble(
                 message: message,
                 currentUserId: currentUser.id,
+                avatarUrl: avatarUrl,
+                showTimestamp: showTimestamp,
               );
             },
           ),

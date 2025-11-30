@@ -193,12 +193,12 @@ class _PlansPageState extends ConsumerState<PlansPage> {
           CupertinoDialogAction(
             isDefaultAction: true,
             onPressed: () => Navigator.pop(context, false),
-            child: Text(l10n.cancel),
+            child: Text(l10n.cancel, style: AppTextStyles.body),
           ),
           CupertinoDialogAction(
             isDestructiveAction: isDestructive,
             onPressed: () => Navigator.pop(context, true),
-            child: Text(confirmText),
+            child: Text(confirmText, style: AppTextStyles.body),
           ),
         ],
       ),
@@ -220,7 +220,7 @@ class _PlansPageState extends ConsumerState<PlansPage> {
         actions: [
           CupertinoDialogAction(
             onPressed: () => Navigator.pop(context),
-            child: Text(l10n.confirm),
+            child: Text(l10n.confirm, style: AppTextStyles.body),
           ),
         ],
       ),
@@ -240,7 +240,7 @@ class _PlansPageState extends ConsumerState<PlansPage> {
         actions: [
           CupertinoDialogAction(
             onPressed: () => Navigator.pop(context),
-            child: Text(l10n.confirm),
+            child: Text(l10n.confirm, style: AppTextStyles.body),
           ),
         ],
       ),

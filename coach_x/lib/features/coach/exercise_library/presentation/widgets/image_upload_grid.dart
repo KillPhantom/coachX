@@ -237,7 +237,7 @@ class _ImageUploadGridState extends ConsumerState<ImageUploadGrid> {
             content: Text(e.toString()),
             actions: [
               CupertinoDialogAction(
-                child: Text(AppLocalizations.of(context)!.cancel),
+                child: Text(AppLocalizations.of(context)!.cancel, style: AppTextStyles.body),
                 onPressed: () => Navigator.pop(context),
               ),
             ],
@@ -257,7 +257,7 @@ class _ImageUploadGridState extends ConsumerState<ImageUploadGrid> {
         content: Text(l10n.deleteImageMessage),
         actions: [
           CupertinoDialogAction(
-            child: Text(l10n.cancel),
+            child: Text(l10n.cancel, style: AppTextStyles.body),
             onPressed: () => Navigator.pop(context),
           ),
           CupertinoDialogAction(
@@ -269,7 +269,7 @@ class _ImageUploadGridState extends ConsumerState<ImageUploadGrid> {
               widget.onImagesChanged(List.from(_uploadedUrls));
               Navigator.pop(context);
             },
-            child: Text(l10n.delete),
+            child: Text(l10n.delete, style: AppTextStyles.body),
           ),
         ],
       ),

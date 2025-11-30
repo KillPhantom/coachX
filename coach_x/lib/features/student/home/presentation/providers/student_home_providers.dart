@@ -132,7 +132,7 @@ final activeExercisePlanIdProvider = Provider<String?>((ref) {
   return userData.when(
     data: (user) => user?.activeExercisePlanId,
     loading: () => null,
-    error: (_, __) => null,
+    error: (_, _) => null,
   );
 });
 
@@ -144,7 +144,7 @@ final activeDietPlanIdProvider = Provider<String?>((ref) {
   return userData.when(
     data: (user) => user?.activeDietPlanId,
     loading: () => null,
-    error: (_, __) => null,
+    error: (_, _) => null,
   );
 });
 
@@ -156,7 +156,7 @@ final activeSupplementPlanIdProvider = Provider<String?>((ref) {
   return userData.when(
     data: (user) => user?.activeSupplementPlanId,
     loading: () => null,
-    error: (_, __) => null,
+    error: (_, _) => null,
   );
 });
 
@@ -395,13 +395,20 @@ final dietProgressProvider = Provider<Map<String, double>?>((ref) {
   final meals = todayTraining.diet?.meals ?? [];
   final actualMacros = meals.isNotEmpty ? _calculateActualIntake(meals) : null;
 
-  // 获取计划的目标营养
+  // 获取计划的目标营养（处理 days 为空的情况）
   final dayNum = dayNumbers['diet'] ?? 1;
-  final dietDay = plans.dietPlan!.days.firstWhere(
-    (day) => day.day == dayNum,
-    orElse: () => plans.dietPlan!.days.first,
-  );
-  final targetMacros = dietDay.macros;
+  Macros targetMacros;
+
+  if (plans.dietPlan!.days.isEmpty) {
+    // 教练未设置具体餐次，使用 dietPlan 的 targetMacros 或返回零值
+    targetMacros = Macros.zero();
+  } else {
+    final dietDay = plans.dietPlan!.days.firstWhere(
+      (day) => day.day == dayNum,
+      orElse: () => plans.dietPlan!.days.first,
+    );
+    targetMacros = dietDay.macros;
+  }
 
   // 计算进度
   return _calculateDietProgress(actualMacros, targetMacros);

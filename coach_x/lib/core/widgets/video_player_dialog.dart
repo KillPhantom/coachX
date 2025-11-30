@@ -405,7 +405,10 @@ class _VideoPlayerDialogState extends ConsumerState<VideoPlayerDialog> {
       final storagePath =
           'training_keyframes/$trainingId/ex${exerciseIndex}_v${videoIndex}_frame$frameIndex.jpg';
       final file = File(framePath);
-      final url = await StorageService.uploadFile(file, storagePath);
+      final url = await StorageService.uploadFile(
+        file: file,
+        storagePath: storagePath,
+      );
 
       // 更新 Firestore URL
       await _updateKeyframeUrl(trainingId, exerciseIndex, videoIndex, frameIndex, url);
@@ -515,7 +518,7 @@ class _VideoPlayerDialogState extends ConsumerState<VideoPlayerDialog> {
         actions: [
           CupertinoDialogAction(
             onPressed: () => Navigator.pop(context),
-            child: const Text('OK'),
+            child: const Text('OK', style: AppTextStyles.body),
           ),
         ],
       ),

@@ -3,7 +3,7 @@ import 'package:coach_x/core/enums/ai_status.dart';
 import 'package:coach_x/features/coach/plans/data/models/exercise_training_day.dart';
 import 'package:coach_x/features/coach/plans/data/models/ai/ai_suggestion.dart';
 import 'package:coach_x/core/utils/plan_validator.dart';
-import 'ai_streaming_stats.dart';
+import 'plan_import_stats.dart';
 import 'exercise_plan_model.dart';
 import 'plan_generation_params.dart';
 
@@ -28,8 +28,8 @@ class CreateTrainingPlanState {
   /// 当前正在生成的天数
   final int? currentDayNumber;
 
-  /// AI 流式生成统计
-  final AIStreamingStats? aiStreamingStats;
+  /// 计划导入统计（AI 生成、文本导入等）
+  final PlanImportStats? aiStreamingStats;
 
   /// 当前执行步骤 (1-4)
   final int currentStep;
@@ -39,6 +39,10 @@ class CreateTrainingPlanState {
 
   /// 上一次 AI 生成使用的参数（用于重试）
   final PlanGenerationParams? lastGenerationParams;
+
+  /// 手动创建的动作模板映射（动作名称 -> 模板 ID）
+  /// 用于记录通过 "create guidance" 创建的模板
+  final Map<String, String> manuallyCreatedTemplates;
 
   const CreateTrainingPlanState({
     this.planId,
@@ -59,6 +63,7 @@ class CreateTrainingPlanState {
     this.currentStep = 0,
     this.currentStepProgress = 0.0,
     this.lastGenerationParams,
+    this.manuallyCreatedTemplates = const {},
   });
 
   /// 复制并修改部分字段
@@ -77,10 +82,11 @@ class CreateTrainingPlanState {
     bool? isEditMode,
     ExerciseTrainingDay? currentDayInProgress,
     int? currentDayNumber,
-    AIStreamingStats? aiStreamingStats,
+    PlanImportStats? aiStreamingStats,
     int? currentStep,
     double? currentStepProgress,
     PlanGenerationParams? lastGenerationParams,
+    Map<String, String>? manuallyCreatedTemplates,
   }) {
     return CreateTrainingPlanState(
       planId: planId ?? this.planId,
@@ -102,6 +108,8 @@ class CreateTrainingPlanState {
       currentStep: currentStep ?? this.currentStep,
       currentStepProgress: currentStepProgress ?? this.currentStepProgress,
       lastGenerationParams: lastGenerationParams ?? this.lastGenerationParams,
+      manuallyCreatedTemplates:
+          manuallyCreatedTemplates ?? this.manuallyCreatedTemplates,
     );
   }
 

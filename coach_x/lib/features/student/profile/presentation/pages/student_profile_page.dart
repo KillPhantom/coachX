@@ -4,14 +4,23 @@ import 'package:go_router/go_router.dart';
 import 'package:coach_x/l10n/app_localizations.dart';
 import 'package:coach_x/core/theme/app_theme.dart';
 import 'package:coach_x/core/utils/unit_converter.dart';
+import 'package:coach_x/core/utils/toast_utils.dart';
+import 'package:coach_x/core/utils/logger.dart';
 import 'package:coach_x/core/services/auth_service.dart';
+import 'package:coach_x/core/services/cache/user_avatar_cache_service.dart';
 import 'package:coach_x/core/providers/locale_providers.dart';
+import 'package:coach_x/core/enums/gender.dart';
 import 'package:coach_x/routes/route_names.dart';
 import 'package:coach_x/features/shared/profile/presentation/widgets/profile_header.dart';
 import 'package:coach_x/features/shared/profile/presentation/widgets/info_card.dart';
 import 'package:coach_x/features/shared/profile/presentation/widgets/info_row.dart';
 import 'package:coach_x/features/shared/profile/presentation/widgets/settings_row.dart';
+import 'package:coach_x/features/shared/profile/presentation/widgets/avatar_upload_sheet.dart';
 import 'package:coach_x/features/student/profile/presentation/widgets/coach_info_card.dart';
+import 'package:coach_x/features/student/profile/presentation/widgets/edit_name_dialog.dart';
+import 'package:coach_x/features/student/profile/presentation/widgets/edit_gender_selector.dart';
+import 'package:coach_x/features/student/profile/presentation/widgets/edit_born_date_picker.dart';
+import 'package:coach_x/features/student/profile/presentation/widgets/edit_height_dialog.dart';
 import 'package:coach_x/features/student/profile/presentation/providers/student_profile_providers.dart';
 import 'package:coach_x/features/auth/data/providers/user_providers.dart';
 
@@ -43,6 +52,11 @@ class _StudentProfilePageState extends ConsumerState<StudentProfilePage> {
       child: SafeArea(
         child: CustomScrollView(
           slivers: [
+            // 下拉刷新
+            CupertinoSliverRefreshControl(
+              onRefresh: () => _handleRefresh(currentUser.coachId),
+            ),
+
             // 顶部导航栏
             SliverToBoxAdapter(
               child: Padding(
@@ -59,22 +73,7 @@ class _StudentProfilePageState extends ConsumerState<StudentProfilePage> {
                 avatarUrl: currentUser.avatarUrl,
                 name: currentUser.name,
                 roleText: l10n.student,
-                onEditTap: () {
-                  // TODO: 实现头像编辑功能
-                  showCupertinoDialog(
-                    context: context,
-                    builder: (context) => CupertinoAlertDialog(
-                      title: Text(l10n.alert),
-                      content: Text(l10n.avatarEditInDevelopment),
-                      actions: [
-                        CupertinoDialogAction(
-                          child: Text(l10n.confirm),
-                          onPressed: () => Navigator.of(context).pop(),
-                        ),
-                      ],
-                    ),
-                  );
-                },
+                onEditTap: _showAvatarUploadSheet,
               ),
             ),
 
@@ -90,25 +89,42 @@ class _StudentProfilePageState extends ConsumerState<StudentProfilePage> {
                     title: l10n.personalInformation,
                     child: Column(
                       children: [
+                        // 昵称
                         InfoRow(
-                          label: l10n.age,
-                          value: UnitConverter.formatAge(currentUser.bornDate),
+                          label: l10n.nickname,
+                          value: currentUser.name,
                           showDivider: true,
+                          onTap: _showEditNameDialog,
                         ),
+                        // 性别
+                        InfoRow(
+                          label: l10n.gender,
+                          value: currentUser.gender != null
+                              ? (currentUser.gender == Gender.male
+                                    ? l10n.male
+                                    : l10n.female)
+                              : '--',
+                          showDivider: true,
+                          onTap: _showEditGenderDialog,
+                        ),
+                        // 出生日期
+                        InfoRow(
+                          label: l10n.bornDate,
+                          value: UnitConverter.formatBornDate(
+                            currentUser.bornDate,
+                          ),
+                          showDivider: true,
+                          onTap: _showEditBornDatePicker,
+                        ),
+                        // 身高
                         InfoRow(
                           label: l10n.height,
                           value: UnitConverter.formatHeight(
                             currentUser.height,
                             useMetric: isMetric,
                           ),
-                          showDivider: true,
-                        ),
-                        InfoRow(
-                          label: l10n.weight,
-                          value: UnitConverter.formatWeight(
-                            currentUser.initialWeight,
-                            useMetric: isMetric,
-                          ),
+                          showDivider: false,
+                          onTap: _showEditHeightDialog,
                         ),
                       ],
                     ),
@@ -211,7 +227,10 @@ class _StudentProfilePageState extends ConsumerState<StudentProfilePage> {
                                 content: Text(l10n.featureInDevelopment),
                                 actions: [
                                   CupertinoDialogAction(
-                                    child: Text(l10n.confirm),
+                                    child: Text(
+                                      l10n.confirm,
+                                      style: AppTextStyles.body,
+                                    ),
                                     onPressed: () =>
                                         Navigator.of(context).pop(),
                                   ),
@@ -287,7 +306,7 @@ class _StudentProfilePageState extends ConsumerState<StudentProfilePage> {
             content: Text('${l10n.updateFailed}: $e'),
             actions: [
               CupertinoDialogAction(
-                child: Text(l10n.confirm),
+                child: Text(l10n.confirm, style: AppTextStyles.body),
                 onPressed: () => Navigator.of(context).pop(),
               ),
             ],
@@ -350,7 +369,7 @@ class _StudentProfilePageState extends ConsumerState<StudentProfilePage> {
             content: Text('${l10n.updateFailed}: $e'),
             actions: [
               CupertinoDialogAction(
-                child: Text(l10n.confirm),
+                child: Text(l10n.confirm, style: AppTextStyles.body),
                 onPressed: () => Navigator.of(context).pop(),
               ),
             ],
@@ -358,6 +377,17 @@ class _StudentProfilePageState extends ConsumerState<StudentProfilePage> {
         );
       }
     }
+  }
+
+  /// 显示头像上传弹窗
+  void _showAvatarUploadSheet() {
+    final currentUser = ref.read(currentStudentProvider);
+    if (currentUser == null) return;
+
+    showCupertinoModalPopup(
+      context: context,
+      builder: (context) => AvatarUploadSheet(userId: currentUser.id),
+    );
   }
 
   /// 处理登出
@@ -383,11 +413,96 @@ class _StudentProfilePageState extends ConsumerState<StudentProfilePage> {
                 context.go(RouteNames.login);
               }
             },
-            child: Text(l10n.logOut),
+            child: Text(l10n.logOut, style: AppTextStyles.body),
           ),
         ],
       ),
     );
+  }
+
+  /// 显示昵称编辑对话框
+  void _showEditNameDialog() {
+    final currentUser = ref.read(currentStudentProvider);
+    if (currentUser == null) return;
+
+    showCupertinoDialog(
+      context: context,
+      builder: (context) => EditNameDialog(
+        currentName: currentUser.name,
+        onSave: (newName) => _updateUserField('name', newName),
+      ),
+    );
+  }
+
+  /// 显示性别选择器
+  void _showEditGenderDialog() {
+    final currentUser = ref.read(currentStudentProvider);
+    if (currentUser == null) return;
+
+    showCupertinoModalPopup(
+      context: context,
+      builder: (context) => EditGenderSelector(
+        currentGender: currentUser.gender,
+        onSave: (newGender) => _updateUserField('gender', newGender.value),
+      ),
+    );
+  }
+
+  /// 显示出生日期选择器
+  void _showEditBornDatePicker() {
+    final currentUser = ref.read(currentStudentProvider);
+    if (currentUser == null) return;
+
+    showCupertinoModalPopup(
+      context: context,
+      builder: (context) => EditBornDatePicker(
+        currentBornDate: currentUser.bornDate,
+        onSave: (newDate) {
+          final formattedDate =
+              '${newDate.year}-${newDate.month.toString().padLeft(2, '0')}-${newDate.day.toString().padLeft(2, '0')}';
+          return _updateUserField('bornDate', formattedDate);
+        },
+      ),
+    );
+  }
+
+  /// 显示身高编辑对话框
+  void _showEditHeightDialog() {
+    final currentUser = ref.read(currentStudentProvider);
+    if (currentUser == null) return;
+
+    final isMetric = ref.read(isMetricProvider);
+
+    showCupertinoDialog(
+      context: context,
+      builder: (context) => EditHeightDialog(
+        currentHeight: currentUser.height,
+        isMetric: isMetric,
+        onSave: (newHeight) => _updateUserField('height', newHeight),
+      ),
+    );
+  }
+
+  /// 通用字段更新方法
+  Future<void> _updateUserField(String fieldName, dynamic value) async {
+    final currentUser = ref.read(currentStudentProvider);
+    if (currentUser == null) return;
+
+    try {
+      final userRepo = ref.read(userRepositoryProvider);
+      await userRepo.updateUser(currentUser.id, {fieldName: value});
+
+      if (mounted) {
+        final l10n = AppLocalizations.of(context)!;
+        ToastUtils.showSuccessToast(context, l10n.updateSuccess);
+      }
+    } catch (e, stackTrace) {
+      AppLogger.error('Failed to update $fieldName', e, stackTrace);
+      if (mounted) {
+        final l10n = AppLocalizations.of(context)!;
+        ToastUtils.showErrorToast(context, '${l10n.updateFailed}: $e');
+      }
+    }
   }
 
   /// 构建无教练卡片
@@ -424,5 +539,17 @@ class _StudentProfilePageState extends ConsumerState<StudentProfilePage> {
         textAlign: TextAlign.center,
       ),
     );
+  }
+
+  /// 处理下拉刷新
+  Future<void> _handleRefresh(String? coachId) async {
+    // 强制刷新教练头像缓存
+    if (coachId != null) {
+      await UserAvatarCacheService.forceRefreshAvatar(coachId);
+    }
+
+    // 刷新教练信息 Provider
+    ref.invalidate(coachInfoProvider);
+    ref.invalidate(coachAvatarUrlProvider);
   }
 }

@@ -119,7 +119,7 @@ class InvitationCodeItem extends StatelessWidget {
         content: const Text('邀请码已复制'),
         actions: [
           CupertinoDialogAction(
-            child: const Text('确定'),
+            child: const Text('确定', style: AppTextStyles.body),
             onPressed: () => Navigator.of(context).pop(),
           ),
         ],

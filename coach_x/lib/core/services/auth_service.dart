@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:coach_x/core/utils/logger.dart';
 import 'package:coach_x/core/services/user_cache_service.dart';
+import 'package:coach_x/core/services/cache/user_avatar_cache_service.dart';
 
 /// Firebase Authentication服务
 ///
@@ -90,6 +91,9 @@ class AuthService {
 
       // 清除用户缓存
       await UserCacheService.clearCache();
+
+      // 清除头像缓存
+      await UserAvatarCacheService.invalidateAllAvatars();
 
       // 退出Firebase认证
       await _auth.signOut();

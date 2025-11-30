@@ -3,6 +3,7 @@ import 'package:coach_x/core/enums/muscle_group.dart';
 import 'package:coach_x/core/enums/equipment.dart';
 import 'package:coach_x/core/enums/training_level.dart';
 import 'package:coach_x/core/enums/workload_level.dart';
+import 'package:coach_x/core/enums/training_style.dart';
 import 'package:coach_x/features/coach/exercise_library/data/models/exercise_template_model.dart';
 
 /// 训练计划生成参数
@@ -42,6 +43,9 @@ class PlanGenerationParams {
   /// 可用设备（可多选）
   final List<Equipment> equipment;
 
+  /// 训练风格（可多选）
+  final List<TrainingStyle> trainingStyles;
+
   /// 补充说明（可选）
   final String? notes;
 
@@ -65,6 +69,7 @@ class PlanGenerationParams {
     required this.setsPerExerciseMin,
     required this.setsPerExerciseMax,
     required this.equipment,
+    this.trainingStyles = const [],
     this.notes,
     this.language = '中文',
     this.exerciseTemplates,
@@ -84,6 +89,7 @@ class PlanGenerationParams {
       setsPerExerciseMin: 3,
       setsPerExerciseMax: 5,
       equipment: [Equipment.barbell, Equipment.dumbbell],
+      trainingStyles: [],
       notes: null,
       language: '中文',
     );
@@ -102,6 +108,7 @@ class PlanGenerationParams {
     int? setsPerExerciseMin,
     int? setsPerExerciseMax,
     List<Equipment>? equipment,
+    List<TrainingStyle>? trainingStyles,
     String? notes,
     String? language,
     List<ExerciseTemplateModel>? exerciseTemplates,
@@ -118,6 +125,7 @@ class PlanGenerationParams {
       setsPerExerciseMin: setsPerExerciseMin ?? this.setsPerExerciseMin,
       setsPerExerciseMax: setsPerExerciseMax ?? this.setsPerExerciseMax,
       equipment: equipment ?? this.equipment,
+      trainingStyles: trainingStyles ?? this.trainingStyles,
       notes: notes ?? this.notes,
       language: language ?? this.language,
       exerciseTemplates: exerciseTemplates ?? this.exerciseTemplates,
@@ -138,6 +146,7 @@ class PlanGenerationParams {
       'sets_per_exercise_min': setsPerExerciseMin,
       'sets_per_exercise_max': setsPerExerciseMax,
       'equipment': equipment.map((e) => e.toJsonString()).toList(),
+      'training_styles': trainingStyles.map((s) => s.toJsonString()).toList(),
       if (notes != null) 'notes': notes,
       'language': language,
       // 动作库列表（传递完整数据：id + name + tags）
@@ -172,6 +181,10 @@ class PlanGenerationParams {
       equipment: (json['equipment'] as List<dynamic>)
           .map((e) => equipmentFromString(e as String))
           .toList(),
+      trainingStyles: (json['training_styles'] as List<dynamic>?)
+              ?.map((s) => trainingStyleFromString(s as String))
+              .toList() ??
+          [],
       notes: json['notes'] as String?,
       language: json['language'] as String? ?? '中文',
     );

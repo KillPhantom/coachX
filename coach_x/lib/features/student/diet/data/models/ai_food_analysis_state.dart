@@ -12,6 +12,9 @@ class AIFoodAnalysisState {
   /// 分析进度 (0.0 - 1.0)
   final double progress;
 
+  /// 上传进度 (0.0 - 1.0)
+  final double uploadProgress;
+
   /// 识别的食物列表
   final List<RecognizedFood> foods;
 
@@ -46,6 +49,7 @@ class AIFoodAnalysisState {
     this.isAnalyzing = false,
     this.isUploading = false,
     this.progress = 0.0,
+    this.uploadProgress = 0.0,
     this.foods = const [],
     this.errorMessage,
     this.selectedMealName,
@@ -101,6 +105,7 @@ class AIFoodAnalysisState {
     bool? isAnalyzing,
     bool? isUploading,
     double? progress,
+    double? uploadProgress,
     List<RecognizedFood>? foods,
     String? errorMessage,
     String? selectedMealName,
@@ -116,6 +121,7 @@ class AIFoodAnalysisState {
       isAnalyzing: isAnalyzing ?? this.isAnalyzing,
       isUploading: isUploading ?? this.isUploading,
       progress: progress ?? this.progress,
+      uploadProgress: uploadProgress ?? this.uploadProgress,
       foods: foods ?? this.foods,
       errorMessage: errorMessage,
       selectedMealName: selectedMealName ?? this.selectedMealName,

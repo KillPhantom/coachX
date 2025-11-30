@@ -44,12 +44,9 @@ class _BodyStatsInputSheetState extends ConsumerState<BodyStatsInputSheet> {
       if (image != null) {
         String? compressedPath;
         try {
-          // 步骤2: 使用 ImageCompressor 压缩图片
-          compressedPath = await ImageCompressor.compressImage(
+          // 步骤2: 使用 ImageCompressor 压缩图片（用户查看用配置）
+          compressedPath = await ImageCompressor.compressImageForUser(
             image.path,
-            quality: 85,
-            maxWidth: 1920,
-            maxHeight: 1920,
           );
 
           // 步骤3: 添加压缩后的图片路径
@@ -148,7 +145,7 @@ class _BodyStatsInputSheetState extends ConsumerState<BodyStatsInputSheet> {
         content: Text(message),
         actions: [
           CupertinoDialogAction(
-            child: Text(l10n.ok),
+            child: Text(l10n.ok, style: AppTextStyles.body),
             onPressed: () => Navigator.of(context).pop(),
           ),
         ],
@@ -171,12 +168,12 @@ class _BodyStatsInputSheetState extends ConsumerState<BodyStatsInputSheet> {
         actions: [
           CupertinoDialogAction(
             onPressed: () => Navigator.of(context).pop(false),
-            child: Text(l10n.cancel),
+            child: Text(l10n.cancel, style: AppTextStyles.body),
           ),
           CupertinoDialogAction(
             isDestructiveAction: true,
             onPressed: () => Navigator.of(context).pop(true),
-            child: Text(l10n.replace),
+            child: Text(l10n.replace, style: AppTextStyles.body),
           ),
         ],
       ),

@@ -163,6 +163,9 @@ class FeedbackRepositoryImpl implements FeedbackRepository {
     String? voiceUrl,
     int? voiceDuration,
     String? imageUrl,
+    String? videoUrl,
+    String? videoThumbnailUrl,
+    int? videoDuration,
   }) async {
     try {
       final now = DateTime.now().millisecondsSinceEpoch;
@@ -179,6 +182,9 @@ class FeedbackRepositoryImpl implements FeedbackRepository {
         'voiceUrl': voiceUrl,
         'voiceDuration': voiceDuration,
         'imageUrl': imageUrl,
+        'videoUrl': videoUrl,
+        'videoThumbnailUrl': videoThumbnailUrl,
+        'videoDuration': videoDuration,
         'createdAt': now,
         'isRead': false,
       };
@@ -245,6 +251,55 @@ class FeedbackRepositoryImpl implements FeedbackRepository {
   }
 
   @override
+  Future<String> uploadVideoFile(
+    String filePath,
+    String dailyTrainingId,
+  ) async {
+    try {
+      final timestamp = DateTime.now().millisecondsSinceEpoch;
+      final fileExtension = filePath.split('.').last;
+      final fileName = 'video_$timestamp.$fileExtension';
+      final storagePath = 'feedback_videos/$dailyTrainingId/$fileName';
+
+      AppLogger.info('上传视频文件: $storagePath');
+
+      final ref = FirebaseStorage.instance.ref(storagePath);
+      await ref.putFile(File(filePath));
+      final downloadUrl = await ref.getDownloadURL();
+
+      AppLogger.info('视频文件上传成功: $downloadUrl');
+      return downloadUrl;
+    } catch (e, stackTrace) {
+      AppLogger.error('上传视频文件失败: $filePath', e, stackTrace);
+      rethrow;
+    }
+  }
+
+  @override
+  Future<String> uploadVideoThumbnail(
+    String filePath,
+    String dailyTrainingId,
+  ) async {
+    try {
+      final timestamp = DateTime.now().millisecondsSinceEpoch;
+      final fileName = 'video_thumb_$timestamp.jpg';
+      final storagePath = 'feedback_videos/$dailyTrainingId/$fileName';
+
+      AppLogger.info('上传视频缩略图: $storagePath');
+
+      final ref = FirebaseStorage.instance.ref(storagePath);
+      await ref.putFile(File(filePath));
+      final downloadUrl = await ref.getDownloadURL();
+
+      AppLogger.info('视频缩略图上传成功: $downloadUrl');
+      return downloadUrl;
+    } catch (e, stackTrace) {
+      AppLogger.error('上传视频缩略图失败: $filePath', e, stackTrace);
+      rethrow;
+    }
+  }
+
+  @override
   Stream<List<TrainingFeedbackModel>> getExerciseHistoryFeedbacks({
     required String studentId,
     required String exerciseTemplateId,
@@ -290,10 +345,9 @@ class FeedbackRepositoryImpl implements FeedbackRepository {
     try {
       AppLogger.info('查询图文项反馈: $dailyTrainingId');
 
-      // 构建查询条件：仅查询无 exerciseTemplateId 的反馈
+      // 构建查询条件：查询 dailyTrainingId，然后在代码中过滤无 exerciseTemplateId 的反馈
       final where = <List<dynamic>>[
         ['dailyTrainingId', '==', dailyTrainingId],
-        ['exerciseTemplateId', '==', null],
       ];
 
       return FirestoreService.watchCollection(
@@ -303,11 +357,14 @@ class FeedbackRepositoryImpl implements FeedbackRepository {
         descending: true,
         limit: limit,
       ).map((snapshot) {
-        return snapshot.docs.map((doc) {
-          final data = doc.data() as Map<String, dynamic>;
-          data['id'] = doc.id;
-          return TrainingFeedbackModel.fromJson(data);
-        }).toList();
+        return snapshot.docs
+            .map((doc) {
+              final data = doc.data() as Map<String, dynamic>;
+              data['id'] = doc.id;
+              return TrainingFeedbackModel.fromJson(data);
+            })
+            .where((feedback) => feedback.exerciseTemplateId == null)
+            .toList();
       });
     } catch (e, stackTrace) {
       AppLogger.error('查询图文项反馈失败: $dailyTrainingId', e, stackTrace);
@@ -405,6 +462,35 @@ class FeedbackRepositoryImpl implements FeedbackRepository {
         AppLogger.error('删除 Storage 文件失败: $storageUrl', e, null);
         rethrow;
       }
+    }
+  }
+
+  @override
+  Future<void> deleteFeedback(String feedbackId, TrainingFeedbackModel feedback) async {
+    try {
+      // 1. 删除关联的 Storage 文件
+      final futures = <Future<void>>[];
+      if (feedback.voiceUrl != null) {
+        futures.add(deleteStorageFile(feedback.voiceUrl!));
+      }
+      if (feedback.imageUrl != null) {
+        futures.add(deleteStorageFile(feedback.imageUrl!));
+      }
+      if (feedback.videoUrl != null) {
+        futures.add(deleteStorageFile(feedback.videoUrl!));
+      }
+      if (feedback.videoThumbnailUrl != null) {
+        futures.add(deleteStorageFile(feedback.videoThumbnailUrl!));
+      }
+
+      await Future.wait(futures);
+
+      // 2. 删除 Firestore 文档
+      await FirestoreService.deleteDocument('dailyTrainingFeedback', feedbackId);
+      AppLogger.info('删除反馈成功: $feedbackId');
+    } catch (e, stackTrace) {
+      AppLogger.error('删除反馈失败: $feedbackId', e, stackTrace);
+      rethrow;
     }
   }
 }

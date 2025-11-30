@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:coach_x/core/utils/logger.dart';
+import 'package:coach_x/core/constants/media_compression_config.dart';
 
 /// 图片压缩工具类
 class ImageCompressor {
@@ -88,5 +89,59 @@ class ImageCompressor {
     }
 
     return compressedPaths;
+  }
+
+  // ==================== 便捷方法（使用统一配置） ====================
+
+  /// 压缩图片（AI 识别用）
+  ///
+  /// 使用优化的参数：quality=70, size=1024
+  /// 适用于：食物识别、训练动作识别等 AI 分析场景
+  static Future<String> compressImageForAI(String imagePath) async {
+    return compressImage(
+      imagePath,
+      quality: MediaCompressionConfig.aiFoodImageQuality,
+      maxWidth: MediaCompressionConfig.aiFoodImageMaxSize,
+      maxHeight: MediaCompressionConfig.aiFoodImageMaxSize,
+    );
+  }
+
+  /// 压缩图片（用户查看用）
+  ///
+  /// 使用较高质量参数：quality=80, size=1280
+  /// 适用于：身体测量照片、训练记录照片等用户需要查看的场景
+  static Future<String> compressImageForUser(String imagePath) async {
+    return compressImage(
+      imagePath,
+      quality: MediaCompressionConfig.userImageQuality,
+      maxWidth: MediaCompressionConfig.userImageMaxSize,
+      maxHeight: MediaCompressionConfig.userImageMaxSize,
+    );
+  }
+
+  /// 压缩缩略图
+  ///
+  /// 使用最小化参数：quality=75, size=512
+  /// 适用于：视频缩略图、列表预览图等
+  static Future<String> compressThumbnail(String imagePath) async {
+    return compressImage(
+      imagePath,
+      quality: MediaCompressionConfig.thumbnailQuality,
+      maxWidth: MediaCompressionConfig.thumbnailMaxSize,
+      maxHeight: MediaCompressionConfig.thumbnailMaxSize,
+    );
+  }
+
+  /// 压缩视频帧
+  ///
+  /// 使用优化参数：quality=70, size=1024
+  /// 适用于：训练视频关键帧提取
+  static Future<String> compressVideoFrame(String imagePath) async {
+    return compressImage(
+      imagePath,
+      quality: MediaCompressionConfig.videoFrameQuality,
+      maxWidth: MediaCompressionConfig.videoFrameMaxSize,
+      maxHeight: MediaCompressionConfig.videoFrameMaxSize,
+    );
   }
 }

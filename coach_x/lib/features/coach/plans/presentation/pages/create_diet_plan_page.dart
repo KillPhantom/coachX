@@ -542,12 +542,12 @@ class _CreateDietPlanPageState extends ConsumerState<CreateDietPlanPage> {
         content: const Text('Are you sure you want to delete this diet day?'),
         actions: [
           CupertinoDialogAction(
-            child: const Text('Cancel'),
+            child: const Text('Cancel', style: AppTextStyles.body),
             onPressed: () => Navigator.of(context).pop(),
           ),
           CupertinoDialogAction(
             isDestructiveAction: true,
-            child: const Text('Delete'),
+            child: const Text('Delete', style: AppTextStyles.body),
             onPressed: () {
               Navigator.of(context).pop();
               notifier.removeDay(index);
@@ -587,12 +587,12 @@ class _CreateDietPlanPageState extends ConsumerState<CreateDietPlanPage> {
         content: const Text('Are you sure you want to delete this meal?'),
         actions: [
           CupertinoDialogAction(
-            child: const Text('Cancel'),
+            child: const Text('Cancel', style: AppTextStyles.body),
             onPressed: () => Navigator.of(context).pop(),
           ),
           CupertinoDialogAction(
             isDestructiveAction: true,
-            child: const Text('Delete'),
+            child: const Text('Delete', style: AppTextStyles.body),
             onPressed: () {
               Navigator.of(context).pop();
               notifier.removeMeal(dayIndex, mealIndex);
@@ -831,7 +831,7 @@ class _CreateDietPlanPageState extends ConsumerState<CreateDietPlanPage> {
         content: Text(message),
         actions: [
           CupertinoDialogAction(
-            child: const Text('OK'),
+            child: const Text('OK', style: AppTextStyles.body),
             onPressed: () => Navigator.of(context).pop(),
           ),
         ],
@@ -920,14 +920,14 @@ class _CreateDietPlanPageState extends ConsumerState<CreateDietPlanPage> {
         ),
         actions: [
           CupertinoDialogAction(
-            child: const Text('取消'),
+            child: const Text('取消', style: AppTextStyles.body),
             onPressed: () {
               controller.dispose();
               Navigator.of(context).pop();
             },
           ),
           CupertinoDialogAction(
-            child: const Text('保存'),
+            child: const Text('保存', style: AppTextStyles.body),
             onPressed: () {
               final newName = controller.text.trim();
               if (newName.isNotEmpty) {
@@ -962,7 +962,7 @@ class _CreateDietPlanPageState extends ConsumerState<CreateDietPlanPage> {
           content: const Text('请先添加饮食日后再使用 AI 编辑'),
           actions: [
             CupertinoDialogAction(
-              child: const Text('确定'),
+              child: const Text('确定', style: AppTextStyles.body),
               onPressed: () => Navigator.pop(context),
             ),
           ],

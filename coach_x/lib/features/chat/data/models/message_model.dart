@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:coach_x/core/utils/json_utils.dart';
 
 /// 消息类型枚举
 enum MessageType {
@@ -98,10 +99,10 @@ class MessageMetadata {
   factory MessageMetadata.fromJson(Map<String, dynamic> json) {
     return MessageMetadata(
       fileName: json['fileName'] as String?,
-      fileSize: json['fileSize'] as int?,
-      duration: json['duration'] as int?,
-      width: json['width'] as int?,
-      height: json['height'] as int?,
+      fileSize: safeIntCast(json['fileSize']),
+      duration: safeIntCast(json['duration']),
+      width: safeIntCast(json['width']),
+      height: safeIntCast(json['height']),
       thumbnailUrl: json['thumbnailUrl'] as String?,
     );
   }
@@ -132,6 +133,12 @@ class MessageModel {
   final bool isDeleted;
   final DateTime createdAt;
   final DateTime? readAt;
+  
+  // 引用消息字段
+  final String? quotedMessageId;
+  final String? quotedMessageContent;
+  final String? quotedMessageSenderId;
+  final String? quotedMessageSenderName;
 
   const MessageModel({
     required this.id,
@@ -146,6 +153,10 @@ class MessageModel {
     this.isDeleted = false,
     required this.createdAt,
     this.readAt,
+    this.quotedMessageId,
+    this.quotedMessageContent,
+    this.quotedMessageSenderId,
+    this.quotedMessageSenderName,
   });
 
   /// 解析Firestore时间戳字段（支持Timestamp和int类型）
@@ -180,19 +191,23 @@ class MessageModel {
       mediaUrl: data['mediaUrl'] as String?,
       mediaMetadata: data['mediaMetadata'] != null
           ? MessageMetadata.fromJson(
-              data['mediaMetadata'] as Map<String, dynamic>,
+              safeMapCast(data['mediaMetadata'], 'mediaMetadata') ?? {},
             )
           : null,
       status: MessageStatus.fromString(data['status'] as String? ?? 'sent'),
       isDeleted: data['isDeleted'] as bool? ?? false,
       createdAt: _parseTimestamp(data['createdAt']),
       readAt: data['readAt'] != null ? _parseTimestamp(data['readAt']) : null,
+      quotedMessageId: data['quotedMessageId'] as String?,
+      quotedMessageContent: data['quotedMessageContent'] as String?,
+      quotedMessageSenderId: data['quotedMessageSenderId'] as String?,
+      quotedMessageSenderName: data['quotedMessageSenderName'] as String?,
     );
   }
 
   /// 转换为Firestore文档数据
   Map<String, dynamic> toFirestore() {
-    final json = {
+    final Map<String, dynamic> json = {
       'conversationId': conversationId,
       'senderId': senderId,
       'receiverId': receiverId,
@@ -205,6 +220,10 @@ class MessageModel {
     if (mediaUrl != null) json['mediaUrl'] = mediaUrl!;
     if (mediaMetadata != null) json['mediaMetadata'] = mediaMetadata!.toJson();
     if (readAt != null) json['readAt'] = Timestamp.fromDate(readAt!);
+    if (quotedMessageId != null) json['quotedMessageId'] = quotedMessageId;
+    if (quotedMessageContent != null) json['quotedMessageContent'] = quotedMessageContent;
+    if (quotedMessageSenderId != null) json['quotedMessageSenderId'] = quotedMessageSenderId;
+    if (quotedMessageSenderName != null) json['quotedMessageSenderName'] = quotedMessageSenderName;
     return json;
   }
 
@@ -225,6 +244,10 @@ class MessageModel {
     bool? isDeleted,
     DateTime? createdAt,
     DateTime? readAt,
+    String? quotedMessageId,
+    String? quotedMessageContent,
+    String? quotedMessageSenderId,
+    String? quotedMessageSenderName,
   }) {
     return MessageModel(
       id: id ?? this.id,
@@ -239,6 +262,10 @@ class MessageModel {
       isDeleted: isDeleted ?? this.isDeleted,
       createdAt: createdAt ?? this.createdAt,
       readAt: readAt ?? this.readAt,
+      quotedMessageId: quotedMessageId ?? this.quotedMessageId,
+      quotedMessageContent: quotedMessageContent ?? this.quotedMessageContent,
+      quotedMessageSenderId: quotedMessageSenderId ?? this.quotedMessageSenderId,
+      quotedMessageSenderName: quotedMessageSenderName ?? this.quotedMessageSenderName,
     );
   }
 }

@@ -1,4 +1,5 @@
 import 'package:coach_x/features/coach/plans/data/models/exercise_plan_model.dart';
+import 'package:coach_x/core/utils/json_utils.dart';
 
 /// 导入结果模型
 ///
@@ -54,13 +55,23 @@ class ImportResult {
   /// 从 JSON 解析
   factory ImportResult.fromJson(Map<String, dynamic> json) {
     if (json['status'] == 'success') {
+      // 安全转换嵌套的 data 对象
+      final data = safeMapCast(json['data'], 'data');
+      if (data == null) {
+        return ImportResult.failure(errorMessage: '数据格式错误');
+      }
+
+      // 安全转换 plan 对象
+      final planData = safeMapCast(data['plan'], 'plan');
+      if (planData == null) {
+        return ImportResult.failure(errorMessage: '计划数据格式错误');
+      }
+
       return ImportResult.success(
-        plan: ExercisePlanModel.fromJson(
-          json['data']['plan'] as Map<String, dynamic>,
-        ),
-        confidence: (json['data']['confidence'] as num?)?.toDouble() ?? 1.0,
+        plan: ExercisePlanModel.fromJson(planData),
+        confidence: (data['confidence'] as num?)?.toDouble() ?? 1.0,
         warnings:
-            (json['data']['warnings'] as List<dynamic>?)
+            (data['warnings'] as List<dynamic>?)
                 ?.map((w) => w.toString())
                 .toList() ??
             [],

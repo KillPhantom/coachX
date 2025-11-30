@@ -78,10 +78,6 @@ class TextFeedItem extends StatelessWidget {
 
           // 操作按钮
           _buildActionButtons(),
-
-          // 批阅状态标记
-          if (feedItem.isReviewed)
-            _buildReviewedTag(),
         ],
       ),
     )));
@@ -145,10 +141,6 @@ class TextFeedItem extends StatelessWidget {
 
           // 操作按钮
           _buildActionButtons(),
-
-          // 批阅状态标记
-          if (feedItem.isReviewed)
-            _buildReviewedTag(),
         ],
       ),
     )));
@@ -163,11 +155,24 @@ class TextFeedItem extends StatelessWidget {
             color: AppColors.primary,
             borderRadius: BorderRadius.circular(12),
             onPressed: onCommentTap,
-            child: Text(
-              '批阅',
-              style: AppTextStyles.buttonLarge.copyWith(
-                color: CupertinoColors.black,
-              ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                if (feedItem.isReviewed) ...[
+                  const Icon(
+                    CupertinoIcons.checkmark_circle_fill,
+                    color: CupertinoColors.black,
+                    size: 20,
+                  ),
+                  const SizedBox(width: 8),
+                ],
+                Text(
+                  feedItem.isReviewed ? '已批阅' : '批阅',
+                  style: AppTextStyles.buttonLarge.copyWith(
+                    color: CupertinoColors.black,
+                  ),
+                ),
+              ],
             ),
           ),
         ),
@@ -187,34 +192,6 @@ class TextFeedItem extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildReviewedTag() {
-    return Container(
-      margin: const EdgeInsets.only(top: 16),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: BoxDecoration(
-        color: AppColors.primary.withOpacity(0.9),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Icon(
-            CupertinoIcons.checkmark_circle_fill,
-            size: 16,
-            color: CupertinoColors.black,
-          ),
-          const SizedBox(width: 8),
-          Text(
-            '已批阅',
-            style: AppTextStyles.callout.copyWith(
-              color: CupertinoColors.black,
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

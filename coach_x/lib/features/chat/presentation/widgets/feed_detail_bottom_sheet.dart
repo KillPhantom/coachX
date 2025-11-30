@@ -36,14 +36,14 @@ class FeedDetailSheet extends ConsumerWidget {
           topRight: Radius.circular(16),
         ),
       ),
-      child: Column(
-        children: [
-          // Draggable Header
-          SingleChildScrollView(
-            controller: scrollController,
-            physics: const BouncingScrollPhysics(
-              parent: AlwaysScrollableScrollPhysics(),
-            ),
+      child: CustomScrollView(
+        controller: scrollController,
+        physics: const BouncingScrollPhysics(
+          parent: AlwaysScrollableScrollPhysics(),
+        ),
+        slivers: [
+          // Header
+          SliverToBoxAdapter(
             child: Column(
               children: [
                 // Handle bar
@@ -92,16 +92,13 @@ class FeedDetailSheet extends ConsumerWidget {
             ),
           ),
 
-          // Scrollable Content (Independent)
-          Expanded(
-            child: SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
-              child: feedItem.type == FeedItemType.video
-                  ? _VideoDetailsContent(feedItem: feedItem)
-                  : feedItem.type == FeedItemType.textCard
-                  ? _TextCardDetailsContent(feedItem: feedItem)
-                  : const SizedBox(),
-            ),
+          // Content
+          SliverToBoxAdapter(
+            child: feedItem.type == FeedItemType.video
+                ? _VideoDetailsContent(feedItem: feedItem)
+                : feedItem.type == FeedItemType.textCard
+                    ? _TextCardDetailsContent(feedItem: feedItem)
+                    : const SizedBox(),
           ),
         ],
       ),

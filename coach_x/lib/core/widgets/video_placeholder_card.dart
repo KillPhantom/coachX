@@ -2,19 +2,25 @@ import 'package:flutter/cupertino.dart';
 import 'package:coach_x/l10n/app_localizations.dart';
 import 'package:coach_x/core/theme/app_theme.dart';
 
-/// 视频占位符卡片
+/// 媒体占位符卡片 (Was VideoPlaceholderCard)
 ///
-/// 显示虚线边框和上传图标，点击打开相机录制
+/// 显示虚线边框和上传图标，点击触发操作
 class VideoPlaceholderCard extends StatelessWidget {
   final VoidCallback onTap;
   final double width;
   final double height;
+  final IconData? icon;
+  final String? text;
+  final Widget? child;
 
   const VideoPlaceholderCard({
     super.key,
     required this.onTap,
     this.width = 100,
     this.height = 100,
+    this.icon,
+    this.text,
+    this.child,
   });
 
   @override
@@ -35,19 +41,19 @@ class VideoPlaceholderCard extends StatelessWidget {
             strokeAlign: BorderSide.strokeAlignInside,
           ),
         ),
-        child: Column(
+        child: child ?? Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // 相机图标
+            // 图标
             Icon(
-              CupertinoIcons.videocam,
+              icon ?? CupertinoIcons.videocam,
               size: 32,
               color: AppColors.textTertiary,
             ),
             const SizedBox(height: 4),
             // 文字
             Text(
-              l10n.recordVideo,
+              text ?? l10n.recordVideo,
               style: AppTextStyles.caption2.copyWith(
                 color: AppColors.textTertiary,
               ),

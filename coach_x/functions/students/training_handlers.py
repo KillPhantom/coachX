@@ -383,19 +383,6 @@ def fetch_weekly_home_stats(req: https_fn.CallableRequest):
             .where('date', '<=', last_week_end) \
             .get()
 
-        # 查询本周的 bodyMeasure 记录
-        this_week_measurements = db.collection('bodyMeasure') \
-            .where('studentID', '==', student_id) \
-            .where('recordDate', '>=', this_week_start) \
-            .where('recordDate', '<=', this_week_end) \
-            .get()
-
-        # 查询上周的 bodyMeasure 记录
-        last_week_measurements = db.collection('bodyMeasure') \
-            .where('studentID', '==', student_id) \
-            .where('recordDate', '>=', last_week_start) \
-            .where('recordDate', '<=', last_week_end) \
-            .get()
 
         # 转换为字典，方便处理
         this_week_trainings_dict = {}
@@ -410,21 +397,13 @@ def fetch_weekly_home_stats(req: https_fn.CallableRequest):
             data['id'] = doc.id
             last_week_trainings_dict[data['date']] = data
 
-        this_week_measurements_list = [doc.to_dict() for doc in this_week_measurements]
-        last_week_measurements_list = [doc.to_dict() for doc in last_week_measurements]
-
         logger.info(f'本周训练记录: {len(this_week_trainings_dict)}天')
         logger.info(f'上周训练记录: {len(last_week_trainings_dict)}天')
-        logger.info(f'本周体重记录: {len(this_week_measurements_list)}条')
-        logger.info(f'上周体重记录: {len(last_week_measurements_list)}条')
 
         # ==================== 计算统计数据 ====================
 
-        # 1. 体重变化统计
-        weight_change_stats = _calculate_weight_change(
-            this_week_measurements_list,
-            last_week_measurements_list
-        )
+        # 1. 体重变化统计（查询最近 N 条记录）
+        weight_change_stats = _calculate_weight_change(db, student_id)
 
         # 2. 卡路里变化统计
         calories_change_stats = _calculate_calories_change(
@@ -470,46 +449,80 @@ def fetch_weekly_home_stats(req: https_fn.CallableRequest):
 
 
 def _calculate_weight_change(
-    this_week_measurements: List[Dict[str, Any]],
-    last_week_measurements: List[Dict[str, Any]]
+    db,
+    student_id: str
 ) -> Dict[str, Any]:
-    """计算体重变化统计"""
-    has_data = len(this_week_measurements) > 0 or len(last_week_measurements) > 0
+    """
+    计算体重变化统计
 
-    if not has_data:
+    查询最近 10 条 bodyMeasure 记录，计算最新两条记录的变化
+    """
+    # 查询最近 10 条体重记录
+    recent_measurements = db.collection('bodyMeasure') \
+        .where('studentID', '==', student_id) \
+        .order_by('recordDate', direction=firestore.Query.DESCENDING) \
+        .limit(10) \
+        .get()
+
+    measurements_list = [doc.to_dict() for doc in recent_measurements]
+
+    logger.info(f'📊 查询到 {len(measurements_list)} 条体重记录')
+
+    if not measurements_list:
         return {
-            'currentWeekAvg': None,
-            'lastWeekAvg': None,
+            'currentWeight': None,
+            'previousWeight': None,
             'change': None,
+            'daysSince': None,
             'unit': 'kg',
             'hasData': False
         }
 
-    # 计算本周平均体重
-    this_week_avg = None
-    unit = 'kg'
-    if this_week_measurements:
-        total = sum(m.get('weight', 0) for m in this_week_measurements)
-        this_week_avg = round(total / len(this_week_measurements), 1)
-        unit = this_week_measurements[0].get('weightUnit', 'kg')
+    # 获取最新记录
+    current = measurements_list[0]
+    current_weight = current.get('weight', 0)
+    unit = current.get('weightUnit', 'kg')
+    current_date_str = current.get('recordDate', '')
 
-    # 计算上周平均体重
-    last_week_avg = None
-    if last_week_measurements:
-        total = sum(m.get('weight', 0) for m in last_week_measurements)
-        last_week_avg = round(total / len(last_week_measurements), 1)
-        if not unit:
-            unit = last_week_measurements[0].get('weightUnit', 'kg')
+    # 如果只有一条记录
+    if len(measurements_list) == 1:
+        return {
+            'currentWeight': round(current_weight, 1),
+            'previousWeight': None,
+            'change': None,
+            'daysSince': None,
+            'unit': unit,
+            'hasData': True
+        }
+
+    # 获取上一条记录
+    previous = measurements_list[1]
+    previous_weight = previous.get('weight', 0)
+    previous_date_str = previous.get('recordDate', '')
+
+    # 计算天数差
+    days_since = None
+    try:
+        current_date = datetime.strptime(current_date_str, '%Y-%m-%d')
+        previous_date = datetime.strptime(previous_date_str, '%Y-%m-%d')
+        days_since = (current_date - previous_date).days
+    except (ValueError, TypeError) as e:
+        logger.warning(f'解析日期失败: {e}')
 
     # 计算变化量
-    change = None
-    if this_week_avg is not None and last_week_avg is not None:
-        change = round(this_week_avg - last_week_avg, 1)
+    change = round(current_weight - previous_weight, 1)
+
+    logger.info(
+        f'📊 体重对比 - 当前: {current_weight}{unit} ({current_date_str}), '
+        f'上次: {previous_weight}{unit} ({previous_date_str}), '
+        f'变化: {change:+.1f}{unit}, 间隔: {days_since} 天'
+    )
 
     return {
-        'currentWeekAvg': this_week_avg,
-        'lastWeekAvg': last_week_avg,
+        'currentWeight': round(current_weight, 1),
+        'previousWeight': round(previous_weight, 1),
         'change': change,
+        'daysSince': days_since,
         'unit': unit,
         'hasData': True
     }
@@ -520,23 +533,25 @@ def _calculate_calories_change(
     last_week_trainings: Dict[str, Dict[str, Any]]
 ) -> Dict[str, Any]:
     """计算卡路里变化统计"""
-    # 计算本周总卡路里
+    # 计算本周总卡路里（从 meals 累加）
     this_week_total = 0.0
     for training in this_week_trainings.values():
         diet = training.get('diet', {})
         if diet:
-            macros = diet.get('macros', {})
-            if macros:
-                this_week_total += macros.get('calories', 0)
+            meals = diet.get('meals', [])
+            for meal in meals:
+                meal_macros = meal.get('macros', {})
+                this_week_total += meal_macros.get('calories', 0)
 
-    # 计算上周总卡路里
+    # 计算上周总卡路里（从 meals 累加）
     last_week_total = 0.0
     for training in last_week_trainings.values():
         diet = training.get('diet', {})
         if diet:
-            macros = diet.get('macros', {})
-            if macros:
-                last_week_total += macros.get('calories', 0)
+            meals = diet.get('meals', [])
+            for meal in meals:
+                meal_macros = meal.get('macros', {})
+                last_week_total += meal_macros.get('calories', 0)
 
     has_data = this_week_total > 0 or last_week_total > 0
 

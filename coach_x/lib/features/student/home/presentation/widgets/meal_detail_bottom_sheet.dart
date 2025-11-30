@@ -2,9 +2,13 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:dotted_border/dotted_border.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:coach_x/l10n/app_localizations.dart';
 import 'package:coach_x/core/theme/app_theme.dart';
 import 'package:coach_x/core/utils/logger.dart';
+import 'package:coach_x/core/utils/image_compressor.dart';
+import 'package:coach_x/core/services/storage_service.dart';
 import 'package:coach_x/features/coach/plans/data/models/meal.dart';
 import 'package:coach_x/features/coach/plans/data/models/food_item.dart';
 
@@ -30,6 +34,9 @@ class _MealDetailBottomSheetState extends ConsumerState<MealDetailBottomSheet> {
   late Meal _editedMeal;
   final TextEditingController _noteController = TextEditingController();
   bool _isSaving = false;
+  bool _isUploadingImage = false;
+  double _uploadProgress = 0.0;
+  String? _uploadError;
 
   @override
   void initState() {
@@ -50,11 +57,20 @@ class _MealDetailBottomSheetState extends ConsumerState<MealDetailBottomSheet> {
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
     if (pickedFile != null) {
-      setState(() {
-        _editedMeal = _editedMeal.copyWith(
-          images: [..._editedMeal.images, pickedFile.path],
-        );
-      });
+      // 上传图片到 Storage
+      final imageUrl = await _uploadImageToStorage(pickedFile.path);
+
+      if (imageUrl != null) {
+        // 上传成功，保存 URL
+        setState(() {
+          _editedMeal = _editedMeal.copyWith(
+            images: [..._editedMeal.images, imageUrl],
+          );
+        });
+      } else if (_uploadError != null && mounted) {
+        // 上传失败，显示错误对话框
+        await _showUploadError(pickedFile.path);
+      }
     }
   }
 
@@ -65,6 +81,115 @@ class _MealDetailBottomSheetState extends ConsumerState<MealDetailBottomSheet> {
       newImages.removeAt(index);
       _editedMeal = _editedMeal.copyWith(images: newImages);
     });
+  }
+
+  /// 上传图片到 Firebase Storage
+  Future<String?> _uploadImageToStorage(String imagePath) async {
+    String? compressedPath;
+    try {
+      setState(() {
+        _isUploadingImage = true;
+        _uploadProgress = 0.0;
+        _uploadError = null;
+      });
+
+      AppLogger.info('📤 开始压缩和上传餐次图片: $imagePath');
+
+      // 压缩图片（使用用户查看配置）
+      compressedPath = await ImageCompressor.compressImageForUser(imagePath);
+
+      // 上传到 Storage
+      final userId = FirebaseAuth.instance.currentUser!.uid;
+      final timestamp = DateTime.now().millisecondsSinceEpoch;
+      final imageFile = File(compressedPath);
+      final imageUrl = await StorageService.uploadFileWithRetry(
+        imageFile,
+        'diet_images/$userId/$timestamp.jpg',
+        onProgress: (progress) {
+          setState(() {
+            _uploadProgress = progress;
+          });
+        },
+      );
+
+      AppLogger.info('✅ 餐次图片上传成功: $imageUrl');
+
+      // 清理临时压缩文件
+      if (compressedPath != imagePath) {
+        try {
+          await File(compressedPath).delete();
+          AppLogger.info('🗑️ 清理临时压缩文件');
+        } catch (e) {
+          AppLogger.warning('清理临时文件失败: $e');
+        }
+      }
+
+      setState(() {
+        _isUploadingImage = false;
+        _uploadProgress = 1.0;
+      });
+
+      return imageUrl;
+    } catch (e, stackTrace) {
+      AppLogger.error('❌ 餐次图片上传失败', e, stackTrace);
+
+      // 清理临时文件
+      if (compressedPath != null && compressedPath != imagePath) {
+        try {
+          await File(compressedPath).delete();
+          AppLogger.info('🗑️ 错误后清理临时压缩文件');
+        } catch (e) {
+          AppLogger.warning('清理临时文件失败: $e');
+        }
+      }
+
+      setState(() {
+        _isUploadingImage = false;
+        _uploadError = e.toString();
+      });
+
+      return null;
+    }
+  }
+
+  /// 显示上传错误对话框
+  Future<void> _showUploadError(String imagePath) async {
+    final l10n = AppLocalizations.of(context)!;
+
+    final result = await showCupertinoDialog<bool>(
+      context: context,
+      builder: (dialogContext) => CupertinoAlertDialog(
+        title: Text(l10n.imageUploadFailed),
+        content: Text(_uploadError ?? l10n.unknownError),
+        actions: [
+          CupertinoDialogAction(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: Text(l10n.cancel, style: AppTextStyles.body),
+          ),
+          CupertinoDialogAction(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: Text(l10n.retry, style: AppTextStyles.body),
+          ),
+        ],
+      ),
+    );
+
+    // 用户选择重试
+    if (result == true && mounted) {
+      final imageUrl = await _uploadImageToStorage(imagePath);
+
+      if (imageUrl != null) {
+        // 重试成功，保存 URL
+        setState(() {
+          _editedMeal = _editedMeal.copyWith(
+            images: [..._editedMeal.images, imageUrl],
+          );
+        });
+      } else if (_uploadError != null && mounted) {
+        // 重试仍然失败，再次显示错误
+        await _showUploadError(imagePath);
+      }
+    }
   }
 
   /// 显示营养数据编辑器
@@ -121,7 +246,7 @@ class _MealDetailBottomSheetState extends ConsumerState<MealDetailBottomSheet> {
         actions: [
           CupertinoDialogAction(
             onPressed: () => Navigator.of(dialogContext).pop(),
-            child: Text(l10n.cancel),
+            child: Text(l10n.cancel, style: AppTextStyles.body),
           ),
           CupertinoDialogAction(
             onPressed: () {
@@ -143,7 +268,7 @@ class _MealDetailBottomSheetState extends ConsumerState<MealDetailBottomSheet> {
 
               Navigator.of(dialogContext).pop();
             },
-            child: Text(l10n.ok),
+            child: Text(l10n.ok, style: AppTextStyles.body),
           ),
         ],
       ),
@@ -180,7 +305,7 @@ class _MealDetailBottomSheetState extends ConsumerState<MealDetailBottomSheet> {
             actions: [
               CupertinoDialogAction(
                 onPressed: () => Navigator.of(dialogContext).pop(),
-                child: Text(AppLocalizations.of(context)!.ok),
+                child: Text(AppLocalizations.of(context)!.ok, style: AppTextStyles.body),
               ),
             ],
           ),
@@ -199,32 +324,35 @@ class _MealDetailBottomSheetState extends ConsumerState<MealDetailBottomSheet> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
-    return Container(
-      height: MediaQuery.of(context).size.height * 0.9,
-      decoration: const BoxDecoration(
-        color: AppColors.backgroundWhite,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24.0)),
-      ),
-      child: Column(
-        children: [
-          _buildNavigationBar(l10n),
-          Expanded(
-            child: ListView(
-              padding: const EdgeInsets.all(AppDimensions.spacingL),
-              children: [
-                _buildPhotoPreview(l10n),
-                const SizedBox(height: AppDimensions.spacingL),
-                _buildFoodsList(l10n),
-                const SizedBox(height: AppDimensions.spacingL),
-                _buildTotalMacros(l10n),
-                const SizedBox(height: AppDimensions.spacingL),
-                _buildNoteSection(l10n),
-                const SizedBox(height: AppDimensions.spacingXXL),
-              ],
+    return AbsorbPointer(
+      absorbing: _isUploadingImage,
+      child: Container(
+        height: MediaQuery.of(context).size.height * 0.9,
+        decoration: const BoxDecoration(
+          color: AppColors.backgroundWhite,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24.0)),
+        ),
+        child: Column(
+          children: [
+            _buildNavigationBar(l10n),
+            Expanded(
+              child: ListView(
+                padding: const EdgeInsets.all(AppDimensions.spacingL),
+                children: [
+                  _buildPhotoPreview(l10n),
+                  const SizedBox(height: AppDimensions.spacingL),
+                  _buildFoodsList(l10n),
+                  const SizedBox(height: AppDimensions.spacingL),
+                  _buildTotalMacros(l10n),
+                  const SizedBox(height: AppDimensions.spacingL),
+                  _buildNoteSection(l10n),
+                  const SizedBox(height: AppDimensions.spacingXXL),
+                ],
+              ),
             ),
-          ),
-          _buildSaveButton(l10n),
-        ],
+            _buildSaveButton(l10n),
+          ],
+        ),
       ),
     );
   }
@@ -265,50 +393,36 @@ class _MealDetailBottomSheetState extends ConsumerState<MealDetailBottomSheet> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              l10n.photos,
-              style: AppTextStyles.callout.copyWith(
-                fontWeight: FontWeight.w600,
-                color: AppColors.primaryText,
-              ),
-            ),
-            CupertinoButton(
-              padding: EdgeInsets.zero,
-              onPressed: _addImage,
-              child: const Icon(
-                CupertinoIcons.add_circled,
-                color: AppColors.primaryColor,
-              ),
-            ),
-          ],
+        Text(
+          l10n.photos,
+          style: AppTextStyles.callout.copyWith(
+            fontWeight: FontWeight.w600,
+            color: AppColors.primaryText,
+          ),
         ),
-        const SizedBox(height: AppDimensions.spacingS),
-        if (_editedMeal.images.isEmpty)
-          Container(
-            height: 150,
-            decoration: BoxDecoration(
-              color: AppColors.backgroundSecondary,
-              borderRadius: BorderRadius.circular(AppDimensions.radiusL),
-            ),
-            child: Center(
-              child: Text(
-                l10n.noPhotos,
-                style: AppTextStyles.callout.copyWith(
+        if (_isUploadingImage) ...[
+          const SizedBox(height: AppDimensions.spacingS),
+          Row(
+            children: [
+              const CupertinoActivityIndicator(),
+              const SizedBox(width: AppDimensions.spacingS),
+              Text(
+                '${l10n.uploadingImage} ${(_uploadProgress * 100).toInt()}%',
+                style: AppTextStyles.caption1.copyWith(
                   color: AppColors.textSecondary,
                 ),
               ),
-            ),
-          )
-        else
-          SizedBox(
-            height: 150,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: _editedMeal.images.length,
-              itemBuilder: (context, index) {
+            ],
+          ),
+        ],
+        const SizedBox(height: AppDimensions.spacingS),
+        SizedBox(
+          height: 150,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: _editedMeal.images.length + 1,
+            itemBuilder: (context, index) {
+              if (index < _editedMeal.images.length) {
                 final imagePath = _editedMeal.images[index];
                 return Container(
                   width: 150,
@@ -338,7 +452,8 @@ class _MealDetailBottomSheetState extends ConsumerState<MealDetailBottomSheet> {
                         right: 4,
                         child: CupertinoButton(
                           padding: EdgeInsets.zero,
-                          onPressed: () => _deleteImage(index), minimumSize: Size(0, 0),
+                          onPressed: () => _deleteImage(index),
+                          minimumSize: const Size(0, 0),
                           child: Container(
                             padding: const EdgeInsets.all(4),
                             decoration: const BoxDecoration(
@@ -356,10 +471,52 @@ class _MealDetailBottomSheetState extends ConsumerState<MealDetailBottomSheet> {
                     ],
                   ),
                 );
-              },
+              } else {
+                return _buildImagePlaceholder();
+              }
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// 构建图片上传占位符
+  Widget _buildImagePlaceholder() {
+    final isDisabled = _isUploadingImage;
+
+    return GestureDetector(
+      onTap: isDisabled ? null : _addImage,
+      child: Container(
+        width: 150,
+        margin: const EdgeInsets.only(right: AppDimensions.spacingS),
+        child: DottedBorder(
+          color: isDisabled
+              ? AppColors.dividerLight
+              : AppColors.textSecondary.withValues(alpha: 0.5),
+          strokeWidth: 2,
+          dashPattern: const [6, 4],
+          borderType: BorderType.RRect,
+          radius: const Radius.circular(AppDimensions.radiusL),
+          child: Container(
+            width: 150,
+            height: 150,
+            decoration: BoxDecoration(
+              color: AppColors.backgroundSecondary,
+              borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+            ),
+            child: Center(
+              child: Icon(
+                CupertinoIcons.add,
+                size: 40,
+                color: isDisabled
+                    ? AppColors.dividerLight
+                    : AppColors.textSecondary.withValues(alpha: 0.6),
+              ),
             ),
           ),
-      ],
+        ),
+      ),
     );
   }
 
@@ -527,6 +684,8 @@ class _MealDetailBottomSheetState extends ConsumerState<MealDetailBottomSheet> {
 
   /// 构建保存按钮
   Widget _buildSaveButton(AppLocalizations l10n) {
+    final isDisabled = _isSaving || _isUploadingImage;
+
     return Container(
       padding: const EdgeInsets.all(AppDimensions.spacingL),
       decoration: const BoxDecoration(
@@ -537,8 +696,8 @@ class _MealDetailBottomSheetState extends ConsumerState<MealDetailBottomSheet> {
       child: SizedBox(
         width: double.infinity,
         child: CupertinoButton(
-          color: _isSaving ? AppColors.dividerLight : AppColors.primaryColor,
-          onPressed: _isSaving ? null : _handleSave,
+          color: isDisabled ? AppColors.dividerLight : AppColors.primaryColor,
+          onPressed: isDisabled ? null : _handleSave,
           padding: const EdgeInsets.symmetric(vertical: AppDimensions.spacingM),
           borderRadius: BorderRadius.circular(AppDimensions.radiusM),
           child: _isSaving

@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hive/hive.dart';
+import 'package:equatable/equatable.dart';
 
 part 'exercise_template_model.g.dart';
 
@@ -7,7 +8,8 @@ part 'exercise_template_model.g.dart';
 ///
 /// 教练创建的动作模板，包含指导视频、文字说明、辅助图片等
 @HiveType(typeId: 10) // TypeId for Hive adapter
-class ExerciseTemplateModel extends HiveObject {
+// ignore: must_be_immutable
+class ExerciseTemplateModel extends HiveObject with EquatableMixin {
   /// 模板 ID（文档 ID）
   @HiveField(0)
   final String id;
@@ -129,12 +131,16 @@ class ExerciseTemplateModel extends HiveObject {
   }
 
   @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-
-    return other is ExerciseTemplateModel && other.id == id;
-  }
-
-  @override
-  int get hashCode => id.hashCode;
+  List<Object?> get props => [
+        id,
+        ownerId,
+        name,
+        tags,
+        textGuidance,
+        imageUrls,
+        createdAt,
+        updatedAt,
+        videoUrls,
+        thumbnailUrls,
+      ];
 }

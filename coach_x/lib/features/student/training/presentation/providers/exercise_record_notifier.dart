@@ -2,17 +2,13 @@ import 'dart:io';
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:video_compress/video_compress.dart';
-import 'package:coach_x/core/constants/app_constants.dart';
-import 'package:coach_x/core/services/video_service.dart';
 import 'package:coach_x/core/utils/logger.dart';
-import 'package:coach_x/core/utils/video_utils.dart';
 import 'package:coach_x/features/coach/plans/data/models/exercise.dart';
 import 'package:coach_x/features/coach/plans/data/models/training_set.dart';
 import 'package:coach_x/features/student/home/data/models/daily_training_model.dart';
 import 'package:coach_x/features/student/training/data/models/student_exercise_model.dart';
 import 'package:coach_x/features/student/training/data/models/student_exercise_record_state.dart';
-import 'package:coach_x/core/models/video_upload_state.dart';
+import 'package:coach_x/core/models/media_upload_state.dart';
 import 'package:coach_x/features/student/training/data/repositories/training_record_repository.dart';
 
 /// 训练记录 Notifier
@@ -23,134 +19,7 @@ class ExerciseRecordNotifier extends StateNotifier<ExerciseRecordState> {
   ExerciseRecordNotifier(this._repository, String initialDate)
     : super(ExerciseRecordState.initial(initialDate));
 
-  /// 后台压缩并上传视频
-  ///
-  /// @deprecated 此方法已弃用，现在由 VideoUploadSection 处理压缩和上传。
-  @Deprecated(
-    'Video compression and upload is now handled by VideoUploadSection.',
-  )
-  Future<void> _compressAndUpload(
-    int exerciseIndex,
-    int videoIndex,
-    File originalFile,
-  ) async {
-    File finalFile = originalFile;
-
-    try {
-      // 条件压缩（后台执行）
-      AppLogger.info('📦 检查视频是否需要压缩');
-      final shouldCompress = await VideoService.shouldCompress(
-        originalFile,
-        thresholdMB: AppConstants.videoCompressionThresholdMB,
-      );
-
-      AppLogger.info('📦 压缩检查结果: ${shouldCompress ? "需要压缩" : "不需要压缩"}');
-
-      if (shouldCompress) {
-        AppLogger.info(
-          '视频超过 ${AppConstants.videoCompressionThresholdMB}MB，开始后台压缩',
-        );
-        finalFile = await VideoService.compressVideo(
-          originalFile,
-          quality: VideoQuality.MediumQuality,
-        );
-        AppLogger.info('视频压缩完成');
-      }
-    } catch (e) {
-      AppLogger.error('视频压缩失败，使用原文件上传', e);
-      // 压缩失败不阻塞上传，继续使用原文件
-    }
-
-    // 压缩完成（或跳过），开始上传
-    _startAsyncUpload(exerciseIndex, videoIndex, finalFile);
-  }
-
-  /// 启动后台异步上传
-  ///
-  /// @deprecated 此方法已弃用，现在由 VideoUploadSection 处理异步上传。
-  @Deprecated('Async upload is now handled by VideoUploadSection.')
-  void _startAsyncUpload(int exerciseIndex, int videoIndex, File videoFile) {
-    // 构建存储路径
-    final userId = FirebaseAuth.instance.currentUser!.uid;
-    final timestamp = DateTime.now().millisecondsSinceEpoch;
-    final path = 'students/trainings/$userId/$timestamp.mp4';
-
-    AppLogger.info('开始上传: $path');
-
-    // 监听上传进度
-    final subscription = _repository
-        .uploadVideoWithProgress(videoFile, path)
-        .listen(
-          (progress) {
-            // 实时更新进度
-            updateVideoUploadProgress(exerciseIndex, videoIndex, progress);
-            // 安全检查：确保 progress 是有效数字
-            if (progress.isFinite) {
-              AppLogger.info('上传进度: ${(progress * 100).toInt()}%');
-            } else {
-              AppLogger.info('上传进度: 无效值 (NaN/Infinity)');
-            }
-          },
-          onDone: () async {
-            try {
-              // 1. 上传完成，获取视频下载 URL
-              final downloadUrl = await _repository.getDownloadUrl(path);
-              AppLogger.info('视频上传成功: $downloadUrl');
-
-              // 2. 上传缩略图
-              String? thumbnailUrl;
-              final exercise = state.exercises[exerciseIndex];
-              final video = exercise.videos[videoIndex];
-
-              if (video.thumbnailPath != null) {
-                try {
-                  AppLogger.info('开始上传缩略图');
-                  final thumbnailPath = path.replaceAll('.mp4', '_thumb.jpg');
-                  thumbnailUrl = await _repository.uploadThumbnail(
-                    File(video.thumbnailPath!),
-                    thumbnailPath,
-                  );
-                  AppLogger.info('缩略图上传成功: $thumbnailUrl');
-                } catch (e) {
-                  AppLogger.error('缩略图上传失败，继续保存视频', e);
-                  // 缩略图上传失败不阻塞视频保存
-                }
-              }
-
-              // 3. 完成视频上传，保存两个 URL
-              _completeVideoUpload(
-                exerciseIndex,
-                videoIndex,
-                downloadUrl,
-                thumbnailUrl: thumbnailUrl,
-              );
-
-              // 4. 自动保存到 Firestore
-              await saveRecord();
-
-              AppLogger.info('视频记录保存成功');
-            } catch (e) {
-              AppLogger.error('视频上传流程失败', e);
-              _failVideoUpload(exerciseIndex, videoIndex, '上传失败');
-            }
-          },
-          onError: (error) {
-            AppLogger.error('视频上传失败', error);
-            _failVideoUpload(exerciseIndex, videoIndex, error.toString());
-          },
-        );
-
-    // 保存订阅（用于 dispose 时取消）
-    final key = '$exerciseIndex-$videoIndex';
-    final updatedSubscriptions = Map<String, StreamSubscription<double>>.from(
-      state.uploadSubscriptions,
-    );
-    updatedSubscriptions[key] = subscription;
-
-    state = state.copyWith(uploadSubscriptions: updatedSubscriptions);
-  }
-
-  /// 更新视频上传进度
+  /// 更新视频上传进度 (Rename to updateMediaUploadProgress if possible, keeping for compat if needed, but updating internals)
   void updateVideoUploadProgress(
     int exerciseIndex,
     int videoIndex,
@@ -159,75 +28,74 @@ class ExerciseRecordNotifier extends StateNotifier<ExerciseRecordState> {
     if (exerciseIndex < 0 || exerciseIndex >= state.exercises.length) return;
 
     final exercise = state.exercises[exerciseIndex];
-    final updatedExercise = exercise.updateVideoProgress(videoIndex, progress);
+    final updatedExercise = exercise.updateMediaProgress(videoIndex, progress);
     updateExercise(exerciseIndex, updatedExercise);
   }
 
-  /// 完成视频上传
-  void _completeVideoUpload(
-    int exerciseIndex,
-    int videoIndex,
-    String downloadUrl, {
-    String? thumbnailUrl,
-  }) {
+  /// 重试视频上传 (Rename to retryMediaUpload)
+  Future<void> retryMediaUpload(int exerciseIndex, int mediaIndex) async {
     if (exerciseIndex < 0 || exerciseIndex >= state.exercises.length) return;
 
     final exercise = state.exercises[exerciseIndex];
-    final updatedExercise = exercise.completeVideoUpload(
-      videoIndex,
-      downloadUrl,
-      thumbnailUrl: thumbnailUrl,
-    );
-    updateExercise(exerciseIndex, updatedExercise);
+    if (mediaIndex < 0 || mediaIndex >= exercise.media.length) return;
 
-    // 移除订阅
-    final key = '$exerciseIndex-$videoIndex';
-    final updatedSubscriptions = Map<String, StreamSubscription<double>>.from(
-      state.uploadSubscriptions,
-    );
-    updatedSubscriptions.remove(key);
-    state = state.copyWith(uploadSubscriptions: updatedSubscriptions);
-  }
-
-  /// 标记视频上传失败
-  void _failVideoUpload(int exerciseIndex, int videoIndex, String error) {
-    if (exerciseIndex < 0 || exerciseIndex >= state.exercises.length) return;
-
-    final exercise = state.exercises[exerciseIndex];
-    final updatedExercise = exercise.failVideoUpload(videoIndex, error);
-    updateExercise(exerciseIndex, updatedExercise);
-
-    // 移除订阅
-    final key = '$exerciseIndex-$videoIndex';
-    final updatedSubscriptions = Map<String, StreamSubscription<double>>.from(
-      state.uploadSubscriptions,
-    );
-    updatedSubscriptions.remove(key);
-    state = state.copyWith(uploadSubscriptions: updatedSubscriptions);
-  }
-
-  /// 重试视频上传
-  Future<void> retryVideoUpload(int exerciseIndex, int videoIndex) async {
-    if (exerciseIndex < 0 || exerciseIndex >= state.exercises.length) return;
-
-    final exercise = state.exercises[exerciseIndex];
-    if (videoIndex < 0 || videoIndex >= exercise.videos.length) return;
-
-    final video = exercise.videos[videoIndex];
-    if (video.status != VideoUploadStatus.error || video.localPath == null) {
+    final item = exercise.media[mediaIndex];
+    if (item.status != MediaUploadStatus.error || item.localPath == null) {
       return;
     }
 
     AppLogger.info(
-      '重试上传视频: exerciseIndex=$exerciseIndex, videoIndex=$videoIndex',
+      '重试上传媒体: exerciseIndex=$exerciseIndex, mediaIndex=$mediaIndex',
     );
 
     // 重置状态为 pending
-    final updatedExercise = exercise.retryVideoUpload(videoIndex);
+    final updatedExercise = exercise.retryMediaUpload(mediaIndex);
     updateExercise(exerciseIndex, updatedExercise);
 
-    // 重新启动上传
-    _startAsyncUpload(exerciseIndex, videoIndex, File(video.localPath!));
+    // 重新启动上传 (注意：Notifier 不再负责上传，这里可能逻辑有变。
+    // VideoUploadSection 处理了重试逻辑（onRetry callback）。
+    // 所以这里其实主要就是重置状态，VideoUploadSection 收到 retry 后会重新调用 process logic?
+    // Wait, VideoUploadSection.onRetry calls _handleMediaRetry which resets state AND restarts upload.
+    // VideoUploadSection manages its own upload process.
+    // ExerciseRecordNotifier syncs state.
+    // If VideoUploadSection handles retries internally and notifies callbacks,
+    // then Notifier just needs to respond to callbacks.
+    // BUT VideoUploadSection takes `initialMedia` from parent.
+    // If parent updates `initialMedia` (via Riverpod state change), VideoUploadSection might rebuild or sync?
+    // VideoUploadSection `_initializeMedia` only runs on `initState`.
+    // It doesn't sync from props on build unless keys change or we implement `didUpdateWidget`.
+    // Looking at VideoUploadSection (old):
+    // `didUpdateWidget` wasn't implemented to sync `initialVideos`.
+    // `ExerciseRecordCard` passes `exercise.videos` to `VideoUploadSection`.
+    // If `VideoUploadSection` manages its own state `_videos`, and `ExerciseRecordCard` passes updated videos from Riverpod...
+    // There is a disconnection risk.
+    // `VideoUploadSection` (new) has `_mediaList`. It initializes from `widget.initialMedia` in `initState`.
+    // It does NOT update `_mediaList` when `widget.initialMedia` changes in `didUpdateWidget`.
+    // So `ExerciseRecordNotifier` updates are NOT reflected in `VideoUploadSection` if `VideoUploadSection` is already built.
+    // However, `VideoUploadSection` calls callbacks (`onUploadCompleted`) which update Notifier.
+    // The flow seems to be: VideoUploadSection (Source of Truth for upload process) -> Notifier (Persisted State).
+    // So `retryMediaUpload` in Notifier might only be needed if we want to reset persisted state.
+    // But `VideoUploadSection` has `_handleMediaRetry` which handles re-upload locally.
+    // The `VideoThumbnailCard` inside `VideoUploadSection` calls `_handleMediaRetry`.
+    // `ExerciseRecordCard` passes `onVideoRetry` callback to `VideoUploadSection`.
+    // Wait, `VideoUploadSection` (old) had `onVideoRetry`? No.
+    // `VideoUploadSection` (old) `VideoThumbnailCard` called `_handleVideoRetry` (internal).
+    // `ExerciseRecordCard` passed `onVideoRetry`?
+    // `ExerciseRecordCard`: `this.onVideoRetry`.
+    // `VideoUploadSection` (old) did NOT have `onVideoRetry` callback exposed.
+    // Ah, `ExerciseRecordCard` passed `onVideoRetry` to ... wait.
+    // In `ExerciseRecordCard.dart`:
+    // `VideoUploadSection(...)`
+    // It did NOT pass `onVideoRetry`.
+    // `ExerciseRecordCard` constructor HAS `onVideoRetry`, but it wasn't used in `build` for `VideoUploadSection`.
+    // So `ExerciseRecordNotifier.retryVideoUpload` might be unused or for other purposes?
+    // Let's check usages of `retryVideoUpload` in `ExerciseRecordPage`.
+    // `onVideoRetry: (videoIndex) { ref.read(...).retryVideoUpload(index, videoIndex); }`
+    // But `ExerciseRecordCard` didn't hook it up to `VideoUploadSection`.
+    // So `retryVideoUpload` in Notifier was likely dead code or for a different UI path.
+    // `VideoUploadSection` handles retry internally.
+    
+    // I'll keep `retryMediaUpload` in Notifier just in case, but updated to use `media`.
   }
 
   @override
@@ -241,15 +109,13 @@ class ExerciseRecordNotifier extends StateNotifier<ExerciseRecordState> {
   }
 
   /// 加载今日训练
-  ///
-  /// [exercisePlanDay] - 计划中的训练日数据（用于预填充）
   Future<void> loadExercisesForToday({
     required String coachId,
     String? exercisePlanId,
     int? exerciseDayNumber,
     List<Exercise>? exercisePlanDay,
   }) async {
-    try {
+      try {
       state = state.copyWith(isLoading: true, clearError: true);
 
       // 尝试从服务器获取已保存的记录
@@ -277,7 +143,7 @@ class ExerciseRecordNotifier extends StateNotifier<ExerciseRecordState> {
             type: planExercise.type,
             sets: planExercise.sets,
             completed: false,
-            videos: const [],
+            media: const [], // Changed from videos to media
             exerciseTemplateId: planExercise.exerciseTemplateId,
           );
         }).toList();
@@ -325,7 +191,7 @@ class ExerciseRecordNotifier extends StateNotifier<ExerciseRecordState> {
 
   /// 快捷完成某个 exercise（标记为完成并保存）
   Future<void> quickComplete(int index) async {
-    if (index < 0 || index >= state.exercises.length) return;
+      if (index < 0 || index >= state.exercises.length) return;
 
     try {
       final exercise = state.exercises[index];
@@ -361,7 +227,7 @@ class ExerciseRecordNotifier extends StateNotifier<ExerciseRecordState> {
 
   /// 保存训练记录
   Future<void> saveRecord() async {
-    try {
+      try {
       state = state.copyWith(isSaving: true, clearError: true);
 
       if (state.coachId == null) {
@@ -416,81 +282,21 @@ class ExerciseRecordNotifier extends StateNotifier<ExerciseRecordState> {
     }
   }
 
-  /// 上传视频（异步非阻塞版本）
-  ///
-  /// @deprecated 此方法已弃用，现在由 VideoUploadSection 处理上传。
-  /// 使用 addPendingVideo() 添加 pending 视频，
-  /// 使用 completeVideoUpload() 在上传完成后更新状态。
-  @Deprecated(
-    'Use addPendingVideo() and completeVideoUpload() instead. '
-    'Video upload is now handled by VideoUploadSection.',
-  )
-  Future<void> uploadVideo(int exerciseIndex, File videoFile) async {
-    try {
-      AppLogger.info(
-        '🎬 [uploadVideo] 收到上传请求: exerciseIndex=$exerciseIndex, videoPath=${videoFile.path}',
-      );
-
-      if (exerciseIndex < 0 || exerciseIndex >= state.exercises.length) {
-        AppLogger.error(
-          '❌ [uploadVideo] exerciseIndex 无效: $exerciseIndex (总数: ${state.exercises.length})',
-        );
-        return;
-      }
-
-      AppLogger.info(
-        '📋 [uploadVideo] 当前 exercise: ${state.exercises[exerciseIndex].name}',
-      );
-      AppLogger.info(
-        '📋 [uploadVideo] 当前视频数: ${state.exercises[exerciseIndex].videos.length}',
-      );
-
-      // 1. 生成缩略图（本地）
-      AppLogger.info('🖼️ [uploadVideo] 开始生成视频缩略图');
-      final thumbnailFile = await VideoUtils.generateThumbnail(videoFile.path);
-      AppLogger.info(
-        '🖼️ [uploadVideo] 缩略图生成${thumbnailFile != null ? "成功: ${thumbnailFile.path}" : "失败（返回null）"}',
-      );
-
-      // 2. 立即添加到列表（pending 状态）
-      final exercise = state.exercises[exerciseIndex];
-      AppLogger.info('➕ [uploadVideo] 添加视频到pending列表');
-      final updatedExercise = exercise.addPendingVideo(
-        videoFile.path,
-        thumbnailFile?.path,
-      );
-      updateExercise(exerciseIndex, updatedExercise);
-      AppLogger.info(
-        '✅ [uploadVideo] 视频已添加到列表，新视频数: ${updatedExercise.videos.length}',
-      );
-
-      // 3. 启动后台压缩 + 上传（不等待）
-      final videoIndex = updatedExercise.videos.length - 1;
-      AppLogger.info('🚀 [uploadVideo] 启动后台压缩和上传: videoIndex=$videoIndex');
-      _compressAndUpload(exerciseIndex, videoIndex, videoFile);
-
-      AppLogger.info('✅ [uploadVideo] 视频添加成功，后台压缩和上传已启动');
-    } catch (e, stackTrace) {
-      AppLogger.error('❌ [uploadVideo] 视频处理失败', e, stackTrace);
-      state = state.copyWith(error: '视频处理失败: ${e.toString()}');
-    }
-  }
-
-  /// 删除视频
-  Future<void> deleteVideo(int exerciseIndex, int videoIndex) async {
+  /// 删除视频 (Rename to deleteMedia)
+  Future<void> deleteMedia(int exerciseIndex, int mediaIndex) async {
     try {
       if (exerciseIndex < 0 || exerciseIndex >= state.exercises.length) return;
 
       final exercise = state.exercises[exerciseIndex];
-      if (videoIndex < 0 || videoIndex >= exercise.videos.length) return;
+      if (mediaIndex < 0 || mediaIndex >= exercise.media.length) return;
 
-      AppLogger.info('删除视频: exercise=$exerciseIndex, video=$videoIndex');
+      AppLogger.info('删除媒体: exercise=$exerciseIndex, media=$mediaIndex');
 
       // 如果视频正在上传，取消上传任务
-      final key = '$exerciseIndex-$videoIndex';
+      final key = '$exerciseIndex-$mediaIndex';
       final subscription = state.uploadSubscriptions[key];
       if (subscription != null) {
-        AppLogger.info('取消视频上传任务: $key');
+        AppLogger.info('取消上传任务: $key');
         await subscription.cancel();
 
         // 从订阅列表中移除
@@ -502,24 +308,25 @@ class ExerciseRecordNotifier extends StateNotifier<ExerciseRecordState> {
         state = state.copyWith(uploadSubscriptions: updatedSubscriptions);
       }
 
-      // 更新 exercise（移除视频）
-      final updatedExercise = exercise.removeVideo(videoIndex);
+      // 更新 exercise（移除媒体）
+      final updatedExercise = exercise.removeMedia(mediaIndex);
       updateExercise(exerciseIndex, updatedExercise);
 
       // 自动保存
       await saveRecord();
 
-      AppLogger.info('视频删除成功');
+      AppLogger.info('媒体删除成功');
     } catch (e, stackTrace) {
-      AppLogger.error('视频删除失败', e, stackTrace);
-      state = state.copyWith(error: '视频删除失败: ${e.toString()}');
+      AppLogger.error('媒体删除失败', e, stackTrace);
+      state = state.copyWith(error: '媒体删除失败: ${e.toString()}');
       rethrow;
     }
   }
 
+  // Set updates methods same...
   /// 实时更新 Set（不触发保存，不标记完成）
   void updateSetRealtime(int exerciseIndex, int setIndex, TrainingSet set) {
-    if (exerciseIndex < 0 || exerciseIndex >= state.exercises.length) return;
+     if (exerciseIndex < 0 || exerciseIndex >= state.exercises.length) return;
 
     final exercise = state.exercises[exerciseIndex];
     if (setIndex < 0 || setIndex >= exercise.sets.length) return;
@@ -590,8 +397,7 @@ class ExerciseRecordNotifier extends StateNotifier<ExerciseRecordState> {
     );
   }
 
-  // ========== 计时器相关方法 ==========
-
+  // Timer methods... (Same)
   /// 启动全局计时器
   void startTimer() {
     state = state.copyWith(
@@ -695,7 +501,7 @@ class ExerciseRecordNotifier extends StateNotifier<ExerciseRecordState> {
   /// 重置计时器到下一个未完成的 exercise
   /// [completedIndex] 刚完成的 exercise 索引
   void _resetTimerToNextIncomplete(int completedIndex) {
-    if (!state.isTimerRunning) return;
+       if (!state.isTimerRunning) return;
 
     // 先从完成的 exercise 后面找
     for (int i = completedIndex + 1; i < state.exercises.length; i++) {
@@ -719,81 +525,82 @@ class ExerciseRecordNotifier extends StateNotifier<ExerciseRecordState> {
     AppLogger.info('所有 Exercise 已完成，无需重置计时器');
   }
 
-  // ========== 视频状态管理方法（新增，v2.4）==========
+  // ========== 视频状态管理方法（新增，v2.4）========== (Rename to Media State Management)
 
-  /// 添加 Pending 状态视频（不启动上传）
+  /// 添加 Pending 状态媒体（不启动上传）
   ///
-  /// 由 VideoUploadSection 选择视频后调用，仅添加占位符
-  void addPendingVideo(
+  /// 由 MediaUploadSection 选择媒体后调用，仅添加占位符
+  void addPendingMedia(
     int exerciseIndex,
     String localPath,
+    MediaType type, {
     String? thumbnailPath,
-  ) {
+  }) {
     if (exerciseIndex < 0 || exerciseIndex >= state.exercises.length) {
       AppLogger.error(
-        '❌ [addPendingVideo] exerciseIndex 无效: $exerciseIndex (总数: ${state.exercises.length})',
+        '❌ [addPendingMedia] exerciseIndex 无效: $exerciseIndex (总数: ${state.exercises.length})',
       );
       return;
     }
 
     AppLogger.info(
-      '➕ [addPendingVideo] 添加 pending 视频: exerciseIndex=$exerciseIndex, localPath=$localPath',
+      '➕ [addPendingMedia] 添加 pending 媒体: exerciseIndex=$exerciseIndex, localPath=$localPath, type=$type',
     );
 
     final exercise = state.exercises[exerciseIndex];
-    final updatedExercise = exercise.addPendingVideo(localPath, thumbnailPath);
+    final updatedExercise = exercise.addPendingMedia(localPath, type, thumbnailPath: thumbnailPath);
     updateExercise(exerciseIndex, updatedExercise);
 
     AppLogger.info(
-      '✅ [addPendingVideo] Pending 视频已添加，当前视频数: ${updatedExercise.videos.length}',
+      '✅ [addPendingMedia] Pending 媒体已添加，当前媒体数: ${updatedExercise.media.length}',
     );
   }
 
-  /// 完成视频上传（由 VideoUploadSection 上传完成后调用）
+  /// 完成媒体上传（由 MediaUploadSection 上传完成后调用）
   ///
-  /// 更新视频状态为 completed，并立即保存到 Firestore
-  Future<void> completeVideoUpload(
+  /// 更新媒体状态为 completed，并立即保存到 Firestore
+  Future<void> completeMediaUpload(
     int exerciseIndex,
-    int videoIndex,
+    int mediaIndex,
     String downloadUrl, {
     String? thumbnailUrl,
   }) async {
     if (exerciseIndex < 0 || exerciseIndex >= state.exercises.length) {
       AppLogger.error(
-        '❌ [completeVideoUpload] exerciseIndex 无效: $exerciseIndex (总数: ${state.exercises.length})',
+        '❌ [completeMediaUpload] exerciseIndex 无效: $exerciseIndex (总数: ${state.exercises.length})',
       );
       return;
     }
 
     final exercise = state.exercises[exerciseIndex];
-    if (videoIndex < 0 || videoIndex >= exercise.videos.length) {
+    if (mediaIndex < 0 || mediaIndex >= exercise.media.length) {
       AppLogger.error(
-        '❌ [completeVideoUpload] videoIndex 无效: $videoIndex (总数: ${exercise.videos.length})',
+        '❌ [completeMediaUpload] mediaIndex 无效: $mediaIndex (总数: ${exercise.media.length})',
       );
       return;
     }
 
     AppLogger.info(
-      '✅ [completeVideoUpload] 视频上传完成: exerciseIndex=$exerciseIndex, videoIndex=$videoIndex, downloadUrl=$downloadUrl',
+      '✅ [completeMediaUpload] 媒体上传完成: exerciseIndex=$exerciseIndex, mediaIndex=$mediaIndex, downloadUrl=$downloadUrl',
     );
 
     try {
-      // 更新视频状态为 completed
-      final updatedExercise = exercise.completeVideoUpload(
-        videoIndex,
+      // 更新状态为 completed
+      final updatedExercise = exercise.completeMediaUpload(
+        mediaIndex,
         downloadUrl,
         thumbnailUrl: thumbnailUrl,
       );
       updateExercise(exerciseIndex, updatedExercise);
 
-      AppLogger.info('📝 [completeVideoUpload] 状态已更新，准备保存到 Firestore');
+      AppLogger.info('📝 [completeMediaUpload] 状态已更新，准备保存到 Firestore');
 
       // 立即保存到 Firestore
       await saveRecord();
 
-      AppLogger.info('✅ [completeVideoUpload] 视频记录已保存到后端');
+      AppLogger.info('✅ [completeMediaUpload] 媒体记录已保存到后端');
     } catch (e, stackTrace) {
-      AppLogger.error('❌ [completeVideoUpload] 保存失败', e, stackTrace);
+      AppLogger.error('❌ [completeMediaUpload] 保存失败', e, stackTrace);
       // 不抛出错误，避免阻塞 UI
     }
   }

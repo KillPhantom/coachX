@@ -96,6 +96,30 @@ class AppLocalizationsEn extends AppLocalizations {
   String get avatarEditInDevelopment => 'Avatar editing is under development';
 
   @override
+  String get selectAvatarSource => 'Select Avatar Source';
+
+  @override
+  String get chooseFromGallery => 'Choose from Gallery';
+
+  @override
+  String get uploadingAvatar => 'Uploading Avatar...';
+
+  @override
+  String get processingImage => 'Processing Image...';
+
+  @override
+  String get uploadSuccess => 'Upload Successful';
+
+  @override
+  String get uploadFailed => 'Upload Failed';
+
+  @override
+  String get retryUpload => 'Retry';
+
+  @override
+  String get cropCircular => 'Crop to Circle';
+
+  @override
   String get accountSettingsInDevelopment =>
       'Account Settings is under development';
 
@@ -1056,6 +1080,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String get timeSpentLabel => 'Time Spent';
 
   @override
+  String get feedbackHistoryTitle => 'Training History';
+
+  @override
+  String get feedbackSortAscLabel => 'Asc';
+
+  @override
+  String get feedbackSortDescLabel => 'Desc';
+
+  @override
+  String get trainingCalendarTitle => 'Training History';
+
+  @override
+  String get trainingCalendarEmptyDay => 'No training record for this date.';
+
+  @override
+  String get trainingCalendarViewSummary => 'View summary';
+
+  @override
   String get addCustomExerciseHint => 'Tap \'+\' to add custom exercise';
 
   @override
@@ -1091,7 +1133,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get coachPlan => 'Coach\'s Plan';
 
   @override
-  String get feedbackSearchPlaceholder => 'Search feedback...';
+  String get feedbackSearchPlaceholder => 'Search exercises or feedback';
 
   @override
   String get feedbackStartDate => 'Start Date';
@@ -1208,9 +1250,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get videoUploadFailed => 'Upload failed';
 
   @override
-  String get retryUpload => 'Retry';
-
-  @override
   String get processing => 'Processing...';
 
   @override
@@ -1309,7 +1348,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get createSuccess => 'Exercise created successfully';
 
   @override
-  String get updateSuccess => 'Exercise updated successfully';
+  String get updateSuccess => 'Updated successfully';
 
   @override
   String get waitingForUpload => 'Waiting for upload to complete...';
@@ -1643,7 +1682,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get exerciseGuidance => 'Exercise Guidance';
 
   @override
-  String get viewGuidance => 'View Guidance';
+  String get viewGuidance => 'view guidance';
 
   @override
   String get noGuidanceAvailable => 'No guidance available for this exercise';
@@ -1793,6 +1832,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get startParsing => 'Start Parsing';
 
   @override
+  String get textImportSummaryTitle => 'Text Import Complete';
+
+  @override
+  String get textImportSummarySubtitle =>
+      'Successfully extracted training plan from text';
+
+  @override
+  String get exerciseFromLibrary => 'Exercise From Library';
+
+  @override
+  String get createGuidance => 'create guidance';
+
+  @override
   String get extractionSuccess =>
       'Text extracted successfully! Please review and edit if needed.';
 
@@ -1917,4 +1969,102 @@ class AppLocalizationsEn extends AppLocalizations {
   String mealNumberFormat(int number) {
     return 'Meal $number';
   }
+
+  @override
+  String get imageUploadFailed => 'Image upload failed';
+
+  @override
+  String get unknownError => 'Unknown error';
+
+  @override
+  String get thisWeekIntake => 'This week';
+
+  @override
+  String get noLastWeekData => 'No last week data';
+
+  @override
+  String get today => 'today';
+
+  @override
+  String get nickname => 'Nickname';
+
+  @override
+  String get nicknamePlaceholder => 'Enter nickname';
+
+  @override
+  String get nicknameRequired => 'Nickname cannot be empty';
+
+  @override
+  String get editNickname => 'Edit Nickname';
+
+  @override
+  String get gender => 'Gender';
+
+  @override
+  String get male => 'Male';
+
+  @override
+  String get female => 'Female';
+
+  @override
+  String get selectGender => 'Select Gender';
+
+  @override
+  String get editGender => 'Edit Gender';
+
+  @override
+  String get bornDate => 'Birth Date';
+
+  @override
+  String get selectBornDate => 'Select Birth Date';
+
+  @override
+  String get editBornDate => 'Edit Birth Date';
+
+  @override
+  String get dateFormat => 'yyyy-MM-dd';
+
+  @override
+  String get editHeight => 'Edit Height';
+
+  @override
+  String get heightPlaceholder => 'Enter height';
+
+  @override
+  String get heightInvalid => 'Invalid height value';
+
+  @override
+  String get heightInCm => 'Height (cm)';
+
+  @override
+  String get heightInFeet => 'Height (ft)';
+
+  @override
+  String get heightInInches => 'inches';
+
+  @override
+  String get feet => 'ft';
+
+  @override
+  String get inches => 'in';
+
+  @override
+  String get aiAssistant => 'AI Assistant';
+
+  @override
+  String get aiWelcomeMessage =>
+      'Hello! How can I assist you with this training plan today?';
+
+  @override
+  String get aiWelcomeHint =>
+      'Try asking me to modify exercises, adjust intensity, or add new training days.';
+
+  @override
+  String get aiQuickActionAnalyzePlan => 'Analyze the plan\'s pros and cons';
+
+  @override
+  String get aiQuickActionReduceWeight => 'Reduce all weights by 10%';
+
+  @override
+  String get aiInputPlaceholder => 'Ask AI for suggestions...';
 }

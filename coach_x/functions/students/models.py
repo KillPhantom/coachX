@@ -53,11 +53,10 @@ class StudentListItem:
             'name': self.name,
             'email': self.email,
             'coachId': self.coachId,
+            'avatarUrl': self.avatarUrl,  # 始终包含，即使是 None
         }
-        
+
         # 添加可选字段
-        if self.avatarUrl:
-            result['avatarUrl'] = self.avatarUrl
         
         if self.exercisePlan:
             result['exercisePlan'] = self.exercisePlan.to_dict()

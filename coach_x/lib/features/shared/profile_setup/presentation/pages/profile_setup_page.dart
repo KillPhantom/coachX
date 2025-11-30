@@ -378,7 +378,7 @@ class _ProfileSetupPageState extends ConsumerState<ProfileSetupPage> {
           children: [
             Expanded(
               child: _buildGenderOption(
-                Gender.male,
+                '男',  // Male
                 selectedGender == Gender.male,
                 () => controller.setGender(Gender.male),
               ),
@@ -386,7 +386,7 @@ class _ProfileSetupPageState extends ConsumerState<ProfileSetupPage> {
             const SizedBox(width: AppDimensions.spacingM),
             Expanded(
               child: _buildGenderOption(
-                Gender.female,
+                '女',  // Female
                 selectedGender == Gender.female,
                 () => controller.setGender(Gender.female),
               ),
@@ -398,7 +398,7 @@ class _ProfileSetupPageState extends ConsumerState<ProfileSetupPage> {
   }
 
   Widget _buildGenderOption(
-    Gender gender,
+    String displayText,
     bool isSelected,
     VoidCallback onTap,
   ) {
@@ -418,7 +418,7 @@ class _ProfileSetupPageState extends ConsumerState<ProfileSetupPage> {
         ),
         child: Center(
           child: Text(
-            gender.displayName,
+            displayText,
             style: AppTextStyles.body.copyWith(
               color: isSelected
                   ? AppColors.primaryColor

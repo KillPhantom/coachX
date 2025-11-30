@@ -66,7 +66,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
             content: Text(next.errorMessage ?? l10n.errorOccurred),
             actions: [
               CupertinoDialogAction(
-                child: Text(l10n.confirm),
+                child: Text(l10n.confirm, style: AppTextStyles.body),
                 onPressed: () => Navigator.of(context).pop(),
               ),
             ],

@@ -25,6 +25,9 @@ class TrainingFeedbackModel {
   final String? voiceUrl; // 语音文件URL
   final int? voiceDuration; // 语音时长（秒）
   final String? imageUrl; // 图片URL
+  final String? videoUrl; // 视频URL
+  final String? videoThumbnailUrl; // 视频缩略图URL
+  final int? videoDuration; // 视频时长（秒）
 
   // === 元数据 ===
   final int createdAt; // 反馈创建时间（毫秒时间戳）
@@ -43,6 +46,9 @@ class TrainingFeedbackModel {
     this.voiceUrl,
     this.voiceDuration,
     this.imageUrl,
+    this.videoUrl,
+    this.videoThumbnailUrl,
+    this.videoDuration,
     required this.createdAt,
     this.isRead = false,
   });
@@ -62,6 +68,9 @@ class TrainingFeedbackModel {
       voiceUrl: json['voiceUrl'] as String?,
       voiceDuration: safeIntCast(json['voiceDuration'], null, 'voiceDuration'),
       imageUrl: json['imageUrl'] as String?,
+      videoUrl: json['videoUrl'] as String?,
+      videoThumbnailUrl: json['videoThumbnailUrl'] as String?,
+      videoDuration: safeIntCast(json['videoDuration'], null, 'videoDuration'),
       createdAt: safeIntCast(json['createdAt'], 0, 'createdAt') ?? 0,
       isRead: json['isRead'] as bool? ?? false,
     );
@@ -82,6 +91,9 @@ class TrainingFeedbackModel {
       'voiceUrl': voiceUrl,
       'voiceDuration': voiceDuration,
       'imageUrl': imageUrl,
+      'videoUrl': videoUrl,
+      'videoThumbnailUrl': videoThumbnailUrl,
+      'videoDuration': videoDuration,
       'createdAt': createdAt,
       'isRead': isRead,
     };
@@ -101,6 +113,9 @@ class TrainingFeedbackModel {
     String? voiceUrl,
     int? voiceDuration,
     String? imageUrl,
+    String? videoUrl,
+    String? videoThumbnailUrl,
+    int? videoDuration,
     int? createdAt,
     bool? isRead,
   }) {
@@ -117,6 +132,9 @@ class TrainingFeedbackModel {
       voiceUrl: voiceUrl ?? this.voiceUrl,
       voiceDuration: voiceDuration ?? this.voiceDuration,
       imageUrl: imageUrl ?? this.imageUrl,
+      videoUrl: videoUrl ?? this.videoUrl,
+      videoThumbnailUrl: videoThumbnailUrl ?? this.videoThumbnailUrl,
+      videoDuration: videoDuration ?? this.videoDuration,
       createdAt: createdAt ?? this.createdAt,
       isRead: isRead ?? this.isRead,
     );

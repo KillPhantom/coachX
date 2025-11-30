@@ -64,29 +64,36 @@ class WeeklyTrainingsSummary {
 
 /// 体重变化统计
 class WeightChangeStats {
-  final double? currentWeekAvg;
-  final double? lastWeekAvg;
+  final double? currentWeight;
+  final double? previousWeight;
   final double? change;
+  final int? daysSince;
   final String unit;
   final bool hasData;
 
   const WeightChangeStats({
-    this.currentWeekAvg,
-    this.lastWeekAvg,
+    this.currentWeight,
+    this.previousWeight,
     this.change,
+    this.daysSince,
     required this.unit,
     required this.hasData,
   });
 
   factory WeightChangeStats.fromJson(Map<String, dynamic> json) {
     return WeightChangeStats(
-      currentWeekAvg: safeDoubleCast(
-        json['currentWeekAvg'],
+      currentWeight: safeDoubleCast(
+        json['currentWeight'],
         null,
-        'currentWeekAvg',
+        'currentWeight',
       ),
-      lastWeekAvg: safeDoubleCast(json['lastWeekAvg'], null, 'lastWeekAvg'),
+      previousWeight: safeDoubleCast(
+        json['previousWeight'],
+        null,
+        'previousWeight',
+      ),
       change: safeDoubleCast(json['change'], null, 'change'),
+      daysSince: safeIntCast(json['daysSince'], null, 'daysSince'),
       unit: json['unit'] as String? ?? 'kg',
       hasData: json['hasData'] as bool? ?? false,
     );
@@ -94,9 +101,10 @@ class WeightChangeStats {
 
   Map<String, dynamic> toJson() {
     return {
-      'currentWeekAvg': currentWeekAvg,
-      'lastWeekAvg': lastWeekAvg,
+      'currentWeight': currentWeight,
+      'previousWeight': previousWeight,
       'change': change,
+      'daysSince': daysSince,
       'unit': unit,
       'hasData': hasData,
     };

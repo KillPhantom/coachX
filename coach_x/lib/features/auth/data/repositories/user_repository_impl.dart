@@ -1,4 +1,5 @@
 import 'package:coach_x/core/services/firestore_service.dart';
+import 'package:coach_x/core/services/cache/user_avatar_cache_service.dart';
 import 'package:coach_x/core/utils/logger.dart';
 import 'package:coach_x/features/auth/data/models/user_model.dart';
 import 'package:coach_x/features/auth/data/repositories/user_repository.dart';
@@ -44,6 +45,12 @@ class UserRepositoryImpl implements UserRepository {
     try {
       await FirestoreService.updateDocument(_collection, userId, data);
       AppLogger.info('用户更新成功: $userId');
+
+      // 如果更新了头像 URL，自动失效缓存
+      if (data.containsKey('avatarUrl')) {
+        await UserAvatarCacheService.invalidateAvatar(userId);
+        AppLogger.info('🗑️ 头像缓存已自动失效: $userId');
+      }
     } catch (e, stackTrace) {
       AppLogger.error('更新用户失败: $userId', e, stackTrace);
       rethrow;

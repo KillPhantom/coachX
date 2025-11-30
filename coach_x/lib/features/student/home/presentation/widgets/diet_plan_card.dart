@@ -17,7 +17,8 @@ import 'meal_detail_bottom_sheet.dart';
 ///
 /// PageView全宽滚动卡片，第一张显示总营养，后续显示各餐详情
 class DietPlanCard extends ConsumerStatefulWidget {
-  final DietDay dietDay;
+  final DietDay? dietDay;
+  final List<Meal> mergedMeals;
   final Macros? actualMacros;
   final StudentDietRecordModel? todayDietRecord;
   final Map<String, double>? progress;
@@ -25,7 +26,8 @@ class DietPlanCard extends ConsumerStatefulWidget {
 
   const DietPlanCard({
     super.key,
-    required this.dietDay,
+    this.dietDay,
+    required this.mergedMeals,
     this.actualMacros,
     this.todayDietRecord,
     this.progress,
@@ -102,7 +104,23 @@ class _DietPlanCardState extends ConsumerState<DietPlanCard> {
         {'calories': 0.0, 'protein': 0.0, 'carbs': 0.0, 'fat': 0.0};
 
     final totalPages =
-        widget.dietDay.meals.length + 1; // +1 for total nutrition card
+        widget.mergedMeals.length + 1; // +1 for total nutrition card
+
+    // 计算目标营养值：
+    // 1. 优先使用教练设置的 dietDay.macros（从 meals 累加计算）
+    // 2. 如果教练未设置 meals，则使用 dietDay.targetMacros（教练设置的目标值）
+    // 3. 如果都没有，使用零值（仅显示实际摄入，不计算进度）
+    Macros targetMacros;
+    if (widget.dietDay != null && widget.dietDay!.meals.isNotEmpty) {
+      // 教练设置了具体餐次，使用餐次累加的营养值
+      targetMacros = widget.dietDay!.macros;
+    } else if (widget.dietDay?.targetMacros != null) {
+      // 教练设置了目标营养值但没有具体餐次
+      targetMacros = widget.dietDay!.targetMacros!;
+    } else {
+      // 没有任何目标值
+      targetMacros = Macros.zero();
+    }
 
     return SizedBox(
       height: 160,
@@ -118,7 +136,7 @@ class _DietPlanCardState extends ConsumerState<DietPlanCard> {
                 horizontal: AppDimensions.spacingM,
               ),
               child: TotalNutritionCard(
-                macros: widget.dietDay.macros,
+                macros: targetMacros,
                 actualMacros: widget.actualMacros,
                 progress: progressData,
               ),
@@ -126,19 +144,20 @@ class _DietPlanCardState extends ConsumerState<DietPlanCard> {
           } else {
             // 后续卡：餐次详情
             final mealIndex = index - 1;
-            final planMeal = widget.dietDay.meals[mealIndex];
+            final displayMeal = widget.mergedMeals[mealIndex];
 
             // 从今日记录中查找匹配的餐次
             final recordedMeal = widget.todayDietRecord?.meals
-                .cast()
-                .firstWhere((m) => m.name == planMeal.name, orElse: () => null);
+                .cast<Meal?>()
+                .firstWhere((m) => m?.name == displayMeal.name,
+                    orElse: () => null);
 
             return Padding(
               padding: const EdgeInsets.symmetric(
                 horizontal: AppDimensions.spacingM,
               ),
               child: MealDetailCard(
-                meal: planMeal,
+                meal: displayMeal,
                 recordedMeal: recordedMeal,
                 onViewDetails: recordedMeal != null
                     ? () => _showMealDetailSheet(context, recordedMeal)

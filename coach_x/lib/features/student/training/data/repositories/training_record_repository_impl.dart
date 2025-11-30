@@ -74,7 +74,10 @@ class TrainingRecordRepositoryImpl implements TrainingRecordRepository {
     try {
       AppLogger.info('上传训练视频: $path');
 
-      final downloadUrl = await StorageService.uploadFile(videoFile, path);
+      final downloadUrl = await StorageService.uploadFile(
+        file: videoFile,
+        storagePath: path,
+      );
 
       AppLogger.info('上传训练视频成功: $downloadUrl');
 
@@ -117,7 +120,10 @@ class TrainingRecordRepositoryImpl implements TrainingRecordRepository {
     try {
       AppLogger.info('上传视频缩略图: $path');
 
-      final downloadUrl = await StorageService.uploadFile(thumbnailFile, path);
+      final downloadUrl = await StorageService.uploadFile(
+        file: thumbnailFile,
+        storagePath: path,
+      );
 
       AppLogger.info('上传视频缩略图成功: $downloadUrl');
 
@@ -133,7 +139,10 @@ class TrainingRecordRepositoryImpl implements TrainingRecordRepository {
     try {
       AppLogger.info('上传语音反馈: $path');
 
-      final downloadUrl = await StorageService.uploadFile(audioFile, path);
+      final downloadUrl = await StorageService.uploadFile(
+        file: audioFile,
+        storagePath: path,
+      );
 
       AppLogger.info('上传语音反馈成功: $downloadUrl');
 

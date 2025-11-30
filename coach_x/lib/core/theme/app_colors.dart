@@ -10,10 +10,10 @@ class AppColors {
   static const Color primaryColor = Color(0xFFF2E8CF);
 
   /// 主色文字
-  static const Color primaryText = Color.fromARGB(255, 141, 130, 112);
+  static const Color primaryText = Color.fromARGB(255, 179, 165, 141);
 
   /// 主色浅色背景
-  static const Color primaryLight = Color(0xFFFDFAF3);
+  static const Color primaryLight = Color.fromARGB(255, 240, 215, 162);
 
   /// 主色交互色
   static const Color primaryAction = Color(0xFFA88B70);
@@ -73,7 +73,8 @@ class AppColors {
 
   // ==================== 功能色 ====================
   /// 成功/完成 - 绿色
-  static const Color successGreen = Color(0xFF7D8471);
+  static const Color successGreen = Color.fromARGB(255, 106, 210, 113);
+  static const Color successGreenLight = Color.fromARGB(255, 136, 228, 162);
   static const Color success = successGreen; // 别名
 
   /// 警告 - 黄色

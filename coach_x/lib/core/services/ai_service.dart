@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:coach_x/core/utils/logger.dart';
+import 'package:coach_x/core/utils/json_utils.dart';
 import 'package:coach_x/core/enums/ai_status.dart';
 import 'package:coach_x/features/coach/plans/data/models/ai/ai_generation_response.dart';
 import 'package:coach_x/features/coach/plans/data/models/exercise_plan_model.dart';
@@ -355,8 +356,11 @@ class AIService {
         textContent: textContent,
       );
 
+      // 安全转换 Cloud Functions 返回的数据
+      final safeResult = Map<String, dynamic>.from(result as Map);
+
       // 解析结果
-      final importResult = ImportResult.fromJson(result);
+      final importResult = ImportResult.fromJson(safeResult);
 
       if (importResult.isSuccess) {
         AppLogger.info(

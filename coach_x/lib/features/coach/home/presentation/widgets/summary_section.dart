@@ -93,7 +93,7 @@ class SummarySection extends ConsumerWidget {
         content: Text(message),
         actions: [
           CupertinoDialogAction(
-            child: Text(l10n.know),
+            child: Text(l10n.know, style: AppTextStyles.body),
             onPressed: () => Navigator.of(context).pop(),
           ),
         ],

@@ -23,6 +23,7 @@ class ExerciseRecordPage extends ConsumerStatefulWidget {
 
 class _ExerciseRecordPageState extends ConsumerState<ExerciseRecordPage> {
   late PageController _pageController;
+  late ScrollController _tileScrollController;
   int _currentPage = 0;
 
   @override
@@ -30,6 +31,7 @@ class _ExerciseRecordPageState extends ConsumerState<ExerciseRecordPage> {
     super.initState();
     _pageController = PageController();
     _pageController.addListener(_onPageChanged);
+    _tileScrollController = ScrollController();
 
     // 页面加载时初始化数据
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -41,6 +43,7 @@ class _ExerciseRecordPageState extends ConsumerState<ExerciseRecordPage> {
   void dispose() {
     _pageController.removeListener(_onPageChanged);
     _pageController.dispose();
+    _tileScrollController.dispose();
     super.dispose();
   }
 
@@ -51,8 +54,27 @@ class _ExerciseRecordPageState extends ConsumerState<ExerciseRecordPage> {
       setState(() {
         _currentPage = currentPage;
       });
+      // 自动滚动 tile 列表到当前 exercise
+      _scrollToCurrentTile(currentPage);
       // 页面切换不重置计时器
     }
+  }
+
+  /// 自动滚动到当前 tile (确保可见)
+  void _scrollToCurrentTile(int index) {
+    if (!_tileScrollController.hasClients) {
+      return;
+    }
+
+    // 估算每个 tile 的宽度 (最小80px + 间距8px)
+    const double estimatedTileWidth = 88.0;
+    final double offset = index * estimatedTileWidth;
+
+    _tileScrollController.animateTo(
+      offset,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+    );
   }
 
   Future<void> _loadData() async {
@@ -171,6 +193,15 @@ class _ExerciseRecordPageState extends ConsumerState<ExerciseRecordPage> {
                 completedCount: state.exercises
                     .where((e) => e.completed)
                     .length,
+                exerciseNames: state.exercises.map((e) => e.name).toList(),
+                onExerciseTap: (index) {
+                  _pageController.animateToPage(
+                    index,
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeInOut,
+                  );
+                },
+                tileScrollController: _tileScrollController,
                 onPreviousPage: () {
                   if (_currentPage > 0) {
                     _pageController.previousPage(
@@ -292,32 +323,28 @@ class _ExerciseRecordPageState extends ConsumerState<ExerciseRecordPage> {
                   .read(exerciseRecordNotifierProvider.notifier)
                   .quickComplete(index);
             },
-            onVideoUploaded: (videoFile) {
-              // 添加 pending 视频到状态（缩略图路径为 null）
+            onMediaSelected: (file, type) {
+              // 添加 pending 媒体到状态（缩略图路径为 null）
               ref
                   .read(exerciseRecordNotifierProvider.notifier)
-                  .addPendingVideo(index, videoFile.path, null);
+                  .addPendingMedia(index, file.path, type, thumbnailPath: null);
             },
-            onVideoUploadCompleted: (videoIndex, downloadUrl, thumbnailUrl) {
-              // 上传完成，更新状态并保存到 Firestore
+            onMediaUploadCompleted:
+                (mediaIndex, downloadUrl, thumbnailUrl, type) {
+                  // 上传完成，更新状态并保存到 Firestore
+                  ref
+                      .read(exerciseRecordNotifierProvider.notifier)
+                      .completeMediaUpload(
+                        index,
+                        mediaIndex,
+                        downloadUrl,
+                        thumbnailUrl: thumbnailUrl,
+                      );
+                },
+            onMediaDeleted: (mediaIndex) {
               ref
                   .read(exerciseRecordNotifierProvider.notifier)
-                  .completeVideoUpload(
-                    index,
-                    videoIndex,
-                    downloadUrl,
-                    thumbnailUrl: thumbnailUrl,
-                  );
-            },
-            onVideoDeleted: (videoIndex) {
-              ref
-                  .read(exerciseRecordNotifierProvider.notifier)
-                  .deleteVideo(index, videoIndex);
-            },
-            onVideoRetry: (videoIndex) {
-              ref
-                  .read(exerciseRecordNotifierProvider.notifier)
-                  .retryVideoUpload(index, videoIndex);
+                  .deleteMedia(index, mediaIndex);
             },
           ),
         );

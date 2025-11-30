@@ -5,6 +5,7 @@ import 'package:coach_x/core/theme/app_colors.dart';
 import 'package:coach_x/core/theme/app_text_styles.dart';
 import 'package:coach_x/l10n/app_localizations.dart';
 import '../../data/models/training_review_list_item_model.dart';
+import 'package:coach_x/core/models/media_upload_state.dart';
 
 /// 训练审核卡片组件
 ///
@@ -193,7 +194,7 @@ class TrainingReviewCard extends StatelessWidget {
     final totalVideos = hasExercises
         ? item.exercises!.fold<int>(
             0,
-            (sum, exercise) => sum + exercise.videos.length,
+            (sum, exercise) => sum + exercise.media.where((m) => m.type == MediaType.video).length,
           )
         : 0;
 
@@ -226,7 +227,7 @@ class TrainingReviewCard extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
         color: isReviewed
-            ? AppColors.successGreen.withValues(alpha: 0.15)
+            ? AppColors.successGreen.withValues(alpha: 0.25)
             : AppColors.warningYellow.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(12),
       ),

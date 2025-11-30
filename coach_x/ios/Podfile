@@ -30,6 +30,9 @@ flutter_ios_podfile_setup
 # Force GTMSessionFetcher to use 3.x version for compatibility between Firebase and MLKit
 pod 'GTMSessionFetcher/Core', '~> 3.5'
 
+# ML Kit Chinese Text Recognition
+pod 'GoogleMLKit/TextRecognitionChinese'
+
 target 'Runner' do
   use_frameworks!
 
