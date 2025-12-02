@@ -382,6 +382,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get invitationCodeCopied => 'Invitation code copied';
 
   @override
+  String get filterAll => 'All';
+
+  @override
+  String get filterValid => 'Valid';
+
+  @override
+  String get filterExpired => 'Expired';
+
+  @override
   String get selectAction => 'Select action';
 
   @override
@@ -1166,9 +1175,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get searchStudentName => 'Search by student name';
 
   @override
-  String get filterAll => 'All';
-
-  @override
   String get filterPending => 'Pending';
 
   @override
@@ -1543,7 +1549,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get viewMore => 'View More';
 
   @override
-  String get recordTraining => 'record training';
+  String get recordTraining => 'Check-ins (7 days)';
 
   @override
   String get recordsToReview => 'Records to Review';
@@ -2067,4 +2073,117 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get aiInputPlaceholder => 'Ask AI for suggestions...';
+
+  @override
+  String get createDietPlan => 'Create Diet Plan';
+
+  @override
+  String get aiGuidedDietCreate => 'AI Guided Creation';
+
+  @override
+  String get aiGuidedDietDesc =>
+      'Answer a few questions to generate a personalized diet plan';
+
+  @override
+  String get scanOrPasteDiet => 'Scan or Paste Text';
+
+  @override
+  String get scanOrPasteDietDesc =>
+      'Import an existing diet plan from image or text';
+
+  @override
+  String get manualDietCreate => 'Manual Creation';
+
+  @override
+  String get dietStep1ProfileTitle => 'Personal Profile';
+
+  @override
+  String get dietStep1ProfileSubtitle => 'Basic body metrics and information';
+
+  @override
+  String get dietStep2GoalTitle => 'Goals & Activity';
+
+  @override
+  String get dietStep2GoalSubtitle => 'Define your nutrition objectives';
+
+  @override
+  String get dietStep3PreferencesTitle => 'Preferences & Restrictions';
+
+  @override
+  String get dietStep3PreferencesSubtitle => 'Customize your meal preferences';
+
+  @override
+  String get weightKg => 'Weight (kg)';
+
+  @override
+  String get heightCm => 'Height (cm)';
+
+  @override
+  String get bodyFatPercentage => 'Body Fat % (Optional)';
+
+  @override
+  String get dietGoal => 'Diet Goal';
+
+  @override
+  String get activityLevel => 'Activity Level';
+
+  @override
+  String get mealCount => 'Meals per Day';
+
+  @override
+  String get dietaryPreferences => 'Dietary Preferences';
+
+  @override
+  String get dietaryRestrictions => 'Other Requirements';
+
+  @override
+  String get dietaryRestrictionsPlaceholder =>
+      'Enter allergy information and food preferences (optional)';
+
+  @override
+  String get referenceTrainingPlan => 'Reference Training Plan (Optional)';
+
+  @override
+  String get dietStep1Title => 'Analyzing Requirements';
+
+  @override
+  String get dietStep1Description =>
+      'Calculating BMR, TDEE, and target calories';
+
+  @override
+  String get dietStep2Title => 'Generating Diet Plan';
+
+  @override
+  String get dietStep2Description =>
+      'AI is creating your personalized meal plan';
+
+  @override
+  String get dietStep3Title => 'Calculating Nutrition';
+
+  @override
+  String get dietStep3Description => 'Verifying macronutrient distribution';
+
+  @override
+  String get dietStep4Title => 'Generation Complete';
+
+  @override
+  String get dietStep4Description => 'Your diet plan is ready';
+
+  @override
+  String get viewDetailsAndEdit => 'View Details and Edit';
+
+  @override
+  String get statDietTotalDays => 'Days';
+
+  @override
+  String get statDietTotalMeals => 'Meals';
+
+  @override
+  String get statBMR => 'BMR (kcal)';
+
+  @override
+  String get statTDEE => 'TDEE (kcal)';
+
+  @override
+  String get statTargetCalories => 'Target Calories (kcal)';
 }

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:coach_x/core/utils/logger.dart';
 import 'package:coach_x/features/coach/plans/data/models/create_supplement_plan_state.dart';
@@ -348,7 +349,10 @@ class CreateSupplementPlanNotifier
         throw Exception('计划不存在');
       }
 
-      // 更新状态
+      // 生成初始快照 JSON
+      final initialDaysJson = jsonEncode(plan.days.map((d) => d.toJson()).toList());
+
+      // 更新状态（包含初始快照）
       state = state.copyWith(
         planId: plan.id,
         planName: plan.name,
@@ -356,6 +360,9 @@ class CreateSupplementPlanNotifier
         days: plan.days,
         isLoading: false,
         isEditMode: true,
+        initialPlanName: plan.name,
+        initialDescription: plan.description,
+        initialDaysJson: initialDaysJson,
       );
 
       AppLogger.info('✅ 补剂计划加载成功: ${plan.name}');
@@ -455,6 +462,17 @@ class CreateSupplementPlanNotifier
   void reset() {
     state = const CreateSupplementPlanState();
     AppLogger.debug('🔄 重置创建补剂计划状态');
+  }
+
+  /// 保存当前状态为初始快照（用于判断是否有修改）
+  void saveInitialSnapshot() {
+    final initialDaysJson = jsonEncode(state.days.map((d) => d.toJson()).toList());
+    state = state.copyWith(
+      initialPlanName: state.planName,
+      initialDescription: state.description,
+      initialDaysJson: initialDaysJson,
+    );
+    AppLogger.debug('📸 保存初始快照 - days: ${state.days.length}');
   }
 
   /// 清空错误

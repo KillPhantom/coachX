@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:coach_x/core/enums/app_status.dart';
 import 'package:coach_x/core/enums/ai_status.dart';
@@ -426,7 +427,10 @@ class CreateTrainingPlanNotifier
       // 从Repository加载计划
       final plan = await _planRepository.getPlanDetail(planId: planId);
 
-      // 更新状态
+      // 生成初始快照 JSON
+      final initialDaysJson = jsonEncode(plan.days.map((d) => d.toJson()).toList());
+
+      // 更新状态（包含初始快照）
       state = state.copyWith(
         planId: plan.id,
         planName: plan.name,
@@ -434,6 +438,9 @@ class CreateTrainingPlanNotifier
         days: plan.days,
         loadingStatus: LoadingStatus.success,
         isEditMode: true,
+        initialPlanName: plan.name,
+        initialDescription: plan.description,
+        initialDaysJson: initialDaysJson,
       );
 
       AppLogger.info('✅ 训练计划加载成功: ${plan.name}');
@@ -516,6 +523,17 @@ class CreateTrainingPlanNotifier
   void reset() {
     state = const CreateTrainingPlanState();
     AppLogger.debug('🔄 重置创建计划状态');
+  }
+
+  /// 保存当前状态为初始快照（用于判断是否有修改）
+  void saveInitialSnapshot() {
+    final initialDaysJson = jsonEncode(state.days.map((d) => d.toJson()).toList());
+    state = state.copyWith(
+      initialPlanName: state.planName,
+      initialDescription: state.description,
+      initialDaysJson: initialDaysJson,
+    );
+    AppLogger.debug('📸 保存初始快照 - days: ${state.days.length}');
   }
 
   /// 清空错误

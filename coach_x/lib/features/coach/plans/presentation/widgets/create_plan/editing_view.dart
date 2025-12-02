@@ -11,7 +11,7 @@ import 'package:coach_x/features/coach/plans/data/models/suggestion_review_state
 import 'package:coach_x/features/coach/plans/presentation/providers/create_training_plan_notifier.dart';
 import 'package:coach_x/features/coach/plans/presentation/providers/suggestion_review_providers.dart';
 import 'package:coach_x/features/coach/plans/presentation/widgets/plan_header_widget.dart';
-import 'package:coach_x/features/coach/plans/presentation/widgets/day_pill.dart';
+import 'package:coach_x/features/coach/plans/presentation/widgets/day_pill_scroll_view.dart';
 import 'package:coach_x/features/coach/plans/presentation/widgets/training_day_editor.dart';
 import 'package:coach_x/features/coach/plans/presentation/widgets/exercise_card.dart';
 import 'package:coach_x/features/coach/plans/presentation/widgets/set_row.dart';
@@ -135,68 +135,15 @@ class _EditingViewState extends ConsumerState<EditingView> {
         ),
 
         // Horizontal Day Pills Scroll View
-        Container(
-          height: 52,
-          padding: const EdgeInsets.symmetric(vertical: 6),
-          decoration: BoxDecoration(
-            color: CupertinoColors.systemBackground.resolveFrom(context),
-            border: Border(
-              bottom: BorderSide(
-                color: CupertinoColors.separator.resolveFrom(context),
-              ),
-            ),
-          ),
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            itemCount: widget.state.days.length + 1,
-            itemBuilder: (context, index) {
-              if (index == widget.state.days.length) {
-                // Add Day Button
-                return GestureDetector(
-                  onTap: widget.onAddDay,
-                  child: Container(
-                    margin: const EdgeInsets.only(right: 8),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 10,
-                    ),
-                    decoration: BoxDecoration(
-                      color: AppColors.primaryText.withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(
-                        color: AppColors.primaryText.withValues(alpha: 0.3),
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          CupertinoIcons.add,
-                          color: AppColors.primaryText,
-                          size: 18,
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          l10n.addDay,
-                          style: AppTextStyles.footnote,
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              }
-
-              final day = widget.state.days[index];
-              return DayPill(
-                label: day.name,
-                dayNumber: day.day,
-                isSelected: widget.selectedDayIndex == index,
-                onTap: () => widget.onDayIndexChanged(index),
-                onLongPress: null, // Day options menu handled by parent
-              );
-            },
-          ),
+        DayPillScrollView(
+          dayItems: widget.state.days
+              .map((day) => (name: day.name, day: day.day))
+              .toList(),
+          selectedDayIndex: widget.selectedDayIndex,
+          onDayTap: (index) => widget.onDayIndexChanged(index),
+          onDayLongPress: null, // Day options menu handled by parent
+          onAddDay: widget.onAddDay,
+          addDayLabel: l10n.addDay,
         ),
 
         // Content Area

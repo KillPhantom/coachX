@@ -8,12 +8,13 @@ import 'package:coach_x/features/coach/plans/presentation/providers/create_train
 import 'package:coach_x/features/coach/plans/data/models/create_plan_page_state.dart';
 import 'package:coach_x/features/coach/plans/data/models/create_training_plan_state.dart';
 import 'package:coach_x/features/coach/exercise_library/presentation/providers/exercise_library_providers.dart';
-import 'step_card.dart';
-import 'summary_card.dart';
-import 'create_templates_confirmation_dialog.dart';
+import '../shared/step_card.dart';
+import '../shared/progress_bar.dart';
+import 'training_summary_card.dart';
+import '../create_templates_confirmation_dialog.dart';
 
-class AIStreamingView extends ConsumerWidget {
-  const AIStreamingView({super.key});
+class TrainingAIStreamingView extends ConsumerWidget {
+  const TrainingAIStreamingView({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -39,7 +40,7 @@ class AIStreamingView extends ConsumerWidget {
                           state.currentStep == 4 &&
                           state.aiStreamingStats != null) ...[
                         const SizedBox(height: 30),
-                        SummaryCard(
+                        TrainingSummaryCard(
                           stats: state.aiStreamingStats!,
                           onViewPlan: () => _handleViewPlan(context, ref),
                         ),
@@ -71,35 +72,8 @@ class AIStreamingView extends ConsumerWidget {
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 8),
-        _buildProgressBar(state.currentStepProgress),
+        StreamingProgressBar(progress: state.currentStepProgress),
       ],
-    );
-  }
-
-  Widget _buildProgressBar(double progress) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        return Container(
-          height: 8,
-          decoration: BoxDecoration(
-            color: CupertinoColors.systemGrey5,
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: CupertinoColors.systemGrey4, width: 0.5),
-          ),
-          child: Align(
-            alignment: Alignment.centerLeft,
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 300),
-              curve: Curves.easeInOut,
-              width: constraints.maxWidth * (progress / 100),
-              decoration: BoxDecoration(
-                color: CupertinoColors.systemGreen,
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
-          ),
-        );
-      },
     );
   }
 

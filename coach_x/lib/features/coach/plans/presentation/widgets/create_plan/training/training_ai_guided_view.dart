@@ -19,16 +19,16 @@ import 'package:coach_x/features/coach/plans/presentation/providers/create_train
 /// Step 1: 目标与水平 (The Goal)
 /// Step 2: 时间与重点 (The Focus)
 /// Step 3: 场景与微调 (The Context)
-class AIGuidedView extends ConsumerStatefulWidget {
+class TrainingAIGuidedView extends ConsumerStatefulWidget {
   final VoidCallback onGenerationStart;
 
-  const AIGuidedView({super.key, required this.onGenerationStart});
+  const TrainingAIGuidedView({super.key, required this.onGenerationStart});
 
   @override
-  ConsumerState<AIGuidedView> createState() => _AIGuidedViewState();
+  ConsumerState<TrainingAIGuidedView> createState() => _TrainingAIGuidedViewState();
 }
 
-class _AIGuidedViewState extends ConsumerState<AIGuidedView> {
+class _TrainingAIGuidedViewState extends ConsumerState<TrainingAIGuidedView> {
   final PageController _pageController = PageController();
   int _currentStep = 0;
   final int _totalSteps = 3;

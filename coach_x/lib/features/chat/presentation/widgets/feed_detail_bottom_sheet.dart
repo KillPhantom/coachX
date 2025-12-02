@@ -97,8 +97,8 @@ class FeedDetailSheet extends ConsumerWidget {
             child: feedItem.type == FeedItemType.video
                 ? _VideoDetailsContent(feedItem: feedItem)
                 : feedItem.type == FeedItemType.textCard
-                    ? _TextCardDetailsContent(feedItem: feedItem)
-                    : const SizedBox(),
+                ? _TextCardDetailsContent(feedItem: feedItem)
+                : const SizedBox(),
           ),
         ],
       ),
@@ -196,9 +196,7 @@ class _VideoDetailsContent extends StatelessWidget {
             : AppColors.backgroundSecondary,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: completed
-              ? AppColors.primary
-              : AppColors.dividerLight,
+          color: completed ? AppColors.primary : AppColors.dividerLight,
           width: 1,
         ),
       ),
@@ -207,9 +205,7 @@ class _VideoDetailsContent extends StatelessWidget {
           Text(
             '${index + 1}',
             style: AppTextStyles.bodyMedium.copyWith(
-              color: completed
-                  ? AppColors.primary
-                  : AppColors.textSecondary,
+              color: completed ? AppColors.primary : AppColors.textSecondary,
             ),
           ),
           const SizedBox(width: 16),
@@ -255,9 +251,11 @@ class _TextCardDetailsContent extends StatelessWidget {
     }
   }
 
-  Widget _buildAggregatedContent(BuildContext context, Map<String, dynamic> metadata) {
+  Widget _buildAggregatedContent(
+    BuildContext context,
+    Map<String, dynamic> metadata,
+  ) {
     final exercises = metadata['exercises'] as List? ?? [];
-    final meals = metadata['meals'] as List? ?? [];
 
     return Padding(
       padding: const EdgeInsets.all(16),
@@ -271,89 +269,18 @@ class _TextCardDetailsContent extends StatelessWidget {
               final exercise = e as Map<String, dynamic>;
               final name = exercise['name'] as String? ?? '';
               final sets = exercise['sets'] as List? ?? [];
-              
+
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(name, style: AppTextStyles.bodySemiBold),
                   const SizedBox(height: 8),
                   ...sets.asMap().entries.map((entry) {
-                     return _buildSetItem(entry.key, entry.value as Map<String, dynamic>);
+                    return _buildSetItem(
+                      entry.key,
+                      entry.value as Map<String, dynamic>,
+                    );
                   }),
-                  const SizedBox(height: 24),
-                ],
-              );
-            }),
-            Container(height: 1, color: AppColors.dividerLight),
-            const SizedBox(height: 24),
-          ],
-
-          if (meals.isNotEmpty) ...[
-            Text('饮食记录', style: AppTextStyles.title3),
-            const SizedBox(height: 16),
-            ...meals.map((m) {
-              final meal = m as Map<String, dynamic>;
-              final name = meal['name'] as String? ?? 'Meal';
-              final images = meal['images'] as List? ?? [];
-              final items = meal['items'] as List? ?? [];
-              
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(name, style: AppTextStyles.bodySemiBold),
-                  const SizedBox(height: 8),
-                  
-                  // Meal Images
-                  if (images.isNotEmpty)
-                    SizedBox(
-                      height: 120,
-                      child: ListView.separated(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: images.length,
-                        separatorBuilder: (_, __) => const SizedBox(width: 8),
-                        itemBuilder: (context, index) {
-                          return ClipRRect(
-                            borderRadius: BorderRadius.circular(8),
-                            child: Image.network(
-                              images[index] as String,
-                              width: 120,
-                              height: 120,
-                              fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) => Container(
-                                width: 120,
-                                height: 120,
-                                color: AppColors.backgroundSecondary,
-                                child: const Icon(CupertinoIcons.photo),
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  if (images.isNotEmpty) const SizedBox(height: 12),
-
-                  // Food Items list
-                  if (items.isNotEmpty)
-                    ...items.map((item) {
-                      final foodItem = item as Map<String, dynamic>;
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 4),
-                        child: Row(
-                          children: [
-                             Text(
-                               '• ${foodItem['name']}',
-                               style: AppTextStyles.body,
-                             ),
-                             const Spacer(),
-                             Text(
-                               '${foodItem['amount']} ${foodItem['unit']}',
-                               style: AppTextStyles.body.copyWith(color: AppColors.textSecondary),
-                             ),
-                          ],
-                        ),
-                      );
-                    }),
-
                   const SizedBox(height: 24),
                 ],
               );
@@ -364,7 +291,10 @@ class _TextCardDetailsContent extends StatelessWidget {
     );
   }
 
-  Widget _buildSingleContent(BuildContext context, Map<String, dynamic> metadata) {
+  Widget _buildSingleContent(
+    BuildContext context,
+    Map<String, dynamic> metadata,
+  ) {
     final l10n = AppLocalizations.of(context)!;
     final sets = metadata['sets'] as List;
     final totalSets = metadata['totalSets'] as int;
@@ -441,9 +371,7 @@ class _TextCardDetailsContent extends StatelessWidget {
           Text(
             '${index + 1}',
             style: AppTextStyles.bodyMedium.copyWith(
-              color: completed
-                  ? AppColors.primary
-                  : AppColors.textSecondary,
+              color: completed ? AppColors.primary : AppColors.textSecondary,
             ),
           ),
           const SizedBox(width: 16),

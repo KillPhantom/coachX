@@ -10,14 +10,22 @@ import 'package:coach_x/features/student/training/data/models/student_exercise_m
 import 'package:coach_x/features/student/training/data/models/student_exercise_record_state.dart';
 import 'package:coach_x/core/models/media_upload_state.dart';
 import 'package:coach_x/features/student/training/data/repositories/training_record_repository.dart';
+import 'package:coach_x/core/services/media_upload_manager.dart';
 
 /// 训练记录 Notifier
 class ExerciseRecordNotifier extends StateNotifier<ExerciseRecordState> {
   final TrainingRecordRepository _repository;
+  final MediaUploadManager _uploadManager;
   Timer? _debounceTimer;
+  StreamSubscription<UploadProgress>? _uploadProgressSubscription;
 
-  ExerciseRecordNotifier(this._repository, String initialDate)
-    : super(ExerciseRecordState.initial(initialDate));
+  ExerciseRecordNotifier(
+    this._repository,
+    this._uploadManager,
+    String initialDate,
+  ) : super(ExerciseRecordState.initial(initialDate)) {
+    _listenToUploadProgress();
+  }
 
   /// 更新视频上传进度 (Rename to updateMediaUploadProgress if possible, keeping for compat if needed, but updating internals)
   void updateVideoUploadProgress(
@@ -100,11 +108,14 @@ class ExerciseRecordNotifier extends StateNotifier<ExerciseRecordState> {
 
   @override
   void dispose() {
-    // 取消所有上传订阅
+    _debounceTimer?.cancel();
+    _uploadProgressSubscription?.cancel();
+    _uploadManager.dispose();
+
+    // 取消所有上传订阅（旧代码，保持兼容）
     for (final subscription in state.uploadSubscriptions.values) {
       subscription.cancel();
     }
-    _debounceTimer?.cancel();
     super.dispose();
   }
 
@@ -525,11 +536,71 @@ class ExerciseRecordNotifier extends StateNotifier<ExerciseRecordState> {
     AppLogger.info('所有 Exercise 已完成，无需重置计时器');
   }
 
-  // ========== 视频状态管理方法（新增，v2.4）========== (Rename to Media State Management)
+  // ========== 媒体上传管理方法 ==========
 
-  /// 添加 Pending 状态媒体（不启动上传）
+  /// 监听上传进度
+  void _listenToUploadProgress() {
+    _uploadProgressSubscription = _uploadManager.progressStream.listen((progress) {
+      _handleUploadProgress(progress);
+    });
+  }
+
+  /// 处理上传进度事件
+  void _handleUploadProgress(UploadProgress progress) {
+    // 解析 taskId (格式: "exerciseIndex_mediaIndex")
+    final parts = progress.taskId.split('_');
+    if (parts.length != 2) {
+      AppLogger.error('[ExerciseRecordNotifier] 无效的 taskId 格式: ${progress.taskId}');
+      return;
+    }
+
+    final exerciseIndex = int.tryParse(parts[0]);
+    final mediaIndex = int.tryParse(parts[1]);
+
+    if (exerciseIndex == null || mediaIndex == null) {
+      AppLogger.error('[ExerciseRecordNotifier] 无法解析 taskId: ${progress.taskId}');
+      return;
+    }
+
+    if (exerciseIndex < 0 || exerciseIndex >= state.exercises.length) {
+      AppLogger.error('[ExerciseRecordNotifier] exerciseIndex 越界: $exerciseIndex');
+      return;
+    }
+
+    final exercise = state.exercises[exerciseIndex];
+    if (mediaIndex < 0 || mediaIndex >= exercise.media.length) {
+      AppLogger.error('[ExerciseRecordNotifier] mediaIndex 越界: $mediaIndex');
+      return;
+    }
+
+    AppLogger.info(
+      '[ExerciseRecordNotifier] 上传进度更新: ${progress.taskId} - ${(progress.progress * 100).toInt()}% (${progress.status})',
+    );
+
+    // 更新媒体状态
+    final updatedMedia = List<MediaUploadState>.from(exercise.media);
+    updatedMedia[mediaIndex] = updatedMedia[mediaIndex].copyWith(
+      status: progress.status,
+      progress: progress.progress,
+      error: progress.error,
+      downloadUrl: progress.downloadUrl,
+      thumbnailUrl: progress.thumbnailUrl,
+      thumbnailPath: progress.thumbnailPath,
+    );
+
+    final updatedExercise = exercise.copyWith(media: updatedMedia);
+    updateExercise(exerciseIndex, updatedExercise);
+
+    // 如果完成，保存到 Firestore
+    if (progress.status == MediaUploadStatus.completed) {
+      AppLogger.info('[ExerciseRecordNotifier] 媒体上传完成，保存记录: ${progress.taskId}');
+      saveRecord();
+    }
+  }
+
+  /// 添加媒体并启动上传
   ///
-  /// 由 MediaUploadSection 选择媒体后调用，仅添加占位符
+  /// 由 UI 选择媒体后调用，立即启动后台上传
   void addPendingMedia(
     int exerciseIndex,
     String localPath,
@@ -544,15 +615,33 @@ class ExerciseRecordNotifier extends StateNotifier<ExerciseRecordState> {
     }
 
     AppLogger.info(
-      '➕ [addPendingMedia] 添加 pending 媒体: exerciseIndex=$exerciseIndex, localPath=$localPath, type=$type',
+      '➕ [addPendingMedia] 添加媒体并启动上传: exerciseIndex=$exerciseIndex, localPath=$localPath, type=$type',
     );
 
+    // 1. 添加到 state
     final exercise = state.exercises[exerciseIndex];
     final updatedExercise = exercise.addPendingMedia(localPath, type, thumbnailPath: thumbnailPath);
     updateExercise(exerciseIndex, updatedExercise);
 
+    // 2. 立即启动后台上传
+    final mediaIndex = updatedExercise.media.length - 1;
+    final taskId = '${exerciseIndex}_$mediaIndex';
+    final userId = FirebaseAuth.instance.currentUser?.uid ?? 'unknown';
+    final timestamp = DateTime.now().millisecondsSinceEpoch;
+    final ext = type == MediaType.video ? 'mp4' : 'jpg';
+    final storagePath = 'students/trainings/$userId/$timestamp.$ext';
+
+    _uploadManager.startUpload(
+      file: File(localPath),
+      type: type,
+      storagePath: storagePath,
+      taskId: taskId,
+      maxVideoSeconds: 60,
+      compressionThresholdMB: 50,
+    );
+
     AppLogger.info(
-      '✅ [addPendingMedia] Pending 媒体已添加，当前媒体数: ${updatedExercise.media.length}',
+      '✅ [addPendingMedia] 媒体已添加并开始上传，taskId=$taskId',
     );
   }
 
@@ -604,4 +693,5 @@ class ExerciseRecordNotifier extends StateNotifier<ExerciseRecordState> {
       // 不抛出错误，避免阻塞 UI
     }
   }
+
 }

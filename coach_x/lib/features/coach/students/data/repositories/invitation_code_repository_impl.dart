@@ -1,4 +1,5 @@
 import 'package:coach_x/core/services/cloud_functions_service.dart';
+import 'package:coach_x/core/utils/json_utils.dart';
 import 'package:coach_x/core/utils/logger.dart';
 import '../models/invitation_code_model.dart';
 import 'invitation_code_repository.dart';
@@ -13,15 +14,12 @@ class InvitationCodeRepositoryImpl implements InvitationCodeRepository {
       final response = await CloudFunctionsService.call(
         'fetch_invitation_codes',
       );
-      final data = response['data'] as Map<String, dynamic>;
+      final data = safeMapCast(response['data'], 'data')!;
 
       // 解析邀请码列表
-      final codesList = data['codes'] as List<dynamic>;
+      final codesList = safeMapListCast(data['codes'], 'codes');
       final codes = codesList
-          .map(
-            (json) =>
-                InvitationCodeModel.fromJson(json as Map<String, dynamic>),
-          )
+          .map((json) => InvitationCodeModel.fromJson(json))
           .toList();
 
       AppLogger.info('fetch_invitation_codes成功: ${codes.length}个邀请码');

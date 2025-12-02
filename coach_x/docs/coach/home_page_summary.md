@@ -9,7 +9,6 @@
 ```
 CoachHomePage
 ├── SummarySection (统计概览)
-├── EventReminderSection (即将到来的日程)
 └── PendingReviewsSection (待审核训练)
 ```
 
@@ -25,7 +24,6 @@ CoachHomePage
 
 **数据依赖**:
 - `coachSummaryProvider` (用于刷新)
-- `eventRemindersProvider` (用于刷新)
 - `trainingReviewsStreamProvider` (用于刷新)
 
 ---
@@ -55,10 +53,10 @@ CoachHomePage
 - `coachSummaryProvider` → `CoachSummaryModel`
 
 **字段说明**:
-- **第1列**: 过去30天完成训练的学生数 / 总学生数
-  - 数据: `CoachSummaryModel.studentsCompletedLast30Days`
-  - 格式: `{x}/{total} record training`
-  - 点击: TODO - 跳转到学生列表页（筛选过去30天完成训练的学生）
+- **第1列**: 本周学生打卡次数（最近7天）
+  - 数据: `CoachSummaryModel.studentCheckInsLast7Days`
+  - 格式: `{n}` (显示打卡次数数字)
+  - 点击: 跳转到学生列表页 (`RouteNames.coachStudents`)
 
 - **第2列**: 待审核的训练记录数
   - 数据: `CoachSummaryModel.unreviewedTrainings`
@@ -72,23 +70,7 @@ CoachHomePage
 
 ---
 
-### 3. EventReminderSection (即将到来的日程)
-**文件**: `lib/features/coach/home/presentation/widgets/event_reminder_section.dart`
-
-**职责**:
-- 显示即将到来的事件提醒（线下课程、治疗预约等）
-
-**数据源**:
-- `eventRemindersProvider` → `List<EventReminderModel>`
-
-**数据过滤**:
-- 只显示未完成的事件 (`isCompleted == false`)
-- 按计划时间升序排序
-- 限制最多3条
-
----
-
-### 4. PendingReviewsSection (待审核训练)
+### 3. PendingReviewsSection (待审核训练)
 **文件**: `lib/features/coach/home/presentation/widgets/pending_reviews_section.dart`
 
 **职责**:
@@ -132,59 +114,18 @@ PendingReviewsSection
 
 ```dart
 class CoachSummaryModel {
-  final int studentsCompletedLast30Days;  // 过去30天完成训练的学生数
-  final int totalStudents;                // 总学生数
+  final int studentCheckInsLast7Days;     // 本周学生打卡次数（最近7天）
   final int unreadMessages;               // 未读消息数
   final int unreviewedTrainings;          // 待审核训练记录数
   final DateTime lastUpdated;             // 最后更新时间
-
-  String get completionRate;              // "{x}/{totalStudents}"
-  double get completionPercentage;        // x / totalStudents
 }
 ```
 
-**数据来源** (待实现):
-- Cloud Function: `fetchStudentsStats()`
-- 整合未读消息统计和待审核训练数（过去30天）
-
----
-
-### EventReminderModel
-**文件**: `lib/features/coach/home/data/models/event_reminder_model.dart`
-
-```dart
-enum EventReminderType {
-  offlineClass,      // 线下课程
-  therapySession,    // 治疗/按摩预约
-  planDeadline,      // 计划截止
-  studentCheckIn,    // 学生打卡
-  custom,            // 自定义事件
-}
-
-class EventReminderModel {
-  final String id;
-  final EventReminderType type;
-  final String title;
-  final String? description;
-  final DateTime scheduledTime;
-  final String? studentId;
-  final String? studentName;
-  final String? location;
-  final bool isCompleted;
-  final DateTime createdAt;
-  final String coachId;
-}
-```
-
-**数据来源** (待实现):
-- Firestore Collection: `eventReminders`
-- Query:
-  ```
-  where('coachId', '==', currentCoachId)
-  where('isCompleted', '==', false)
-  orderBy('scheduledTime')
-  limit(3)
-  ```
+**数据来源**:
+- Repository: `CoachHomeRepositoryImpl`
+- 直接查询 Firestore：
+  - `dailyTrainings` collection (打卡次数、待审核数)
+  - `conversations` collection (未读消息数)
 
 ---
 
@@ -215,30 +156,17 @@ class TrainingReviewListItemModel {
 ```
 CoachHomePage
     ↓ watches
-coachSummaryProvider (FutureProvider)
-    ↓ fetches
-Cloud Function: fetchStudentsStats() (TODO)
+coachSummaryProvider (FutureProvider.autoDispose)
+    ↓ calls
+CoachHomeRepository.fetchCoachSummary()
+    ↓ queries
+Firestore (dailyTrainings + conversations)
     ↓ returns
 CoachSummaryModel
     ↓ consumed by
 SummarySection
     ↓ renders
 3-Column Layout (_StatColumn x3)
-```
-
-### Event Reminder Flow
-```
-CoachHomePage
-    ↓ watches
-eventRemindersProvider (FutureProvider)
-    ↓ queries (TODO)
-Firestore: eventReminders collection
-    ↓ returns
-List<EventReminderModel>
-    ↓ consumed by
-EventReminderSection
-    ↓ renders
-EventReminderItem (for each reminder)
 ```
 
 ### Pending Reviews Flow
@@ -265,8 +193,8 @@ TrainingReviewCard x5 + View More Button
 | Provider | Type | Purpose |
 |----------|------|---------|
 | `currentCoachIdProvider` | Provider | 提供当前教练ID |
-| `coachSummaryProvider` | FutureProvider | 提供统计概览数据 (mock) |
-| `eventRemindersProvider` | FutureProvider | 提供事件提醒列表 (mock) |
+| `coachHomeRepositoryProvider` | Provider | 提供 CoachHomeRepository 实例 |
+| `coachSummaryProvider` | FutureProvider.autoDispose | 提供统计概览数据（1小时缓存） |
 | `top5PendingReviewsProvider` | Provider | 提供最新5条待审核训练 |
 
 ### Dependencies from other features
@@ -308,40 +236,16 @@ TrainingReviewCard x5 + View More Button
 
 ---
 
-## TODO Items
-
-### Backend API
-1. 实现 Cloud Function: `fetchStudentsStats()`
-   - 返回过去30天完成训练的学生数
-   - 返回总学生数
-   - 返回未读消息数
-   - 返回待审核训练记录数
-
-2. 实现 Firestore监听: `eventReminders` collection
-   - 按教练ID和完成状态筛选
-   - 按计划时间排序
-
-### Frontend功能
-1. Summary Section第1列点击跳转
-   - 需要确定跳转目标页面和筛选条件
-
-2. Summary Section第3列点击跳转
-   - 实现切换到Chat Tab的逻辑
-
-### 性能优化
-- 考虑将 `coachSummaryProvider` 改为 `StreamProvider` 以实现实时更新
-- 考虑添加缓存机制避免频繁重新获取数据
-
----
-
 ## File Structure
 
 ```
 lib/features/coach/home/
 ├── data/
-│   └── models/
-│       ├── coach_summary_model.dart
-│       └── event_reminder_model.dart
+│   ├── models/
+│   │   └── coach_summary_model.dart
+│   └── repositories/
+│       ├── coach_home_repository.dart
+│       └── coach_home_repository_impl.dart
 └── presentation/
     ├── pages/
     │   └── coach_home_page.dart
@@ -349,8 +253,6 @@ lib/features/coach/home/
     │   └── coach_home_providers.dart
     └── widgets/
         ├── summary_section.dart
-        ├── event_reminder_section.dart
-        ├── event_reminder_item.dart
         └── pending_reviews_section.dart
 ```
 
@@ -372,43 +274,4 @@ lib/features/coach/home/
 
 ---
 
-## Recent Changes (2025-11-16)
-
-### UI重构
-- Summary Section改为3列横向布局（原为3行纵向布局）
-- Recent Activity Section替换为Pending Reviews Section
-- Event Reminder Section标题更新为"Upcoming Schedule"
-
-### 数据模型更新
-- `CoachSummaryModel.studentsCompletedToday` → `studentsCompletedLast30Days`
-- 统计时间范围从"今日"改为"过去30天"
-
-### 新增组件
-- `PendingReviewsSection` - 显示最新5条待审核训练
-- `_StatColumn` (私有组件) - Summary Section的统计列
-
-### 删除组件
-- `RecentActivitySection`
-- `RecentActivityItem`
-- `RecentActivityModel`
-- `SummaryItem`
-- `recentActivitiesProvider`
-
----
-
-## Testing Checklist
-
-- [ ] Summary Section 3列显示正确
-- [ ] Summary Section点击跳转功能正常
-- [ ] Event Reminder Section标题为"Upcoming Schedule"
-- [ ] Pending Reviews Section显示最多5条记录
-- [ ] Pending Reviews Section "View More"按钮跳转正确
-- [ ] 下拉刷新功能正常
-- [ ] 空状态显示正确
-- [ ] Loading状态显示正确
-- [ ] Error状态显示正确并可重试
-- [ ] 中英文切换正常
-
----
-
-Last Updated: 2025-11-16
+**Last Updated**: 2025-12-01

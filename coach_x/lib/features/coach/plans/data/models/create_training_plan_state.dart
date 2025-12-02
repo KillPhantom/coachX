@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:coach_x/core/enums/app_status.dart';
 import 'package:coach_x/core/enums/ai_status.dart';
 import 'package:coach_x/features/coach/plans/data/models/exercise_training_day.dart';
@@ -44,6 +45,11 @@ class CreateTrainingPlanState {
   /// 用于记录通过 "create guidance" 创建的模板
   final Map<String, String> manuallyCreatedTemplates;
 
+  /// 初始快照 - 用于判断是否有未保存的修改（编辑模式）
+  final String? initialPlanName;
+  final String? initialDescription;
+  final String? initialDaysJson;
+
   const CreateTrainingPlanState({
     this.planId,
     this.planName = '',
@@ -64,6 +70,9 @@ class CreateTrainingPlanState {
     this.currentStepProgress = 0.0,
     this.lastGenerationParams,
     this.manuallyCreatedTemplates = const {},
+    this.initialPlanName,
+    this.initialDescription,
+    this.initialDaysJson,
   });
 
   /// 复制并修改部分字段
@@ -87,6 +96,9 @@ class CreateTrainingPlanState {
     double? currentStepProgress,
     PlanGenerationParams? lastGenerationParams,
     Map<String, String>? manuallyCreatedTemplates,
+    String? initialPlanName,
+    String? initialDescription,
+    String? initialDaysJson,
   }) {
     return CreateTrainingPlanState(
       planId: planId ?? this.planId,
@@ -110,6 +122,9 @@ class CreateTrainingPlanState {
       lastGenerationParams: lastGenerationParams ?? this.lastGenerationParams,
       manuallyCreatedTemplates:
           manuallyCreatedTemplates ?? this.manuallyCreatedTemplates,
+      initialPlanName: initialPlanName ?? this.initialPlanName,
+      initialDescription: initialDescription ?? this.initialDescription,
+      initialDaysJson: initialDaysJson ?? this.initialDaysJson,
     );
   }
 
@@ -175,7 +190,18 @@ class CreateTrainingPlanState {
 
   /// 是否有未保存的更改
   bool get hasUnsavedChanges {
-    return planName.isNotEmpty || days.isNotEmpty;
+    // 快照未设置，表示刚初始化还没保存快照
+    if (initialDaysJson == null) {
+      return false;
+    }
+
+    // 对比初始快照
+    if (planName != (initialPlanName ?? '')) return true;
+    if (description != (initialDescription ?? '')) return true;
+
+    // 深度对比 days（通过 JSON 序列化）
+    final currentDaysJson = jsonEncode(days.map((d) => d.toJson()).toList());
+    return currentDaysJson != initialDaysJson;
   }
 
   /// 获取当前选中的训练日

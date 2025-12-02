@@ -7,7 +7,7 @@ import 'package:coach_x/core/utils/logger.dart';
 import 'package:coach_x/features/coach/plans/data/models/supplement.dart';
 import 'package:coach_x/features/coach/plans/presentation/providers/create_supplement_plan_providers.dart';
 import 'package:coach_x/features/coach/plans/presentation/widgets/plan_header_widget.dart';
-import 'package:coach_x/features/coach/plans/presentation/widgets/day_pill.dart';
+import 'package:coach_x/features/coach/plans/presentation/widgets/day_pill_scroll_view.dart';
 import 'package:coach_x/features/coach/plans/presentation/widgets/supplement_day_editor.dart';
 import 'package:coach_x/features/coach/plans/presentation/widgets/ai_supplement_creation_panel.dart';
 import 'package:coach_x/features/coach/plans/presentation/widgets/import_supplement_plan_sheet.dart';
@@ -59,6 +59,8 @@ class _CreateSupplementPlanPageState
         setState(() {
           _selectedDayIndex = 0;
         });
+        // 保存初始快照（用于判断是否有修改）
+        notifier.saveInitialSnapshot();
       }
     });
   }
@@ -109,78 +111,21 @@ class _CreateSupplementPlanPageState
                 ),
 
                 // Day Pills
-                Container(
-                  height: 52,
-                  padding: const EdgeInsets.symmetric(vertical: 6),
-                  decoration: BoxDecoration(
-                    color: CupertinoColors.systemBackground.resolveFrom(
-                      context,
-                    ),
-                    border: Border(
-                      bottom: BorderSide(
-                        color: CupertinoColors.separator.resolveFrom(context),
-                      ),
-                    ),
-                  ),
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    itemCount: state.days.length + 1,
-                    itemBuilder: (context, index) {
-                      if (index == state.days.length) {
-                        return GestureDetector(
-                          onTap: () => _onAddDay(notifier),
-                          child: Container(
-                            margin: const EdgeInsets.only(right: 8),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 10,
-                            ),
-                            decoration: BoxDecoration(
-                              color: AppColors.primaryLight,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  CupertinoIcons.add,
-                                  color: AppColors.primaryText,
-                                  size: 18,
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  'Add Day',
-                                  style: AppTextStyles.footnote.copyWith(
-                                    color: AppColors.primaryText,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
-                      }
-
-                      final day = state.days[index];
-                      return DayPill(
-                        label: day.name,
-                        dayNumber: day.day,
-                        isSelected: _selectedDayIndex == index,
-                        onTap: () {
-                          setState(() {
-                            _selectedDayIndex = index;
-                          });
-                        },
-                        onLongPress: () => _showDayOptionsMenu(
-                          context,
-                          notifier,
-                          index,
-                          day.name,
-                        ),
-                      );
-                    },
-                  ),
+                DayPillScrollView(
+                  dayItems: state.days
+                      .map((day) => (name: day.name, day: day.day))
+                      .toList(),
+                  selectedDayIndex: _selectedDayIndex,
+                  onDayTap: (index) {
+                    setState(() {
+                      _selectedDayIndex = index;
+                    });
+                  },
+                  onDayLongPress: (index, dayName) {
+                    _showDayOptionsMenu(context, notifier, index, dayName);
+                  },
+                  onAddDay: () => _onAddDay(notifier),
+                  addDayLabel: 'Add Day',
                 ),
 
                 // Content Area

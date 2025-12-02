@@ -626,6 +626,21 @@
     "description": "Invitation code copied message"
   },
 
+  "filterAll": "All",
+  "@filterAll": {
+    "description": "Filter option for all items"
+  },
+
+  "filterValid": "Valid",
+  "@filterValid": {
+    "description": "Filter option for valid items"
+  },
+
+  "filterExpired": "Expired",
+  "@filterExpired": {
+    "description": "Filter option for expired items"
+  },
+
   "selectAction": "Select action",
   "@selectAction": {
     "description": "Select action title"
@@ -2769,9 +2784,9 @@
     "description": "View all button text"
   },
 
-  "recordTraining": "record training",
+  "recordTraining": "Check-ins (7 days)",
   "@recordTraining": {
-    "description": "Record training text for summary stats"
+    "description": "Check-ins in last 7 days for summary stats"
   },
 
   "recordsToReview": "Records to Review",
@@ -3718,5 +3733,185 @@
   "aiInputPlaceholder": "Ask AI for suggestions...",
   "@aiInputPlaceholder": {
     "description": "Input placeholder in AI edit chat panel"
+  },
+
+  "createDietPlan": "Create Diet Plan",
+  "@createDietPlan": {
+    "description": "Create diet plan page title"
+  },
+
+  "aiGuidedDietCreate": "AI Guided Creation",
+  "@aiGuidedDietCreate": {
+    "description": "AI guided diet creation option"
+  },
+
+  "aiGuidedDietDesc": "Answer a few questions to generate a personalized diet plan",
+  "@aiGuidedDietDesc": {
+    "description": "AI guided diet creation description"
+  },
+
+  "scanOrPasteDiet": "Scan or Paste Text",
+  "@scanOrPasteDiet": {
+    "description": "Scan or paste diet text option"
+  },
+
+  "scanOrPasteDietDesc": "Import an existing diet plan from image or text",
+  "@scanOrPasteDietDesc": {
+    "description": "Scan or paste diet description"
+  },
+
+  "manualDietCreate": "Manual Creation",
+  "@manualDietCreate": {
+    "description": "Manual diet creation option"
+  },
+
+  "dietStep1ProfileTitle": "Personal Profile",
+  "@dietStep1ProfileTitle": {
+    "description": "Diet creation step 1 title"
+  },
+
+  "dietStep1ProfileSubtitle": "Basic body metrics and information",
+  "@dietStep1ProfileSubtitle": {
+    "description": "Diet creation step 1 subtitle"
+  },
+
+  "dietStep2GoalTitle": "Goals & Activity",
+  "@dietStep2GoalTitle": {
+    "description": "Diet creation step 2 title"
+  },
+
+  "dietStep2GoalSubtitle": "Define your nutrition objectives",
+  "@dietStep2GoalSubtitle": {
+    "description": "Diet creation step 2 subtitle"
+  },
+
+  "dietStep3PreferencesTitle": "Preferences & Restrictions",
+  "@dietStep3PreferencesTitle": {
+    "description": "Diet creation step 3 title"
+  },
+
+  "dietStep3PreferencesSubtitle": "Customize your meal preferences",
+  "@dietStep3PreferencesSubtitle": {
+    "description": "Diet creation step 3 subtitle"
+  },
+
+  "weightKg": "Weight (kg)",
+  "@weightKg": {
+    "description": "Weight in kilograms label"
+  },
+
+  "heightCm": "Height (cm)",
+  "@heightCm": {
+    "description": "Height in centimeters label"
+  },
+
+  "bodyFatPercentage": "Body Fat % (Optional)",
+  "@bodyFatPercentage": {
+    "description": "Body fat percentage label"
+  },
+
+  "dietGoal": "Diet Goal",
+  "@dietGoal": {
+    "description": "Diet goal label"
+  },
+
+  "activityLevel": "Activity Level",
+  "@activityLevel": {
+    "description": "Activity level label"
+  },
+
+  "mealCount": "Meals per Day",
+  "@mealCount": {
+    "description": "Meal count per day label"
+  },
+
+  "dietaryPreferences": "Dietary Preferences",
+  "@dietaryPreferences": {
+    "description": "Dietary preferences label"
+  },
+
+  "dietaryRestrictions": "Other Requirements",
+  "@dietaryRestrictions": {
+    "description": "Dietary restrictions and other requirements label"
+  },
+
+  "dietaryRestrictionsPlaceholder": "Enter allergy information and food preferences (optional)",
+  "@dietaryRestrictionsPlaceholder": {
+    "description": "Placeholder for dietary restrictions input field"
+  },
+
+  "referenceTrainingPlan": "Reference Training Plan (Optional)",
+  "@referenceTrainingPlan": {
+    "description": "Reference training plan label"
+  },
+
+  "dietStep1Title": "Analyzing Requirements",
+  "@dietStep1Title": {
+    "description": "Diet AI generation step 1 title"
+  },
+
+  "dietStep1Description": "Calculating BMR, TDEE, and target calories",
+  "@dietStep1Description": {
+    "description": "Diet AI generation step 1 description"
+  },
+
+  "dietStep2Title": "Generating Diet Plan",
+  "@dietStep2Title": {
+    "description": "Diet AI generation step 2 title"
+  },
+
+  "dietStep2Description": "AI is creating your personalized meal plan",
+  "@dietStep2Description": {
+    "description": "Diet AI generation step 2 description"
+  },
+
+  "dietStep3Title": "Calculating Nutrition",
+  "@dietStep3Title": {
+    "description": "Diet AI generation step 3 title"
+  },
+
+  "dietStep3Description": "Verifying macronutrient distribution",
+  "@dietStep3Description": {
+    "description": "Diet AI generation step 3 description"
+  },
+
+  "dietStep4Title": "Generation Complete",
+  "@dietStep4Title": {
+    "description": "Diet AI generation step 4 title"
+  },
+
+  "dietStep4Description": "Your diet plan is ready",
+  "@dietStep4Description": {
+    "description": "Diet AI generation step 4 description"
+  },
+
+  "viewDetailsAndEdit": "View Details and Edit",
+  "@viewDetailsAndEdit": {
+    "description": "Button to confirm AI generation and view full diet plan"
+  },
+
+  "statDietTotalDays": "Days",
+  "@statDietTotalDays": {
+    "description": "Diet total days statistic"
+  },
+
+  "statDietTotalMeals": "Meals",
+  "@statDietTotalMeals": {
+    "description": "Diet total meals statistic"
+  },
+
+  "statBMR": "BMR (kcal)",
+  "@statBMR": {
+    "description": "Basal Metabolic Rate statistic"
+  },
+
+  "statTDEE": "TDEE (kcal)",
+  "@statTDEE": {
+    "description": "Total Daily Energy Expenditure statistic"
+  },
+
+  "statTargetCalories": "Target Calories (kcal)",
+  "@statTargetCalories": {
+    "description": "Target calories statistic"
   }
 }

@@ -33,7 +33,7 @@ class _GuidedDietCreationSheetState
   final TextEditingController _bodyFatController = TextEditingController();
   String? _selectedTrainingPlanId;
   final Set<DietaryPreference> _dietaryPreferences = {};
-  final Set<Allergen> _allergies = {};
+  final TextEditingController _dietaryRestrictionsController = TextEditingController();
   int _mealCount = 4;
   int _planDurationDays = 1;
 
@@ -41,8 +41,6 @@ class _GuidedDietCreationSheetState
   bool _hasOtherDietaryPreference = false;
   final TextEditingController _otherDietaryPreferenceController =
       TextEditingController();
-  bool _hasOtherAllergy = false;
-  final TextEditingController _otherAllergyController = TextEditingController();
 
   // 展开状态
   bool _showAdvancedOptions = false;
@@ -54,7 +52,7 @@ class _GuidedDietCreationSheetState
     _ageController.dispose();
     _bodyFatController.dispose();
     _otherDietaryPreferenceController.dispose();
-    _otherAllergyController.dispose();
+    _dietaryRestrictionsController.dispose();
     super.dispose();
   }
 
@@ -83,7 +81,9 @@ class _GuidedDietCreationSheetState
             ? _dietaryPreferences.toList()
             : null,
         mealCount: _mealCount,
-        allergies: _allergies.isNotEmpty ? _allergies.toList() : null,
+        dietaryRestrictions: _dietaryRestrictionsController.text.trim().isNotEmpty
+            ? _dietaryRestrictionsController.text.trim()
+            : null,
         planDurationDays: _planDurationDays,
       );
 
@@ -424,31 +424,24 @@ class _GuidedDietCreationSheetState
         ),
         const SizedBox(height: 12),
 
-        // 过敏信息
-        _buildMultiSelectorWithOther<Allergen>(
-          label: '过敏信息（可多选）',
-          values: Allergen.values,
-          selectedValues: _allergies,
-          getDisplayName: (a) => a.displayName,
-          onToggle: (a) {
-            setState(() {
-              if (_allergies.contains(a)) {
-                _allergies.remove(a);
-              } else {
-                _allergies.add(a);
-              }
-            });
-          },
-          hasOther: _hasOtherAllergy,
-          onOtherToggle: () {
-            setState(() {
-              _hasOtherAllergy = !_hasOtherAllergy;
-              if (!_hasOtherAllergy) {
-                _otherAllergyController.clear();
-              }
-            });
-          },
-          otherController: _otherAllergyController,
+        // 其他要求
+        Text(
+          '其他要求',
+          style: AppTextStyles.subhead.copyWith(fontWeight: FontWeight.w500),
+        ),
+        const SizedBox(height: 6),
+        CupertinoTextField(
+          controller: _dietaryRestrictionsController,
+          placeholder: '填写过敏信息和不喜欢的食物（选填）',
+          maxLines: 3,
+          minLines: 3,
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: AppColors.cardBackground,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: AppColors.divider),
+          ),
+          style: AppTextStyles.body,
         ),
       ],
     );

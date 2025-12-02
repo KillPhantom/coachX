@@ -376,6 +376,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String get invitationCodeCopied => '邀请码已复制';
 
   @override
+  String get filterAll => '全部';
+
+  @override
+  String get filterValid => '有效';
+
+  @override
+  String get filterExpired => '已过期';
+
+  @override
   String get selectAction => '选择操作';
 
   @override
@@ -1157,9 +1166,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get searchStudentName => '按学生姓名搜索';
 
   @override
-  String get filterAll => '全部';
-
-  @override
   String get filterPending => '待审核';
 
   @override
@@ -1532,7 +1538,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get viewMore => '查看更多';
 
   @override
-  String get recordTraining => '学生打卡';
+  String get recordTraining => '本周打卡（7天）';
 
   @override
   String get recordsToReview => '待评价记录';
@@ -2048,4 +2054,112 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get aiInputPlaceholder => '向 AI 提问或提出修改建议...';
+
+  @override
+  String get createDietPlan => '创建饮食计划';
+
+  @override
+  String get aiGuidedDietCreate => 'AI 引导创建';
+
+  @override
+  String get aiGuidedDietDesc => '回答几个问题，生成个性化饮食方案';
+
+  @override
+  String get scanOrPasteDiet => '扫描或粘贴文本';
+
+  @override
+  String get scanOrPasteDietDesc => '从图片或文本导入已有饮食计划';
+
+  @override
+  String get manualDietCreate => '手动创建';
+
+  @override
+  String get dietStep1ProfileTitle => '个人资料';
+
+  @override
+  String get dietStep1ProfileSubtitle => '基本身体指标和信息';
+
+  @override
+  String get dietStep2GoalTitle => '目标与活动';
+
+  @override
+  String get dietStep2GoalSubtitle => '确定您的营养目标';
+
+  @override
+  String get dietStep3PreferencesTitle => '偏好与限制';
+
+  @override
+  String get dietStep3PreferencesSubtitle => '自定义您的饮食偏好';
+
+  @override
+  String get weightKg => '体重 (kg)';
+
+  @override
+  String get heightCm => '身高 (cm)';
+
+  @override
+  String get bodyFatPercentage => '体脂率 (可选)';
+
+  @override
+  String get dietGoal => '饮食目标';
+
+  @override
+  String get activityLevel => '活动水平';
+
+  @override
+  String get mealCount => '每日餐数';
+
+  @override
+  String get dietaryPreferences => '饮食偏好';
+
+  @override
+  String get dietaryRestrictions => '其他要求';
+
+  @override
+  String get dietaryRestrictionsPlaceholder => '填写过敏信息和不喜欢的食物（选填）';
+
+  @override
+  String get referenceTrainingPlan => '引用训练计划 (可选)';
+
+  @override
+  String get dietStep1Title => '分析饮食要求';
+
+  @override
+  String get dietStep1Description => '计算 BMR、TDEE 和目标热量';
+
+  @override
+  String get dietStep2Title => '生成饮食计划';
+
+  @override
+  String get dietStep2Description => 'AI 正在生成您的专属方案';
+
+  @override
+  String get dietStep3Title => '计算营养数据';
+
+  @override
+  String get dietStep3Description => '验证营养成分分布';
+
+  @override
+  String get dietStep4Title => '完成生成';
+
+  @override
+  String get dietStep4Description => '饮食计划已准备就绪';
+
+  @override
+  String get viewDetailsAndEdit => '查看详情并编辑';
+
+  @override
+  String get statDietTotalDays => '天数';
+
+  @override
+  String get statDietTotalMeals => '餐次';
+
+  @override
+  String get statBMR => '基础代谢 (kcal)';
+
+  @override
+  String get statTDEE => '总消耗 (kcal)';
+
+  @override
+  String get statTargetCalories => '目标热量 (kcal)';
 }

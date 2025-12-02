@@ -42,7 +42,10 @@ class DietDayEditor extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: AppColors.primaryLight,
+                color: AppColors.backgroundCard,
+                border: Border.all(
+                  color: AppColors.borderColor,
+                ),
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Column(
@@ -61,7 +64,7 @@ class DietDayEditor extends StatelessWidget {
                         'Daily Total',
                         style: AppTextStyles.callout.copyWith(
                           fontWeight: FontWeight.w600,
-                          color: AppColors.primaryAction,
+                          color: AppColors.textPrimary,
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -164,7 +167,7 @@ class DietDayEditor extends StatelessWidget {
         value,
         style: AppTextStyles.caption1.copyWith(
           fontWeight: FontWeight.w600,
-          color: AppColors.primaryAction,
+          color: AppColors.textPrimary,
         ),
       ),
     );
@@ -247,7 +250,7 @@ class _EditableMacroBadgeState extends State<_EditableMacroBadge> {
             decoration: null,
             style: AppTextStyles.caption1.copyWith(
               fontWeight: FontWeight.w600,
-              color: AppColors.primaryAction,
+              color: AppColors.textPrimary,
             ),
             onChanged: (value) {
               final newValue = double.tryParse(value);

@@ -812,6 +812,24 @@ abstract class AppLocalizations {
   /// **'Invitation code copied'**
   String get invitationCodeCopied;
 
+  /// Filter button for all records
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get filterAll;
+
+  /// Filter option for valid items
+  ///
+  /// In en, this message translates to:
+  /// **'Valid'**
+  String get filterValid;
+
+  /// Filter option for expired items
+  ///
+  /// In en, this message translates to:
+  /// **'Expired'**
+  String get filterExpired;
+
   /// Select action title
   ///
   /// In en, this message translates to:
@@ -2294,12 +2312,6 @@ abstract class AppLocalizations {
   /// **'Search by student name'**
   String get searchStudentName;
 
-  /// Filter button for all records
-  ///
-  /// In en, this message translates to:
-  /// **'All'**
-  String get filterAll;
-
   /// Filter button for pending records
   ///
   /// In en, this message translates to:
@@ -3044,10 +3056,10 @@ abstract class AppLocalizations {
   /// **'View More'**
   String get viewMore;
 
-  /// Record training text for summary stats
+  /// Check-ins in last 7 days for summary stats
   ///
   /// In en, this message translates to:
-  /// **'record training'**
+  /// **'Check-ins (7 days)'**
   String get recordTraining;
 
   /// Records to review label for summary stats
@@ -4033,6 +4045,222 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Ask AI for suggestions...'**
   String get aiInputPlaceholder;
+
+  /// Create diet plan page title
+  ///
+  /// In en, this message translates to:
+  /// **'Create Diet Plan'**
+  String get createDietPlan;
+
+  /// AI guided diet creation option
+  ///
+  /// In en, this message translates to:
+  /// **'AI Guided Creation'**
+  String get aiGuidedDietCreate;
+
+  /// AI guided diet creation description
+  ///
+  /// In en, this message translates to:
+  /// **'Answer a few questions to generate a personalized diet plan'**
+  String get aiGuidedDietDesc;
+
+  /// Scan or paste diet text option
+  ///
+  /// In en, this message translates to:
+  /// **'Scan or Paste Text'**
+  String get scanOrPasteDiet;
+
+  /// Scan or paste diet description
+  ///
+  /// In en, this message translates to:
+  /// **'Import an existing diet plan from image or text'**
+  String get scanOrPasteDietDesc;
+
+  /// Manual diet creation option
+  ///
+  /// In en, this message translates to:
+  /// **'Manual Creation'**
+  String get manualDietCreate;
+
+  /// Diet creation step 1 title
+  ///
+  /// In en, this message translates to:
+  /// **'Personal Profile'**
+  String get dietStep1ProfileTitle;
+
+  /// Diet creation step 1 subtitle
+  ///
+  /// In en, this message translates to:
+  /// **'Basic body metrics and information'**
+  String get dietStep1ProfileSubtitle;
+
+  /// Diet creation step 2 title
+  ///
+  /// In en, this message translates to:
+  /// **'Goals & Activity'**
+  String get dietStep2GoalTitle;
+
+  /// Diet creation step 2 subtitle
+  ///
+  /// In en, this message translates to:
+  /// **'Define your nutrition objectives'**
+  String get dietStep2GoalSubtitle;
+
+  /// Diet creation step 3 title
+  ///
+  /// In en, this message translates to:
+  /// **'Preferences & Restrictions'**
+  String get dietStep3PreferencesTitle;
+
+  /// Diet creation step 3 subtitle
+  ///
+  /// In en, this message translates to:
+  /// **'Customize your meal preferences'**
+  String get dietStep3PreferencesSubtitle;
+
+  /// Weight in kilograms label
+  ///
+  /// In en, this message translates to:
+  /// **'Weight (kg)'**
+  String get weightKg;
+
+  /// Height in centimeters label
+  ///
+  /// In en, this message translates to:
+  /// **'Height (cm)'**
+  String get heightCm;
+
+  /// Body fat percentage label
+  ///
+  /// In en, this message translates to:
+  /// **'Body Fat % (Optional)'**
+  String get bodyFatPercentage;
+
+  /// Diet goal label
+  ///
+  /// In en, this message translates to:
+  /// **'Diet Goal'**
+  String get dietGoal;
+
+  /// Activity level label
+  ///
+  /// In en, this message translates to:
+  /// **'Activity Level'**
+  String get activityLevel;
+
+  /// Meal count per day label
+  ///
+  /// In en, this message translates to:
+  /// **'Meals per Day'**
+  String get mealCount;
+
+  /// Dietary preferences label
+  ///
+  /// In en, this message translates to:
+  /// **'Dietary Preferences'**
+  String get dietaryPreferences;
+
+  /// Dietary restrictions and other requirements label
+  ///
+  /// In en, this message translates to:
+  /// **'Other Requirements'**
+  String get dietaryRestrictions;
+
+  /// Placeholder for dietary restrictions input field
+  ///
+  /// In en, this message translates to:
+  /// **'Enter allergy information and food preferences (optional)'**
+  String get dietaryRestrictionsPlaceholder;
+
+  /// Reference training plan label
+  ///
+  /// In en, this message translates to:
+  /// **'Reference Training Plan (Optional)'**
+  String get referenceTrainingPlan;
+
+  /// Diet AI generation step 1 title
+  ///
+  /// In en, this message translates to:
+  /// **'Analyzing Requirements'**
+  String get dietStep1Title;
+
+  /// Diet AI generation step 1 description
+  ///
+  /// In en, this message translates to:
+  /// **'Calculating BMR, TDEE, and target calories'**
+  String get dietStep1Description;
+
+  /// Diet AI generation step 2 title
+  ///
+  /// In en, this message translates to:
+  /// **'Generating Diet Plan'**
+  String get dietStep2Title;
+
+  /// Diet AI generation step 2 description
+  ///
+  /// In en, this message translates to:
+  /// **'AI is creating your personalized meal plan'**
+  String get dietStep2Description;
+
+  /// Diet AI generation step 3 title
+  ///
+  /// In en, this message translates to:
+  /// **'Calculating Nutrition'**
+  String get dietStep3Title;
+
+  /// Diet AI generation step 3 description
+  ///
+  /// In en, this message translates to:
+  /// **'Verifying macronutrient distribution'**
+  String get dietStep3Description;
+
+  /// Diet AI generation step 4 title
+  ///
+  /// In en, this message translates to:
+  /// **'Generation Complete'**
+  String get dietStep4Title;
+
+  /// Diet AI generation step 4 description
+  ///
+  /// In en, this message translates to:
+  /// **'Your diet plan is ready'**
+  String get dietStep4Description;
+
+  /// Button to confirm AI generation and view full diet plan
+  ///
+  /// In en, this message translates to:
+  /// **'View Details and Edit'**
+  String get viewDetailsAndEdit;
+
+  /// Diet total days statistic
+  ///
+  /// In en, this message translates to:
+  /// **'Days'**
+  String get statDietTotalDays;
+
+  /// Diet total meals statistic
+  ///
+  /// In en, this message translates to:
+  /// **'Meals'**
+  String get statDietTotalMeals;
+
+  /// Basal Metabolic Rate statistic
+  ///
+  /// In en, this message translates to:
+  /// **'BMR (kcal)'**
+  String get statBMR;
+
+  /// Total Daily Energy Expenditure statistic
+  ///
+  /// In en, this message translates to:
+  /// **'TDEE (kcal)'**
+  String get statTDEE;
+
+  /// Target calories statistic
+  ///
+  /// In en, this message translates to:
+  /// **'Target Calories (kcal)'**
+  String get statTargetCalories;
 }
 
 class _AppLocalizationsDelegate

@@ -33,11 +33,11 @@ class SummarySection extends ConsumerWidget {
           summaryAsync.when(
             data: (summary) => Row(
               children: [
-                // 第1列：过去30天学生完成训练
+                // 第1列：本周学生打卡次数
                 Expanded(
                   child: _StatColumn(
                     icon: Icons.fitness_center,
-                    value: summary.completionRate,
+                    value: '${summary.studentCheckInsLast7Days}',
                     label: l10n.recordTraining,
                     onTap: () => context.push(RouteNames.coachStudents),
                   ),

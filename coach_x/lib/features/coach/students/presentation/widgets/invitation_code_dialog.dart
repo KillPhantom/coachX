@@ -24,10 +24,14 @@ class InvitationCodeDialog extends ConsumerStatefulWidget {
   }
 }
 
+/// 邀请码筛选类型
+enum _InvitationCodeFilter { all, valid, expired }
+
 class _InvitationCodeDialogState extends ConsumerState<InvitationCodeDialog> {
   final _totalDaysController = TextEditingController(text: '180');
   final _noteController = TextEditingController();
   bool _isGenerating = false;
+  _InvitationCodeFilter _filter = _InvitationCodeFilter.all;
 
   @override
   void dispose() {
@@ -46,6 +50,7 @@ class _InvitationCodeDialogState extends ConsumerState<InvitationCodeDialog> {
         height: MediaQuery.of(context).size.height * 0.85,
         padding: const EdgeInsets.all(AppDimensions.spacingL),
         child: SafeArea(
+          top: false,
           child: DismissKeyboard(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -73,10 +78,37 @@ class _InvitationCodeDialogState extends ConsumerState<InvitationCodeDialog> {
 
                 const SizedBox(height: AppDimensions.spacingL),
 
-                // 现有邀请码列表
-                Text(
-                  l10n.existingInvitationCodes,
-                  style: AppTextStyles.bodyMedium,
+                // 现有邀请码列表标题和筛选
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      l10n.existingInvitationCodes,
+                      style: AppTextStyles.bodyMedium,
+                    ),
+                    CupertinoSlidingSegmentedControl<_InvitationCodeFilter>(
+                      groupValue: _filter,
+                      children: {
+                        _InvitationCodeFilter.all: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8),
+                          child: Text(l10n.filterAll, style: AppTextStyles.caption1),
+                        ),
+                        _InvitationCodeFilter.valid: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8),
+                          child: Text(l10n.filterValid, style: AppTextStyles.caption1),
+                        ),
+                        _InvitationCodeFilter.expired: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8),
+                          child: Text(l10n.filterExpired, style: AppTextStyles.caption1),
+                        ),
+                      },
+                      onValueChanged: (value) {
+                        if (value != null) {
+                          setState(() => _filter = value);
+                        }
+                      },
+                    ),
+                  ],
                 ),
 
                 const SizedBox(height: AppDimensions.spacingM),
@@ -84,7 +116,19 @@ class _InvitationCodeDialogState extends ConsumerState<InvitationCodeDialog> {
                 Expanded(
                   child: codesAsync.when(
                     data: (codes) {
-                      if (codes.isEmpty) {
+                      // 根据筛选条件过滤
+                      final filteredCodes = codes.where((code) {
+                        switch (_filter) {
+                          case _InvitationCodeFilter.all:
+                            return true;
+                          case _InvitationCodeFilter.valid:
+                            return code.isValid;
+                          case _InvitationCodeFilter.expired:
+                            return code.isExpired || code.used;
+                        }
+                      }).toList();
+
+                      if (filteredCodes.isEmpty) {
                         return Center(
                           child: Text(
                             l10n.noInvitationCodes,
@@ -94,9 +138,9 @@ class _InvitationCodeDialogState extends ConsumerState<InvitationCodeDialog> {
                       }
 
                       return ListView.builder(
-                        itemCount: codes.length,
+                        itemCount: filteredCodes.length,
                         itemBuilder: (context, index) {
-                          return InvitationCodeItem(code: codes[index]);
+                          return InvitationCodeItem(code: filteredCodes[index]);
                         },
                       );
                     },
