@@ -211,6 +211,93 @@ class PlansCacheService {
     }
   }
 
+  // ==================== 计划详情缓存 ====================
+
+  /// 获取缓存的计划详情
+  ///
+  /// [planId] 计划 ID
+  /// [planType] 计划类型：'exercise', 'diet', 'supplement'
+  static Future<Map<String, dynamic>?> getCachedPlanDetail(
+    String planId,
+    String planType,
+  ) async {
+    try {
+      final box = await _getBox();
+      final key = 'plan_detail_${planType}_$planId';
+      final metadataKey = '${key}_metadata';
+
+      // 检查元数据
+      final metadata = box.get(metadataKey) as CacheMetadata?;
+      if (!CacheHelper.isMetadataValid(metadata)) {
+        AppLogger.info('❌ $planType 计划详情缓存无效或不存在: $planId');
+        return null;
+      }
+
+      // 读取缓存数据（JSON 格式）
+      final cachedData = box.get(key) as Map?;
+      if (cachedData == null) {
+        AppLogger.info('❌ $planType 计划详情缓存数据不存在: $planId');
+        return null;
+      }
+
+      AppLogger.info('✅ $planType 计划详情缓存命中: $planId');
+      return Map<String, dynamic>.from(cachedData);
+    } catch (e, stackTrace) {
+      AppLogger.error('❌ 读取 $planType 计划详情缓存失败', e, stackTrace);
+      return null;
+    }
+  }
+
+  /// 缓存计划详情
+  ///
+  /// [planId] 计划 ID
+  /// [planType] 计划类型：'exercise', 'diet', 'supplement'
+  /// [planJson] 计划数据（JSON 格式）
+  static Future<void> cachePlanDetail(
+    String planId,
+    String planType,
+    Map<String, dynamic> planJson,
+  ) async {
+    try {
+      final box = await _getBox();
+      final key = 'plan_detail_${planType}_$planId';
+      final metadataKey = '${key}_metadata';
+
+      // 创建元数据
+      final metadata = CacheHelper.createMetadata(key, _cacheValidity);
+
+      // 写入缓存
+      await box.put(key, planJson);
+      await box.put(metadataKey, metadata);
+
+      AppLogger.info('💾 $planType 计划详情已缓存: $planId');
+    } catch (e, stackTrace) {
+      AppLogger.error('❌ 缓存 $planType 计划详情失败', e, stackTrace);
+    }
+  }
+
+  /// 清除指定计划的详情缓存
+  ///
+  /// [planId] 计划 ID
+  /// [planType] 计划类型：'exercise', 'diet', 'supplement'
+  static Future<void> invalidatePlanDetail(
+    String planId,
+    String planType,
+  ) async {
+    try {
+      final box = await _getBox();
+      final key = 'plan_detail_${planType}_$planId';
+      final metadataKey = '${key}_metadata';
+
+      await box.delete(key);
+      await box.delete(metadataKey);
+
+      AppLogger.info('🗑️ 已清除 $planType 计划详情缓存: $planId');
+    } catch (e, stackTrace) {
+      AppLogger.error('❌ 清除 $planType 计划详情缓存失败', e, stackTrace);
+    }
+  }
+
   // ==================== 缓存失效 ====================
 
   /// 清除指定类型的列表缓存

@@ -2,6 +2,7 @@ import 'feed_item_type.dart';
 import '../../../student/training/data/models/student_exercise_model.dart';
 import '../../../../core/models/video_model.dart';
 import '../../../student/diet/data/models/student_diet_record_model.dart';
+import '../../../coach/plans/data/models/macros.dart';
 
 /// Feed 流的基本单元
 class TrainingFeedItem {
@@ -26,7 +27,7 @@ class TrainingFeedItem {
   /// 额外数据
   /// - video: {videoUrl, thumbnailUrl, videoIndex, duration}
   /// - textCard: {sets, totalSets, completedSets, avgWeight, totalReps}
-  /// - aggregated textCard: {exercises: [], meals: [], isAggregated: true}
+  /// - aggregated textCard: {exercises: [], meals: [], actualMacros: {}, targetMacros: {}, isAggregated: true}
   final Map<String, dynamic>? metadata;
 
   const TrainingFeedItem({
@@ -107,6 +108,8 @@ class TrainingFeedItem {
     required List<StudentExerciseModel> exercises,
     required StudentDietRecordModel? diet,
     required bool isReviewed,
+    Macros? actualMacros,
+    Macros? targetMacros,
   }) {
     return TrainingFeedItem(
       id: '${dailyTrainingId}_aggregated',
@@ -118,6 +121,8 @@ class TrainingFeedItem {
         'isAggregated': true,
         'exercises': exercises.map((e) => e.toJson()).toList(),
         'meals': diet?.meals.map((m) => m.toJson()).toList() ?? [],
+        if (actualMacros != null) 'actualMacros': actualMacros.toJson(),
+        if (targetMacros != null) 'targetMacros': targetMacros.toJson(),
       },
     );
   }

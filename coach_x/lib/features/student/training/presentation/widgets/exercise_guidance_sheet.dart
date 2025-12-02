@@ -26,6 +26,7 @@ class ExerciseGuidanceSheet extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final templateAsync = ref.watch(exerciseTemplateProvider(templateId));
+    final headerTitle = templateAsync.value?.name ?? l10n.exerciseGuidance;
 
     return Container(
       height: MediaQuery.of(context).size.height * 0.75,
@@ -34,17 +35,28 @@ class ExerciseGuidanceSheet extends ConsumerWidget {
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
       child: SafeArea(
+        top: false,
         child: Column(
           children: [
             // 标题栏
-            _buildHeader(context, l10n),
+            _buildHeader(context, headerTitle),
 
             // 内容区域
             Expanded(
               child: templateAsync.when(
-                data: (template) => template == null
-                    ? _buildEmptyState(l10n)
-                    : _buildContent(context, l10n, template),
+                data: (template) {
+                  if (template == null) return _buildEmptyState(l10n);
+
+                  final hasContent = template.videoUrls.isNotEmpty ||
+                      (template.textGuidance?.isNotEmpty ?? false) ||
+                      template.imageUrls.isNotEmpty;
+
+                  if (!hasContent) {
+                    return _buildEmptyState(l10n);
+                  }
+
+                  return _buildContent(context, l10n, template);
+                },
                 loading: () => _buildLoadingState(l10n),
                 error: (error, stack) => _buildErrorState(l10n),
               ),
@@ -56,7 +68,7 @@ class ExerciseGuidanceSheet extends ConsumerWidget {
   }
 
   /// 构建标题栏
-  Widget _buildHeader(BuildContext context, AppLocalizations l10n) {
+  Widget _buildHeader(BuildContext context, String title) {
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: AppDimensions.spacingM,
@@ -70,7 +82,13 @@ class ExerciseGuidanceSheet extends ConsumerWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(l10n.exerciseGuidance, style: AppTextStyles.title3),
+          Expanded(
+            child: Text(
+              title,
+              style: AppTextStyles.title3,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
           CupertinoButton(
             padding: EdgeInsets.zero,
             onPressed: () => Navigator.of(context).pop(),

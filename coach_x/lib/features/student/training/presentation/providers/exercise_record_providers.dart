@@ -2,6 +2,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:coach_x/features/student/training/data/models/student_exercise_record_state.dart';
 import 'package:coach_x/features/student/training/data/repositories/training_record_repository.dart';
 import 'package:coach_x/features/student/training/data/repositories/training_record_repository_impl.dart';
+import 'package:coach_x/core/services/media_upload_manager.dart';
+import 'package:coach_x/core/providers/media_upload_providers.dart';
 import 'exercise_record_notifier.dart';
 
 /// Training Record Repository Provider
@@ -18,9 +20,10 @@ final exerciseRecordNotifierProvider =
       ExerciseRecordState
     >((ref) {
       final repository = ref.watch(trainingRecordRepositoryProvider);
+      final uploadManager = ref.watch(mediaUploadManagerProvider);
       final today = DateTime.now();
       final dateString =
           '${today.year}-${today.month.toString().padLeft(2, '0')}-${today.day.toString().padLeft(2, '0')}';
 
-      return ExerciseRecordNotifier(repository, dateString);
+      return ExerciseRecordNotifier(repository, uploadManager, dateString);
     });

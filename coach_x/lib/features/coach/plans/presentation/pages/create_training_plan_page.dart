@@ -8,7 +8,6 @@ import 'package:coach_x/core/enums/ai_status.dart';
 import 'package:coach_x/features/coach/plans/data/models/create_plan_page_state.dart';
 import 'package:coach_x/features/coach/plans/data/models/create_training_plan_state.dart';
 import 'package:coach_x/features/coach/plans/data/models/import_result.dart';
-import 'package:coach_x/features/coach/plans/data/models/exercise.dart';
 import 'package:coach_x/features/coach/plans/data/models/training_set.dart';
 import 'package:coach_x/features/coach/plans/data/models/exercise_plan_model.dart';
 import 'package:coach_x/features/coach/plans/data/models/suggestion_review_state.dart';
@@ -16,10 +15,10 @@ import 'package:coach_x/features/coach/plans/presentation/providers/create_train
 import 'package:coach_x/features/coach/plans/presentation/providers/suggestion_review_providers.dart';
 import 'package:coach_x/features/coach/plans/presentation/providers/edit_conversation_providers.dart';
 import 'package:coach_x/features/coach/plans/presentation/widgets/create_plan/initial_view.dart';
-import 'package:coach_x/features/coach/plans/presentation/widgets/create_plan/ai_guided_view.dart';
+import 'package:coach_x/features/coach/plans/presentation/widgets/create_plan/training/training_ai_guided_view.dart';
 import 'package:coach_x/features/coach/plans/presentation/widgets/create_plan/text_import_view.dart';
-import 'package:coach_x/features/coach/plans/presentation/widgets/create_plan/text_import_summary_view.dart';
-import 'package:coach_x/features/coach/plans/presentation/widgets/create_plan/ai_streaming_view.dart';
+import 'package:coach_x/features/coach/plans/presentation/widgets/create_plan/training/training_text_import_summary_view.dart';
+import 'package:coach_x/features/coach/plans/presentation/widgets/create_plan/training/training_ai_streaming_view.dart';
 import 'package:coach_x/features/coach/plans/presentation/widgets/create_plan/editing_view.dart';
 import 'package:coach_x/features/coach/plans/presentation/widgets/ai_edit_chat_panel.dart';
 import 'package:coach_x/features/coach/plans/presentation/widgets/review_mode_overlay.dart';
@@ -115,6 +114,8 @@ class _CreateTrainingPlanPageState
         setState(() {
           _selectedDayIndex = next.days.isNotEmpty ? 0 : null;
         });
+        // 保存初始快照（用于判断是否有修改）
+        ref.read(createTrainingPlanNotifierProvider.notifier).saveInitialSnapshot();
         AppLogger.info('✅ AI 生成完成，切换到编辑模式');
       }
     });
@@ -133,6 +134,8 @@ class _CreateTrainingPlanPageState
         setState(() {
           _selectedDayIndex = state.days.isNotEmpty ? 0 : null;
         });
+        // 保存初始快照（用于判断是否有修改）
+        ref.read(createTrainingPlanNotifierProvider.notifier).saveInitialSnapshot();
         AppLogger.info('✅ AI Streaming 完成，默认选中第一天');
       }
 
@@ -143,6 +146,8 @@ class _CreateTrainingPlanPageState
         setState(() {
           _selectedDayIndex = state.days.isNotEmpty ? 0 : null;
         });
+        // 保存初始快照（用于判断是否有修改）
+        ref.read(createTrainingPlanNotifierProvider.notifier).saveInitialSnapshot();
         AppLogger.info('✅ 文本导入完成，默认选中第一天');
       }
     });
@@ -267,7 +272,7 @@ class _CreateTrainingPlanPageState
         );
 
       case CreatePlanPageState.aiGuided:
-        return AIGuidedView(
+        return TrainingAIGuidedView(
           onGenerationStart: () {
             // AI 生成开始后，页面状态保持在 aiGuided
             // 等待生成完成后自动切换到 editing（通过 listener）
@@ -279,10 +284,10 @@ class _CreateTrainingPlanPageState
         return TextImportView(onImportSuccess: _onImportSuccess);
 
       case CreatePlanPageState.textImportSummary:
-        return const TextImportSummaryView();
+        return const TrainingTextImportSummaryView();
 
       case CreatePlanPageState.aiStreaming:
-        return const AIStreamingView();
+        return const TrainingAIStreamingView();
 
       case CreatePlanPageState.editing:
         return EditingView(

@@ -128,3 +128,83 @@ def parse_string_param(value: Any, default: Optional[str] = None) -> Optional[st
         return str(value['value'])
 
     return str(value)
+
+
+def unwrap_protobuf_values(data: Any) -> Any:
+    """
+    递归解包 Protobuf 包装的值
+
+    Firebase Cloud Functions 2nd gen 使用 gRPC/Protobuf 传输数据时，
+    会自动将整数和浮点数包装为 Protobuf wrapper types:
+    - int -> Int64Value: {'@type': 'type.googleapis.com/google.protobuf.Int64Value', 'value': '123'}
+    - float -> DoubleValue: {'@type': 'type.googleapis.com/google.protobuf.DoubleValue', 'value': '1.23'}
+
+    此函数递归遍历数据结构，将所有 Protobuf 包装值解包为原始 Python 类型。
+
+    Args:
+        data: 可能包含 Protobuf 包装值的数据（dict, list, 或原始值）
+
+    Returns:
+        解包后的数据，类型与输入相同（dict, list, 或原始值）
+
+    Examples:
+        >>> unwrap_protobuf_values({'count': {'@type': '...Int64Value', 'value': '10'}})
+        {'count': 10}
+
+        >>> unwrap_protobuf_values({
+        ...     'planSelection': {
+        ...         'exerciseDayNumber': {'@type': '...Int64Value', 'value': '2'},
+        ...         'dietDayNumber': {'@type': '...Int64Value', 'value': '3'}
+        ...     }
+        ... })
+        {'planSelection': {'exerciseDayNumber': 2, 'dietDayNumber': 3}}
+
+        >>> unwrap_protobuf_values([
+        ...     {'id': 1, 'weight': {'@type': '...DoubleValue', 'value': '100.5'}}
+        ... ])
+        [{'id': 1, 'weight': 100.5}]
+    """
+    # 如果是 None，直接返回
+    if data is None:
+        return None
+
+    # 检测 Protobuf 包装格式
+    if isinstance(data, dict):
+        # 检查是否是 Protobuf wrapper type
+        if '@type' in data and 'value' in data:
+            type_url = data.get('@type', '')
+            value = data.get('value')
+
+            # Int64Value
+            if 'Int64Value' in type_url:
+                try:
+                    return int(value)
+                except (ValueError, TypeError):
+                    return value
+
+            # DoubleValue
+            if 'DoubleValue' in type_url:
+                try:
+                    return float(value)
+                except (ValueError, TypeError):
+                    return value
+
+            # FloatValue
+            if 'FloatValue' in type_url:
+                try:
+                    return float(value)
+                except (ValueError, TypeError):
+                    return value
+
+            # 其他未知包装类型，返回 value 字段
+            return value
+
+        # 普通字典，递归处理每个值
+        return {key: unwrap_protobuf_values(val) for key, val in data.items()}
+
+    # 列表，递归处理每个元素
+    if isinstance(data, list):
+        return [unwrap_protobuf_values(item) for item in data]
+
+    # 原始类型（int, float, str, bool），直接返回
+    return data

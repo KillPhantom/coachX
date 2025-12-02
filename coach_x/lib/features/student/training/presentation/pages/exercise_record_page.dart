@@ -324,7 +324,7 @@ class _ExerciseRecordPageState extends ConsumerState<ExerciseRecordPage> {
                   .quickComplete(index);
             },
             onMediaSelected: (file, type) {
-              // 添加 pending 媒体到状态（缩略图路径为 null）
+              // 添加媒体到 state 并立即启动后台上传（MediaUploadManager）
               ref
                   .read(exerciseRecordNotifierProvider.notifier)
                   .addPendingMedia(index, file.path, type, thumbnailPath: null);

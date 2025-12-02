@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:coach_x/core/enums/ai_status.dart';
 import 'package:coach_x/core/theme/app_colors.dart';
 import 'package:coach_x/core/theme/app_text_styles.dart';
 import 'package:coach_x/core/utils/logger.dart';
@@ -10,17 +11,25 @@ import 'package:coach_x/features/coach/plans/data/models/food_item.dart';
 import 'package:coach_x/features/coach/plans/data/models/diet_plan_model.dart';
 import 'package:coach_x/features/coach/plans/data/models/diet_plan_edit_suggestion.dart';
 import 'package:coach_x/features/coach/plans/data/models/diet_suggestion_review_state.dart';
+import 'package:coach_x/features/coach/plans/data/models/create_plan_page_state.dart';
+import 'package:coach_x/features/coach/plans/data/models/create_diet_plan_state.dart';
 import 'package:coach_x/features/coach/plans/presentation/providers/create_diet_plan_providers.dart';
 import 'package:coach_x/features/coach/plans/presentation/providers/create_diet_plan_notifier.dart';
 import 'package:coach_x/features/coach/plans/presentation/providers/diet_suggestion_review_providers.dart';
 import 'package:coach_x/features/coach/plans/presentation/widgets/plan_header_widget.dart';
-import 'package:coach_x/features/coach/plans/presentation/widgets/day_pill.dart';
+import 'package:coach_x/features/coach/plans/presentation/widgets/day_pill_scroll_view.dart';
 import 'package:coach_x/features/coach/plans/presentation/widgets/diet_day_editor.dart';
 import 'package:coach_x/features/coach/plans/presentation/widgets/meal_card.dart';
 import 'package:coach_x/features/coach/plans/presentation/widgets/food_item_row.dart';
 import 'package:coach_x/features/coach/plans/presentation/widgets/guided_diet_creation_sheet.dart';
 import 'package:coach_x/features/coach/plans/presentation/widgets/ai_edit_diet_chat_panel.dart';
 import 'package:coach_x/features/coach/plans/presentation/widgets/diet_review_mode_overlay.dart';
+import 'package:coach_x/features/coach/plans/presentation/widgets/create_plan/initial_view.dart';
+import 'package:coach_x/features/coach/plans/presentation/widgets/create_plan/text_import_view.dart';
+import 'package:coach_x/features/coach/plans/presentation/widgets/create_plan/diet/diet_ai_guided_view.dart';
+import 'package:coach_x/features/coach/plans/presentation/widgets/create_plan/diet/diet_ai_streaming_view.dart';
+import 'package:coach_x/features/coach/plans/presentation/widgets/create_plan/diet/diet_text_import_summary_view.dart';
+import 'package:coach_x/l10n/app_localizations.dart';
 
 /// 创建/编辑饮食计划页面
 class CreateDietPlanPage extends ConsumerStatefulWidget {
@@ -48,39 +57,38 @@ class _CreateDietPlanPageState extends ConsumerState<CreateDietPlanPage> {
     super.initState();
     // 加载计划或创建新计划
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final notifier = ref.read(createDietPlanNotifierProvider.notifier);
-
-      AppLogger.debug('🔍 接收到的 planId: ${widget.planId}');
-
       if (widget.planId != null && widget.planId!.isNotEmpty) {
         // 编辑模式：加载现有计划
-        AppLogger.info('📝 编辑模式 - 加载计划 ID: ${widget.planId}');
-        final success = await notifier.loadPlan(widget.planId!);
-        if (success && mounted) {
-          final state = ref.read(createDietPlanNotifierProvider);
-          AppLogger.info('✅ 计划加载成功 - 饮食日数量: ${state.days.length}');
-          if (state.days.isNotEmpty) {
-            setState(() {
-              _selectedDayIndex = 0;
-            });
-          }
-        } else if (mounted) {
-          // 加载失败，显示错误并返回
-          AppLogger.error('❌ 加载计划失败');
-          _showErrorDialog(context, '加载计划失败');
-        }
+        await _loadPlan();
       } else {
-        // 创建模式：添加第一个饮食日作为默认
-        AppLogger.info('➕ 创建模式 - 初始化新计划 (planId: ${widget.planId})');
-        final state = ref.read(createDietPlanNotifierProvider);
-        if (state.days.isEmpty) {
-          notifier.addDay(name: 'Day 1');
-          setState(() {
-            _selectedDayIndex = 0;
-          });
-        }
+        // 创建模式：显示初始选择页面
+        ref.read(createDietPlanPageStateProvider.notifier).state =
+            CreatePlanPageState.initial;
       }
     });
+  }
+
+  /// 加载现有计划
+  Future<void> _loadPlan() async {
+    final notifier = ref.read(createDietPlanNotifierProvider.notifier);
+
+    AppLogger.info('📝 编辑模式 - 加载计划 ID: ${widget.planId}');
+    final success = await notifier.loadPlan(widget.planId!);
+
+    if (success && mounted) {
+      final state = ref.read(createDietPlanNotifierProvider);
+      AppLogger.info('✅ 计划加载成功 - 饮食日数量: ${state.days.length}');
+
+      ref.read(createDietPlanPageStateProvider.notifier).state =
+          CreatePlanPageState.editing;
+      setState(() {
+        _selectedDayIndex = state.days.isNotEmpty ? 0 : null;
+      });
+    } else if (mounted) {
+      // 加载失败，显示错误并返回
+      AppLogger.error('❌ 加载计划失败');
+      _showErrorDialog(context, '加载计划失败');
+    }
   }
 
   @override
@@ -112,8 +120,31 @@ class _CreateDietPlanPageState extends ConsumerState<CreateDietPlanPage> {
   Widget build(BuildContext context) {
     final state = ref.watch(createDietPlanNotifierProvider);
     final notifier = ref.read(createDietPlanNotifierProvider.notifier);
-    final reviewState = ref.watch(dietSuggestionReviewNotifierProvider);
     final isDietReviewMode = ref.watch(isDietReviewModeProvider);
+
+    // 监听页面状态变化
+    final pageState = ref.watch(createDietPlanPageStateProvider);
+
+    // 注意：AI 生成完成后不再自动切换到 editing
+    // 用户需要在 StreamView 中点击确认按钮后才会切换
+
+    // 监听页面状态变化（处理自动选中第一天）
+    ref.listen<CreatePlanPageState>(createDietPlanPageStateProvider, (
+      previous,
+      next,
+    ) {
+      if (!mounted) return;
+
+      // 当切换到 editing 时，默认选中第一天
+      if (previous != CreatePlanPageState.editing &&
+          next == CreatePlanPageState.editing) {
+        final state = ref.read(createDietPlanNotifierProvider);
+        setState(() {
+          _selectedDayIndex = state.days.isNotEmpty ? 0 : null;
+        });
+        AppLogger.info('✅ 切换到编辑模式，默认选中第一天');
+      }
+    });
 
     // 监听 Review Mode 高亮变化，自动切换 day、展开 meal 并滚动
     ref.listen<DietSuggestionReviewState?>(
@@ -189,228 +220,8 @@ class _CreateDietPlanPageState extends ConsumerState<CreateDietPlanPage> {
       ),
       child: Stack(
         children: [
-          // Main Content
-          SafeArea(
-            child: Column(
-              children: [
-                // Plan Header
-                PlanHeaderWidget(
-                  planName: state.planName,
-                  onNameChanged: notifier.updatePlanName,
-                  totalDays: state.totalDays,
-                  totalExercises: state.totalMeals,
-                  totalSets: state.totalFoodItems,
-                ),
-
-                // Horizontal Day Pills Scroll View
-                Container(
-                  height: 52,
-                  padding: const EdgeInsets.symmetric(vertical: 6),
-                  decoration: BoxDecoration(
-                    color: CupertinoColors.systemBackground.resolveFrom(
-                      context,
-                    ),
-                    border: Border(
-                      bottom: BorderSide(
-                        color: CupertinoColors.separator.resolveFrom(context),
-                      ),
-                    ),
-                  ),
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    itemCount: state.days.length + 1, // +1 for Add button
-                    itemBuilder: (context, index) {
-                      if (index == state.days.length) {
-                        // Add Day Button
-                        return GestureDetector(
-                          onTap: () => _onAddDay(notifier),
-                          child: Container(
-                            margin: const EdgeInsets.only(right: 8),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 10,
-                            ),
-                            decoration: BoxDecoration(
-                              color: AppColors.primaryLight,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  CupertinoIcons.add,
-                                  color: AppColors.primaryText,
-                                  size: 18,
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  'Add Day',
-                                  style: AppTextStyles.footnote.copyWith(
-                                    color: AppColors.primaryText,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
-                      }
-
-                      final day = state.days[index];
-                      return DayPill(
-                        label: day.name,
-                        dayNumber: day.day,
-                        isSelected: _selectedDayIndex == index,
-                        onTap: () {
-                          setState(() {
-                            _selectedDayIndex = index;
-                            _expandedMealIndex = null; // 切换天时收起所有餐次
-                          });
-                        },
-                        onLongPress: () => _showDayOptionsMenu(
-                          context,
-                          notifier,
-                          index,
-                          day.name,
-                        ),
-                      );
-                    },
-                  ),
-                ),
-
-                // Content Area
-                Expanded(
-                  child:
-                      _selectedDayIndex != null &&
-                          _selectedDayIndex! < state.days.length
-                      ? DismissKeyboardOnScroll(
-                          child: SingleChildScrollView(
-                            controller: _mealsScrollController,
-                            child: DietDayEditor(
-                              onAddMeal: () =>
-                                  _onAddMeal(notifier, _selectedDayIndex!),
-                              totalMacros:
-                                  state.days[_selectedDayIndex!].targetMacros ??
-                                  state.days[_selectedDayIndex!].macros,
-                              onProteinChanged: (value) =>
-                                  notifier.updateDayTargetMacros(
-                                    _selectedDayIndex!,
-                                    protein: value,
-                                  ),
-                              onCarbsChanged: (value) =>
-                                  notifier.updateDayTargetMacros(
-                                    _selectedDayIndex!,
-                                    carbs: value,
-                                  ),
-                              onFatChanged: (value) =>
-                                  notifier.updateDayTargetMacros(
-                                    _selectedDayIndex!,
-                                    fat: value,
-                                  ),
-                              mealsWidget: _buildMealsList(
-                                context,
-                                notifier,
-                                _selectedDayIndex!,
-                                state.days[_selectedDayIndex!].meals,
-                                reviewState,
-                              ),
-                            ),
-                          ),
-                        )
-                      : Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                CupertinoIcons.calendar_badge_plus,
-                                size: 64,
-                                color: CupertinoColors.secondaryLabel
-                                    .resolveFrom(context),
-                              ),
-                              const SizedBox(height: 16),
-                              Text(
-                                'Select a day or add a new one',
-                                style: AppTextStyles.callout.copyWith(
-                                  color: CupertinoColors.secondaryLabel
-                                      .resolveFrom(context),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                ),
-
-                // Save Button (Fixed at bottom)
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: CupertinoColors.systemBackground.resolveFrom(
-                      context,
-                    ),
-                    border: Border(
-                      top: BorderSide(
-                        color: CupertinoColors.separator.resolveFrom(context),
-                      ),
-                    ),
-                  ),
-                  child: SafeArea(
-                    top: false,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        // Save Button
-                        CupertinoButton(
-                          padding: EdgeInsets.zero,
-                          onPressed: state.canSave && !state.isLoading
-                              ? () => _onSave(context, notifier)
-                              : null,
-                          child: Container(
-                            width: double.infinity,
-                            height: 50,
-                            decoration: BoxDecoration(
-                              color: state.canSave && !state.isLoading
-                                  ? AppColors.primary
-                                  : CupertinoColors.quaternarySystemFill
-                                        .resolveFrom(context),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            alignment: Alignment.center,
-                            child: state.isLoading
-                                ? const CupertinoActivityIndicator(
-                                    color: CupertinoColors.white,
-                                  )
-                                : Text(
-                                    'Save Plan',
-                                    style: TextStyle(
-                                      color: state.canSave
-                                          ? CupertinoColors.black
-                                          : CupertinoColors.systemGrey,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                          ),
-                        ),
-
-                        // Validation Errors
-                        if (state.validationErrors.isNotEmpty)
-                          Padding(
-                            padding: const EdgeInsets.only(top: 8),
-                            child: Text(
-                              state.validationErrors.first,
-                              style: AppTextStyles.footnote.copyWith(
-                                color: CupertinoColors.systemRed,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
+          // Main Content - 根据页面状态显示不同内容
+          _buildBody(context, pageState),
 
           // Loading Overlay
           if (state.isLoading)
@@ -511,7 +322,8 @@ class _CreateDietPlanPageState extends ConsumerState<CreateDietPlanPage> {
 
     if (success) {
       AppLogger.info('✅ 饮食计划保存成功');
-      _showSuccessDialog(context);
+      // TODO: 实现成功对话框
+      // _showSuccessDialog(context);
     } else {
       // Re-read state to check for error message
       state = ref.read(createDietPlanNotifierProvider);
@@ -628,199 +440,6 @@ class _CreateDietPlanPageState extends ConsumerState<CreateDietPlanPage> {
   }
 
   // ==================== UI Builders ====================
-
-  /// 构建餐次列表
-  Widget _buildMealsList(
-    BuildContext context,
-    notifier,
-    int dayIndex,
-    List<Meal> meals,
-    reviewState,
-  ) {
-    if (meals.isEmpty) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 20),
-        child: Text(
-          'No meals yet. Click "Add" to add one.',
-          style: AppTextStyles.footnote.copyWith(
-            color: CupertinoColors.secondaryLabel,
-          ),
-          textAlign: TextAlign.center,
-        ),
-      );
-    }
-
-    return Column(
-      children: meals.asMap().entries.map((entry) {
-        final mealIndex = entry.key;
-        final meal = entry.value;
-
-        // 判断当前 Meal 是否是 Review 焦点
-        final currentChange = reviewState?.currentChange;
-        final isHighlighted =
-            currentChange != null &&
-            currentChange.dayIndex == dayIndex &&
-            currentChange.mealIndex == mealIndex;
-
-        // 为每个 MealCard 分配 GlobalKey 用于自动滚动
-        final mealKey = '${dayIndex}_$mealIndex';
-        _mealKeys.putIfAbsent(mealKey, () => GlobalKey());
-
-        return MealCard(
-          key: _mealKeys[mealKey],
-          meal: meal,
-          index: mealIndex,
-          isExpanded: _expandedMealIndex == mealIndex,
-          onTap: () {
-            setState(() {
-              _expandedMealIndex = _expandedMealIndex == mealIndex
-                  ? null
-                  : mealIndex;
-            });
-          },
-          onDelete: () => _onDeleteMeal(notifier, dayIndex, mealIndex),
-          onNameChanged: (name) =>
-              notifier.updateMealName(dayIndex, mealIndex, name),
-          onNoteChanged: (note) =>
-              notifier.updateMealNote(dayIndex, mealIndex, note),
-          onAddFoodItem: () => _onAddFoodItem(notifier, dayIndex, mealIndex),
-          foodItemsWidget: _buildFoodItemsList(
-            context,
-            notifier,
-            dayIndex,
-            mealIndex,
-            meal.items,
-            reviewState,
-          ),
-          // Review Mode 参数
-          isHighlighted: isHighlighted,
-          activeSuggestion: isHighlighted ? currentChange : null,
-        );
-      }).toList(),
-    );
-  }
-
-  /// 构建食物条目列表
-  Widget _buildFoodItemsList(
-    BuildContext context,
-    notifier,
-    int dayIndex,
-    int mealIndex,
-    List<FoodItem> items,
-    reviewState,
-  ) {
-    if (items.isEmpty) {
-      return const SizedBox.shrink();
-    }
-
-    final currentChange = reviewState?.currentChange;
-
-    return Column(
-      children: items.asMap().entries.map((entry) {
-        final itemIndex = entry.key;
-        final item = entry.value;
-
-        // 判断当前 FoodItem 是否是 Review 焦点
-        final isHighlighted =
-            currentChange != null &&
-            currentChange.dayIndex == dayIndex &&
-            currentChange.mealIndex == mealIndex &&
-            currentChange.foodItemIndex == itemIndex &&
-            currentChange.type == DietChangeType.modifyFoodItem;
-
-        // 提取 before/after 数据
-        Map<String, dynamic>? beforeData;
-        Map<String, dynamic>? afterData;
-        if (isHighlighted) {
-          if (currentChange.before is Map) {
-            beforeData = Map<String, dynamic>.from(currentChange.before as Map);
-          }
-          if (currentChange.after is Map) {
-            afterData = Map<String, dynamic>.from(currentChange.after as Map);
-          }
-
-          // 补充缺失的 food 字段
-          if (beforeData != null) {
-            beforeData.putIfAbsent('food', () => item.food);
-          }
-          if (afterData != null) {
-            // 优先使用 beforeData 的 food，其次使用 item.food
-            final foodValue = beforeData?['food'] ?? item.food;
-            afterData.putIfAbsent('food', () => foodValue);
-          }
-        }
-
-        return FoodItemRow(
-          item: item,
-          index: itemIndex,
-          onFoodChanged: (food) => notifier.updateFoodItemField(
-            dayIndex,
-            mealIndex,
-            itemIndex,
-            food: food,
-          ),
-          onAmountChanged: (amount) => notifier.updateFoodItemField(
-            dayIndex,
-            mealIndex,
-            itemIndex,
-            amount: amount,
-          ),
-          onProteinChanged: (protein) => notifier.updateFoodItemField(
-            dayIndex,
-            mealIndex,
-            itemIndex,
-            protein: protein,
-          ),
-          onCarbsChanged: (carbs) => notifier.updateFoodItemField(
-            dayIndex,
-            mealIndex,
-            itemIndex,
-            carbs: carbs,
-          ),
-          onFatChanged: (fat) => notifier.updateFoodItemField(
-            dayIndex,
-            mealIndex,
-            itemIndex,
-            fat: fat,
-          ),
-          onCaloriesChanged: (calories) => notifier.updateFoodItemField(
-            dayIndex,
-            mealIndex,
-            itemIndex,
-            calories: calories,
-          ),
-          onDelete: () =>
-              _onDeleteFoodItem(notifier, dayIndex, mealIndex, itemIndex),
-          // Review Mode 参数
-          isHighlighted: isHighlighted,
-          beforeData: beforeData,
-          afterData: afterData,
-        );
-      }).toList(),
-    );
-  }
-
-  // ==================== Dialogs ====================
-
-  /// 显示成功对话框
-  void _showSuccessDialog(BuildContext context) {
-    showCupertinoDialog(
-      context: context,
-      builder: (context) => CupertinoAlertDialog(
-        title: const Text('Success'),
-        content: const Text('Diet plan saved successfully'),
-        actions: [
-          CupertinoDialogAction(
-            child: const Text('OK', style: AppTextStyles.body),
-            onPressed: () {
-              Navigator.of(context).pop();
-              context.pop();
-            },
-          ),
-        ],
-      ),
-    );
-  }
 
   /// 显示错误对话框
   void _showErrorDialog(BuildContext context, String message) {
@@ -981,6 +600,372 @@ class _CreateDietPlanPageState extends ConsumerState<CreateDietPlanPage> {
         notifier: ref.read(createDietPlanNotifierProvider.notifier),
       ),
     );
+  }
+
+  /// 根据页面状态构建不同的内容
+  Widget _buildBody(BuildContext context, CreatePlanPageState pageState) {
+    final l10n = AppLocalizations.of(context)!;
+    final notifier = ref.read(createDietPlanNotifierProvider.notifier);
+
+    switch (pageState) {
+      case CreatePlanPageState.initial:
+        return InitialView(
+          onAIGuidedTap: () =>
+              _switchToState(CreatePlanPageState.aiGuided),
+          onTextImportTap: () =>
+              _switchToState(CreatePlanPageState.textImport),
+          onManualCreateTap: _createManualPlan,
+        );
+
+      case CreatePlanPageState.aiGuided:
+        return DietAIGuidedView(
+          onGenerationStart: _handleGenerationStart,
+        );
+
+      case CreatePlanPageState.textImport:
+        return TextImportView(
+          onImportSuccess: (result) {
+            // TODO: 处理导入结果，切换到 textImportSummary 状态
+            _switchToState(CreatePlanPageState.textImportSummary);
+          },
+        );
+
+      case CreatePlanPageState.textImportSummary:
+        return const DietTextImportSummaryView();
+
+      case CreatePlanPageState.aiStreaming:
+        return DietAIStreamingView(
+          onConfirm: _handleStreamingConfirm,
+        );
+
+      case CreatePlanPageState.editing:
+        return _buildEditingContent();
+    }
+  }
+
+  /// 构建编辑器内容（现有的编辑界面）
+  Widget _buildEditingContent() {
+    final l10n = AppLocalizations.of(context)!;
+    final state = ref.watch(createDietPlanNotifierProvider);
+    final notifier = ref.read(createDietPlanNotifierProvider.notifier);
+    final reviewState = ref.watch(dietSuggestionReviewNotifierProvider);
+
+    return SafeArea(
+      child: Column(
+        children: [
+          // Plan Header
+          PlanHeaderWidget(
+            planName: state.planName,
+            onNameChanged: notifier.updatePlanName,
+            totalDays: state.totalDays,
+            totalExercises: state.totalMeals,
+            totalSets: state.totalFoodItems,
+          ),
+
+          // Horizontal Day Pills Scroll View
+          DayPillScrollView(
+            dayItems: state.days
+                .map((day) => (name: day.name, day: day.day))
+                .toList(),
+            selectedDayIndex: _selectedDayIndex,
+            onDayTap: (index) {
+              setState(() {
+                _selectedDayIndex = index;
+                _expandedMealIndex = null; // 切换天时收起所有餐次
+              });
+            },
+            onDayLongPress: (index, dayName) {
+              _showDayOptionsMenu(context, notifier, index, dayName);
+            },
+            onAddDay: () => _onAddDay(notifier),
+            addDayLabel: l10n.addDay,
+          ),
+
+          // Content Area
+          Expanded(
+            child: _selectedDayIndex != null &&
+                    _selectedDayIndex! < state.days.length
+                ? DismissKeyboardOnScroll(
+                    child: SingleChildScrollView(
+                      controller: _mealsScrollController,
+                      child: DietDayEditor(
+                        onAddMeal: () =>
+                            _onAddMeal(notifier, _selectedDayIndex!),
+                        totalMacros:
+                            state.days[_selectedDayIndex!].targetMacros ??
+                            state.days[_selectedDayIndex!].macros,
+                        onProteinChanged: (value) =>
+                            notifier.updateDayTargetMacros(
+                              _selectedDayIndex!,
+                              protein: value,
+                            ),
+                        onCarbsChanged: (value) =>
+                            notifier.updateDayTargetMacros(
+                              _selectedDayIndex!,
+                              carbs: value,
+                            ),
+                        onFatChanged: (value) =>
+                            notifier.updateDayTargetMacros(
+                              _selectedDayIndex!,
+                              fat: value,
+                            ),
+                        mealsWidget: Column(
+                          children: _buildMealsList(
+                            context,
+                            notifier,
+                            _selectedDayIndex!,
+                            state.days[_selectedDayIndex!].meals,
+                            reviewState,
+                          ),
+                        ),
+                      ),
+                    ),
+                  )
+                : Center(
+                    child: Text(
+                      'Select a day or add a new one',
+                      style: AppTextStyles.body.copyWith(
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                  ),
+          ),
+
+          // Save Button
+          _buildSaveButton(context, notifier, state),
+        ],
+      ),
+    );
+  }
+
+  /// 构建餐次列表
+  List<Widget> _buildMealsList(
+    BuildContext context,
+    CreateDietPlanNotifier notifier,
+    int selectedDayIndex,
+    List<Meal> meals,
+    DietSuggestionReviewState? reviewState,
+  ) {
+    return meals.asMap().entries.map((entry) {
+      final mealIndex = entry.key;
+      final meal = entry.value;
+      final isExpanded = _expandedMealIndex == mealIndex;
+
+      // 生成唯一的 GlobalKey
+      final mealKey = '${selectedDayIndex}_$mealIndex';
+      _mealKeys.putIfAbsent(mealKey, () => GlobalKey());
+
+      // 构建 food items widget
+      final foodItemsWidget = Column(
+        children: meal.items.asMap().entries.map((itemEntry) {
+          final itemIndex = itemEntry.key;
+          final item = itemEntry.value;
+          return FoodItemRow(
+            item: item,
+            index: itemIndex,
+            onFoodChanged: (value) => notifier.updateFoodItemField(
+              selectedDayIndex,
+              mealIndex,
+              itemIndex,
+              food: value,
+            ),
+            onAmountChanged: (value) => notifier.updateFoodItemField(
+              selectedDayIndex,
+              mealIndex,
+              itemIndex,
+              amount: value,
+            ),
+            onProteinChanged: (value) => notifier.updateFoodItemField(
+              selectedDayIndex,
+              mealIndex,
+              itemIndex,
+              protein: value,
+            ),
+            onCarbsChanged: (value) => notifier.updateFoodItemField(
+              selectedDayIndex,
+              mealIndex,
+              itemIndex,
+              carbs: value,
+            ),
+            onFatChanged: (value) => notifier.updateFoodItemField(
+              selectedDayIndex,
+              mealIndex,
+              itemIndex,
+              fat: value,
+            ),
+            onCaloriesChanged: (value) => notifier.updateFoodItemField(
+              selectedDayIndex,
+              mealIndex,
+              itemIndex,
+              calories: value,
+            ),
+            onDelete: () => notifier.removeFoodItem(
+              selectedDayIndex,
+              mealIndex,
+              itemIndex,
+            ),
+          );
+        }).toList(),
+      );
+
+      return MealCard(
+        key: _mealKeys[mealKey],
+        meal: meal,
+        index: mealIndex,
+        isExpanded: isExpanded,
+        onTap: () => setState(() {
+          _expandedMealIndex = isExpanded ? null : mealIndex;
+        }),
+        onNameChanged: (name) => notifier.updateMealName(
+          selectedDayIndex,
+          mealIndex,
+          name,
+        ),
+        onNoteChanged: (note) => notifier.updateMealNote(
+          selectedDayIndex,
+          mealIndex,
+          note,
+        ),
+        onAddFoodItem: () => notifier.addFoodItem(
+          selectedDayIndex,
+          mealIndex,
+        ),
+        onDelete: () {
+          notifier.removeMeal(selectedDayIndex, mealIndex);
+          setState(() {
+            _expandedMealIndex = null;
+          });
+        },
+        foodItemsWidget: foodItemsWidget,
+      );
+    }).toList();
+  }
+
+  /// 构建保存按钮
+  Widget _buildSaveButton(
+    BuildContext context,
+    CreateDietPlanNotifier notifier,
+    CreateDietPlanState state,
+  ) {
+    final l10n = AppLocalizations.of(context)!;
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: CupertinoColors.systemBackground.resolveFrom(context),
+        border: Border(
+          top: BorderSide(
+            color: CupertinoColors.separator.resolveFrom(context),
+          ),
+        ),
+      ),
+      child: SafeArea(
+        top: false,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Save Button
+            CupertinoButton(
+              padding: EdgeInsets.zero,
+              onPressed: state.canSave && !state.isLoading
+                  ? () => _onSave(context, notifier)
+                  : null,
+              child: Container(
+                width: double.infinity,
+                height: 50,
+                decoration: BoxDecoration(
+                  color: state.canSave && !state.isLoading
+                      ? AppColors.primary
+                      : CupertinoColors.quaternarySystemFill.resolveFrom(context),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                alignment: Alignment.center,
+                child: state.isLoading
+                    ? const CupertinoActivityIndicator(color: CupertinoColors.white)
+                    : Text(
+                        l10n.savePlan,
+                        style: TextStyle(
+                          color: state.canSave
+                              ? CupertinoColors.black
+                              : CupertinoColors.systemGrey,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+              ),
+            ),
+
+            // Validation Errors
+            if (state.validationErrors.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: Text(
+                  state.validationErrors.first,
+                  style: AppTextStyles.footnote.copyWith(
+                    color: CupertinoColors.systemRed,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// 切换页面状态
+  void _switchToState(CreatePlanPageState newState) {
+    ref.read(createDietPlanPageStateProvider.notifier).state = newState;
+    AppLogger.debug('📄 切换页面状态到: $newState');
+  }
+
+  /// AI 生成开始时的处理
+  void _handleGenerationStart() {
+    // 立即切换到 aiStreaming 状态展示进度
+    _switchToState(CreatePlanPageState.aiStreaming);
+    AppLogger.info('🔄 AI 生成开始，切换到 streaming 视图');
+  }
+
+  /// AI 流式生成完成后用户点击确认按钮的处理
+  void _handleStreamingConfirm() {
+    final notifier = ref.read(createDietPlanNotifierProvider.notifier);
+    final state = ref.read(createDietPlanNotifierProvider);
+
+    // 切换到编辑模式
+    _switchToState(CreatePlanPageState.editing);
+
+    // 选中第一天
+    setState(() {
+      _selectedDayIndex = state.days.isNotEmpty ? 0 : null;
+    });
+
+    // 只在编辑模式下保存初始快照（首次创建不需要）
+    if (state.isEditMode) {
+      notifier.saveInitialSnapshot();
+      AppLogger.info('✅ 用户确认查看计划，切换到编辑模式（已保存快照）');
+    } else {
+      AppLogger.info('✅ 用户确认查看计划，切换到编辑模式（首次创建）');
+    }
+  }
+
+  /// 创建手动计划（添加 Day 1 并进入 editing）
+  void _createManualPlan() {
+    final notifier = ref.read(createDietPlanNotifierProvider.notifier);
+    final state = ref.read(createDietPlanNotifierProvider);
+
+    if (state.days.isEmpty) {
+      notifier.addDay(name: 'Day 1');
+      setState(() {
+        _selectedDayIndex = 0;
+      });
+    }
+
+    // 切换到编辑模式
+    _switchToState(CreatePlanPageState.editing);
+
+    // 保存初始快照（用于判断是否有修改）
+    notifier.saveInitialSnapshot();
+
+    AppLogger.info('➕ 创建手动计划 - 进入编辑模式');
   }
 
   /// 构建当前计划

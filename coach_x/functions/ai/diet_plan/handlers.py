@@ -36,7 +36,7 @@ def generate_diet_plan_with_skill(req: https_fn.CallableRequest):
         - training_plan_id: str, 可选，训练计划ID（用于获取训练计划并应用碳循环）
         - dietary_preferences: list, 可选，饮食偏好
         - meal_count: int, 可选，每日餐数
-        - allergies: list, 可选，过敏信息
+        - dietary_restrictions: str, 可选，饮食限制和其他要求（自由文本）
         - plan_duration_days: int, 可选，计划天数
 
     返回:
@@ -94,8 +94,8 @@ def generate_diet_plan_with_skill(req: https_fn.CallableRequest):
         if req.data.get("dietary_preferences"):
             skill_params["dietary_preferences"] = req.data["dietary_preferences"]
 
-        if req.data.get("allergies"):
-            skill_params["allergies"] = req.data["allergies"]
+        if req.data.get("dietary_restrictions"):
+            skill_params["dietary_restrictions"] = req.data["dietary_restrictions"]
 
         # 先处理训练计划和碳循环逻辑
         has_training_plan = False
@@ -103,7 +103,7 @@ def generate_diet_plan_with_skill(req: https_fn.CallableRequest):
         if training_plan_id:
             logger.info(f"引用训练计划: {training_plan_id}")
             # 获取训练计划数据
-            from google.cloud import firestore
+            from firebase_admin import firestore
             db = firestore.client()
             plan_ref = db.collection("exercisePlans").document(training_plan_id)
             plan_doc = plan_ref.get()

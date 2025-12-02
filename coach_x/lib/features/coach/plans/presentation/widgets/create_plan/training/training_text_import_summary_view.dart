@@ -16,16 +16,16 @@ import 'package:coach_x/features/student/training/presentation/widgets/exercise_
 /// - 为新动作创建指导内容
 /// - 编辑动作名称
 /// - 批量创建剩余模板
-class TextImportSummaryView extends ConsumerStatefulWidget {
-  const TextImportSummaryView({super.key});
+class TrainingTextImportSummaryView extends ConsumerStatefulWidget {
+  const TrainingTextImportSummaryView({super.key});
 
   @override
-  ConsumerState<TextImportSummaryView> createState() =>
-      _TextImportSummaryViewState();
+  ConsumerState<TrainingTextImportSummaryView> createState() =>
+      _TrainingTextImportSummaryViewState();
 }
 
-class _TextImportSummaryViewState
-    extends ConsumerState<TextImportSummaryView> {
+class _TrainingTextImportSummaryViewState
+    extends ConsumerState<TrainingTextImportSummaryView> {
   /// 动作名称编辑控制器 (originalName -> controller)
   final Map<String, TextEditingController> _nameControllers = {};
 

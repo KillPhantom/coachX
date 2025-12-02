@@ -1,6 +1,7 @@
 import 'package:coach_x/core/services/cloud_functions_service.dart';
 import 'package:coach_x/core/utils/logger.dart';
 import '../models/diet_plan_model.dart';
+import '../cache/plans_cache_service.dart';
 
 /// 饮食计划仓库
 class DietPlanRepository {
@@ -84,6 +85,9 @@ class DietPlanRepository {
 
       if (result['status'] == 'success') {
         AppLogger.info('✅ 饮食计划更新成功');
+
+        // 更新成功后清除详情缓存
+        await PlansCacheService.invalidatePlanDetail(plan.id, 'diet');
       } else {
         throw Exception(result['message'] ?? '更新失败');
       }
@@ -98,6 +102,18 @@ class DietPlanRepository {
     try {
       AppLogger.info('📖 获取饮食计划: $planId');
 
+      // 1. 尝试从缓存读取
+      final cachedPlanJson = await PlansCacheService.getCachedPlanDetail(
+        planId,
+        'diet',
+      );
+      if (cachedPlanJson != null) {
+        final plan = DietPlanModel.fromJson(cachedPlanJson);
+        AppLogger.info('✅ 饮食计划详情从缓存加载成功');
+        return plan;
+      }
+
+      // 2. 缓存无效，调用 Cloud Function
       final result = await CloudFunctionsService.call('diet_plan', {
         'action': 'get',
         'planId': planId,
@@ -107,11 +123,16 @@ class DietPlanRepository {
         final planData = _deepConvertMap(result['data']['plan'] as Map);
 
         // 安全地解析时间戳字段
-        final plan = DietPlanModel.fromJson({
+        final normalizedJson = {
           ...planData,
           'createdAt': _parseTimestamp(planData['createdAt']),
           'updatedAt': _parseTimestamp(planData['updatedAt']),
-        });
+        };
+
+        final plan = DietPlanModel.fromJson(normalizedJson);
+
+        // 3. 写入缓存
+        await PlansCacheService.cachePlanDetail(planId, 'diet', normalizedJson);
 
         AppLogger.info('✅ 饮食计划获取成功');
         return plan;

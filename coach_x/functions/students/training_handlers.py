@@ -5,6 +5,7 @@ from firebase_functions import https_fn
 from firebase_admin import firestore
 from google.cloud.firestore import SERVER_TIMESTAMP
 from utils import logger, db_helper
+from utils.param_parser import unwrap_protobuf_values
 from typing import Dict, Any, Tuple, Optional, List
 from datetime import datetime, timedelta
 import tempfile
@@ -145,8 +146,13 @@ def upsert_today_training(req: https_fn.CallableRequest):
         doc_id = training_data.get('id', '').strip()
         doc_ref = None
 
+        # 解包 Protobuf 包装值（修复 Firebase Cloud Functions 2nd gen 的 gRPC 序列化问题）
+        # 例如：{'exerciseDayNumber': {'@type': '...Int64Value', 'value': '2'}} -> {'exerciseDayNumber': 2}
+        unwrapped_data = unwrap_protobuf_values(training_data)
+        logger.info(f'🔧 已解包 Protobuf 包装值')
+
         # 准备保存的数据（移除id字段，Firestore不需要）
-        save_data = {k: v for k, v in training_data.items() if k != 'id'}
+        save_data = {k: v for k, v in unwrapped_data.items() if k != 'id'}
 
         # 如果存在记录，更新它
         if existing_query:

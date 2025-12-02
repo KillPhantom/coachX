@@ -2,11 +2,8 @@
 ///
 /// 用于表示教练首页的统计信息
 class CoachSummaryModel {
-  /// 过去30天完成训练的学生数
-  final int studentsCompletedLast30Days;
-
-  /// 总学生数
-  final int totalStudents;
+  /// 本周学生打卡次数（最近7天）
+  final int studentCheckInsLast7Days;
 
   /// 未读消息数
   final int unreadMessages;
@@ -18,8 +15,7 @@ class CoachSummaryModel {
   final DateTime lastUpdated;
 
   const CoachSummaryModel({
-    required this.studentsCompletedLast30Days,
-    required this.totalStudents,
+    required this.studentCheckInsLast7Days,
     required this.unreadMessages,
     required this.unreviewedTrainings,
     required this.lastUpdated,
@@ -28,8 +24,7 @@ class CoachSummaryModel {
   /// 从JSON创建
   factory CoachSummaryModel.fromJson(Map<String, dynamic> json) {
     return CoachSummaryModel(
-      studentsCompletedLast30Days: json['studentsCompletedLast30Days'] as int,
-      totalStudents: json['totalStudents'] as int,
+      studentCheckInsLast7Days: json['studentCheckInsLast7Days'] as int,
       unreadMessages: json['unreadMessages'] as int,
       unreviewedTrainings: json['unreviewedTrainings'] as int,
       lastUpdated: DateTime.parse(json['lastUpdated'] as String),
@@ -39,41 +34,23 @@ class CoachSummaryModel {
   /// 转换为JSON
   Map<String, dynamic> toJson() {
     return {
-      'studentsCompletedLast30Days': studentsCompletedLast30Days,
-      'totalStudents': totalStudents,
+      'studentCheckInsLast7Days': studentCheckInsLast7Days,
       'unreadMessages': unreadMessages,
       'unreviewedTrainings': unreviewedTrainings,
       'lastUpdated': lastUpdated.toIso8601String(),
     };
   }
 
-  /// 获取完成率文本
-  ///
-  /// 例如: "15/25"
-  String get completionRate {
-    return '$studentsCompletedLast30Days/$totalStudents';
-  }
-
-  /// 获取完成率百分比
-  ///
-  /// 例如: 0.6 (60%)
-  double get completionPercentage {
-    if (totalStudents == 0) return 0.0;
-    return studentsCompletedLast30Days / totalStudents;
-  }
-
   /// 复制并修改
   CoachSummaryModel copyWith({
-    int? studentsCompletedLast30Days,
-    int? totalStudents,
+    int? studentCheckInsLast7Days,
     int? unreadMessages,
     int? unreviewedTrainings,
     DateTime? lastUpdated,
   }) {
     return CoachSummaryModel(
-      studentsCompletedLast30Days:
-          studentsCompletedLast30Days ?? this.studentsCompletedLast30Days,
-      totalStudents: totalStudents ?? this.totalStudents,
+      studentCheckInsLast7Days:
+          studentCheckInsLast7Days ?? this.studentCheckInsLast7Days,
       unreadMessages: unreadMessages ?? this.unreadMessages,
       unreviewedTrainings: unreviewedTrainings ?? this.unreviewedTrainings,
       lastUpdated: lastUpdated ?? this.lastUpdated,

@@ -202,8 +202,8 @@ class ExerciseRecordCard extends StatelessWidget {
             maxVideoSeconds: 60,
             initialMedia: exercise.media,
             onMediaSelected: (index, file, type) {
-              // 添加 pending 状态媒体到 notifier（不启动上传）
-              // 上传由 MediaUploadSection 负责
+              // 通知 Notifier 添加媒体并启动后台上传
+              // 上传由 MediaUploadManager 负责（后台异步）
               onMediaSelected(file, type);
             },
             onUploadCompleted: (index, url, thumbnailUrl, type) {

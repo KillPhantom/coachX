@@ -5,6 +5,7 @@ import '../../../student/home/data/models/daily_training_model.dart';
 import '../../../student/training/data/models/student_exercise_model.dart';
 import '../../../student/diet/data/models/student_diet_record_model.dart';
 import '../../../../core/models/video_model.dart';
+import '../../../coach/plans/data/models/macros.dart';
 
 class TrainingFeedRepositoryImpl implements TrainingFeedRepository {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -36,7 +37,9 @@ class TrainingFeedRepositoryImpl implements TrainingFeedRepository {
         [];
 
     final dietData = data['diet'] as Map<String, dynamic>?;
-    final diet = dietData != null ? StudentDietRecordModel.fromJson(dietData) : null;
+    final diet = dietData != null
+        ? StudentDietRecordModel.fromJson(dietData)
+        : null;
 
     final feedItems = <TrainingFeedItem>[];
     final nonVideoExercises = <StudentExerciseModel>[];
@@ -69,16 +72,29 @@ class TrainingFeedRepositoryImpl implements TrainingFeedRepository {
     }
 
     // 生成聚合的 Text Card (包含所有无视频动作 + 饮食记录)
-    if (nonVideoExercises.isNotEmpty || (diet != null && diet.meals.isNotEmpty)) {
+    if (nonVideoExercises.isNotEmpty ||
+        (diet != null && diet.meals.isNotEmpty)) {
       final allExercisesReviewed = nonVideoExercises.every((e) => e.isReviewed);
       final dietReviewed = diet?.isReviewed ?? true;
-      
+
+      // 获取 actual macros
+      final actualMacros = diet?.macros;
+
+      // 获取 target macros
+      final studentId = data['studentID'] as String?;
+      Macros? targetMacros;
+      if (studentId != null) {
+        targetMacros = await _fetchTargetMacros(studentId);
+      }
+
       feedItems.add(
         TrainingFeedItem.aggregated(
           dailyTrainingId: dailyTrainingId,
           exercises: nonVideoExercises,
           diet: diet,
           isReviewed: allExercisesReviewed && dietReviewed,
+          actualMacros: actualMacros,
+          targetMacros: targetMacros,
         ),
       );
     }
@@ -90,7 +106,6 @@ class TrainingFeedRepositoryImpl implements TrainingFeedRepository {
 
     return feedItems;
   }
-
 
   @override
   Stream<DailyTrainingModel> watchDailyTraining(String dailyTrainingId) {
@@ -106,5 +121,33 @@ class TrainingFeedRepositoryImpl implements TrainingFeedRepository {
           data['id'] = snapshot.id; // 添加文档 ID
           return DailyTrainingModel.fromJson(data);
         });
+  }
+
+  /// 获取学生的目标 Macros（从 active diet plan）
+  Future<Macros?> _fetchTargetMacros(String studentId) async {
+    try {
+      final querySnapshot = await _firestore
+          .collection('dietPlans')
+          .where('studentID', isEqualTo: studentId)
+          .where('isActive', isEqualTo: true)
+          .limit(1)
+          .get();
+
+      if (querySnapshot.docs.isEmpty) {
+        return null;
+      }
+
+      final planData = querySnapshot.docs.first.data();
+      final totalMacrosData = planData['totalMacros'] as Map<String, dynamic>?;
+
+      if (totalMacrosData == null) {
+        return null;
+      }
+
+      return Macros.fromJson(totalMacrosData);
+    } catch (e) {
+      // 查询失败时返回 null，不影响主流程
+      return null;
+    }
   }
 }

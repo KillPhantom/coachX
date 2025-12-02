@@ -36,8 +36,8 @@ class DietPlanGenerationParams {
   /// 每日餐数（可选，默认4餐）
   final int? mealCount;
 
-  /// 过敏信息列表（可选）
-  final List<Allergen>? allergies;
+  /// 饮食限制和其他要求（可选）
+  final String? dietaryRestrictions;
 
   /// 计划天数（可选，默认7天）
   final int? planDurationDays;
@@ -53,7 +53,7 @@ class DietPlanGenerationParams {
     this.trainingPlanId,
     this.dietaryPreferences,
     this.mealCount,
-    this.allergies,
+    this.dietaryRestrictions,
     this.planDurationDays,
   });
 
@@ -87,8 +87,8 @@ class DietPlanGenerationParams {
       json['meal_count'] = mealCount;
     }
 
-    if (allergies != null && allergies!.isNotEmpty) {
-      json['allergies'] = allergies!.map((a) => a.apiValue).toList();
+    if (dietaryRestrictions != null && dietaryRestrictions!.trim().isNotEmpty) {
+      json['dietary_restrictions'] = dietaryRestrictions!.trim();
     }
 
     if (planDurationDays != null) {
@@ -110,7 +110,7 @@ class DietPlanGenerationParams {
     String? trainingPlanId,
     List<DietaryPreference>? dietaryPreferences,
     int? mealCount,
-    List<Allergen>? allergies,
+    String? dietaryRestrictions,
     int? planDurationDays,
   }) {
     return DietPlanGenerationParams(
@@ -124,7 +124,7 @@ class DietPlanGenerationParams {
       trainingPlanId: trainingPlanId ?? this.trainingPlanId,
       dietaryPreferences: dietaryPreferences ?? this.dietaryPreferences,
       mealCount: mealCount ?? this.mealCount,
-      allergies: allergies ?? this.allergies,
+      dietaryRestrictions: dietaryRestrictions ?? this.dietaryRestrictions,
       planDurationDays: planDurationDays ?? this.planDurationDays,
     );
   }

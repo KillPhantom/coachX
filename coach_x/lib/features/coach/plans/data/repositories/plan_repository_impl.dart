@@ -202,7 +202,8 @@ class PlanRepositoryImpl implements PlanRepository {
 
       AppLogger.debug('✅ 更新训练计划成功');
 
-      // 更新成功后清除列表缓存
+      // 更新成功后清除详情缓存和列表缓存
+      await PlansCacheService.invalidatePlanDetail(plan.id, 'exercise');
       await PlansCacheService.invalidateListCache('exercise');
     } on FirebaseFunctionsException catch (e) {
       AppLogger.error('❌ 更新计划失败: ${e.code} - ${e.message}');
@@ -218,6 +219,18 @@ class PlanRepositoryImpl implements PlanRepository {
     try {
       AppLogger.debug('📖 获取训练计划详情: $planId');
 
+      // 1. 尝试从缓存读取
+      final cachedPlanJson = await PlansCacheService.getCachedPlanDetail(
+        planId,
+        'exercise',
+      );
+      if (cachedPlanJson != null) {
+        final plan = ExercisePlanModel.fromJson(cachedPlanJson);
+        AppLogger.debug('✅ 训练计划详情从缓存加载成功');
+        return plan;
+      }
+
+      // 2. 缓存无效，调用 Cloud Function
       final result = await CloudFunctionsService.getExercisePlanDetail(
         planId: planId,
       );
@@ -236,11 +249,16 @@ class PlanRepositoryImpl implements PlanRepository {
       final planJson = _deepConvertMap(planData as Map);
 
       // 安全地解析时间戳字段
-      final plan = ExercisePlanModel.fromJson({
+      final normalizedJson = {
         ...planJson,
         'createdAt': _parseTimestamp(planJson['createdAt']),
         'updatedAt': _parseTimestamp(planJson['updatedAt']),
-      });
+      };
+
+      final plan = ExercisePlanModel.fromJson(normalizedJson);
+
+      // 3. 写入缓存
+      await PlansCacheService.cachePlanDetail(planId, 'exercise', normalizedJson);
 
       AppLogger.debug('✅ 获取训练计划详情成功');
 

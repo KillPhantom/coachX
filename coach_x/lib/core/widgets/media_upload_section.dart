@@ -4,13 +4,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:video_compress/video_compress.dart';
 import 'package:coach_x/l10n/app_localizations.dart';
 import 'package:coach_x/core/theme/app_theme.dart';
 import 'package:coach_x/core/models/media_upload_state.dart';
-import 'package:coach_x/core/services/video_service.dart';
 import 'package:coach_x/core/providers/media_upload_providers.dart';
-import 'package:coach_x/core/utils/video_utils.dart';
 import 'package:coach_x/core/utils/logger.dart';
 import 'package:coach_x/core/widgets/media_thumbnail_card.dart';
 import 'package:coach_x/core/widgets/video_placeholder_card.dart';
@@ -82,7 +79,6 @@ class _MediaUploadSectionState extends ConsumerState<MediaUploadSection> {
   final List<MediaUploadState> _mediaList = [];
   final List<String> _mediaIds = []; // Track IDs to handle index shifting
   final Map<String, StreamSubscription<double>> _uploadSubscriptions = {};
-  final Map<String, StreamSubscription> _compressionSubscriptions = {}; // Track compression subscriptions
   final ImagePicker _picker = ImagePicker();
   bool _isPicking = false; // Track if the picker is currently active/processing
 
@@ -93,9 +89,33 @@ class _MediaUploadSectionState extends ConsumerState<MediaUploadSection> {
   }
 
   @override
+  void didUpdateWidget(MediaUploadSection oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // 同步 Riverpod state 到本地显示
+    if (widget.initialMedia != oldWidget.initialMedia) {
+      _syncMediaFromProps();
+    }
+  }
+
+  @override
   void dispose() {
     _cancelAllUploads();
     super.dispose();
+  }
+
+  /// 同步 props 中的媒体状态到本地列表
+  void _syncMediaFromProps() {
+    setState(() {
+      _mediaList.clear();
+      _mediaIds.clear();
+      if (widget.initialMedia != null && widget.initialMedia!.isNotEmpty) {
+        _mediaList.addAll(widget.initialMedia!);
+        // 为同步的媒体生成 ID
+        for (var i = 0; i < widget.initialMedia!.length; i++) {
+          _mediaIds.add('synced_${DateTime.now().microsecondsSinceEpoch}_$i');
+        }
+      }
+    });
   }
 
   /// 初始化已有媒体
@@ -111,20 +131,13 @@ class _MediaUploadSectionState extends ConsumerState<MediaUploadSection> {
     }
   }
 
-  /// 取消所有上传和压缩
+  /// 取消所有上传订阅
   void _cancelAllUploads() {
     for (final subscription in _uploadSubscriptions.values) {
       subscription.cancel();
     }
     _uploadSubscriptions.clear();
-
-    for (final subscription in _compressionSubscriptions.values) {
-      subscription.cancel();
-    }
-    _compressionSubscriptions.clear();
-
-    // 取消 video_compress 的压缩任务
-    VideoService.cancelCompression();
+    // 压缩和上传任务由 MediaUploadManager 管理，不需要在此清理
   }
 
   bool get canAddMore => _mediaList.length < widget.maxCount;
@@ -226,20 +239,16 @@ class _MediaUploadSectionState extends ConsumerState<MediaUploadSection> {
     setState(() {
       final id = _mediaIds[index];
 
-      // 取消上传（如果正在上传）
+      // 取消上传订阅（如果存在）
       _uploadSubscriptions[id]?.cancel();
       _uploadSubscriptions.remove(id);
-
-      // 取消压缩（如果正在压缩）
-      _compressionSubscriptions[id]?.cancel();
-      _compressionSubscriptions.remove(id);
 
       // 移除媒体
       _mediaList.removeAt(index);
       _mediaIds.removeAt(index);
     });
 
-    // 通知父组件
+    // 通知父组件（会取消 MediaUploadManager 的任务）
     widget.onMediaDeleted?.call(index);
   }
 
@@ -248,20 +257,10 @@ class _MediaUploadSectionState extends ConsumerState<MediaUploadSection> {
     if (_mediaList[index].localPath == null) return;
 
     AppLogger.info('重试上传: index=$index');
-    
-    final id = _mediaIds[index];
 
-    // 重置状态为 pending
-    setState(() {
-      _mediaList[index] = _mediaList[index].copyWith(
-        status: MediaUploadStatus.pending,
-        progress: 0.0,
-        error: null,
-      );
-    });
-
-    // 重新启动上传
-    _startUpload(id, File(_mediaList[index].localPath!), _mediaList[index].type);
+    // 通知父组件重新上传，由 MediaUploadManager 处理
+    final media = _mediaList[index];
+    widget.onMediaSelected?.call(index, File(media.localPath!), media.type);
   }
 
   /// 显示媒体源选择
@@ -425,165 +424,13 @@ class _MediaUploadSectionState extends ConsumerState<MediaUploadSection> {
     }
   }
 
-  /// 处理媒体文件（验证 + 压缩 + 上传）
+  /// 处理媒体文件（选择并通知父组件）
   Future<void> _processAndUploadMedia(File file, MediaType type) async {
-    AppLogger.info('开始处理媒体: ${file.path}, 类型: $type');
+    AppLogger.info('选择媒体: ${file.path}, 类型: $type');
 
-    // Prevent duplicates: Check if file path already exists in pending/uploading items
-    final isDuplicate = _mediaList.any((m) => 
-      m.localPath == file.path && 
-      (m.status == MediaUploadStatus.pending || m.status == MediaUploadStatus.uploading)
-    );
-    
-    if (isDuplicate) {
-      AppLogger.info('Media already being processed, ignoring duplicate request.');
-      return;
-    }
-
-    // Generate unique ID for this upload task
-    final id = DateTime.now().microsecondsSinceEpoch.toString();
-
-    // 1. 立即添加到列表（pending 状态）
-    setState(() {
-      _mediaList.add(MediaUploadState.pending(
-        localPath: file.path,
-        thumbnailPath: null, // 暂时没有缩略图
-        type: type,
-      ));
-      _mediaIds.add(id);
-    });
-    
-    // 通知父组件 (index is last one)
-    final initialIndex = _mediaIds.length - 1;
-    widget.onMediaSelected?.call(initialIndex, file, type);
-
-    try {
-        String? thumbnailPath;
-
-        if (type == MediaType.video) {
-            // 2. 生成缩略图 (优先生成，提升体验)
-            // 确保不阻塞 UI - 给一点时间让 UI 先渲染出 placeholder
-            await Future.delayed(const Duration(milliseconds: 300)); 
-            final thumb = await VideoUtils.generateThumbnail(file.path);
-            thumbnailPath = thumb?.path;
-
-            // 立即更新缩略图
-            if (mounted) {
-              final currentIndex = _mediaIds.indexOf(id);
-              if (currentIndex != -1) {
-                setState(() {
-                  if (thumbnailPath != null) {
-                    _mediaList[currentIndex] = _mediaList[currentIndex].copyWith(
-                      thumbnailPath: thumbnailPath,
-                    );
-                  }
-                });
-              } else {
-                // Item deleted during thumbnail generation
-                AppLogger.info('Item $id deleted during thumbnail generation');
-                return;
-              }
-            }
-
-            // 3. 验证视频时长
-            final isValid = await VideoUtils.validateVideoFile(
-                file,
-                maxSeconds: widget.maxVideoSeconds,
-            );
-            if (!isValid) {
-                if (mounted) {
-                    final l10n = AppLocalizations.of(context)!;
-                    _showErrorAlert(l10n.videoTooLongMessage);
-                    // 移除刚刚添加的 item
-                    setState(() {
-                      final idx = _mediaIds.indexOf(id);
-                      if (idx != -1) {
-                        _mediaList.removeAt(idx);
-                        _mediaIds.removeAt(idx);
-                        // We should probably notify parent about deletion if we notified selection?
-                        // The parent might have added a placeholder.
-                        // But onMediaSelected is usually for "added".
-                        // onMediaDeleted is for "removed".
-                        widget.onMediaDeleted?.call(idx);
-                      }
-                    });
-                }
-                return;
-            }
-
-            // 4. 压缩视频 (后台进行)
-            await _compressAndUploadVideo(id, file);
-        } else {
-            // 图片直接上传 (或者也可以加压缩逻辑)
-            _startUpload(id, file, type);
-        }
-
-    } catch (e, stackTrace) {
-        AppLogger.error('媒体处理失败', e, stackTrace);
-        _failUpload(id, 'Failed to process media');
-    }
-  }
-
-  /// 压缩并上传视频（支持进度监听）
-  Future<void> _compressAndUploadVideo(String id, File originalFile) async {
-    // Check if item still exists
-    if (!_mediaIds.contains(id)) return;
-
-    try {
-      // 条件压缩
-      final shouldCompress = await VideoService.shouldCompress(
-        originalFile,
-        thresholdMB: widget.videoCompressionThresholdMB,
-      );
-
-      if (shouldCompress) {
-        AppLogger.info('视频需要压缩');
-
-        // 监听压缩进度
-        final compressionStream = VideoService.compressVideo(
-          originalFile,
-          quality: VideoQuality.MediumQuality,
-        );
-
-        final subscription = compressionStream.listen(
-          (compressProgress) {
-            if (mounted) {
-              final index = _mediaIds.indexOf(id);
-              if (index != -1) {
-                setState(() {
-                  // 压缩进度映射到 0-60%
-                  final displayProgress = compressProgress.progress * 0.6;
-                  _mediaList[index] = _mediaList[index].copyWith(
-                    status: MediaUploadStatus.compressing,
-                    progress: displayProgress,
-                  );
-                });
-
-                // 压缩完成，开始上传
-                if (compressProgress.file != null) {
-                  _startUpload(id, compressProgress.file!, MediaType.video);
-                }
-              }
-            }
-          },
-          onError: (error, stackTrace) {
-            AppLogger.error('视频压缩失败', error, stackTrace);
-            _failUpload(id, 'Compression failed');
-          },
-          onDone: () {
-            _compressionSubscriptions.remove(id);
-          },
-        );
-
-        _compressionSubscriptions[id] = subscription;
-      } else {
-        // 不需要压缩，直接上传
-        _startUpload(id, originalFile, MediaType.video);
-      }
-    } catch (e, stackTrace) {
-      AppLogger.error('压缩流程失败', e, stackTrace);
-      _failUpload(id, 'Compression setup failed');
-    }
+    // 只通知父组件，由父组件（Notifier）负责添加到状态并启动上传
+    // MediaUploadManager 会处理缩略图生成、验证、压缩和上传
+    widget.onMediaSelected?.call(_mediaList.length, file, type);
   }
 
   /// 启动异步上传

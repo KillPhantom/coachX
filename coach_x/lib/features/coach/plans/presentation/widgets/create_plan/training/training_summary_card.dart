@@ -4,21 +4,21 @@ import 'package:coach_x/core/theme/app_text_styles.dart';
 import 'package:coach_x/l10n/app_localizations.dart';
 import 'package:coach_x/features/coach/plans/data/models/plan_import_stats.dart';
 
-class SummaryCard extends StatefulWidget {
+class TrainingSummaryCard extends StatefulWidget {
   final PlanImportStats stats;
   final VoidCallback onViewPlan;
 
-  const SummaryCard({
+  const TrainingSummaryCard({
     super.key,
     required this.stats,
     required this.onViewPlan,
   });
 
   @override
-  State<SummaryCard> createState() => _SummaryCardState();
+  State<TrainingSummaryCard> createState() => _TrainingSummaryCardState();
 }
 
-class _SummaryCardState extends State<SummaryCard>
+class _TrainingSummaryCardState extends State<TrainingSummaryCard>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _scaleAnimation;
