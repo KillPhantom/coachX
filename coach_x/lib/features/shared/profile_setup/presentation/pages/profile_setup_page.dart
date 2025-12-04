@@ -11,6 +11,7 @@ import 'package:coach_x/core/enums/gender.dart';
 import 'package:coach_x/core/services/auth_service.dart';
 import 'package:coach_x/core/utils/validation_utils.dart';
 import 'package:coach_x/features/shared/profile_setup/presentation/controllers/profile_setup_controller.dart';
+import 'package:coach_x/features/student/profile/presentation/widgets/edit_born_date_picker.dart';
 import 'package:coach_x/routes/route_names.dart';
 
 /// Profile Setup页面
@@ -378,7 +379,7 @@ class _ProfileSetupPageState extends ConsumerState<ProfileSetupPage> {
           children: [
             Expanded(
               child: _buildGenderOption(
-                '男',  // Male
+                '男', // Male
                 selectedGender == Gender.male,
                 () => controller.setGender(Gender.male),
               ),
@@ -386,7 +387,7 @@ class _ProfileSetupPageState extends ConsumerState<ProfileSetupPage> {
             const SizedBox(width: AppDimensions.spacingM),
             Expanded(
               child: _buildGenderOption(
-                '女',  // Female
+                '女', // Female
                 selectedGender == Gender.female,
                 () => controller.setGender(Gender.female),
               ),
@@ -449,36 +450,11 @@ class _ProfileSetupPageState extends ConsumerState<ProfileSetupPage> {
           onTap: () {
             showCupertinoModalPopup(
               context: context,
-              builder: (context) => Container(
-                height: 250,
-                color: AppColors.backgroundWhite,
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        CupertinoButton(
-                          child: const Text('取消'),
-                          onPressed: () => Navigator.of(context).pop(),
-                        ),
-                        CupertinoButton(
-                          child: const Text('确定'),
-                          onPressed: () => Navigator.of(context).pop(),
-                        ),
-                      ],
-                    ),
-                    Expanded(
-                      child: CupertinoDatePicker(
-                        mode: CupertinoDatePickerMode.date,
-                        initialDateTime: selectedDate ?? DateTime(2000, 1, 1),
-                        maximumDate: DateTime.now(),
-                        minimumDate: DateTime(1900, 1, 1),
-                        onDateTimeChanged: (date) =>
-                            controller.setBornDate(date),
-                      ),
-                    ),
-                  ],
-                ),
+              builder: (context) => EditBornDatePicker(
+                currentBornDate: selectedDate,
+                onSave: (newDate) async {
+                  controller.setBornDate(newDate);
+                },
               ),
             );
           },

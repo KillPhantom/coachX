@@ -105,18 +105,24 @@ class ProfileSetupController extends StateNotifier<ProfileSetupState> {
   }
 
   /// 验证邀请码
-  Future<void> verifyInvitationCode(String code) async {
+  ///
+  /// [code] 邀请码
+  /// [confirm] 是否确认使用 (默认false)
+  Future<void> verifyInvitationCode(String code, {bool confirm = false}) async {
     try {
       state = state.copyWith(isValidatingCode: true);
 
-      final result = await CloudFunctionsService.verifyInvitationCode(code);
+      final result = await CloudFunctionsService.verifyInvitationCode(
+        code,
+        confirm: confirm,
+      );
 
       if (result['valid'] == true) {
         state = state.copyWith(
           isValidatingCode: false,
           coachId: result['coachId'] as String?,
         );
-        AppLogger.info('邀请码验证成功');
+        AppLogger.info('邀请码验证成功 (confirm=$confirm)');
       } else {
         state = state.copyWith(
           isValidatingCode: false,
@@ -145,12 +151,13 @@ class ProfileSetupController extends StateNotifier<ProfileSetupState> {
     try {
       state = state.copyWith(status: ProfileSetupStatus.loading);
 
-      // 如果是学生且有邀请码，先验证邀请码
+      // 如果是学生且有邀请码，先验证并使用邀请码
       String? coachId;
       if (role == UserRole.student &&
           invitationCode != null &&
           invitationCode.isNotEmpty) {
-        await verifyInvitationCode(invitationCode);
+        // 使用 confirm: true 直接兑换邀请码
+        await verifyInvitationCode(invitationCode, confirm: true);
         if (state.errorMessage != null) {
           // 验证失败
           state = state.copyWith(status: ProfileSetupStatus.error);

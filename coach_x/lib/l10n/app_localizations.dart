@@ -710,6 +710,12 @@ abstract class AppLocalizations {
   /// **'No training plans'**
   String get noTrainingPlans;
 
+  /// Message shown when student has no supplement plan assigned
+  ///
+  /// In en, this message translates to:
+  /// **'No supplement plan'**
+  String get noSupplementPlan;
+
   /// Filter by training plan label
   ///
   /// In en, this message translates to:
@@ -1124,6 +1130,12 @@ abstract class AppLocalizations {
   /// **'Supplement Plan'**
   String get supplementPlan;
 
+  /// Training plan title
+  ///
+  /// In en, this message translates to:
+  /// **'Training Plan'**
+  String get trainingPlan;
+
   /// Supplements count with action label
   ///
   /// In en, this message translates to:
@@ -1370,23 +1382,35 @@ abstract class AppLocalizations {
   /// **'Rest Day'**
   String get restDay;
 
-  /// No plan assigned message
+  /// No plan found message
   ///
   /// In en, this message translates to:
-  /// **'No Plan Assigned'**
-  String get noPlanAssigned;
+  /// **'No Plan Found'**
+  String get noPlanFound;
 
-  /// Contact coach for plan message
+  /// Create new training plan prompt
   ///
   /// In en, this message translates to:
-  /// **'Contact your coach to get a training plan'**
-  String get contactCoachForPlan;
+  /// **'Create a new training plan'**
+  String get createNewTrainingPlan;
 
-  /// View available plans button
+  /// Create new diet plan prompt
   ///
   /// In en, this message translates to:
-  /// **'View Available Plans'**
-  String get viewAvailablePlans;
+  /// **'Create a new diet plan'**
+  String get createNewDietPlan;
+
+  /// Create new supplement plan prompt
+  ///
+  /// In en, this message translates to:
+  /// **'Create a new supplement plan'**
+  String get createNewSupplementPlan;
+
+  /// Get started button text
+  ///
+  /// In en, this message translates to:
+  /// **'Get Started'**
+  String get getStarted;
 
   /// Detail button label
   ///
@@ -4261,6 +4285,114 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Target Calories (kcal)'**
   String get statTargetCalories;
+
+  /// AI conversation page title
+  ///
+  /// In en, this message translates to:
+  /// **'AI Assistant'**
+  String get aiConversationTitle;
+
+  /// AI chat placeholder message when no coach is connected
+  ///
+  /// In en, this message translates to:
+  /// **'Connect with your coach to start chatting and receive personalized training guidance'**
+  String get aiChatPlaceholderMessage;
+
+  /// Connect coach button text
+  ///
+  /// In en, this message translates to:
+  /// **'Connect Coach'**
+  String get connectCoach;
+
+  /// Connect coach modal title
+  ///
+  /// In en, this message translates to:
+  /// **'Connect to Coach'**
+  String get connectCoachModalTitle;
+
+  /// Connect coach modal description
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter the invitation code provided by your coach'**
+  String get connectCoachModalDescription;
+
+  /// Invitation code input placeholder
+  ///
+  /// In en, this message translates to:
+  /// **'XXXX-XXXX-XXXX'**
+  String get invitationCodePlaceholder;
+
+  /// Connecting status text
+  ///
+  /// In en, this message translates to:
+  /// **'Connecting...'**
+  String get connecting;
+
+  /// Connect success message
+  ///
+  /// In en, this message translates to:
+  /// **'Successfully connected to coach!'**
+  String get connectSuccess;
+
+  /// Invalid invitation code error
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid invitation code'**
+  String get invalidInvitationCode;
+
+  /// Invitation code already used error
+  ///
+  /// In en, this message translates to:
+  /// **'This invitation code has been used'**
+  String get invitationCodeUsed;
+
+  /// Invitation code expired error
+  ///
+  /// In en, this message translates to:
+  /// **'This invitation code has expired'**
+  String get invitationCodeExpired;
+
+  /// Connect button text
+  ///
+  /// In en, this message translates to:
+  /// **'Connect'**
+  String get connect;
+
+  /// Shortcut to analyze training history
+  ///
+  /// In en, this message translates to:
+  /// **'Analyze Training History'**
+  String get aiAnalyzeTrainingHistory;
+
+  /// Shortcut to analyze diet plan
+  ///
+  /// In en, this message translates to:
+  /// **'Analyze Diet Plan'**
+  String get aiAnalyzeDietPlan;
+
+  /// Shortcut to analyze training plan
+  ///
+  /// In en, this message translates to:
+  /// **'Analyze Training Plan'**
+  String get aiAnalyzeTrainingPlan;
+
+  /// Button to connect with real coach
+  ///
+  /// In en, this message translates to:
+  /// **'Connect with real coach'**
+  String get connectWithCoach;
+
+  /// Title for invitation code input
+  ///
+  /// In en, this message translates to:
+  /// **'Enter Invitation Code'**
+  String get enterInvitationCode;
+
+  /// Error message for invalid code
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid Code'**
+  String get invalidCode;
 }
 
 class _AppLocalizationsDelegate

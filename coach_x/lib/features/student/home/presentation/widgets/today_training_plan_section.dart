@@ -18,6 +18,7 @@ class TodayTrainingPlanSection extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final plansAsync = ref.watch(studentPlansProvider);
+    final activePlans = ref.watch(currentActivePlansProvider);
     final dayNumbers = ref.watch(currentDayNumbersProvider);
     final latestTrainingAsync = ref.watch(latestTrainingProvider);
 
@@ -25,14 +26,17 @@ class TodayTrainingPlanSection extends ConsumerWidget {
       loading: () => const SizedBox.shrink(),
       error: (error, stack) => const SizedBox.shrink(),
       data: (plans) {
-        if (plans.exercisePlan == null) {
-          return const SizedBox.shrink();
+        // 从 activePlans 获取当前激活的训练计划
+        final activeExercisePlan = activePlans['exercisePlan'];
+
+        if (activeExercisePlan == null) {
+          return _buildEmptyState(l10n);
         }
 
         final dayNum = dayNumbers['exercise'] ?? 1;
-        final trainingDay = plans.exercisePlan!.days.firstWhere(
+        final trainingDay = activeExercisePlan.days.firstWhere(
           (day) => day.day == dayNum,
-          orElse: () => plans.exercisePlan!.days.first,
+          orElse: () => activeExercisePlan.days.first,
         );
 
         return Container(
@@ -101,6 +105,52 @@ class TodayTrainingPlanSection extends ConsumerWidget {
           ),
         );
       },
+    );
+  }
+
+  /// 构建空状态卡片
+  Widget _buildEmptyState(AppLocalizations l10n) {
+    return Container(
+      padding: const EdgeInsets.all(AppDimensions.spacingM),
+      decoration: BoxDecoration(
+        color: AppColors.backgroundWhite,
+        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.shadowColor.withValues(alpha: 0.08),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // 标题
+          Text(l10n.trainingPlan, style: AppTextStyles.bodyMedium),
+          const SizedBox(height: AppDimensions.spacingM),
+
+          // 空状态内容
+          Row(
+            children: [
+              Icon(
+                CupertinoIcons.square_list,
+                size: 20,
+                color: AppColors.textTertiary,
+              ),
+              const SizedBox(width: AppDimensions.spacingS),
+              Expanded(
+                child: Text(
+                  l10n.noTrainingPlans,
+                  style: AppTextStyles.callout.copyWith(
+                    color: AppColors.textTertiary,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 

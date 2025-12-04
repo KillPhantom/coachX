@@ -29,10 +29,6 @@ class TodayRecordSection extends ConsumerWidget {
       loading: () => const SizedBox.shrink(),
       error: (error, stack) => const SizedBox.shrink(),
       data: (plans) {
-        if (plans.hasNoPlan) {
-          return const SizedBox.shrink();
-        }
-
         // 处理 dayNumbers 加载中的情况
         // 如果 dayNumbers 尚未加载完成，提供默认值 { 'diet': 1 }
         // dayNumbersAsync 已经是 Map<String, int> 类型，不是 AsyncValue
@@ -83,11 +79,6 @@ class TodayRecordSection extends ConsumerWidget {
     Macros? actualMacros,
     DailyTrainingModel? todayTraining,
   ) {
-    // 只显示饮食计划
-    if (plans.dietPlan == null) {
-      return const SizedBox.shrink();
-    }
-
     return _DietPlanWithIndicator(
       plans: plans,
       dayNumbers: dayNumbers,
@@ -132,8 +123,9 @@ class _DietPlanWithIndicatorState extends State<_DietPlanWithIndicator> {
     final planMealNames = planMeals.map((m) => m.name).toSet();
 
     // 找出学生自行添加的餐次（不在计划中的）
-    final extraMeals =
-        recordedMeals.where((m) => !planMealNames.contains(m.name)).toList();
+    final extraMeals = recordedMeals
+        .where((m) => !planMealNames.contains(m.name))
+        .toList();
 
     // 合并：计划餐次 + 额外餐次
     return [...planMeals, ...extraMeals];
@@ -144,8 +136,9 @@ class _DietPlanWithIndicatorState extends State<_DietPlanWithIndicator> {
     // 处理 dayNumbers 为空的情况
     final dayNum = widget.dayNumbers['diet'] ?? 1;
 
-    // 获取当天的饮食计划，处理空列表情况
-    final dietDay = widget.plans.dietPlan!.days.isNotEmpty
+    // 获取当天的饮食计划，处理空列表情况和 dietPlan 为 null 的情况
+    final dietDay = widget.plans.dietPlan != null &&
+            widget.plans.dietPlan!.days.isNotEmpty
         ? widget.plans.dietPlan!.days.firstWhere(
             (day) => day.day == dayNum,
             orElse: () => widget.plans.dietPlan!.days.first,

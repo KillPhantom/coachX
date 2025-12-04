@@ -328,6 +328,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noTrainingPlans => 'No training plans';
 
   @override
+  String get noSupplementPlan => 'No supplement plan';
+
+  @override
   String get filterByTrainingPlan => 'Filter by training plan';
 
   @override
@@ -547,6 +550,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get supplementPlan => 'Supplement Plan';
 
   @override
+  String get trainingPlan => 'Training Plan';
+
+  @override
   String supplementsToTake(int count) {
     return '$count supplements to take';
   }
@@ -683,13 +689,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get restDay => 'Rest Day';
 
   @override
-  String get noPlanAssigned => 'No Plan Assigned';
+  String get noPlanFound => 'No Plan Found';
 
   @override
-  String get contactCoachForPlan => 'Contact your coach to get a training plan';
+  String get createNewTrainingPlan => 'Create a new training plan';
 
   @override
-  String get viewAvailablePlans => 'View Available Plans';
+  String get createNewDietPlan => 'Create a new diet plan';
+
+  @override
+  String get createNewSupplementPlan => 'Create a new supplement plan';
+
+  @override
+  String get getStarted => 'Get Started';
 
   @override
   String get detail => 'Detail';
@@ -2186,4 +2198,60 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get statTargetCalories => 'Target Calories (kcal)';
+
+  @override
+  String get aiConversationTitle => 'AI Assistant';
+
+  @override
+  String get aiChatPlaceholderMessage =>
+      'Connect with your coach to start chatting and receive personalized training guidance';
+
+  @override
+  String get connectCoach => 'Connect Coach';
+
+  @override
+  String get connectCoachModalTitle => 'Connect to Coach';
+
+  @override
+  String get connectCoachModalDescription =>
+      'Please enter the invitation code provided by your coach';
+
+  @override
+  String get invitationCodePlaceholder => 'XXXX-XXXX-XXXX';
+
+  @override
+  String get connecting => 'Connecting...';
+
+  @override
+  String get connectSuccess => 'Successfully connected to coach!';
+
+  @override
+  String get invalidInvitationCode => 'Invalid invitation code';
+
+  @override
+  String get invitationCodeUsed => 'This invitation code has been used';
+
+  @override
+  String get invitationCodeExpired => 'This invitation code has expired';
+
+  @override
+  String get connect => 'Connect';
+
+  @override
+  String get aiAnalyzeTrainingHistory => 'Analyze Training History';
+
+  @override
+  String get aiAnalyzeDietPlan => 'Analyze Diet Plan';
+
+  @override
+  String get aiAnalyzeTrainingPlan => 'Analyze Training Plan';
+
+  @override
+  String get connectWithCoach => 'Connect with real coach';
+
+  @override
+  String get enterInvitationCode => 'Enter Invitation Code';
+
+  @override
+  String get invalidCode => 'Invalid Code';
 }

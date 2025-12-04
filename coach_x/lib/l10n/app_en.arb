@@ -541,6 +541,11 @@
     "description": "No training plans message"
   },
 
+  "noSupplementPlan": "No supplement plan",
+  "@noSupplementPlan": {
+    "description": "Message shown when student has no supplement plan assigned"
+  },
+
   "filterByTrainingPlan": "Filter by training plan",
   "@filterByTrainingPlan": {
     "description": "Filter by training plan label"
@@ -910,6 +915,11 @@
     "description": "Supplement plan title"
   },
 
+  "trainingPlan": "Training Plan",
+  "@trainingPlan": {
+    "description": "Training plan title"
+  },
+
   "supplementsToTake": "{count} supplements to take",
   "@supplementsToTake": {
     "description": "Supplements count with action label",
@@ -1133,19 +1143,29 @@
     "description": "Rest day label"
   },
 
-  "noPlanAssigned": "No Plan Assigned",
-  "@noPlanAssigned": {
-    "description": "No plan assigned message"
+  "noPlanFound": "No Plan Found",
+  "@noPlanFound": {
+    "description": "No plan found message"
   },
 
-  "contactCoachForPlan": "Contact your coach to get a training plan",
-  "@contactCoachForPlan": {
-    "description": "Contact coach for plan message"
+  "createNewTrainingPlan": "Create a new training plan",
+  "@createNewTrainingPlan": {
+    "description": "Create new training plan prompt"
   },
 
-  "viewAvailablePlans": "View Available Plans",
-  "@viewAvailablePlans": {
-    "description": "View available plans button"
+  "createNewDietPlan": "Create a new diet plan",
+  "@createNewDietPlan": {
+    "description": "Create new diet plan prompt"
+  },
+
+  "createNewSupplementPlan": "Create a new supplement plan",
+  "@createNewSupplementPlan": {
+    "description": "Create new supplement plan prompt"
+  },
+
+  "getStarted": "Get Started",
+  "@getStarted": {
+    "description": "Get started button text"
   },
 
   "detail": "Detail",
@@ -3913,5 +3933,100 @@
   "statTargetCalories": "Target Calories (kcal)",
   "@statTargetCalories": {
     "description": "Target calories statistic"
+  },
+
+  "aiConversationTitle": "AI Assistant",
+  "@aiConversationTitle": {
+    "description": "AI conversation page title"
+  },
+
+  "aiChatPlaceholderMessage": "Connect with your coach to start chatting and receive personalized training guidance",
+  "@aiChatPlaceholderMessage": {
+    "description": "AI chat placeholder message when no coach is connected"
+  },
+
+  "connectCoach": "Connect Coach",
+  "@connectCoach": {
+    "description": "Connect coach button text"
+  },
+
+  "connectCoachModalTitle": "Connect to Coach",
+  "@connectCoachModalTitle": {
+    "description": "Connect coach modal title"
+  },
+
+  "connectCoachModalDescription": "Please enter the invitation code provided by your coach",
+  "@connectCoachModalDescription": {
+    "description": "Connect coach modal description"
+  },
+
+  "invitationCodePlaceholder": "XXXX-XXXX-XXXX",
+  "@invitationCodePlaceholder": {
+    "description": "Invitation code input placeholder"
+  },
+
+  "connecting": "Connecting...",
+  "@connecting": {
+    "description": "Connecting status text"
+  },
+
+  "connectSuccess": "Successfully connected to coach!",
+  "@connectSuccess": {
+    "description": "Connect success message"
+  },
+
+  "invalidInvitationCode": "Invalid invitation code",
+  "@invalidInvitationCode": {
+    "description": "Invalid invitation code error"
+  },
+
+  "invitationCodeUsed": "This invitation code has been used",
+  "@invitationCodeUsed": {
+    "description": "Invitation code already used error"
+  },
+
+  "invitationCodeExpired": "This invitation code has expired",
+  "@invitationCodeExpired": {
+    "description": "Invitation code expired error"
+  },
+
+  "connect": "Connect",
+  "@connect": {
+    "description": "Connect button text"
+  },
+
+  "ok": "OK",
+  "@ok": {
+    "description": "OK button text"
+  },
+
+  "aiAnalyzeTrainingHistory": "Analyze Training History",
+  "@aiAnalyzeTrainingHistory": {
+    "description": "Shortcut to analyze training history"
+  },
+
+  "aiAnalyzeDietPlan": "Analyze Diet Plan",
+  "@aiAnalyzeDietPlan": {
+    "description": "Shortcut to analyze diet plan"
+  },
+
+  "aiAnalyzeTrainingPlan": "Analyze Training Plan",
+  "@aiAnalyzeTrainingPlan": {
+    "description": "Shortcut to analyze training plan"
+  },
+
+  "connectWithCoach": "Connect with real coach",
+  "@connectWithCoach": {
+    "description": "Button to connect with real coach"
+  },
+
+  "enterInvitationCode": "Enter Invitation Code",
+  "@enterInvitationCode": {
+    "description": "Title for invitation code input"
+  },
+
+  "invalidCode": "Invalid Code",
+  "@invalidCode": {
+    "description": "Error message for invalid code"
   }
 }

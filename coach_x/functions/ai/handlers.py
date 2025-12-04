@@ -40,6 +40,15 @@ from .food_macros.handlers import (
     get_food_macros,
 )
 
+from .food_nutrition.handlers import (
+    analyze_food_nutrition,
+)
+
+# 聊天模块
+from .chat.handlers import (
+    chat_with_ai,
+)
+
 # 向后兼容导出
 __all__ = [
     # Training Plan
@@ -60,6 +69,10 @@ __all__ = [
 
     # Food Macros
     'get_food_macros',
+    'analyze_food_nutrition',
+
+    # Chat
+    'chat_with_ai',
 
     # Supplement Plan
     'generate_supplement_plan_conversation',

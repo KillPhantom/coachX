@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:coach_x/l10n/app_localizations.dart';
 import 'package:coach_x/core/theme/app_theme.dart';
 import 'package:coach_x/features/coach/plans/data/models/supplement_plan_model.dart';
@@ -34,18 +35,25 @@ class SupplementPlanContent extends ConsumerWidget {
               ),
               const SizedBox(height: AppDimensions.spacingM),
               Text(
-                l10n.noPlanAssigned,
-                style: AppTextStyles.bodyMedium.copyWith(
+                l10n.noPlanFound,
+                style: AppTextStyles.title3.copyWith(
                   color: AppColors.textSecondary,
                 ),
               ),
               const SizedBox(height: AppDimensions.spacingS),
               Text(
-                l10n.contactCoachForPlan,
-                style: AppTextStyles.subhead.copyWith(
+                l10n.createNewSupplementPlan,
+                style: AppTextStyles.callout.copyWith(
                   color: AppColors.textSecondary,
                 ),
                 textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: AppDimensions.spacingXL),
+              CupertinoButton.filled(
+                onPressed: () {
+                  context.push('/supplement-plan/new');
+                },
+                child: Text(l10n.getStarted, style: AppTextStyles.buttonMedium),
               ),
             ],
           ),
@@ -120,7 +128,7 @@ class SupplementPlanContent extends ConsumerWidget {
                     child: Padding(
                       padding: const EdgeInsets.all(AppDimensions.spacingXL),
                       child: Text(
-                        l10n.noPlanAssigned,
+                        l10n.noPlansYet,
                         style: AppTextStyles.subhead.copyWith(
                           color: AppColors.textSecondary,
                         ),

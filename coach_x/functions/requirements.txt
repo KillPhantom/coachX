@@ -11,5 +11,8 @@ google-cloud-storage>=2.18.0
 # AI 服务
 anthropic>=0.25.0
 
+# Web Framework (for HTTP functions)
+flask>=3.0.0
+
 # 工具库
 python-dateutil>=2.9.0
