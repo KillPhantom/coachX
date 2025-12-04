@@ -4,6 +4,7 @@ import 'package:coach_x/app/providers.dart';
 import 'package:coach_x/core/theme/app_theme.dart';
 import 'package:coach_x/l10n/app_localizations.dart';
 import 'package:coach_x/features/chat/presentation/pages/chat_detail_page.dart';
+import 'package:coach_x/features/student/chat/presentation/pages/ai_chat_page.dart';
 
 /// 学生对话页面
 /// 直接显示与教练的对话
@@ -24,9 +25,9 @@ class StudentChatPage extends ConsumerWidget {
           return _buildErrorState(context, l10n, '用户未登录');
         }
 
-        // 学生没有教练
+        // 学生没有教练，显示 AI 对话页面
         if (user.coachId == null || user.coachId!.isEmpty) {
-          return _buildNoCoachState(context, l10n);
+          return const AIChatPage();
         }
 
         // 构建 conversationId
@@ -67,40 +68,6 @@ class StudentChatPage extends ConsumerWidget {
               error.toString(),
               style: AppTextStyles.footnote.copyWith(
                 color: AppColors.textSecondary,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  /// 没有教练状态
-  Widget _buildNoCoachState(BuildContext context, AppLocalizations l10n) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(
-              CupertinoIcons.person_2,
-              size: 80,
-              color: AppColors.textTertiary,
-            ),
-            const SizedBox(height: 20),
-            Text(
-              l10n.noCoachTitle,
-              style: AppTextStyles.title3.copyWith(
-                color: AppColors.textSecondary,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              l10n.noCoachMessage,
-              style: AppTextStyles.footnote.copyWith(
-                color: AppColors.textTertiary,
               ),
               textAlign: TextAlign.center,
             ),

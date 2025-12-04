@@ -103,7 +103,7 @@ class AppConstants {
   ///
   /// 💻 iOS 模拟器调试时：
   /// - 使用 '127.0.0.1' 即可
-  static const String firebaseEmulatorHost = '192.168.1.114';
+  static const String firebaseEmulatorHost = '127.0.0.1';
 
   /// Firebase Functions Emulator 端口
   static const int firebaseFunctionsEmulatorPort = 5001;
@@ -125,6 +125,6 @@ class AppConstants {
   /// 用户名最大长度
   static const int maxUsernameLength = 20;
 
-  /// 邀请码长度
-  static const int invitationCodeLength = 8;
+  /// 邀请码长度（格式: XXXX-XXXX-XXXX）
+  static const int invitationCodeLength = 14;
 }

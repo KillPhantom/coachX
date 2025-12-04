@@ -325,6 +325,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get noTrainingPlans => '暂无训练计划';
 
   @override
+  String get noSupplementPlan => '暂无补剂计划';
+
+  @override
   String get filterByTrainingPlan => '按训练计划筛选';
 
   @override
@@ -540,6 +543,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get supplementPlan => '补剂计划';
 
   @override
+  String get trainingPlan => '训练计划';
+
+  @override
   String supplementsToTake(int count) {
     return '$count 个补剂需服用';
   }
@@ -675,13 +681,19 @@ class AppLocalizationsZh extends AppLocalizations {
   String get restDay => '休息日';
 
   @override
-  String get noPlanAssigned => '暂无计划';
+  String get noPlanFound => '未找到计划';
 
   @override
-  String get contactCoachForPlan => '请联系教练分配训练计划';
+  String get createNewTrainingPlan => '创建新的训练计划';
 
   @override
-  String get viewAvailablePlans => '查看可用计划';
+  String get createNewDietPlan => '创建新的饮食计划';
+
+  @override
+  String get createNewSupplementPlan => '创建新的补剂计划';
+
+  @override
+  String get getStarted => '开始创建';
 
   @override
   String get detail => '详情';
@@ -2162,4 +2174,58 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get statTargetCalories => '目标热量 (kcal)';
+
+  @override
+  String get aiConversationTitle => 'AI 助手';
+
+  @override
+  String get aiChatPlaceholderMessage => '连接教练即可开始对话，获得个性化的训练指导';
+
+  @override
+  String get connectCoach => '连接教练';
+
+  @override
+  String get connectCoachModalTitle => '连接教练';
+
+  @override
+  String get connectCoachModalDescription => '请输入教练提供的邀请码';
+
+  @override
+  String get invitationCodePlaceholder => 'XXXX-XXXX-XXXX';
+
+  @override
+  String get connecting => '连接中...';
+
+  @override
+  String get connectSuccess => '成功连接到教练！';
+
+  @override
+  String get invalidInvitationCode => '邀请码无效';
+
+  @override
+  String get invitationCodeUsed => '此邀请码已被使用';
+
+  @override
+  String get invitationCodeExpired => '此邀请码已过期';
+
+  @override
+  String get connect => '连接';
+
+  @override
+  String get aiAnalyzeTrainingHistory => '分析训练历史';
+
+  @override
+  String get aiAnalyzeDietPlan => '分析饮食计划';
+
+  @override
+  String get aiAnalyzeTrainingPlan => '分析训练计划';
+
+  @override
+  String get connectWithCoach => 'Connect with real coach';
+
+  @override
+  String get enterInvitationCode => 'Enter Invitation Code';
+
+  @override
+  String get invalidCode => 'Invalid Code';
 }

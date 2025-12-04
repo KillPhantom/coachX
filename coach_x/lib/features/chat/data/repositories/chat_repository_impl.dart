@@ -53,7 +53,42 @@ class ChatRepositoryImpl implements ChatRepository {
       );
 
       if (!doc.exists) {
-        return null;
+        AppLogger.info('对话不存在，尝试创建: $conversationId');
+
+        // 从 conversationId 解析 coachId 和 studentId
+        // 格式: coach_{coachId}_student_{studentId}
+        final parts = conversationId.split('_');
+        if (parts.length == 4 && parts[0] == 'coach' && parts[2] == 'student') {
+          final coachId = parts[1];
+          final studentId = parts[3];
+
+          AppLogger.info('解析 conversationId: coachId=$coachId, studentId=$studentId');
+
+          try {
+            // 调用 getOrCreateConversation 确保对话存在
+            await getOrCreateConversation(coachId, studentId);
+            AppLogger.info('对话创建成功，重新获取: $conversationId');
+
+            // 重新获取对话
+            final doc = await FirestoreService.getDocument(
+              'conversations',
+              conversationId,
+            );
+
+            if (!doc.exists) {
+              AppLogger.warning('对话创建后仍不存在: $conversationId');
+              return null;
+            }
+
+            return ConversationModel.fromFirestore(doc);
+          } catch (fallbackError, fallbackStackTrace) {
+            AppLogger.error('创建对话失败: $conversationId', fallbackError, fallbackStackTrace);
+            rethrow;
+          }
+        } else {
+          AppLogger.warning('conversationId 格式不正确，无法自动创建: $conversationId');
+          return null;
+        }
       }
 
       return ConversationModel.fromFirestore(doc);

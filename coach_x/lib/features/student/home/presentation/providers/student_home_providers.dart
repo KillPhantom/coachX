@@ -200,17 +200,11 @@ final currentActivePlansProvider = Provider<Map<String, dynamic>>((ref) {
     activePlans['exercisePlan'] = plans.getActiveExercisePlan(
       activeExercisePlanId,
     );
-  } else if (plans.exercisePlans.isNotEmpty) {
-    // 如果没有选中的计划但列表不为空，默认选择第一个
-    activePlans['exercisePlan'] = plans.exercisePlans.first;
   }
 
   // 获取选中的饮食计划
   if (activeDietPlanId != null) {
     activePlans['dietPlan'] = plans.getActiveDietPlan(activeDietPlanId);
-  } else if (plans.dietPlans.isNotEmpty) {
-    // 如果没有选中的计划但列表不为空，默认选择第一个
-    activePlans['dietPlan'] = plans.dietPlans.first;
   }
 
   // 获取选中的补剂计划
@@ -218,9 +212,6 @@ final currentActivePlansProvider = Provider<Map<String, dynamic>>((ref) {
     activePlans['supplementPlan'] = plans.getActiveSupplementPlan(
       activeSupplementPlanId,
     );
-  } else if (plans.supplementPlans.isNotEmpty) {
-    // 如果没有选中的计划但列表不为空，默认选择第一个
-    activePlans['supplementPlan'] = plans.supplementPlans.first;
   }
 
   AppLogger.info(

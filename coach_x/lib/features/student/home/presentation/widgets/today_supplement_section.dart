@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:coach_x/l10n/app_localizations.dart';
 import 'package:coach_x/core/theme/app_theme.dart';
-import '../../data/models/student_plans_model.dart';
+import 'package:coach_x/features/coach/plans/data/models/supplement_plan_model.dart';
 import '../providers/student_home_providers.dart';
 import 'supplement_plan_card.dart';
 import 'supplement_day_detail_sheet.dart';
@@ -17,15 +17,19 @@ class TodaySupplementSection extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final plansAsync = ref.watch(studentPlansProvider);
+    final activePlans = ref.watch(currentActivePlansProvider);
     final dayNumbersAsync = ref.watch(currentDayNumbersProvider);
 
     return plansAsync.when(
       loading: () => const SizedBox.shrink(),
       error: (error, stack) => const SizedBox.shrink(),
       data: (plans) {
-        // 如果没有补剂计划，不显示此区块
-        if (plans.supplementPlan == null) {
-          return const SizedBox.shrink();
+        // 从 activePlans 获取当前激活的补剂计划
+        final activeSupplementPlan = activePlans['supplementPlan'];
+
+        // 如果没有补剂计划，显示空状态
+        if (activeSupplementPlan == null) {
+          return _buildEmptyState(l10n);
         }
 
         return Container(
@@ -53,7 +57,7 @@ class TodaySupplementSection extends ConsumerWidget {
               ),
 
               // 补剂卡片
-              _buildSupplementCard(plans, dayNumbersAsync),
+              _buildSupplementCard(activeSupplementPlan, dayNumbersAsync),
             ],
           ),
         );
@@ -61,14 +65,60 @@ class TodaySupplementSection extends ConsumerWidget {
     );
   }
 
+  /// 构建空状态卡片
+  Widget _buildEmptyState(AppLocalizations l10n) {
+    return Container(
+      padding: const EdgeInsets.all(AppDimensions.spacingM),
+      decoration: BoxDecoration(
+        color: AppColors.backgroundWhite,
+        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.shadowColor.withValues(alpha: 0.08),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // 标题
+          Text(l10n.supplementPlan, style: AppTextStyles.bodyMedium),
+          const SizedBox(height: AppDimensions.spacingM),
+
+          // 空状态内容
+          Row(
+            children: [
+              Icon(
+                CupertinoIcons.capsule,
+                size: 20,
+                color: AppColors.textTertiary,
+              ),
+              const SizedBox(width: AppDimensions.spacingS),
+              Expanded(
+                child: Text(
+                  l10n.noSupplementPlan,
+                  style: AppTextStyles.callout.copyWith(
+                    color: AppColors.textTertiary,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildSupplementCard(
-    StudentPlansModel plans,
+    SupplementPlanModel supplementPlan,
     Map<String, int> dayNumbers,
   ) {
     final dayNum = dayNumbers['supplement'] ?? 1;
-    final supplementDay = plans.supplementPlan!.days.firstWhere(
+    final supplementDay = supplementPlan.days.firstWhere(
       (day) => day.day == dayNum,
-      orElse: () => plans.supplementPlan!.days.first,
+      orElse: () => supplementPlan.days.first,
     );
 
     // 计算总补剂数

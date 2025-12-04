@@ -220,18 +220,18 @@ class ValidationUtils {
     return null;
   }
 
-  /// 验证邀请码
+  /// 验证邀请码（格式: XXXX-XXXX-XXXX）
   static String? validateInvitationCode(String? value) {
     if (StringUtils.isEmpty(value)) {
       return '邀请码不能为空';
     }
 
     if (value!.length != AppConstants.invitationCodeLength) {
-      return '邀请码长度必须为${AppConstants.invitationCodeLength}位';
+      return '邀请码格式错误，应为 XXXX-XXXX-XXXX';
     }
 
-    if (!RegExp(r'^[A-Z0-9]+$').hasMatch(value)) {
-      return '邀请码只能包含大写字母和数字';
+    if (!RegExp(r'^[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$').hasMatch(value)) {
+      return '邀请码格式错误，应为 XXXX-XXXX-XXXX（大写字母和数字）';
     }
 
     return null;

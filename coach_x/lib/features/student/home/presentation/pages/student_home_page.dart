@@ -8,7 +8,6 @@ import '../widgets/weekly_status_section.dart';
 import '../widgets/today_record_section.dart';
 import '../widgets/today_supplement_section.dart';
 import '../widgets/today_training_plan_section.dart';
-import '../widgets/empty_plan_placeholder.dart';
 
 /// 学生首页
 ///
@@ -42,12 +41,7 @@ class StudentHomePage extends ConsumerWidget {
             },
           ),
           data: (plans) {
-            // 如果没有任何计划，显示空状态
-            if (plans.hasNoPlan) {
-              return EmptyPlanPlaceholder(onRefresh: handleRefresh);
-            }
-
-            // 有计划，显示完整首页
+            // 显示完整首页
             return CustomScrollView(
               slivers: [
                 // 下拉刷新

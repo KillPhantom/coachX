@@ -114,9 +114,16 @@ class CloudFunctionsService {
   /// 验证邀请码
   ///
   /// [code] 邀请码
+  /// [confirm] 是否确认使用 (默认false)
   /// 返回验证结果
-  static Future<Map<String, dynamic>> verifyInvitationCode(String code) async {
-    return await call('verify_invitation_code', {'code': code});
+  static Future<Map<String, dynamic>> verifyInvitationCode(
+    String code, {
+    bool confirm = false,
+  }) async {
+    return await call('verify_invitation_code', {
+      'code': code,
+      'confirm': confirm,
+    });
   }
 
   /// 生成邀请码（教练专用）

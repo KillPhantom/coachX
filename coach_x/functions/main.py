@@ -25,8 +25,7 @@ from users.handlers import (
 from invitations.handlers import (
     verify_invitation_code,
     generate_invitation_codes,
-    fetch_invitation_codes,
-    mark_invitation_code_used
+    fetch_invitation_codes
 )
 
 # ==================== 导入学生管理模块 ====================
@@ -55,12 +54,9 @@ from ai.handlers import (
     get_food_macros,
     generate_diet_plan_with_skill,
     edit_diet_plan_conversation,
-    generate_supplement_plan_conversation
-)
-
-# ==================== 导入 AI 食物营养分析模块 ====================
-from ai.food_nutrition import (
-    analyze_food_nutrition
+    generate_supplement_plan_conversation,
+    analyze_food_nutrition,
+    chat_with_ai
 )
 
 # ==================== 导入计划管理模块 ====================
@@ -122,7 +118,6 @@ __all__ = [
     'verify_invitation_code',
     'generate_invitation_codes',
     'fetch_invitation_codes',
-    'mark_invitation_code_used',
 
     # 学生管理
     'fetch_students',
@@ -147,6 +142,7 @@ __all__ = [
     'edit_diet_plan_conversation',
     'generate_supplement_plan_conversation',
     'analyze_food_nutrition',
+    'chat_with_ai',
 
     # 计划管理
     'exercise_plan',

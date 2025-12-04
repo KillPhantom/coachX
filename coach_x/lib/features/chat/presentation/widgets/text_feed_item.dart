@@ -87,7 +87,7 @@ class TextFeedItem extends StatelessWidget {
 
               // 非视频动作 Section
               if (hasExercises) ...[
-                _buildExercisesSection(exercises),
+                _buildExercisesSummary(exercises),
                 const SizedBox(height: 24),
               ],
 
@@ -371,6 +371,76 @@ extension _AggregatedViewHelpers on TextFeedItem {
           ),
         ),
       ),
+    );
+  }
+
+  /// 构建非视频动作汇总（折叠版本）
+  Widget _buildExercisesSummary(List exercises) {
+    // 计算完成动作数
+    final completedCount = exercises.where((e) {
+      final exercise = e as Map<String, dynamic>;
+      final sets = exercise['sets'] as List? ?? [];
+      final completedSets = sets.where((s) {
+        final setMap = s as Map<String, dynamic>;
+        return setMap['completed'] as bool? ?? false;
+      }).length;
+      return completedSets == sets.length && sets.isNotEmpty;
+    }).length;
+    final totalCount = exercises.length;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Section 标题
+        Text(
+          '非视频动作',
+          style: AppTextStyles.title3.copyWith(color: CupertinoColors.white),
+        ),
+        const SizedBox(height: 16),
+
+        // 汇总卡片
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: CupertinoColors.systemGrey6.darkColor,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Row(
+            children: [
+              // 左侧：完成数
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '完成动作',
+                      style: AppTextStyles.caption1.copyWith(
+                        color: CupertinoColors.systemGrey,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '$completedCount / $totalCount',
+                      style: AppTextStyles.title2.copyWith(
+                        color: CupertinoColors.white,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // 右侧：完成图标（如果全部完成）
+              if (completedCount == totalCount) ...[
+                Icon(
+                  CupertinoIcons.checkmark_circle_fill,
+                  color: AppColors.primary,
+                  size: 32,
+                ),
+              ],
+            ],
+          ),
+        ),
+      ],
     );
   }
 

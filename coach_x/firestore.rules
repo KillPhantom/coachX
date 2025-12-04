@@ -30,10 +30,12 @@ service cloud.firestore {
     // ==================== Conversations Collection ====================
 
     match /conversations/{conversationId} {
-      // 允许对话参与者读取
-      allow read: if isSignedIn() &&
+      // 允许对话参与者读取（包括不存在的文档）
+      allow read: if isSignedIn() && (
+        !exists(/databases/$(database)/documents/conversations/$(conversationId)) ||
         (resource.data.coachId == request.auth.uid ||
-         resource.data.studentId == request.auth.uid);
+         resource.data.studentId == request.auth.uid)
+      );
 
       // 允许对话参与者创建和更新
       allow create, update: if isSignedIn() &&

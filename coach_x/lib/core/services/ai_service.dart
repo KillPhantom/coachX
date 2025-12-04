@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:coach_x/core/utils/logger.dart';
-import 'package:coach_x/core/utils/json_utils.dart';
 import 'package:coach_x/core/enums/ai_status.dart';
 import 'package:coach_x/features/coach/plans/data/models/ai/ai_generation_response.dart';
 import 'package:coach_x/features/coach/plans/data/models/exercise_plan_model.dart';
@@ -996,6 +995,86 @@ class AIService {
     } catch (e, stackTrace) {
       AppLogger.error('❌ 分析食物营养失败', e, stackTrace);
       rethrow;
+    }
+  }
+
+  /// 与 AI 教练对话（流式）
+  ///
+  /// [userMessage] 用户的消息
+  /// 返回 Stream，实时 yield 生成事件
+  static Stream<Map<String, dynamic>> chatWithAI({
+    required String userMessage,
+  }) async* {
+    try {
+      AppLogger.info('🔄 开始 AI 对话');
+      AppLogger.info(
+        '用户消息: ${userMessage.substring(0, userMessage.length > 50 ? 50 : userMessage.length)}...',
+      );
+
+      // 获取当前用户ID
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        AppLogger.error('❌ 用户未登录');
+        yield {'type': 'error', 'error': '用户未登录'};
+        return;
+      }
+
+      // 构建请求 URL
+      final url = Uri.parse(
+        '${CloudFunctionsService.baseUrl}/chat_with_ai',
+      );
+
+      // 发起 HTTP POST 请求
+      final request = http.Request('POST', url);
+      request.headers['Content-Type'] = 'application/json';
+      request.body = jsonEncode({
+        'user_id': user.uid,
+        'message': userMessage,
+      });
+
+      AppLogger.info('发送对话请求到: $url');
+
+      // 发送请求并获取流式响应
+      final response = await request.send();
+
+      if (response.statusCode != 200) {
+        AppLogger.error('❌ 请求失败: ${response.statusCode}');
+        yield {'type': 'error', 'error': '请求失败: HTTP ${response.statusCode}'};
+        return;
+      }
+
+      AppLogger.info('✅ SSE 连接建立');
+
+      // 读取 SSE 流
+      await for (final chunk in response.stream.transform(utf8.decoder)) {
+        // 按行分割
+        final lines = chunk.split('\n');
+
+        for (final line in lines) {
+          // SSE 格式：data: {...}
+          if (line.startsWith('data: ')) {
+            final data = line.substring(6).trim();
+            if (data.isEmpty) continue;
+
+            try {
+              final json = jsonDecode(data) as Map<String, dynamic>;
+              yield json;
+
+              // 如果是完成或错误，结束流
+              if (json['type'] == 'complete' || json['type'] == 'error') {
+                return;
+              }
+            } catch (e) {
+              AppLogger.warning('解析 SSE 数据失败: $e');
+            }
+          }
+        }
+      }
+
+      AppLogger.info('✅ SSE 流结束');
+    } catch (e, stackTrace) {
+      AppLogger.error('❌ AI 对话异常', e, stackTrace);
+      yield {'type': 'error', 'error': '对话失败: $e'};
     }
   }
 }

@@ -26,6 +26,11 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
   final _confirmPasswordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
+  final _nameFieldKey = GlobalKey<CustomTextFieldState>();
+  final _emailFieldKey = GlobalKey<CustomTextFieldState>();
+  final _passwordFieldKey = GlobalKey<CustomTextFieldState>();
+  final _confirmPasswordFieldKey = GlobalKey<CustomTextFieldState>();
+
   @override
   void dispose() {
     _nameController.dispose();
@@ -36,7 +41,15 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
   }
 
   void _handleRegister() {
-    if (_formKey.currentState?.validate() ?? false) {
+    // 验证所有字段
+    final nameValid = _nameFieldKey.currentState?.validate() ?? false;
+    final emailValid = _emailFieldKey.currentState?.validate() ?? false;
+    final passwordValid = _passwordFieldKey.currentState?.validate() ?? false;
+    final confirmPasswordValid =
+        _confirmPasswordFieldKey.currentState?.validate() ?? false;
+
+    // 只有所有字段都通过验证才继续
+    if (nameValid && emailValid && passwordValid && confirmPasswordValid) {
       ref
           .read(registerControllerProvider.notifier)
           .signUpWithEmail(
@@ -123,6 +136,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
 
                   // 姓名输入
                   CustomTextField(
+                    key: _nameFieldKey,
                     controller: _nameController,
                     placeholder: l10n.namePlaceholder,
                     prefix: const Padding(
@@ -146,6 +160,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
 
                   // 邮箱输入
                   CustomTextField(
+                    key: _emailFieldKey,
                     controller: _emailController,
                     placeholder: l10n.emailPlaceholder,
                     keyboardType: TextInputType.emailAddress,
@@ -165,6 +180,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
 
                   // 密码输入
                   CustomTextField(
+                    key: _passwordFieldKey,
                     controller: _passwordController,
                     placeholder: l10n.passwordMinLength,
                     isPassword: true,
@@ -184,6 +200,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
 
                   // 确认密码输入
                   CustomTextField(
+                    key: _confirmPasswordFieldKey,
                     controller: _confirmPasswordController,
                     placeholder: l10n.confirmPasswordPlaceholder,
                     isPassword: true,

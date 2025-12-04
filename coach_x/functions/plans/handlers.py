@@ -1637,6 +1637,7 @@ def get_student_all_plans(req: https_fn.CallableRequest):
         raise https_fn.HttpsError('internal', f'服务器错误: {str(e)}')
 
 
+
 def _get_student_all_plans_by_type(db, student_id: str, collection_name: str):
     """
     获取学生某一类型的所有计划（教练分配 + 自己创建）

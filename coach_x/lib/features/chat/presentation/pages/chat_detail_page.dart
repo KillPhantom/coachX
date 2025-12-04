@@ -31,10 +31,6 @@ class ChatDetailPage extends ConsumerWidget {
     final currentUser = ref.watch(currentUserProvider).value;
     final isCoach = currentUser?.role == UserRole.coach;
     final conversationAsync = ref.watch(conversationDetailProvider(conversationId));
-    final conversation = conversationAsync.value;
-    final otherName = (currentUser != null && conversation != null)
-        ? conversation.getOtherUserName(currentUser.id)
-        : '';
 
     return CupertinoPageScaffold(
       backgroundColor: AppColors.backgroundWhite,
@@ -46,9 +42,15 @@ class ChatDetailPage extends ConsumerWidget {
                 onPressed: () => Navigator.of(context).pop(),
               )
             : null,
-        middle: Text(
-          otherName,
-          style: AppTextStyles.navTitle,
+        middle: conversationAsync.when(
+          data: (conversation) => Text(
+            (currentUser != null && conversation != null)
+                ? conversation.getOtherUserName(currentUser.id)
+                : '',
+            style: AppTextStyles.navTitle,
+          ),
+          loading: () => const SizedBox.shrink(),
+          error: (_, __) => const SizedBox.shrink(),
         ),
         trailing: isCoach
             ? CupertinoButton(
@@ -62,20 +64,21 @@ class ChatDetailPage extends ConsumerWidget {
               )
             : null,
       ),
-      child: SafeArea(
-        top: false,
-        child: Column(
-          children: [
-            // Tab 切换器
-            _buildTabBar(context, ref, selectedTab),
-          // Tab 内容
-          Expanded(
-            child: selectedTab == ChatDetailTab.chat
-                ? ChatTabContent(conversationId: conversationId)
-                : FeedbackTabContent(conversationId: conversationId),
-          ),
-          // 消息输入栏（仅在 Chat Tab 显示）
-          if (selectedTab == ChatDetailTab.chat) ...[
+      child: conversationAsync.when(
+        data: (conversation) => SafeArea(
+          top: false,
+          child: Column(
+            children: [
+              // Tab 切换器
+              _buildTabBar(context, ref, selectedTab),
+            // Tab 内容
+            Expanded(
+              child: selectedTab == ChatDetailTab.chat
+                  ? ChatTabContent(conversationId: conversationId)
+                  : FeedbackTabContent(conversationId: conversationId),
+            ),
+            // 消息输入栏（仅在 Chat Tab 显示）
+            if (selectedTab == ChatDetailTab.chat) ...[
             // 引用消息展示
             Consumer(
               builder: (context, ref, child) {
@@ -114,6 +117,13 @@ class ChatDetailPage extends ConsumerWidget {
             ),
           ],
           ],
+        ),
+      ),
+        loading: () => const Center(
+          child: CupertinoActivityIndicator(radius: 16),
+        ),
+        error: (error, stack) => const Center(
+          child: CupertinoActivityIndicator(radius: 16),
         ),
       ),
     );

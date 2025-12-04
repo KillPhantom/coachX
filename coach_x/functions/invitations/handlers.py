@@ -16,18 +16,22 @@ USE_FAKE_DATA = False
 @https_fn.on_call()
 def verify_invitation_code(req: https_fn.CallableRequest):
     """
-    验证邀请码
+    验证并可选择性地使用邀请码
     
     请求参数:
         - code: 邀请码
+        - confirm: 是否确认使用 (默认False)
     
     返回:
         - status: 状态码
         - valid: 是否有效
         - coachId: 教练ID (如果有效)
+        - codeId: 邀请码ID (如果有效)
+        - message: 消息
     """
     try:
         code = req.data.get('code')
+        confirm = req.data.get('confirm', False)
         
         if not code:
             raise https_fn.HttpsError('invalid-argument', '邀请码不能为空')
@@ -51,6 +55,32 @@ def verify_invitation_code(req: https_fn.CallableRequest):
         
         # 检查邀请码状态
         if code_data.get('used', False):
+            # 如果是当前用户使用的，且在confirm模式下，视为成功（幂等性）
+            if confirm and req.auth and code_data.get('usedBy') == req.auth.uid:
+                # 即使之前验证过，也要确保 conversation 文档存在 (修复旧数据或部分失败的情况)
+                coach_id = code_data.get('coachId')
+                user_id = req.auth.uid
+                if coach_id:
+                     db = firestore.client()
+                     conversation_id = f'coach_{coach_id}_student_{user_id}'
+                     conversation_ref = db.collection('conversations').document(conversation_id)
+                     # 使用 set + merge 确保存在
+                     conversation_ref.set({
+                        'coachId': coach_id,
+                        'studentId': user_id,
+                        'updatedAt': firestore.SERVER_TIMESTAMP,
+                        'isArchived': False 
+                     }, merge=True)
+
+                logger.info(f'用户 {req.auth.uid} 重复提交已使用的邀请码 {code}')
+                return {
+                    'status': 'success',
+                    'valid': True,
+                    'coachId': code_data.get('coachId'),
+                    'codeId': code_doc.id,
+                    'message': '邀请码已验证'
+                }
+            
             return {
                 'status': 'success',
                 'valid': False,
@@ -61,20 +91,89 @@ def verify_invitation_code(req: https_fn.CallableRequest):
         if code_data.get('expiresAt'):
             expires_at = code_data['expiresAt']
             now = firestore.SERVER_TIMESTAMP
-            if expires_at < now:
+            # 这里不能直接比较 SERVER_TIMESTAMP 和 datetime
+            # Firestore SERVER_TIMESTAMP 在写入时才会解析
+            # 在读取时，如果使用 snapshot.to_dict()，它是一个 datetime 对象
+            # 但在这里我们在同一函数中可能拿不到实时的 SERVER_TIMESTAMP 值用于比较
+            # 简单的做法是信任客户端时间或单独查询当前时间，但最好的做法是让Firestore查询过滤
+            # 或者，如果 expires_at 是 datetime 对象，我们与当前系统时间比较
+            
+            import datetime
+            now_local = datetime.datetime.now(datetime.timezone.utc)
+            
+            # 确保 expires_at 是带时区的 datetime
+            if hasattr(expires_at, 'timestamp'):
+                 # 已经是 datetime
+                 if expires_at.tzinfo is None:
+                     expires_at = expires_at.replace(tzinfo=datetime.timezone.utc)
+                 
+                 if expires_at < now_local:
+                    return {
+                        'status': 'success',
+                        'valid': False,
+                        'message': '邀请码已过期'
+                    }
+            # 如果是其他类型（如 Sentinel），通常意味着刚刚写入，这里假设未过期
+
+        
+        # 如果需要确认使用
+        if confirm:
+            if not req.auth:
+                raise https_fn.HttpsError('unauthenticated', '使用邀请码需要登录')
+            
+            user_id = req.auth.uid
+            coach_id = code_data.get('coachId')
+            
+            if not coach_id:
+                logger.error(f'邀请码 {code} 缺少 coachId')
                 return {
                     'status': 'success',
                     'valid': False,
-                    'message': '邀请码已过期'
+                    'message': '无效的邀请码数据'
                 }
+
+            # 执行事务更新：标记邀请码已用 + 更新用户教练
+            db = firestore.client()
+            batch = db.batch()
+            
+            # 1. 标记邀请码
+            batch.update(code_doc.reference, {
+                'used': True,
+                'usedBy': user_id,
+                'usedAt': firestore.SERVER_TIMESTAMP
+            })
+            
+            # 2. 更新用户
+            user_ref = db.collection('users').document(user_id)
+            batch.update(user_ref, {
+                'coachId': coach_id,
+                'updatedAt': firestore.SERVER_TIMESTAMP
+            })
+
+            # 3. 确保对话文档存在 (解决权限问题)
+            # 文档ID格式必须与前端一致: coach_{coachId}_student_{studentId}
+            conversation_id = f'coach_{coach_id}_student_{user_id}'
+            conversation_ref = db.collection('conversations').document(conversation_id)
+            
+            # 使用 merge=True，如果文档不存在则创建，存在则更新
+            # 必须包含 coachId 和 studentId 字段，否则 security rules 会拒绝访问
+            batch.set(conversation_ref, {
+                'coachId': coach_id,
+                'studentId': user_id,
+                'updatedAt': firestore.SERVER_TIMESTAMP,
+                'isArchived': False # 确保未归档
+            }, merge=True)
+            
+            batch.commit()
+            logger.info(f'邀请码 {code} 已被用户 {user_id} 使用，关联教练 {coach_id}，对话文档 {conversation_id} 已准备')
         
-        logger.info(f'邀请码验证成功: {code}')
+        logger.info(f'邀请码验证成功: {code}, confirm={confirm}')
         
         return {
             'status': 'success',
             'valid': True,
             'coachId': code_data.get('coachId'),
-            'codeId': code_doc.id,  # 返回文档ID用于后续标记使用
+            'codeId': code_doc.id,
             'message': '邀请码有效'
         }
     
@@ -304,60 +403,6 @@ def fetch_invitation_codes(req: https_fn.CallableRequest):
         logger.error(f'查询邀请码失败', e)
         raise https_fn.HttpsError('internal', f'服务器错误: {str(e)}')
 
-
-@https_fn.on_call()
-def mark_invitation_code_used(req: https_fn.CallableRequest):
-    """
-    标记邀请码已使用
-    
-    请求参数:
-        - codeId: 邀请码文档ID
-        - studentId: 学生ID
-    
-    返回:
-        - status: 状态码
-        - message: 消息
-    """
-    try:
-        # ========== 测试模式：直接返回成功 ==========
-        if USE_FAKE_DATA:
-            code_id = req.data.get('codeId')
-            student_id = req.data.get('studentId', req.auth.uid if req.auth else 'fake_student')
-            logger.info(f'[测试模式] 模拟标记邀请码: {code_id} by {student_id}')
-            return {
-                'status': 'success',
-                'message': '邀请码已标记为使用'
-            }
-        # ========== 生产模式：真实数据库操作 ==========
-        
-        # 检查认证
-        if not req.auth:
-            raise https_fn.HttpsError('unauthenticated', '用户未登录')
-        
-        code_id = req.data.get('codeId')
-        student_id = req.data.get('studentId', req.auth.uid)
-        
-        if not code_id:
-            raise https_fn.HttpsError('invalid-argument', '邀请码ID不能为空')
-        
-        # 更新邀请码状态
-        db_helper.update_document('invitationCodes', code_id, {
-            'used': True,
-            'usedBy': student_id
-        })
-        
-        logger.info(f'邀请码标记为已使用: {code_id} by {student_id}')
-        
-        return {
-            'status': 'success',
-            'message': '邀请码已标记为使用'
-        }
-    
-    except https_fn.HttpsError:
-        raise
-    except Exception as e:
-        logger.error(f'标记邀请码失败', e)
-        raise https_fn.HttpsError('internal', f'服务器错误: {str(e)}')
 
 
 def _generate_fake_invitation_codes():
