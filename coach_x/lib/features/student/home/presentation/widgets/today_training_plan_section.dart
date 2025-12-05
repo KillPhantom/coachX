@@ -5,6 +5,7 @@ import 'package:coach_x/l10n/app_localizations.dart';
 import 'package:coach_x/core/theme/app_theme.dart';
 import 'package:coach_x/routes/route_names.dart';
 import 'package:coach_x/features/coach/plans/data/models/exercise.dart';
+import 'package:coach_x/features/coach/plans/data/models/exercise_plan_model.dart';
 import 'package:coach_x/features/student/training/presentation/widgets/exercise_guidance_sheet.dart';
 import '../providers/student_home_providers.dart';
 
@@ -27,7 +28,8 @@ class TodayTrainingPlanSection extends ConsumerWidget {
       error: (error, stack) => const SizedBox.shrink(),
       data: (plans) {
         // 从 activePlans 获取当前激活的训练计划
-        final activeExercisePlan = activePlans['exercisePlan'];
+        final activeExercisePlan =
+            activePlans['exercisePlan'] as ExercisePlanModel?;
 
         if (activeExercisePlan == null) {
           return _buildEmptyState(l10n);
