@@ -9,7 +9,7 @@ google-cloud-firestore>=2.18.0
 google-cloud-storage>=2.18.0
 
 # AI 服务
-anthropic>=0.25.0
+anthropic>=0.40.0
 
 # Web Framework (for HTTP functions)
 flask>=3.0.0

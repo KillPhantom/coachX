@@ -25,7 +25,8 @@ class TodaySupplementSection extends ConsumerWidget {
       error: (error, stack) => const SizedBox.shrink(),
       data: (plans) {
         // 从 activePlans 获取当前激活的补剂计划
-        final activeSupplementPlan = activePlans['supplementPlan'];
+        final activeSupplementPlan =
+            activePlans['supplementPlan'] as SupplementPlanModel?;
 
         // 如果没有补剂计划，显示空状态
         if (activeSupplementPlan == null) {

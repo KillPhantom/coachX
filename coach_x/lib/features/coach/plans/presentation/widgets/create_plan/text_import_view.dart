@@ -36,7 +36,18 @@ class _TextImportViewState extends ConsumerState<TextImportView> {
   String? _errorMessage;
 
   @override
+  void initState() {
+    super.initState();
+    _textController.addListener(_onTextChanged);
+  }
+
+  void _onTextChanged() {
+    setState(() {});
+  }
+
+  @override
   void dispose() {
+    _textController.removeListener(_onTextChanged);
     _textController.dispose();
     _focusNode.dispose();
     super.dispose();
@@ -421,7 +432,11 @@ class _TextImportViewState extends ConsumerState<TextImportView> {
                       disabledColor: AppColors.primary.withValues(alpha: 0.3),
                       child: Text(
                         l10n.startParsing,
-                        style: AppTextStyles.buttonMedium
+                        style: AppTextStyles.buttonMedium.copyWith(
+                          color: (isLoading || !hasText)
+                              ? null
+                              : CupertinoColors.white,
+                        ),
                       ),
                     ),
                   ),

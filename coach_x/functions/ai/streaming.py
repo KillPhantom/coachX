@@ -7,8 +7,12 @@ AI 流式生成模块
 
 from typing import Dict, Any, Generator, Optional, List
 import json
+import time
 
 from .claude_client import get_claude_client
+
+# 单天生成最大重试次数
+MAX_DAY_RETRIES = 2
 from .tools import get_single_day_tool, get_plan_edit_tool, get_diet_plan_edit_tool
 from .training_plan.prompts import build_single_day_prompt, get_system_prompt, build_edit_conversation_prompt
 from .diet_plan.prompts import build_edit_diet_plan_prompt
@@ -69,173 +73,205 @@ def stream_generate_training_plan(params: Dict[str, Any]) -> Generator[Dict[str,
         
         # 逐天生成
         for day_num in range(1, days_count + 1):
-            try:
-                logger.info(f'📝 [Stream Day {day_num}] ===== 开始生成第 {day_num}/{days_count} 天 =====')
-                
-                # 发送思考事件
-                yield {
-                    'type': 'thinking',
-                    'day': day_num,
-                    'content': f'正在规划第 {day_num} 天训练...'
-                }
-                
-                # 构建当天的 Prompt
-                system_prompt = get_system_prompt(language)
-                user_prompt = build_single_day_prompt(
-                    day=day_num,
-                    params=params,
-                    previous_days=previous_days,
-                    exercise_templates=params.get('exercise_templates')
-                )
-                
-                logger.info(f'📝 [Stream Day {day_num}] System Prompt 长度: {len(system_prompt)} 字符')
-                logger.info(f'📝 [Stream Day {day_num}] User Prompt 长度: {len(user_prompt)} 字符')
-                logger.debug(f'📝 [Stream Day {day_num}] User Prompt 前200字符: {user_prompt[:200]}...')
-                
-                # 发送开始事件
-                yield {
-                    'type': 'day_start',
-                    'day': day_num
-                }
-                
-                # 调用流式 API
-                logger.info(f'🔄 [Stream Day {day_num}] 开始调用 Claude Streaming API')
-                tool_input = None
-                event_count = 0
-                
-                for event in claude_client.call_claude_streaming(
-                    system_prompt=system_prompt,
-                    user_prompt=user_prompt,
-                    tools=[tool]
-                ):
-                    event_count += 1
-                    event_type = event.get('type')
-                    logger.debug(f'📨 [Stream Day {day_num}] Event #{event_count}: type={event_type}')
-                    
-                    if event_type == 'tool_start':
-                        tool_name = event.get('tool_name', 'unknown')
-                        logger.info(f'🔧 [Stream Day {day_num}] Tool 调用开始: {tool_name}')
-                    
-                    elif event_type == 'tool_delta':
-                        # 可选：传递部分 JSON（目前不需要）
-                        logger.debug(f'📨 [Stream Day {day_num}] Tool delta 事件')
-                        pass
-                    
-                    elif event_type == 'tool_complete':
-                        tool_input = event.get('tool_input')
-                        logger.info(f'✅ [Stream Day {day_num}] Tool 调用完成')
-                        logger.info(f'📦 [Stream Day {day_num}] Tool Input 类型: {type(tool_input)}')
-                        
-                        # 详细记录 tool_input 的内容
-                        if isinstance(tool_input, dict):
-                            logger.info(f'📦 [Stream Day {day_num}] Tool Input Keys: {list(tool_input.keys())}')
-                            logger.debug(f'📦 [Stream Day {day_num}] Tool Input 完整内容: {json.dumps(tool_input, ensure_ascii=False, indent=2)}')
-                        else:
-                            logger.error(f'❌ [Stream Day {day_num}] Tool Input 不是字典类型！实际类型: {type(tool_input)}, 值: {tool_input}')
-                            raise TypeError(f'Tool Input 应该是字典类型，但得到了 {type(tool_input)}')
-                        
-                        break
-                    
-                    elif event_type == 'error':
-                        error_msg = event.get('error', '未知错误')
-                        logger.error(f'❌ [Stream Day {day_num}] Claude API 返回错误: {error_msg}')
-                        raise Exception(error_msg)
-                
-                logger.info(f'📊 [Stream Day {day_num}] 共收到 {event_count} 个事件')
-                
-                # 验证 tool_input
-                if not tool_input:
-                    logger.error(f'❌ [Stream Day {day_num}] 未获取到 tool_input')
+            # 单天重试逻辑
+            retry_count = 0
+            day_success = False
+            last_error = None
+            tool_input = None
+
+            while retry_count <= MAX_DAY_RETRIES and not day_success:
+                try:
+                    if retry_count > 0:
+                        # 重试时发送通知
+                        logger.warning(f'🔄 [Stream Day {day_num}] 重试 {retry_count}/{MAX_DAY_RETRIES}')
+                        yield {
+                            'type': 'thinking',
+                            'day': day_num,
+                            'content': f'正在重试第 {day_num} 天训练生成...'
+                        }
+                        # 指数退避延迟
+                        delay = 2 ** retry_count
+                        logger.info(f'⏱️ [Stream Day {day_num}] 等待 {delay} 秒后重试')
+                        time.sleep(delay)
+
+                    logger.info(f'📝 [Stream Day {day_num}] ===== 开始生成第 {day_num}/{days_count} 天 =====')
+
+                    # 发送思考事件
                     yield {
-                        'type': 'error',
+                        'type': 'thinking',
                         'day': day_num,
-                        'error': f'第 {day_num} 天生成失败: 未获取到数据'
+                        'content': f'正在规划第 {day_num} 天训练...'
                     }
-                    return
-                
-                # 验证必要字段
-                day_name = tool_input.get('name')  # Tool 返回的是 'name' 不是 'day_name'
-                exercises = tool_input.get('exercises')
-                
-                logger.info(f'🔍 [Stream Day {day_num}] name: {day_name}')
-                logger.info(f'🔍 [Stream Day {day_num}] exercises 数量: {len(exercises) if exercises else 0}')
-                
-                if not day_name:
-                    logger.error(f'❌ [Stream Day {day_num}] 缺少 name 字段')
+
+                    # 构建当天的 Prompt
+                    system_prompt = get_system_prompt(language)
+                    user_prompt = build_single_day_prompt(
+                        day=day_num,
+                        params=params,
+                        previous_days=previous_days,
+                        exercise_templates=params.get('exercise_templates')
+                    )
+
+                    logger.info(f'📝 [Stream Day {day_num}] System Prompt 长度: {len(system_prompt)} 字符')
+                    logger.info(f'📝 [Stream Day {day_num}] User Prompt 长度: {len(user_prompt)} 字符')
+                    logger.debug(f'📝 [Stream Day {day_num}] User Prompt 前200字符: {user_prompt[:200]}...')
+
+                    # 发送开始事件
                     yield {
-                        'type': 'error',
-                        'day': day_num,
-                        'error': f'第 {day_num} 天数据不完整: 缺少训练名称'
+                        'type': 'day_start',
+                        'day': day_num
                     }
-                    return
-                
-                if not exercises or not isinstance(exercises, list):
-                    logger.error(f'❌ [Stream Day {day_num}] exercises 字段无效: {type(exercises)}')
-                    yield {
-                        'type': 'error',
-                        'day': day_num,
-                        'error': f'第 {day_num} 天数据不完整: 动作列表无效'
-                    }
-                    return
-                
-                # 逐个 yield 动作事件（动作级别流式生成）
-                logger.info(f'📝 [Stream Day {day_num}] 开始逐个发送 {len(exercises)} 个动作')
-                
-                for idx, exercise in enumerate(exercises):
-                    exercise_name = exercise.get('name', '未知动作')
-                    
-                    # 发送动作开始事件
-                    yield {
-                        'type': 'exercise_start',
-                        'day': day_num,
-                        'exercise_index': idx + 1,
-                        'exercise_name': exercise_name,
-                        'total_exercises': len(exercises)
-                    }
-                    logger.debug(f'🏋️ [Stream Day {day_num}] 动作 {idx + 1}/{len(exercises)}: {exercise_name}')
-                    
-                    # 发送动作完成事件
-                    yield {
-                        'type': 'exercise_complete',
-                        'day': day_num,
-                        'exercise_index': idx + 1,
-                        'data': exercise  # 单个动作数据
-                    }
-                    logger.debug(f'✅ [Stream Day {day_num}] 动作 {idx + 1} 完成: {exercise_name}')
-                
-                logger.info(f'✅ [Stream Day {day_num}] 所有 {len(exercises)} 个动作已发送')
-                
-                # 构建训练日数据
-                day_data = {
-                    'day': day_num,
-                    'name': day_name,  # 使用 Tool 返回的 name
-                    'duration': tool_input.get('duration_minutes', params.get('duration_minutes', 60)),
-                    'exercises': exercises,
-                    'notes': [tool_input.get('note', '')] if tool_input.get('note') else []  # note 转为 notes 数组
-                }
-                
-                logger.info(f'✅ [Stream Day {day_num}] 训练日数据构建完成: {day_name}, {len(exercises)} 个动作')
-                
-                # 保存到已完成列表
-                previous_days.append(day_data)
-                
-                # 发送训练日完成事件
-                yield {
-                    'type': 'day_complete',
-                    'day': day_num,
-                    'data': day_data
-                }
-                
-                logger.info(f'🎉 [Stream Day {day_num}] ===== 第 {day_num} 天生成完成 =====')
-            
-            except Exception as e:
-                logger.error(f'❌ [Stream Day {day_num}] 生成异常', exc_info=True)
+
+                    # 调用流式 API
+                    logger.info(f'🔄 [Stream Day {day_num}] 开始调用 Claude Streaming API')
+                    tool_input = None
+                    event_count = 0
+
+                    for event in claude_client.call_claude_streaming(
+                        system_prompt=system_prompt,
+                        user_prompt=user_prompt,
+                        tools=[tool]
+                    ):
+                        event_count += 1
+                        event_type = event.get('type')
+                        logger.debug(f'📨 [Stream Day {day_num}] Event #{event_count}: type={event_type}')
+
+                        if event_type == 'tool_start':
+                            tool_name = event.get('tool_name', 'unknown')
+                            logger.info(f'🔧 [Stream Day {day_num}] Tool 调用开始: {tool_name}')
+
+                        elif event_type == 'tool_delta':
+                            # 可选：传递部分 JSON（目前不需要）
+                            logger.debug(f'📨 [Stream Day {day_num}] Tool delta 事件')
+                            pass
+
+                        elif event_type == 'tool_complete':
+                            tool_input = event.get('tool_input')
+                            logger.info(f'✅ [Stream Day {day_num}] Tool 调用完成')
+                            logger.info(f'📦 [Stream Day {day_num}] Tool Input 类型: {type(tool_input)}')
+
+                            # 详细记录 tool_input 的内容
+                            if isinstance(tool_input, dict):
+                                logger.info(f'📦 [Stream Day {day_num}] Tool Input Keys: {list(tool_input.keys())}')
+                                logger.debug(f'📦 [Stream Day {day_num}] Tool Input 完整内容: {json.dumps(tool_input, ensure_ascii=False, indent=2)}')
+                            else:
+                                logger.error(f'❌ [Stream Day {day_num}] Tool Input 不是字典类型！实际类型: {type(tool_input)}, 值: {tool_input}')
+                                raise TypeError(f'Tool Input 应该是字典类型，但得到了 {type(tool_input)}')
+
+                            break
+
+                        elif event_type == 'error':
+                            error_msg = event.get('error', '未知错误')
+                            logger.error(f'❌ [Stream Day {day_num}] Claude API 返回错误: {error_msg}')
+                            raise Exception(error_msg)
+
+                    logger.info(f'📊 [Stream Day {day_num}] 共收到 {event_count} 个事件')
+
+                    # 验证 tool_input
+                    if not tool_input:
+                        raise Exception('未获取到 tool_input')
+
+                    # 成功标记
+                    day_success = True
+
+                except Exception as e:
+                    last_error = e
+                    retry_count += 1
+                    logger.error(f'❌ [Stream Day {day_num}] 生成失败 (尝试 {retry_count}/{MAX_DAY_RETRIES + 1}): {str(e)}')
+
+                    if retry_count > MAX_DAY_RETRIES:
+                        # 重试耗尽
+                        logger.error(f'❌ [Stream Day {day_num}] 重试次数耗尽，放弃生成')
+                        yield {
+                            'type': 'error',
+                            'day': day_num,
+                            'error': f'第 {day_num} 天生成失败（已重试 {MAX_DAY_RETRIES} 次）: {str(last_error)}'
+                        }
+                        return
+
+            # 如果没有成功且没有抛出异常（不应该发生）
+            if not day_success or not tool_input:
                 yield {
                     'type': 'error',
                     'day': day_num,
-                    'error': f'第 {day_num} 天生成失败: {str(e)}'
+                    'error': f'第 {day_num} 天生成失败: 未获取到数据'
                 }
                 return
+
+            # 验证必要字段
+            day_name = tool_input.get('name')  # Tool 返回的是 'name' 不是 'day_name'
+            exercises = tool_input.get('exercises')
+
+            logger.info(f'🔍 [Stream Day {day_num}] name: {day_name}')
+            logger.info(f'🔍 [Stream Day {day_num}] exercises 数量: {len(exercises) if exercises else 0}')
+
+            if not day_name:
+                logger.error(f'❌ [Stream Day {day_num}] 缺少 name 字段')
+                yield {
+                    'type': 'error',
+                    'day': day_num,
+                    'error': f'第 {day_num} 天数据不完整: 缺少训练名称'
+                }
+                return
+
+            if not exercises or not isinstance(exercises, list):
+                logger.error(f'❌ [Stream Day {day_num}] exercises 字段无效: {type(exercises)}')
+                yield {
+                    'type': 'error',
+                    'day': day_num,
+                    'error': f'第 {day_num} 天数据不完整: 动作列表无效'
+                }
+                return
+
+            # 逐个 yield 动作事件（动作级别流式生成）
+            logger.info(f'📝 [Stream Day {day_num}] 开始逐个发送 {len(exercises)} 个动作')
+
+            for idx, exercise in enumerate(exercises):
+                exercise_name = exercise.get('name', '未知动作')
+
+                # 发送动作开始事件
+                yield {
+                    'type': 'exercise_start',
+                    'day': day_num,
+                    'exercise_index': idx + 1,
+                    'exercise_name': exercise_name,
+                    'total_exercises': len(exercises)
+                }
+                logger.debug(f'🏋️ [Stream Day {day_num}] 动作 {idx + 1}/{len(exercises)}: {exercise_name}')
+
+                # 发送动作完成事件
+                yield {
+                    'type': 'exercise_complete',
+                    'day': day_num,
+                    'exercise_index': idx + 1,
+                    'data': exercise  # 单个动作数据
+                }
+                logger.debug(f'✅ [Stream Day {day_num}] 动作 {idx + 1} 完成: {exercise_name}')
+
+            logger.info(f'✅ [Stream Day {day_num}] 所有 {len(exercises)} 个动作已发送')
+
+            # 构建训练日数据
+            day_data = {
+                'day': day_num,
+                'name': day_name,  # 使用 Tool 返回的 name
+                'duration': tool_input.get('duration_minutes', params.get('duration_minutes', 60)),
+                'exercises': exercises,
+                'notes': [tool_input.get('note', '')] if tool_input.get('note') else []  # note 转为 notes 数组
+            }
+
+            logger.info(f'✅ [Stream Day {day_num}] 训练日数据构建完成: {day_name}, {len(exercises)} 个动作')
+
+            # 保存到已完成列表
+            previous_days.append(day_data)
+
+            # 发送训练日完成事件
+            yield {
+                'type': 'day_complete',
+                'day': day_num,
+                'data': day_data
+            }
+
+            logger.info(f'🎉 [Stream Day {day_num}] ===== 第 {day_num} 天生成完成 =====')
         
         # 全部完成
         logger.info(f'🎉 [Stream] 训练计划生成完成，共 {len(previous_days)} 天')

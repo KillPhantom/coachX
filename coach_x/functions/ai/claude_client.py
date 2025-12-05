@@ -22,6 +22,7 @@ Claude API 客户端
 import os
 import json
 from typing import Optional, Dict, Any
+import httpx
 from anthropic import Anthropic, APIError
 from utils.logger import logger
 
@@ -54,8 +55,24 @@ class ClaudeClient:
                 '\n'
                 '详细配置指南请参考: functions/SECRETS_SETUP.md'
             )
-        
-        self.client = Anthropic(api_key=api_key)
+
+        # 配置超时（流式响应需要较长的读取超时）
+        # connect: 连接超时 30 秒
+        # read: 读取超时 10 分钟（匹配 Cloud Function timeout_sec=540）
+        # write: 写入超时 30 秒
+        # pool: 连接池超时 30 秒
+        timeout = httpx.Timeout(
+            connect=30.0,
+            read=600.0,
+            write=30.0,
+            pool=30.0
+        )
+
+        self.client = Anthropic(
+            api_key=api_key,
+            timeout=timeout,
+            max_retries=3,  # 自动重试 3 次（默认 2 次）
+        )
         
         # 其他配置参数（可通过环境变量覆盖默认值）
         self.model = os.environ.get('ANTHROPIC_MODEL', 'claude-sonnet-4-20250514')

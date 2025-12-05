@@ -6,6 +6,9 @@ import 'package:coach_x/core/theme/app_theme.dart';
 import 'package:coach_x/core/services/cloud_functions_service.dart';
 import 'package:coach_x/core/utils/logger.dart';
 import 'package:coach_x/features/student/home/data/models/student_plans_model.dart';
+import 'package:coach_x/features/coach/plans/data/models/exercise_plan_model.dart';
+import 'package:coach_x/features/coach/plans/data/models/diet_plan_model.dart';
+import 'package:coach_x/features/coach/plans/data/models/supplement_plan_model.dart';
 import 'package:coach_x/features/student/home/presentation/providers/student_home_providers.dart';
 import '../providers/plan_page_providers.dart';
 import 'training_plan_content.dart';
@@ -121,7 +124,7 @@ class PlanTabsView extends ConsumerWidget {
   Widget _buildTrainingTab(BuildContext context, WidgetRef ref) {
     final activeExercisePlanId = ref.watch(activeExercisePlanIdProvider);
     final activePlans = ref.watch(currentActivePlansProvider);
-    final activePlan = activePlans['exercisePlan'];
+    final activePlan = activePlans['exercisePlan'] as ExercisePlanModel?;
 
     return Column(
       children: [
@@ -164,7 +167,7 @@ class PlanTabsView extends ConsumerWidget {
   Widget _buildDietTab(BuildContext context, WidgetRef ref) {
     final activeDietPlanId = ref.watch(activeDietPlanIdProvider);
     final activePlans = ref.watch(currentActivePlansProvider);
-    final activePlan = activePlans['dietPlan'];
+    final activePlan = activePlans['dietPlan'] as DietPlanModel?;
 
     return Column(
       children: [
@@ -207,7 +210,7 @@ class PlanTabsView extends ConsumerWidget {
   Widget _buildSupplementTab(BuildContext context, WidgetRef ref) {
     final activeSupplementPlanId = ref.watch(activeSupplementPlanIdProvider);
     final activePlans = ref.watch(currentActivePlansProvider);
-    final activePlan = activePlans['supplementPlan'];
+    final activePlan = activePlans['supplementPlan'] as SupplementPlanModel?;
 
     return Column(
       children: [
