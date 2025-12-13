@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:coach_x/core/models/media_upload_state.dart';
 import 'package:coach_x/core/services/media_upload_service.dart';
 import 'package:coach_x/core/services/video_service.dart';
+import 'package:coach_x/core/utils/image_compressor.dart';
 import 'package:coach_x/core/utils/logger.dart';
 import 'package:coach_x/core/utils/video_utils.dart';
 import 'package:video_compress/video_compress.dart';
@@ -125,8 +126,10 @@ class MediaUploadManager {
     int maxVideoSeconds,
     int compressionThresholdMB,
   ) async {
+    AppLogger.info('[MediaUploadManager] _executeUpload 开始: ${task.taskId}, type=${task.type}');
     try {
       if (task.type == MediaType.video) {
+        // 视频处理流程
         // 1. 生成缩略图
         AppLogger.info('[MediaUploadManager] 生成缩略图: ${task.taskId}');
         await Future.delayed(const Duration(milliseconds: 300));
@@ -160,10 +163,25 @@ class MediaUploadManager {
         if (shouldCompress) {
           await _compressVideo(task);
         }
+      } else if (task.type == MediaType.image) {
+        // 图片处理流程 - 压缩图片
+        AppLogger.info('[MediaUploadManager] 压缩图片: ${task.taskId}');
+        _emitProgress(task.taskId, 0.1, MediaUploadStatus.compressing);
+
+        final compressedPath = await ImageCompressor.compressImageForUser(task.file.path);
+        if (compressedPath != task.file.path) {
+          // 压缩成功，使用压缩后的文件
+          task.compressedFile = File(compressedPath);
+          AppLogger.info('[MediaUploadManager] 图片压缩完成: ${task.taskId}');
+        }
+
+        _emitProgress(task.taskId, 0.3, MediaUploadStatus.uploading);
       }
 
       // 4. 上传文件
+      AppLogger.info('[MediaUploadManager] 准备调用 _uploadFile: ${task.taskId}');
       await _uploadFile(task);
+      AppLogger.info('[MediaUploadManager] _uploadFile 完成: ${task.taskId}');
     } catch (e, stackTrace) {
       AppLogger.error('[MediaUploadManager] 上传失败: ${task.taskId}', e, stackTrace);
       _emitError(task.taskId, e.toString());
@@ -240,10 +258,11 @@ class MediaUploadManager {
         _emitProgress(task.taskId, displayProgress, MediaUploadStatus.uploading);
       },
       onDone: () async {
+        AppLogger.info('[MediaUploadManager] onDone 回调触发: ${task.taskId}');
         try {
           // 获取下载 URL
           final downloadUrl = await _uploadService.getDownloadUrl(task.storagePath);
-          AppLogger.info('[MediaUploadManager] 获取下载URL成功: ${task.taskId}');
+          AppLogger.info('[MediaUploadManager] 获取下载URL成功: ${task.taskId}, url=$downloadUrl');
 
           // 上传缩略图（仅视频）
           String? thumbnailUrl;
@@ -262,6 +281,7 @@ class MediaUploadManager {
           }
 
           // 发送完成事件
+          AppLogger.info('[MediaUploadManager] 发送完成事件: ${task.taskId}');
           _emitCompleted(task.taskId, downloadUrl, thumbnailUrl);
           _tasks.remove(task.taskId);
           completer.complete();

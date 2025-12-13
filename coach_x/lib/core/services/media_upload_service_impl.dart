@@ -10,16 +10,18 @@ import 'package:coach_x/core/utils/logger.dart';
 class MediaUploadServiceImpl implements MediaUploadService {
   @override
   Stream<double> uploadFileWithProgress(File file, String path, {String? contentType}) {
+    AppLogger.info('[MediaUploadServiceImpl] uploadFileWithProgress 开始: path=$path');
     final storage = FirebaseStorage.instance;
     final ref = storage.ref(path);
-    
-    final metadata = contentType != null 
+
+    final metadata = contentType != null
         ? SettableMetadata(contentType: contentType)
         : null;
 
     final uploadTask = ref.putFile(file, metadata);
 
     return uploadTask.snapshotEvents.map((snapshot) {
+      AppLogger.info('[MediaUploadServiceImpl] snapshot: state=${snapshot.state}, bytes=${snapshot.bytesTransferred}/${snapshot.totalBytes}');
       if (snapshot.state == TaskState.running) {
         // 安全检查：避免除以0导致 NaN 或 Infinity
         if (snapshot.totalBytes == 0) {
@@ -30,6 +32,7 @@ class MediaUploadServiceImpl implements MediaUploadService {
         return progress.clamp(0.0, 1.0);
       } else if (snapshot.state == TaskState.success) {
         // 上传成功，返回 100%
+        AppLogger.info('[MediaUploadServiceImpl] 上传成功!');
         return 1.0;
       } else if (snapshot.state == TaskState.paused) {
         // 暂停时保持当前进度

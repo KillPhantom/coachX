@@ -4393,6 +4393,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Invalid Code'**
   String get invalidCode;
+
+  /// Character count display for text import
+  ///
+  /// In en, this message translates to:
+  /// **'{current}/{max}'**
+  String textImportCharacterCount(int current, int max);
+
+  /// Error message when text exceeds character limit
+  ///
+  /// In en, this message translates to:
+  /// **'Text exceeds {max} character limit'**
+  String textImportExceedsLimit(int max);
 }
 
 class _AppLocalizationsDelegate

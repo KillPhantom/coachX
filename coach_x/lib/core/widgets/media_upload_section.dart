@@ -430,7 +430,12 @@ class _MediaUploadSectionState extends ConsumerState<MediaUploadSection> {
 
     // 只通知父组件，由父组件（Notifier）负责添加到状态并启动上传
     // MediaUploadManager 会处理缩略图生成、验证、压缩和上传
-    widget.onMediaSelected?.call(_mediaList.length, file, type);
+    if (widget.onMediaSelected != null) {
+      AppLogger.info('[MediaUploadSection] 调用 onMediaSelected 回调, index=${_mediaList.length}');
+      widget.onMediaSelected!.call(_mediaList.length, file, type);
+    } else {
+      AppLogger.warning('[MediaUploadSection] onMediaSelected 回调为 null，无法通知父组件');
+    }
   }
 
   /// 启动异步上传

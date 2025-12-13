@@ -928,5 +928,20 @@
   "ok": "确定",
   "aiAnalyzeTrainingHistory": "分析训练历史",
   "aiAnalyzeDietPlan": "分析饮食计划",
-  "aiAnalyzeTrainingPlan": "分析训练计划"
+  "aiAnalyzeTrainingPlan": "分析训练计划",
+
+  "textImportCharacterCount": "{current}/{max}",
+  "@textImportCharacterCount": {
+    "placeholders": {
+      "current": {"type": "int"},
+      "max": {"type": "int"}
+    }
+  },
+
+  "textImportExceedsLimit": "文本超出 {max} 字符限制",
+  "@textImportExceedsLimit": {
+    "placeholders": {
+      "max": {"type": "int"}
+    }
+  }
 }
