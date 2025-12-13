@@ -49,23 +49,27 @@ service cloud.firestore {
     // ==================== Messages Collection ====================
 
     match /messages/{messageId} {
-      // 允许对话参与者读取消息（通过conversationId验证）
+      // Helper: 检查是否为对话参与者
+      function isConversationParticipant(convId) {
+        return exists(/databases/$(database)/documents/conversations/$(convId)) &&
+          (get(/databases/$(database)/documents/conversations/$(convId)).data.coachId == request.auth.uid ||
+           get(/databases/$(database)/documents/conversations/$(convId)).data.studentId == request.auth.uid);
+      }
+
+      // 允许对话参与者读取消息
+      // 如果 conversation 不存在，查询将返回空结果（不会报权限错误）
       allow read: if isSignedIn() && (
-        get(/databases/$(database)/documents/conversations/$(resource.data.conversationId)).data.coachId == request.auth.uid ||
-        get(/databases/$(database)/documents/conversations/$(resource.data.conversationId)).data.studentId == request.auth.uid
+        !exists(/databases/$(database)/documents/conversations/$(resource.data.conversationId)) ||
+        isConversationParticipant(resource.data.conversationId)
       );
 
-      // 允许对话参与者创建消息
-      allow create: if isSignedIn() && (
-        get(/databases/$(database)/documents/conversations/$(request.resource.data.conversationId)).data.coachId == request.auth.uid ||
-        get(/databases/$(database)/documents/conversations/$(request.resource.data.conversationId)).data.studentId == request.auth.uid
-      );
+      // 允许对话参与者创建消息（conversation 必须存在）
+      allow create: if isSignedIn() &&
+        isConversationParticipant(request.resource.data.conversationId);
 
       // 允许对话参与者更新消息状态（如标记已读）
-      allow update: if isSignedIn() && (
-        get(/databases/$(database)/documents/conversations/$(resource.data.conversationId)).data.coachId == request.auth.uid ||
-        get(/databases/$(database)/documents/conversations/$(resource.data.conversationId)).data.studentId == request.auth.uid
-      );
+      allow update: if isSignedIn() &&
+        isConversationParticipant(resource.data.conversationId);
 
       // 不允许删除消息（使用软删除）
       allow delete: if false;

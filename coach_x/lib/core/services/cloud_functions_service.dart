@@ -1,4 +1,6 @@
 import 'package:cloud_functions/cloud_functions.dart';
+import 'package:flutter/foundation.dart';
+import 'package:coach_x/core/constants/app_constants.dart';
 import 'package:coach_x/core/utils/logger.dart';
 import 'package:coach_x/core/utils/json_utils.dart';
 import 'package:coach_x/core/services/auth_service.dart';
@@ -12,17 +14,14 @@ class CloudFunctionsService {
   static final FirebaseFunctions _functions = FirebaseFunctions.instance;
 
   /// Cloud Functions Base URL (用于 SSE 直连)
+  ///
+  /// 自动根据编译模式切换：
+  /// - Debug 模式：使用本地模拟器 (127.0.0.1:5001)
+  /// - Release 模式：使用生产环境
   static String get baseUrl {
-    // 🔧 开发模式：使用本地模拟器
-    // 将这里改为 true 即可使用本地测试
-    final bool useLocalEmulator = true;
-
-    if (useLocalEmulator) {
-      return 'http://127.0.0.1:5001/coachx-9d219/us-central1';
+    if (kDebugMode) {
+      return 'http://${AppConstants.firebaseEmulatorHost}:${AppConstants.firebaseFunctionsEmulatorPort}/coachx-9d219/us-central1';
     }
-
-    // 生产环境
-    // ignore: dead_code
     return 'https://us-central1-coachx-9d219.cloudfunctions.net';
   }
 

@@ -4028,5 +4028,22 @@
   "invalidCode": "Invalid Code",
   "@invalidCode": {
     "description": "Error message for invalid code"
+  },
+
+  "textImportCharacterCount": "{current}/{max}",
+  "@textImportCharacterCount": {
+    "description": "Character count display for text import",
+    "placeholders": {
+      "current": {"type": "int"},
+      "max": {"type": "int"}
+    }
+  },
+
+  "textImportExceedsLimit": "Text exceeds {max} character limit",
+  "@textImportExceedsLimit": {
+    "description": "Error message when text exceeds character limit",
+    "placeholders": {
+      "max": {"type": "int"}
+    }
   }
 }

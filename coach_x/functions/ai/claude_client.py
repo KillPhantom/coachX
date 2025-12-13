@@ -76,7 +76,7 @@ class ClaudeClient:
         
         # 其他配置参数（可通过环境变量覆盖默认值）
         self.model = os.environ.get('ANTHROPIC_MODEL', 'claude-sonnet-4-20250514')
-        self.max_tokens = int(os.environ.get('ANTHROPIC_MAX_TOKENS', '4096'))
+        self.max_tokens = int(os.environ.get('ANTHROPIC_MAX_TOKENS', '16384'))
         self.temperature = float(os.environ.get('ANTHROPIC_TEMPERATURE', '0.7'))
     
     def call_claude(

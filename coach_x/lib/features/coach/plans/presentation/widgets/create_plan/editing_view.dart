@@ -73,6 +73,32 @@ class _EditingViewState extends ConsumerState<EditingView> {
     super.dispose();
   }
 
+  /// 显示 Day 操作菜单（长按触发）
+  void _showDayOptionsMenu(BuildContext context, int dayIndex, String dayName) {
+    final l10n = AppLocalizations.of(context)!;
+
+    showCupertinoModalPopup<void>(
+      context: context,
+      builder: (BuildContext popupContext) => CupertinoActionSheet(
+        title: Text(dayName),
+        actions: <CupertinoActionSheetAction>[
+          CupertinoActionSheetAction(
+            isDestructiveAction: true,
+            onPressed: () {
+              Navigator.pop(popupContext);
+              widget.onDeleteDay(dayIndex);
+            },
+            child: Text(l10n.delete),
+          ),
+        ],
+        cancelButton: CupertinoActionSheetAction(
+          onPressed: () => Navigator.pop(popupContext),
+          child: Text(l10n.cancel),
+        ),
+      ),
+    );
+  }
+
   /// 滚动到高亮的 exercise card
   void _scrollToHighlightedCard(int dayIndex, int? exerciseIndex) {
     if (exerciseIndex == null) return;
@@ -141,7 +167,7 @@ class _EditingViewState extends ConsumerState<EditingView> {
               .toList(),
           selectedDayIndex: widget.selectedDayIndex,
           onDayTap: (index) => widget.onDayIndexChanged(index),
-          onDayLongPress: null, // Day options menu handled by parent
+          onDayLongPress: (index, dayName) => _showDayOptionsMenu(context, index, dayName),
           onAddDay: widget.onAddDay,
           addDayLabel: l10n.addDay,
         ),

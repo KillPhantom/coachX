@@ -2254,4 +2254,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get invalidCode => 'Invalid Code';
+
+  @override
+  String textImportCharacterCount(int current, int max) {
+    return '$current/$max';
+  }
+
+  @override
+  String textImportExceedsLimit(int max) {
+    return 'Text exceeds $max character limit';
+  }
 }

@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:coach_x/core/constants/app_constants.dart';
 import 'package:coach_x/core/theme/app_colors.dart';
 import 'package:coach_x/core/theme/app_text_styles.dart';
 import 'package:coach_x/l10n/app_localizations.dart';
@@ -222,6 +223,9 @@ class _TextImportViewState extends ConsumerState<TextImportView> {
     final l10n = AppLocalizations.of(context)!;
     final isLoading = _isExtracting || _isParsing;
     final hasText = _textController.text.isNotEmpty;
+    final currentLength = _textController.text.length;
+    final maxLength = AppConstants.maxTextImportLength;
+    final isOverLimit = currentLength > maxLength;
 
     return GestureDetector(
       behavior: HitTestBehavior.translucent,
@@ -330,6 +334,32 @@ class _TextImportViewState extends ConsumerState<TextImportView> {
             ),
           ),
 
+        // 2.5. Character Limit Exceeded Warning
+        if (isOverLimit)
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+            color: CupertinoColors.systemOrange.withValues(alpha: 0.1),
+            child: Row(
+              children: [
+                const Icon(
+                  CupertinoIcons.exclamationmark_triangle_fill,
+                  color: CupertinoColors.systemOrange,
+                  size: 16,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    l10n.textImportExceedsLimit(maxLength),
+                    style: AppTextStyles.footnote.copyWith(
+                      color: CupertinoColors.systemOrange,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
         // 3. Toolbar & Action Area
         Container(
           decoration: BoxDecoration(
@@ -384,6 +414,20 @@ class _TextImportViewState extends ConsumerState<TextImportView> {
                         ),
                       ),
 
+                      const SizedBox(width: 12),
+
+                      // Character Count
+                      Text(
+                        l10n.textImportCharacterCount(currentLength, maxLength),
+                        style: AppTextStyles.footnote.copyWith(
+                          color: isOverLimit
+                              ? CupertinoColors.systemOrange
+                              : AppColors.textTertiary,
+                          fontWeight:
+                              isOverLimit ? FontWeight.w600 : FontWeight.normal,
+                        ),
+                      ),
+
                       const Spacer(),
 
                       // Example Hint
@@ -420,7 +464,7 @@ class _TextImportViewState extends ConsumerState<TextImportView> {
                     width: double.infinity,
                     child: CupertinoButton(
                       onPressed:
-                          (isLoading || !hasText)
+                          (isLoading || !hasText || isOverLimit)
                               ? null
                               : () {
                                 // 震动反馈
@@ -433,7 +477,7 @@ class _TextImportViewState extends ConsumerState<TextImportView> {
                       child: Text(
                         l10n.startParsing,
                         style: AppTextStyles.buttonMedium.copyWith(
-                          color: (isLoading || !hasText)
+                          color: (isLoading || !hasText || isOverLimit)
                               ? null
                               : CupertinoColors.white,
                         ),

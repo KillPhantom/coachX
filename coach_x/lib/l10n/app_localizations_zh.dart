@@ -2228,4 +2228,14 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get invalidCode => 'Invalid Code';
+
+  @override
+  String textImportCharacterCount(int current, int max) {
+    return '$current/$max';
+  }
+
+  @override
+  String textImportExceedsLimit(int max) {
+    return '文本超出 $max 字符限制';
+  }
 }
